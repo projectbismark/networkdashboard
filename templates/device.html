@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>BISMark Device</h3>
+
+{% if device_details %}
+    <ul>
+    {% for detail in device_details %}
+        <li>{{ detail.deviceid }}</a></li>
+        <li>{{ detail.macid }}</a></li>
+        <li>{{ detail.type }}</a></li>
+        <li>{{ detail.os }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Device info is not available.</p>
+{% endif %}
+
+{% endblock %}

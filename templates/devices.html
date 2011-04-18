@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>BISMark Devices</h3>
+
+{% if device_list %}
+    <ul>
+    {% for device in device_list %}
+        <li><a href="/device/{{ device.deviceid }}/">{{ device.deviceid }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+
+{% endblock %}
