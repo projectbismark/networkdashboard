@@ -1,7 +1,12 @@
 INITIALIZATION
 --------------
-1. change the location of:
+1. In settings.py, change the location of:
 - MEDIA_ROOT
 - TEMPLATE_DIRS
-in settings.py.
 
+So that <dashboard-root> points to the location of your installation. (Default 'dashboard-root' is '/home/feamster/')
+
+2. Try the development server:
+python manage.py runserver 0.0.0.0:8000
+
+This should work without a hitch on dp4.gtnoise.net.  If you are running with a local copy, you may need to also create a local mirror of the database.
