@@ -1,8 +1,7 @@
 INITIALIZATION
 --------------
-Before running, change the location of:
-- MEDIA
-- templates
+1. change the location of:
+- MEDIA_ROOT
+- TEMPLATE_DIRS
 in settings.py.
 
-(Note: will add default mysql user shortly, as well.)
