@@ -1,20 +1,4 @@
-
-
-<html lang="en">
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Django+PyOFC2 Demo App</title>
-<!-- Date: 2009-04-15 -->
-<script type="text/javascript" src="/static/swfobject.js"></script>
-    <script type="text/javascript">
-     swfobject.embedSWF(
-     "/static/open-flash-chart.swf", "chart_demo",
-     "820", "400", "9.0.0", "/static/expressInstall.swf",
-     {"data-file":"/data/"} );
-    </script>
-</head>
-<body>
-
+{% extends "base.html" %}
 
 {% block content %}
 <h3>BISMark Devices</h3>
@@ -29,9 +13,17 @@
     <p>No polls are available.</p>
 {% endif %}
 
-{% endblock %}
+<script type="text/javascript" src="/static/swfobject.js"></script>
+    <script type="text/javascript">
+     swfobject.embedSWF(
+     "/static/open-flash-chart.swf", "chart_demo",
+     "820", "400", "9.0.0", "/static/expressInstall.swf",
+     {"data-file":"/data/"} );
+    </script>
 
   <div class="chart" id="chart_demo"></div>
-</body>
-</html>
+
+{% endblock %}
+
+
 
