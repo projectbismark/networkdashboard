@@ -21,7 +21,8 @@ urlpatterns = patterns('',
      (r'^$', 'dashboard.summary.views.index'),
      (r'^devices/', 'dashboard.summary.views.showdevices'),
      (r'^device/(?P<device>\w+)', 'dashboard.summary.views.devicesummary'),
-     (r'^data/$', 'dashboard.summary.views.scatter_data'),
+     (r'^data/(?P<device>\w+)', 'dashboard.summary.views.scatter_data'),
+     (r'^data/', 'dashboard.summary.views.chart_data'),
      (r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root':settings.MEDIA_ROOT})
 )
 

@@ -10,10 +10,30 @@
         <li>{{ detail.macid }}</a></li>
         <li>{{ detail.type }}</a></li>
         <li>{{ detail.os }}</a></li>
+	<div>{{ detail.deviceid }}</a></div>
     {% endfor %}
     </ul>
 {% else %}
     <p>Device info is not available.</p>
 {% endif %}
+
+<script type="text/javascript" src="/static/swfobject.js"></script>
+    <script type="text/javascript">
+
+	var loc = window.location.href;
+	spl = loc.split('/');
+
+	if(spl[spl.length-1].length>2) loc="/data/"+spl[spl.length-1];
+	else loc="/data/"+spl[spl.length-2];
+	
+
+     swfobject.embedSWF(
+     "/static/open-flash-chart.swf", "chart_demo",
+     "820", "400", "10.0.0", "/static/expressInstall.swf",
+
+     {"data-file":loc} );
+    </script>
+
+  <div class="chart" id="chart_demo"></div>
 
 {% endblock %}
