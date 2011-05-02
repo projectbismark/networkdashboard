@@ -29,7 +29,7 @@ def chart_data(request):
     
     chart = open_flash_chart()
     chart.title = t
-    chart.y_axis = y1
+    chart.y_axis = y
     chart.add_element(l)
     return HttpResponse(chart.render())
 
