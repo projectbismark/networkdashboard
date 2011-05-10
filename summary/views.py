@@ -5,8 +5,7 @@ from django.shortcuts import render_to_response
 from dashboard.summary.models import *
 from pyofc2  import * 
 import random
-
-
+from datetime import datetime
 import time
 
 def index(request):
@@ -21,47 +20,18 @@ def devicesummary(request, device):
     return render_to_response('device.html', {'device_details': device_details})
     return HttpResponse(output)
 
-def line_data2(request, device):
-    chart = open_flash_chart()
-    device_details = Measurements.objects.filter(deviceid=device,param='RTT')
-    if len(device_details) == 0:
-	return HttpResponse(chart.render())
-    t = title(text=device)
-    l = line()
-    l.values = []
-
-    ymax= 0
-    prevT = 0
-    avgSum = 0
-    n = 0
-    div=2000
-    maxY=200000
-
+def cvs_linegraph(request, device):
+    device_details = Measurements.objects.filter(deviceid=device,param=request.POST.get('param'))
+    xVariable = "Date"
+    yVariable = "Value"
+    output = xVariable + "," + yVariable +"\n"
     for measure in device_details:
-	
-	if (int)(measure.timestamp/div) == prevT :
-		avgSum+=measure.avg
-		n+=1
-	else:
+	t = datetime.fromtimestamp(measure.timestamp).strftime("%Y-%m-%d %H:%M:%S")
+	ret = t + "," + str((measure.avg)) + "\n"
+	output += ret
 
-		if n >0 : l.values.append(avgSum/n)
-		prevT = (int)(measure.timestamp/div)
-    		avgSum = measure.avg
-		n = 1
-    
+    return HttpResponse(output)
 
-    
-    y = y_axis(max=min(max(l.values),maxY),steps=(int)(max(l.values)/10)+1)
-    chart.y_axis = y
-    x = x_axis(steps=(len(l.values)/10)+1)
-    chart.x_axis = x    
-    chart.title = t
-    chart.add_element(l)
-    return HttpResponse(chart.render())
-
-
-############################################################
-# Testing code
 
 def chart_data(request):
     t = title(text=time.strftime('%a %Y %b %d'))
