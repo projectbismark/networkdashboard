@@ -24,22 +24,51 @@
 <OPTION value="RTT">Round trip time
 <OPTION value="LMRTT">LM Round trip time
 <OPTION value="AGGL3BITRATE">AGGL3 Bit Rate
-
+</DIV>
 </SELECT>
+<DIV>
+<SELECT id = "typeselect">
+<OPTION value=1>Last 24 hours
+<OPTION value=3>Last 7 days
+<OPTION value=4>Last 30 days
+<OPTION value=5>Complete history
+</SELECT>
+</DIV>
+
 
 <INPUT type="button" value="render" name="b_render" onClick="render()">
 
 <div id="graphdiv" style="width: 900px;"></div>
 <script type="text/javascript">
 	var content="[not loaded]";
-
+	var limit = 9999999;
+	var units = "val";
+	
 	var loc = window.location.href;
 	spl = loc.split('/');
 
 	if(spl[spl.length-1].length>2) loc="/data_chart/"+spl[spl.length-1];
 	else loc="/data_chart/"+spl[spl.length-2];
        	
+	function createStyle(p)
+	{
 
+		if(p==("RTT"))
+		{
+			limit = 100;
+			units = "msec"
+		}
+		else if(p==("LMRTT"))
+		{
+			limit = 30;
+			units = "msec"
+		}
+		else if(p==("AGGL3BITRATE"))
+		{
+			limit = 200000;
+			units = "kbps"
+		}
+	}
 
         function OnSuccess(data)
         {
@@ -48,8 +77,6 @@
 	      	rollPeriod: 1,
 		errorBars: true,
 	      	showRoller: true,
-
-
 	    		}
 		);
         }
@@ -59,14 +86,14 @@
 	  alert("data loading failed");
         }
 	
-
 	function render()
 	{
+	createStyle(paramselect.value);
 
 	$.ajax({
                 type: "POST",
                 url: loc,
-                data: {'param': paramselect.value},
+                data: {'param': paramselect.value, 'type': typeselect.value, 'limit': limit, 'unit': units},
                 success: OnSuccess,
             });
       

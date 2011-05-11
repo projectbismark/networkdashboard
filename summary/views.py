@@ -6,7 +6,7 @@ from dashboard.summary.models import *
 from pyofc2  import * 
 import random
 from datetime import datetime
-import time
+from time import time
 
 def index(request):
     return render_to_response('index.html')
@@ -21,9 +21,20 @@ def devicesummary(request, device):
     return HttpResponse(output)
 
 def cvs_linegraph(request, device):
-    device_details = Measurements.objects.filter(deviceid=device,param=request.POST.get('param'))
+
+    end = time()
+    start = 0 
+    timetype = request.POST.get('type')
+    if timetype=='1':
+	start = end - 3600*24
+    if timetype=='3':
+	start = end - 3600*24*7
+    if timetype=='4':
+	start = end - 3600*24*30
+ 
+    device_details = Measurements.objects.filter(deviceid=device,param=request.POST.get('param'),timestamp__gt=start,avg__lte=request.POST.get('limit'))
     xVariable = "Date"
-    yVariable = "Value"
+    yVariable = request.POST.get('unit')
     output = xVariable + "," + yVariable +"\n"
     for measure in device_details:
 	t = datetime.fromtimestamp(measure.timestamp).strftime("%Y-%m-%d %H:%M:%S")
@@ -41,33 +52,9 @@ def chart_data(request):
     
     chart = open_flash_chart()
     chart.title = t
-    chart.y_axis = y
+    chart.y_axis = y1
     chart.add_element(l)
     return HttpResponse(chart.render())
-
-def line_data_old(request, device):
-    
-    device_details = Measurements.objects.filter(deviceid=device,param='RTT')
-    print len(device_details)
-    t = title(text=device)
-    l = line()
-    l.values = []
-
-    ymax= 0
-
-    for measure in device_details:
-	l.values.append(measure.avg)
-    
-    
-    chart = open_flash_chart()
-
-    y = y_axis(max=max(l.values),steps=(int)(max(l.values)/10)+1)
-    chart.y_axis = y
-    chart.title = t
-
-    chart.add_element(l)
-    return HttpResponse(chart.render())
-
 
 def scatter_data(request, device):
     device_details = Measurements.objects.filter(deviceid=device)[0:100]
@@ -111,7 +98,7 @@ def scatter_datamax(request, device):
     xmax = 2
     prevT = 0
     prevA = 0
-    div = 1000
+    div = 10000
     for measure in device_details:
 	if measure.avg>ymax: ymax= measure.avg
 	if measure.timestamp<xmin: xmin = measure.timestamp
