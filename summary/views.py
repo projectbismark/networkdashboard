@@ -21,25 +21,56 @@ def devicesummary(request, device):
     return HttpResponse(output)
 
 def cvs_linegraph(request, device):
-
+    chosen_param = request.POST.get('param')
+    chosen_limit = request.POST.get('limit')
+    timetype = request.POST.get('type')
+    '''
+    chosen_param = 'AGGL3BITRATE'
+    chosen_limit = 10000000
+    timetype = 0
+    '''
     end = time()
     start = 0 
-    timetype = request.POST.get('type')
+    
     if timetype=='1':
 	start = end - 3600*24
     if timetype=='3':
 	start = end - 3600*24*7
     if timetype=='4':
 	start = end - 3600*24*30
- 
-    device_details = Measurements.objects.filter(deviceid=device,param=request.POST.get('param'),timestamp__gt=start,avg__lte=request.POST.get('limit'))
-    xVariable = "Date"
-    yVariable = request.POST.get('unit')
-    output = xVariable + "," + yVariable +"\n"
-    for measure in device_details:
-	t = datetime.fromtimestamp(measure.timestamp).strftime("%Y-%m-%d %H:%M:%S")
-	ret = t + "," + str((measure.avg)) + "\n"
-	output += ret
+    if chosen_param == 'AGGL3BITRATE' :
+	    device_details_down = Measurements.objects.filter(deviceid=device,param=chosen_param,timestamp__gt=start,avg__lte=chosen_limit,srcip=2413265837)
+	    device_details_up = Measurements.objects.filter(deviceid=device,param=chosen_param,timestamp__gt=start,avg__lte=chosen_limit,dstip=2413265837)
+	    
+	    tim1 = list()
+            dat1 = list()
+            dat2 = list()
+           
+	    for measure in device_details_down:
+		tim1.append(datetime.fromtimestamp(measure.timestamp).strftime("%Y-%m-%d %H:%M:%S"))
+		dat1.append(measure.avg)
+	    for measure in device_details_up:
+		dat2.append(measure.avg)
+
+	    xVariable = "Date"
+	    yVariable = "Down"
+	    y2Variable = "Up"
+	    output = xVariable + "," + yVariable + "," +  y2Variable +"\n"
+
+	    for i in range(0,min(len(dat1),len(dat2))):
+		ret = str(tim1[i]) + "," + str(dat1[i]) + "," + str(dat2[i]) + "\n"
+		output += ret
+    else:
+	    device_details = Measurements.objects.filter(deviceid=device,param=chosen_param,timestamp__gt=start,avg__lte=chosen_limit)
+	    xVariable = "Date"
+	    yVariable = request.POST.get('unit')
+	    output = xVariable + "," + yVariable +"\n"
+	    for measure in device_details:
+		t = datetime.fromtimestamp(measure.timestamp).strftime("%Y-%m-%d %H:%M:%S")
+		ret = t + "," + str((measure.avg)) + "\n"
+		output += ret
+
+	
 
     return HttpResponse(output)
 
