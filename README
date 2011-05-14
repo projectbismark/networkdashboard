@@ -10,3 +10,7 @@ So that <dashboard-root> points to the location of your installation. (Default '
 python manage.py runserver 0.0.0.0:8000
 
 This should work without a hitch on dp4.gtnoise.net.  If you are running with a local copy, you may need to also create a local mirror of the database.
+
+It would be good to recreate this repo without passwords in it.
+
+AND SWITCH TO GIT
