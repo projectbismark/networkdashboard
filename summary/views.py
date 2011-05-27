@@ -6,62 +6,139 @@ from dashboard.summary.models import *
 from pyofc2  import * 
 import random
 from datetime import datetime
-from time import time
+from time import time,mktime
+from mx.DateTime.ISO import ParseDateTimeUTC
 
 def index(request):
     return render_to_response('index.html')
 
+def newuser(request):
+    return render_to_response('newuser.html')
+ 
+def adduser(request):
+    try:
+	u = Users(name = request.POST.get('name'),
+			email = request.POST.get('email'),
+			street = request.POST.get('street'),
+			city = request.POST.get('city'),
+			state = request.POST.get('state'),
+			postalcode = request.POST.get('postal'),
+			country = request.POST.get('country'),
+			phone = request.POST.get('phone'),
+			skype = request.POST.get('skype'),
+			sip = request.POST.get('sip'))
+
+    	u.save()
+    except IntegrityError as details:
+	return HttpResponse('missing field or duplicate entry. failure!' + details)
+    except:
+	return HttpResponse('unknown database error. failure!')
+
+    return HttpResponse(u.name + ' added. success!')
+
 def showdevices(request):
     device_list = Devices.objects.all()
-    return render_to_response('devices.html', {'device_list': device_list})
+    thelist = list()
+    print 'dd'
+    for row in  device_list:
+	last = Measurements.objects.filter(deviceid=row.deviceid).order_by('-timestamp')[0:5]
+	if len(last)>1:
+		if time()-last[0].timestamp < 3600*24*170:
+			thelist.append(row)
+			print(datetime.fromtimestamp(last[0].timestamp).strftime("%Y-%m-%d %H:%M:%S"))
+
+    return render_to_response('devices.html', {'device_list': thelist})
 
 def devicesummary(request, device):
     device_details = Devices.objects.filter(deviceid=device)
+   
+	
     return render_to_response('device.html', {'device_details': device_details})
     return HttpResponse(output)
 
+def getISP(request, device):
+    UDrow = Userdevice.objects.filter(deviceid=device)
+    if len(UDrow)==0:
+	return HttpResponse(' ')
+    print UDrow[0].userid
+    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
+    if len(USrow)==0:
+	return HttpResponse(' ')
+    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
+    if len(SLArow)==0:
+	return HttpResponse(' ')
+    return HttpResponse(SLArow[0].isp)
+
+def getPlan(request, device):
+    UDrow = Userdevice.objects.filter(deviceid=device)
+    if len(UDrow)==0:
+	return HttpResponse(' ')
+    print UDrow[0].userid
+    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
+    if len(USrow)==0:
+	return HttpResponse(' ')
+    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
+    if len(SLArow)==0:
+	return HttpResponse(' ')
+    return HttpResponse(SLArow[0].sla)
+
+def getLastUpdate(request, device):
+    last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
+    if len(last)<0:
+	return HttpResponse('not found')
+    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%b %d, %Y")))
+
 def cvs_linegraph(request, device):
+    
     chosen_param = request.POST.get('param')
     chosen_limit = request.POST.get('limit')
     timetype = request.POST.get('type')
     '''
     chosen_param = 'AGGL3BITRATE'
-    chosen_limit = 10000000
+    chosen_limit = 100000
     timetype = 0
-    '''
-    end = time()
-    start = 0 
-    
-    if timetype=='1':
-	start = end - 3600*24
-    if timetype=='3':
-	start = end - 3600*24*7
-    if timetype=='4':
-	start = end - 3600*24*30
+	'''
+
+    s = request.POST.get('start')
+    s2 = datetime.strptime(s,"%m/%d/%Y")
+    s3 = ParseDateTimeUTC(str(s2))
+    s4 = datetime.fromtimestamp(s3)   
+    start = mktime(s4.timetuple())
+
+    e = request.POST.get('end')
+    e2 = datetime.strptime(e,"%m/%d/%Y")
+    e3 = ParseDateTimeUTC(str(e2))
+    e4 = datetime.fromtimestamp(e3)   
+    end = mktime(e4.timetuple())+24*3600 
+    print start
+    print end
     if chosen_param == 'AGGL3BITRATE' :
-	    device_details_down = Measurements.objects.filter(deviceid=device,param=chosen_param,timestamp__gt=start,avg__lte=chosen_limit,srcip=2413265837)
-	    device_details_up = Measurements.objects.filter(deviceid=device,param=chosen_param,timestamp__gt=start,avg__lte=chosen_limit,dstip=2413265837)
+	  
+	    device_details_down = Measurements.objects.filter(deviceid=device,param=chosen_param,timestamp__gt=start,timestamp__lte=end,avg__lte=chosen_limit,srcip=2413265837)
+	    device_details_up = Measurements.objects.filter(deviceid=device,param=chosen_param,timestamp__gt=start,timestamp__lte=end,avg__lte=chosen_limit,dstip=2413265837)
 	    
 	    tim1 = list()
             dat1 = list()
             dat2 = list()
            
 	    for measure in device_details_down:
-		tim1.append(datetime.fromtimestamp(measure.timestamp).strftime("%Y-%m-%d %H:%M:%S"))
+		t = datetime.fromtimestamp(measure.timestamp)
+		tim1.append(t)
 		dat1.append(measure.avg)
+
 	    for measure in device_details_up:
 		dat2.append(measure.avg)
 
 	    xVariable = "Date"
-	    yVariable = "Down"
-	    y2Variable = "Up"
+	    yVariable = "Down (kbps)"
+	    y2Variable = "Up (kbps)"
 	    output = xVariable + "," + yVariable + "," +  y2Variable +"\n"
 
 	    for i in range(0,min(len(dat1),len(dat2))):
 		ret = str(tim1[i]) + "," + str(dat1[i]) + "," + str(dat2[i]) + "\n"
 		output += ret
     else:
-	    device_details = Measurements.objects.filter(deviceid=device,param=chosen_param,timestamp__gt=start,avg__lte=chosen_limit)
+	    device_details = Measurements.objects.filter(deviceid=device,param=chosen_param,timestamp__gt=start,timestamp__lte=end,avg__lte=chosen_limit)
 	    xVariable = "Date"
 	    yVariable = request.POST.get('unit')
 	    output = xVariable + "," + yVariable +"\n"
@@ -70,89 +147,28 @@ def cvs_linegraph(request, device):
 		ret = t + "," + str((measure.avg)) + "\n"
 		output += ret
 
-	
-
     return HttpResponse(output)
 
 
-def chart_data(request):
-    t = title(text=time.strftime('%a %Y %b %d'))
-    l = line()
-    l.values = [9,8,7,6,5,4,3,2,1]
-    y = y_axis(max=max(l.values),stroke=0)
-    
-    chart = open_flash_chart()
-    chart.title = t
-    chart.y_axis = y1
-    chart.add_element(l)
-    return HttpResponse(chart.render())
-
-def scatter_data(request, device):
-    device_details = Measurements.objects.filter(deviceid=device)[0:100]
-    t = title(text=device)
-    l = scatter_line()
-    l.values = []
-
-    ymax= 0
-    xmin = 9999999999
-    xmax = 0
-
-    for measure in device_details:
-	if measure.avg>ymax: ymax= measure.avg
-	if measure.timestamp<xmin: xmin = measure.timestamp
-	if measure.timestamp>xmax: xmax = measure.timestamp
-	e = scatter_value(x=measure.timestamp,y=measure.avg)
-	l.values.append(e)
-    
-    
-    chart = open_flash_chart()
-
-    y = y_axis(max=ymax,steps=(int)(ymax/10)+1)
-    chart.y_axis = y
-    x = x_axis(min=xmin,max=xmax,steps=(int)((xmax-xmin)/10))
-    chart.x_axis = x    
-
-    chart.title = t
-
-    chart.add_element(l)
-    return HttpResponse(chart.render())
-
-def scatter_datamax(request, device):
-    device_details = Measurements.objects.filter(deviceid=device)[0:1000]
-    t = title(text=device)
-    l = scatter_line()
-    l.values = []
-
-    ymax= 0
-    
-    xmin = 9999999999
-    xmax = 2
-    prevT = 0
-    prevA = 0
-    div = 10000
-    for measure in device_details:
-	if measure.avg>ymax: ymax= measure.avg
-	if measure.timestamp<xmin: xmin = measure.timestamp
-	if measure.timestamp>xmax: xmax = measure.timestamp
-	
-	if (int)(prevT/div) == (int)(measure.timestamp/div) and measure.avg>prevA:
-		prevA = measure.avg
-
-	elif (int)(prevT/div) < (int)(measure.timestamp/div):
-		l.values.append(scatter_value(x=prevT,y=prevA))
-		prevT = measure.timestamp
-		prevA = measure.avg
-
-    l.values.append(scatter_value(x=prevT,y=prevA))
-    chart = open_flash_chart()
-
-    y = y_axis(max=ymax,steps=(int)(ymax/10)+1)
-    chart.y_axis = y
-    x = x_axis(min=xmin,max=xmax,steps=(int)((xmax-xmin)/10))
-    chart.x_axis = x    
-
-    chart.title = t
-    
-    chart.add_element(l)
-    return HttpResponse(chart.render())
+def pie_chart(request):
+	t = title(text='Device Usage (Mbs)')
+	l = pie()
+	l.values = []
+	l.values.append(pie_value(value=495,label='IMAPS'))
+	l.values.append(pie_value(value=295,label='55005'))
+	l.values.append(pie_value(value=8442,label='alternate HTTP'))
+	l.values.append(pie_value(value=753,label='SSH'))
+	l.values.append(pie_value(value=226,label='53108'))
+	l.values.append(pie_value(value=2044,label='HTTPS'))
+	l.values.append(pie_value(value=109,label='Google Talk'))
+	l.values.append(pie_value(value=12180,label='HTTP'))
+	l.values.append(pie_value(value=669,label='62565'))
+	l.values.append(pie_value(value=1440,label='commplex-link'))
+	l.values.append(pie_value(value=567,label='52552'))
+	chart = open_flash_chart()
+	chart.title = t
+	cols = ['#d01f3c','#356aa0','#C79810']
+	chart.colours=cols
+	chart.add_element(l)
+	return HttpResponse(chart.render())
 

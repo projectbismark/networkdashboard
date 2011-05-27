@@ -1,0 +1,43 @@
+
+
+Name: <input type="text" name="name" id = "nam" value="test"/><br />
+Street: <input type="text" name="street" id="street" value="test"/><br />
+City: <input type="text" name="city" id="city" value="test"/><br />
+State: <input type="text" name="state" id="state" value="test"/><br />
+Country: <input type="text" name="country" id="country" value="te"/><br />
+Postal Code: <input type="text" name="postal" id="postal" value="test"/><br />
+Phone Number: <input type="text" name="phone" id="ph" value="test"/><br />
+SIP: <input type="text" name="sip" id="sip" value="test"/><br />
+Skype: <input type="text" name="skype" id="skype" value="test"/><br />
+Email: <input type="text" name="email" id="eml" value="test"/><br />
+<input type="submit" value="Submit" onClick="render()" value="test"/><br />
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script type="text/javascript">
+	
+        function OnSuccess(data)
+        {
+	        document.write(data);
+        }
+
+	function OnError(data)
+        {
+	        document.write("fail: " + data);
+        }
+		
+	function render()
+	{
+	
+	$.ajax({
+                type: 'POST',
+		url: "adduser.html",
+		data: {'name': nam.value, 'phone': ph.value, 'email': eml.value, 'street' : street.value, 'city'  : city.value, 'state' : state.value, 'country': country.value, 'postal': postal.value, 'sip': sip.value, 'skype': skype.value},
+                success: OnSuccess,
+		error: OnError,
+
+            });
+	   
+      
+	}
+	
+</script>
+

@@ -229,7 +229,7 @@ class TracerouteHops(models.Model):
         db_table = u'TRACEROUTE_HOPS'
 
 class Userdevice(models.Model):
-    userid = models.IntegerField(null=True, blank=True)
+    userid = models.IntegerField(primary_key=True)
     deviceid = models.CharField(max_length=45, blank=True)
     start = models.IntegerField(null=True, blank=True)
     end = models.IntegerField(null=True, blank=True)
@@ -246,7 +246,7 @@ class Users(models.Model):
         db_table = u'USERS'
 
 class Usersla(models.Model):
-    userid = models.IntegerField(null=True, blank=True)
+    userid = models.IntegerField(primary_key=True)
     slaid = models.IntegerField(null=True, blank=True)
     start = models.IntegerField(null=True, blank=True)
     end = models.IntegerField(null=True, blank=True)

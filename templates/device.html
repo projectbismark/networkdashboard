@@ -16,33 +16,87 @@
 {% else %}
     <p>Device info is not available.</p>
 {% endif %}
-
+<br/><br/>
+<script type="text/javascript" src="/static/swfobject.js"></script>
 <script type="text/javascript" src="http://danvk.org/dygraphs/dygraph-combined.js"></script>
-<script src="http://code.jquery.com/jquery-latest.js"></script>
-<DIV>
-<SELECT id = "paramselect">
-<OPTION value="RTT">Round trip time
-<OPTION value="LMRTT">LM Round trip time
-<OPTION value="AGGL3BITRATE">AGGL3 Bit Rate
-</DIV>
-</SELECT>
-<DIV>
-<SELECT id = "typeselect">
-<OPTION value=1>Last 24 hours
-<OPTION value=3>Last 7 days
-<OPTION value=4>Last 30 days
-<OPTION value=5>Complete history
-</SELECT>
-</DIV>
+<script type="text/javascript" src="http://danvk.org/dygraphs/dygraph.js"></script>
+<script src="/static/jquery-latest.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojo/dojo.xd.js"
+        djConfig="parseOnLoad: true">
+        </script>
+        <script type="text/javascript">
+            dojo.require("dijit.form.DateTextBox");
+            dojo.require("dijit.ProgressBar");
+            dojo.require("dijit.Menu");
+            dojo.require("dijit.MenuItem");
+            dojo.require("dijit.form.RadioButton");
+            dojo.require("dijit.form.Button");
+            dojo.require("dijit.TitlePane");
+            dojo.require("dijit.layout.ContentPane");
+        </script>
+        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/claro/claro.css"
+        />
+
+<body class=" claro " onload="CloseProgressBar();">
+
+<label for="fraomDate">
+            From:
+        </label>
+        
+        <input id="fromDate" type="text" name="fromDate" dojoType="dijit.form.DateTextBox"
+        required="true" onChange="dijit.byId('toDate').constraints.min = arguments[0];"
+        />
+        
+        <label for="toDate">
+            To:
+        </label>
+        <input id="toDate" type="text" name="toDate" dojoType="dijit.form.DateTextBox"
+        required="true" onChange="dijit.byId('fromDate').constraints.max = arguments[0];"
+        /><br/><br/>
+
+<table border="0"> 
+
+<tr>
+<td>
+<input type="radio" name="g1" id="g1rb1" value="news" dojoType="dijit.form.RadioButton">
+
+<label for="g1rb1">Round Trip Time</label><br/><br/>
+
+<input type="radio" name="g1" id="g1rb2" value="talk" dojoType="dijit.form.RadioButton" checked>
+
+<label for="g1rb2">Latency</label><br/><br/>
+
+<input type="radio" name="g1" id="g1rb3" value="weather" dojoType="dijit.form.RadioButton">
+
+<label for="g1rb3">Throughput</label><br/><br/>
+
+<input type="radio" name="g1" id="g1rb4" value="weather" dojoType="dijit.form.RadioButton">
+
+<label for="g1rb4">Passive Usage</label><br/><br/>
 
 
-<INPUT type="button" value="render" name="b_render" onClick="render()">
+</td>
+<td>
 
-<div id="graphdiv" style="width: 900px;"></div>
+<label id="loading" for="progressShow" style="display:none;">
+Loading...
+</label>
+<div id="progress" style="width:400px;display:block;" indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
+
+</td>
+<tr/>
+
+</table>
+
+<button dojoType="dijit.form.Button" type="submit" name="submit" onClick="render()">Display</button><br/><br/>
+
+<div class="chart" id="chart_demo" style="display:block;" ></div>
+<div id="graphdiv" style="width:900px;display:block;"></div>
 <script type="text/javascript">
 	var content="[not loaded]";
 	var limit = 9999999;
 	var units = "val";
+	var paramselect = "RTT";
 	
 	var loc = window.location.href;
 	spl = loc.split('/');
@@ -50,35 +104,58 @@
 	if(spl[spl.length-1].length>2) loc="/data_chart/"+spl[spl.length-1];
 	else loc="/data_chart/"+spl[spl.length-2];
        	
-	function createStyle(p)
+	function start()
+	{
+	CloseProgressBar();
+	}
+
+	function createStyle()
 	{
 
-		if(p==("RTT"))
+		if(g1rb1.checked)
 		{
-			limit = 100;
+			limit = 1000;
 			units = "msec"
+			paramselect = "RTT"
 		}
-		else if(p==("LMRTT"))
+		else if(g1rb2.checked)
 		{
-			limit = 30;
+			limit = 1000;
 			units = "msec"
+			paramselect = "LMRTT"
 		}
-		else if(p==("AGGL3BITRATE"))
+		else if(g1rb3.checked)
 		{
 			limit = 200000;
 			units = "kbps"
+			paramselect = "AGGL3BITRATE"
 		}
 	}
 
         function OnSuccess(data)
         {
           content=data;
-	  g = new Dygraph(document.getElementById("graphdiv"),content,{
-	      	rollPeriod: 1,
+	  
+	  if(data.length<30)
+	  {
+		loading.innerHTML="data for the specified data range is empty.";
 
+	  }
+	  else
+	  {
+	        g = new Dygraph(document.getElementById("graphdiv"),content,{
+	      	rollPeriod: 1,
 	      	showRoller: true,
 	    		}
 		);
+
+	  	var chart_container = document.getElementById("graphdiv");
+	  	chart_container.style.display="block";
+		loading.innerHTML = "";
+	  }
+	
+	  
+	  	
         }
 	
         function OnError(data)
@@ -88,20 +165,53 @@
 	
 	function render()
 	{
-	createStyle(paramselect.value);
+	createStyle();
+	OpenProgressBar();
+	if(g1rb4.checked)
+		{
+		   swfobject.embedSWF(
+     "/static/open-flash-chart.swf", "chart_demo",
+     "620", "350", "9.0.0", "/static/expressInstall.swf",
+     {"data-file":"/data/"} );
+		var chart_container = document.getElementById("chart_demo");
+		chart_container.style.display="block";
 
+		}
+	else{
+	
 	$.ajax({
                 type: "POST",
                 url: loc,
-                data: {'param': paramselect.value, 'type': typeselect.value, 'limit': limit, 'unit': units},
+                data: {'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
                 success: OnSuccess,
             });
-      
 	}
 	
+	}
+
+	function CloseProgressBar() {
+		    var progressbar_container = document.getElementById("progress");
+                progressbar_container.style.display="none";
+		
+        }
+
+	function OpenProgressBar() {
+		    var progressbar_container = document.getElementById("progress");
+                progressbar_container.style.display="block";
+		var chart_container = document.getElementById("chart_demo");
+		chart_container.style.display="none";
+		graph_container = document.getElementById("graphdiv");
+		graph_container.style.display="none";
+		loading.innerHTML = "loading...";
+
+		alert("changed");
+            
+        }
+
+
 </script>
 
-
+</body>
 
 
 {% endblock %}
