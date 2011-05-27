@@ -29,8 +29,6 @@ def adduser(request):
 			sip = request.POST.get('sip'))
 
     	u.save()
-    except IntegrityError as details:
-	return HttpResponse('missing field or duplicate entry. failure!' + details)
     except:
 	return HttpResponse('unknown database error. failure!')
 
