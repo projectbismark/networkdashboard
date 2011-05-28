@@ -103,8 +103,9 @@
 
 		</script></td>
 </tr>
-    </table>
     {% endfor %}
+<tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ detail.deviceid }}">Download XML</a></td></tr>
+</table>
 {% else %}
     <p>Device info is not available.</p>
 {% endif %}
@@ -150,21 +151,21 @@
 
 <tr>
 <td>
-<input type="radio" name="g1" id="g1rb1" value="news" dojoType="dijit.form.RadioButton">
+<input type="radio" name="g1" id="g1rb3" value="weather" dojoType="dijit.form.RadioButton">
 
-<label for="g1rb1">Round Trip Time</label><br/><br/>
+<label for="g1rb3">Upload and Download Throughput (kbps)</label><br/><br/>
 
 <input type="radio" name="g1" id="g1rb2" value="talk" dojoType="dijit.form.RadioButton" checked>
 
-<label for="g1rb2">Latency</label><br/><br/>
-
-<input type="radio" name="g1" id="g1rb3" value="weather" dojoType="dijit.form.RadioButton">
-
-<label for="g1rb3">Throughput</label><br/><br/>
+<label for="g1rb2">Last-Mile Latency (ms)</label><br/><br/>
 
 <input type="radio" name="g1" id="g1rb4" value="weather" dojoType="dijit.form.RadioButton">
 
 <label for="g1rb4">Passive Usage</label><br/><br/>
+
+<input type="radio" name="g1" id="g1rb1" value="news" dojoType="dijit.form.RadioButton">
+
+<label for="g1rb1">Round Trip Time (ms)</label><br/><br/>
 
 
 </td>

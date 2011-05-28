@@ -90,7 +90,7 @@ def getUl(request, device):
     SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
     if len(SLArow)==0:
 	return HttpResponse(' ')
-    return HttpResponse(SLArow[0].Ul)
+    return HttpResponse(SLArow[0].ul)
 
 
 def getDl(request, device):
@@ -104,7 +104,7 @@ def getDl(request, device):
     SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
     if len(SLArow)==0:
 	return HttpResponse(' ')
-    return HttpResponse(SLArow[0].Dl)
+    return HttpResponse(SLArow[0].dl)
 
 def getLastUpdate(request, device):
     last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
