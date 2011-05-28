@@ -51,7 +51,7 @@
 		
 		function OnSuccess(data)
 		{
-		document.getElementById('a{{ detail.deviceid }}').innerHTML = data;
+		document.getElementById('a{{ detail.deviceid }}').innerHTML = data  + " kbps";
 		}
 
 		</script></td>
@@ -66,7 +66,7 @@
 		
 		function OnSuccess(data)
 		{
-		document.getElementById('u{{ detail.deviceid }}').innerHTML = data;
+		document.getElementById('u{{ detail.deviceid }}').innerHTML = data + " kbps";
 		}
 
 		</script></td>
@@ -151,11 +151,11 @@
 
 <tr>
 <td>
-<input type="radio" name="g1" id="g1rb3" value="weather" dojoType="dijit.form.RadioButton">
+<input type="radio" name="g1" id="g1rb3" value="weather" dojoType="dijit.form.RadioButton" checked>
 
 <label for="g1rb3">Upload and Download Throughput (kbps)</label><br/><br/>
 
-<input type="radio" name="g1" id="g1rb2" value="talk" dojoType="dijit.form.RadioButton" checked>
+<input type="radio" name="g1" id="g1rb2" value="talk" dojoType="dijit.form.RadioButton">
 
 <label for="g1rb2">Last-Mile Latency (ms)</label><br/><br/>
 
@@ -268,7 +268,7 @@ Loading...
      {"data-file":"/data/"} );
 		var chart_container = document.getElementById("chart_demo");
 		chart_container.style.display="block";
-
+		CloseProgressBar();
 		}
 	else{
 	
