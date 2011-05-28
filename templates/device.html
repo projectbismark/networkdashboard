@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block content %}
 
 {% if device_details %}
@@ -7,10 +6,103 @@
 
 
     <h3>BISMark Device: {{ detail.deviceid }}</h3>
+<script src="/static/jquery-latest.js"></script>
     <table>
         <tr><td>MAC Address</td><td>{{ detail.macid }}</td></tr>
         <tr><td>Type</td><td>{{ detail.type }}</td></tr>
         <tr><td>Operating System</td><td>{{ detail.os }}</td></tr>
+	<tr><td>ISP</td><td><div id="s{{ detail.deviceid }}"></div><script type="text/javascript">
+
+		$.ajax({
+                type: "GET",
+                url: "/getISP/{{ detail.deviceid }}/",
+                success: OnSuccess,
+            });
+		
+		function OnSuccess(data)
+		{
+		document.getElementById('s{{ detail.deviceid }}').innerHTML = data;
+		}
+
+		</script></td>
+</tr>
+<tr><td>Service Plan</td><td><div id="q{{ detail.deviceid }}"></div><script type="text/javascript">
+
+		$.ajax({
+                type: "GET",
+                url: "/getPlan/{{ detail.deviceid }}/",
+                success: OnSuccess,
+            });
+		
+		function OnSuccess(data)
+		{
+		document.getElementById('q{{ detail.deviceid }}').innerHTML = data;
+		}
+
+		</script></td>
+</tr>
+<tr><td>Download Rate</td><td><div id="a{{ detail.deviceid }}"></div><script type="text/javascript">
+
+		$.ajax({
+                type: "GET",
+                url: "/getDl/{{ detail.deviceid }}/",
+                success: OnSuccess,
+            });
+		
+		function OnSuccess(data)
+		{
+		document.getElementById('a{{ detail.deviceid }}').innerHTML = data;
+		}
+
+		</script></td>
+</tr>
+	<tr><td>Upload Rate</td><td><div id="u{{ detail.deviceid }}"></div><script type="text/javascript">
+
+		$.ajax({
+                type: "GET",
+                url: "/getUl/{{ detail.deviceid }}/",
+                success: OnSuccess,
+            });
+		
+		function OnSuccess(data)
+		{
+		document.getElementById('u{{ detail.deviceid }}').innerHTML = data;
+		}
+
+		</script></td>
+<br/>
+</tr>
+
+<tr><td>First Measurment</td><td><div id="y{{ detail.deviceid }}"></div><script type="text/javascript">
+
+		$.ajax({
+                type: "GET",
+                url: "/getFirstUpdate/{{ detail.deviceid }}/",
+                success: OnSuccess,
+            });
+		
+		function OnSuccess(data)
+		{
+		document.getElementById('y{{ detail.deviceid }}').innerHTML = data;
+		}
+
+		</script></td>
+</tr>
+<tr><td>Last Measurment</td><td><div id="d{{ detail.deviceid }}"></div><script type="text/javascript">
+
+		$.ajax({
+                type: "GET",
+                url: "/getLastUpdate/{{ detail.deviceid }}/",
+                success: OnSuccess,
+            });
+		
+		function OnSuccess(data)
+		{
+		document.getElementById('d{{ detail.deviceid }}').innerHTML = data;
+		}
+
+		</script></td>
+</tr>
     </table>
     {% endfor %}
 {% else %}
@@ -20,7 +112,7 @@
 <script type="text/javascript" src="/static/swfobject.js"></script>
 <script type="text/javascript" src="http://danvk.org/dygraphs/dygraph-combined.js"></script>
 <script type="text/javascript" src="http://danvk.org/dygraphs/dygraph.js"></script>
-<script src="/static/jquery-latest.js"></script>
+
         <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojo/dojo.xd.js"
         djConfig="parseOnLoad: true">
         </script>
@@ -81,7 +173,7 @@
 <label id="loading" for="progressShow" style="display:none;">
 Loading...
 </label>
-<div id="progress" style="width:400px;display:block;" indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
+<div id="progress" style="width:400px;" indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
 
 </td>
 <tr/>
@@ -153,7 +245,7 @@ Loading...
 	  	chart_container.style.display="block";
 		loading.innerHTML = "";
 	  }
-	
+	 CloseProgressBar();
 	  
 	  	
         }
@@ -186,7 +278,7 @@ Loading...
                 success: OnSuccess,
             });
 	}
-	
+
 	}
 
 	function CloseProgressBar() {
@@ -204,7 +296,6 @@ Loading...
 		graph_container.style.display="none";
 		loading.innerHTML = "loading...";
 
-		alert("changed");
             
         }
 

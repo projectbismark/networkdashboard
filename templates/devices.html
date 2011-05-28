@@ -26,9 +26,9 @@ table.sortable thead {
 {% if device_list %}
     <ul>
 	
-	    <table border="1" class="sortable">
+<table border="1" class="sortable" width="500" >
 	<tr>
-		<th>Device</th>
+		<th >Device</th>
 		<th>Last Update</th>
 		<th>ISP</th>
 		<th>Plan</th>
@@ -36,12 +36,12 @@ table.sortable thead {
     {% for device in device_list %}        
 
 	<tr>
-		<td><a href="/device/{{ device.deviceid }}/">{{ device.deviceid }}</a></td>
-		<td><div id="d{{ device.deviceid }}"></div><script type="text/javascript">
+		<td align="center"><a href="/device/{{ device.deviceid }}/">{{ device.deviceid }}</a></td>
+		<td align="center"><div id="d{{ device.deviceid }}"></div><script type="text/javascript">
 
 		$.ajax({
                 type: "GET",
-                url: "/getLastUpdate/{{ device.deviceid }}/",
+                url: "/getLastUpdateYMD/{{ device.deviceid }}/",
                 success: OnSuccess,
             });
 		
@@ -53,7 +53,7 @@ table.sortable thead {
 		</script></td>
 
 
-		<td><div id="p{{ device.deviceid }}"></div><script type="text/javascript">
+		<td align="center"><div id="p{{ device.deviceid }}"></div><script type="text/javascript">
 
 		$.ajax({
                 type: "GET",
@@ -68,7 +68,7 @@ table.sortable thead {
 		</script></td>
 
 
-		<td><div id="i{{ device.deviceid }}"></div><script type="text/javascript">
+		<td align="center"><div id="i{{ device.deviceid }}"></div><script type="text/javascript">
 
 		$.ajax({
                 type: "GET",
@@ -95,7 +95,7 @@ table.sortable thead {
 
 
 {% else %}
-    <p>No polls are available.</p>
+    <p>No devices are available.</p>
 {% endif %}
 
   

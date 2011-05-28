@@ -15,33 +15,32 @@ def index(request):
 def newuser(request):
     return render_to_response('newuser.html')
  
-def adduser(request):
-    try:
-	u = Users(name = request.POST.get('name'),
-			email = request.POST.get('email'),
-			street = request.POST.get('street'),
-			city = request.POST.get('city'),
-			state = request.POST.get('state'),
-			postalcode = request.POST.get('postal'),
-			country = request.POST.get('country'),
-			phone = request.POST.get('phone'),
-			skype = request.POST.get('skype'),
-			sip = request.POST.get('sip'))
-
-    	u.save()
-    except:
-	return HttpResponse('unknown database error. failure!')
-
-    return HttpResponse(u.name + ' added. success!')
-
 def showdevices(request):
     device_list = Devices.objects.all()
     thelist = list()
     print 'dd'
     for row in  device_list:
+	if(row.deviceid == "NB-Xuzi-Uky"):
+		continue
 	last = Measurements.objects.filter(deviceid=row.deviceid).order_by('-timestamp')[0:5]
 	if len(last)>1:
 		if time()-last[0].timestamp < 3600*24*170:
+			thelist.append(row)
+			print(datetime.fromtimestamp(last[0].timestamp).strftime("%Y-%m-%d %H:%M:%S"))
+
+    return render_to_response('devices.html', {'device_list': thelist})
+
+
+def showactivedevices(request):
+    device_list = Devices.objects.all()
+    thelist = list()
+    print 'dd'
+    for row in  device_list:
+	if(row.deviceid == "NB-Xuzi-Uky"):
+		continue
+	last = Measurements.objects.filter(deviceid=row.deviceid).order_by('-timestamp')[0:5]
+	if len(last)>1:
+		if time()-last[0].timestamp < 3600*24*7:
 			thelist.append(row)
 			print(datetime.fromtimestamp(last[0].timestamp).strftime("%Y-%m-%d %H:%M:%S"))
 
@@ -80,8 +79,48 @@ def getPlan(request, device):
 	return HttpResponse(' ')
     return HttpResponse(SLArow[0].sla)
 
+def getUl(request, device):
+    UDrow = Userdevice.objects.filter(deviceid=device)
+    if len(UDrow)==0:
+	return HttpResponse(' ')
+    print UDrow[0].userid
+    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
+    if len(USrow)==0:
+	return HttpResponse(' ')
+    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
+    if len(SLArow)==0:
+	return HttpResponse(' ')
+    return HttpResponse(SLArow[0].Ul)
+
+
+def getDl(request, device):
+    UDrow = Userdevice.objects.filter(deviceid=device)
+    if len(UDrow)==0:
+	return HttpResponse(' ')
+    print UDrow[0].userid
+    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
+    if len(USrow)==0:
+	return HttpResponse(' ')
+    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
+    if len(SLArow)==0:
+	return HttpResponse(' ')
+    return HttpResponse(SLArow[0].Dl)
+
 def getLastUpdate(request, device):
     last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
+    if len(last)<0:
+	return HttpResponse('not found')
+    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%b %d, %Y")))
+
+
+def getLastUpdateYMD(request, device):
+    last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
+    if len(last)<0:
+	return HttpResponse('not found')
+    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%m/%d/%y")))
+
+def getFirstUpdate(request, device):
+    last = Measurements.objects.filter(deviceid=device)[0:3]
     if len(last)<0:
 	return HttpResponse('not found')
     return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%b %d, %Y")))
