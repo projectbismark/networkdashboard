@@ -136,14 +136,14 @@
             From:
         </label>
         
-        <input id="fromDate" type="text" name="fromDate" dojoType="dijit.form.DateTextBox"
-        required="true" onChange="dijit.byId('toDate').constraints.min = arguments[0];"
+        <input id="fromDate" type="text" value="{{calenderFrom}}" name="fromDate" dojoType="dijit.form.DateTextBox"
+        required="true" onChange="dijit.byId('toDate').constraints.min = arguments[0];" 
         />
         
         <label for="toDate">
             To:
         </label>
-        <input id="toDate" type="text" name="toDate" dojoType="dijit.form.DateTextBox"
+        <input id="toDate" type="text" value="{{calenderTo}}" name="toDate" dojoType="dijit.form.DateTextBox"
         required="true" onChange="dijit.byId('fromDate').constraints.max = arguments[0];"
         /><br/><br/>
 
@@ -186,6 +186,9 @@ Loading...
 <div class="chart" id="chart_demo" style="display:block;" ></div>
 <div id="graphdiv" style="width:900px;display:block;"></div>
 <script type="text/javascript">
+
+	
+	
 	var content="[not loaded]";
 	var limit = 9999999;
 	var units = "val";

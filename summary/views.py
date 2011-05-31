@@ -48,9 +48,12 @@ def showactivedevices(request):
 
 def devicesummary(request, device):
     device_details = Devices.objects.filter(deviceid=device)
-   
+    last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
+    end = datetime.fromtimestamp(last[0].timestamp).strftime("%Y-%m-%d")
+    start = datetime.fromtimestamp(last[0].timestamp - 3600*24*7).strftime("%Y-%m-%d")
 	
-    return render_to_response('device.html', {'device_details': device_details})
+	
+    return render_to_response('device.html', {'device_details': device_details, 'calenderFrom': start,'calenderTo': end})
     return HttpResponse(output)
 
 def getISP(request, device):
