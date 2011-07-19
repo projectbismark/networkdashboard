@@ -2,7 +2,7 @@
 
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
-from dashboard.summary.models import *
+from networkdashboard.summary.models import *
 from pyofc2  import * 
 import random
 from datetime import datetime
