@@ -11,10 +11,10 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'bismark_live_v1'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'bismark_live_ro'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'f8d74cf689'         # Not used with sqlite3.
+DATABASE_ENGINE = 'postgresql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'bismark_openwrt_live_v0_1'             # Or path to database file if using sqlite3.
+DATABASE_USER = 'feamster'             # Not used with sqlite3.
+DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
@@ -37,7 +37,8 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/home/feamster/bismark/dashboard/media/'
+# CHANGE to something that is local to you for testing
+MEDIA_ROOT = '/home/feamster/git/networkdashboard/media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -65,13 +66,13 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
-ROOT_URLCONF = 'dashboard.urls'
+ROOT_URLCONF = 'networkdashboard.urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/feamster/bismark/dashboard/templates',
+    '/home/feamster/git/networkdashboard/templates',
 )
 
 INSTALLED_APPS = (
@@ -80,7 +81,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'dashboard.summary'
+    'networkdashboard.summary'
 )
 
 
