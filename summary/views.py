@@ -3,7 +3,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from networkdashboard.summary.models import *
-from pyofc2  import * 
 import random
 from datetime import datetime
 from time import time,mktime
