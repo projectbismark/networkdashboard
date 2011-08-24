@@ -111,14 +111,14 @@
 {% endif %}
 <br/><br/>
 <script type="text/javascript" src="/static/swfobject.js"></script>
-<script type="text/javascript" src="http://danvk.org/dygraphs/dygraph-combined.js"></script>
-<script type="text/javascript" src="http://danvk.org/dygraphs/dygraph.js"></script>
+<script type="text/javascript" src="/static/dygraph-combined.js"></script>
+
 
         <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojo/dojo.xd.js"
         djConfig="parseOnLoad: true">
         </script>
         <script type="text/javascript">
-            dojo.require("dijit.form.DateTextBox");
+            dojo.require("dijit.form.DateTextBox");http://danvk.org/dygraphs/dygraph-combined.js
             dojo.require("dijit.ProgressBar");
             dojo.require("dijit.Menu");
             dojo.require("dijit.MenuItem");
@@ -184,7 +184,7 @@ Loading...
 <button dojoType="dijit.form.Button" type="submit" name="submit" onClick="render()">Display</button><br/><br/>
 
 <div class="chart" id="chart_demo" style="display:block;" ></div>
-<div id="graphdiv" style="width:900px;display:block;"></div>
+<div id="graph_div"></div>
 <script type="text/javascript">
 
 	
@@ -231,24 +231,20 @@ Loading...
         function OnSuccess(data)
         {
           content=data;
+
 	  
-	  if(data.length<30)
-	  {
-		loading.innerHTML="data for the specified data range is empty.";
+	  
+	         g = new Dygraph(document.getElementById("graph_div"),
+			   content,
+			   {
+	      		   rollPeriod: 1,
+	      		   showRoller: true,
+	    		   }
+			   );
 
-	  }
-	  else
-	  {
-	        g = new Dygraph(document.getElementById("graphdiv"),content,{
-	      	rollPeriod: 1,
-	      	showRoller: true,
-	    		}
-		);
 
-	  	var chart_container = document.getElementById("graphdiv");
-	  	chart_container.style.display="block";
 		loading.innerHTML = "";
-	  }
+	  
 	 CloseProgressBar();
 	  
 	  	
@@ -276,7 +272,7 @@ Loading...
 	else{
 	
 	$.ajax({
-                type: "POST",
+                type: "GET",
                 url: loc,
                 data: {'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
                 success: OnSuccess,
@@ -296,8 +292,7 @@ Loading...
                 progressbar_container.style.display="block";
 		var chart_container = document.getElementById("chart_demo");
 		chart_container.style.display="none";
-		graph_container = document.getElementById("graphdiv");
-		graph_container.style.display="none";
+		
 		loading.innerHTML = "loading...";
 
             
