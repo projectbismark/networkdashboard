@@ -11,12 +11,12 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'mysql' # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'bismark_live_v1' # Or path to database file if using sqlite3.
-DATABASE_USER = 'bismark_live_ro' # Not used with sqlite3.
-DATABASE_PASSWORD = 'f8d74cf689' # Not used with sqlite3.
-DATABASE_HOST = '' # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = '' # Set to empty string for default. Not used with sqlite3.
+DATABASE_ENGINE = 'postgresql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'bismark_openwrt_live_v0_1'             # Or path to database file if using sqlite3.
+DATABASE_USER = 'feamster'             # Not used with sqlite3.
+DATABASE_PASSWORD = ''         # Not used with sqlite3.
+DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -37,7 +37,8 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/home/feamster/git/networkdashboard/media/'
+# CHANGE to something that is local to you for testing
+MEDIA_ROOT = '/data/users/dashboard/networkdashboard/media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -56,7 +57,7 @@ SECRET_KEY = '44i#g=mway31-d8lj=nx&s-6_c0mf%n%i819fe3w&774mycc+k'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
     'django.template.loaders.app_directories.load_template_source',
-# 'django.template.loaders.eggs.load_template_source',
+#     'django.template.loaders.eggs.load_template_source',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -71,7 +72,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/feamster/git/networkdashboard/templates',
+    '/data/users/dashboard/networkdashboard/templates',
 )
 
 INSTALLED_APPS = (
@@ -84,7 +85,7 @@ INSTALLED_APPS = (
 )
 
 
-try:
-    from settings_dev import *
+try:			
+   	from settings_dev import *
 except ImportError, e:
-    pass
+	pass
