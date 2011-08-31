@@ -1,114 +1,111 @@
 {% extends "base.html" %}
 {% block content %}
 
-{% if device_details %}
-    {% for detail in device_details %}
 
 
-    <h3>BISMark Device: {{ detail.deviceid }}</h3>
+    <h3>BISMark Device: {{ deviceid }}</h3>
 <script src="/static/jquery-latest.js"></script>
     <table>
+	<!--
         <tr><td>MAC Address</td><td>{{ detail.macid }}</td></tr>
         <tr><td>Type</td><td>{{ detail.type }}</td></tr>
-        <tr><td>Operating System</td><td>{{ detail.os }}</td></tr>
-	<tr><td>ISP</td><td><div id="s{{ detail.deviceid }}"></div><script type="text/javascript">
+        <tr><td>Operating System</td><td>{{ detail.os }}</td></tr> -->
+	<tr><td>ISP</td><td><div id="s{{ deviceid }}"></div><script type="text/javascript">
 
 		$.ajax({
                 type: "GET",
-                url: "/getISP/{{ detail.deviceid }}/",
+                url: "/getISP/{{ deviceid }}/",
                 success: OnSuccess,
             });
 		
 		function OnSuccess(data)
 		{
-		document.getElementById('s{{ detail.deviceid }}').innerHTML = data;
+		document.getElementById('s{{ deviceid }}').innerHTML = data;
 		}
 
 		</script></td>
 </tr>
-<tr><td>Service Plan</td><td><div id="q{{ detail.deviceid }}"></div><script type="text/javascript">
+<tr><td>Service Plan</td><td><div id="q{{ deviceid }}"></div><script type="text/javascript">
 
 		$.ajax({
                 type: "GET",
-                url: "/getPlan/{{ detail.deviceid }}/",
+                url: "/getPlan/{{ deviceid }}/",
                 success: OnSuccess,
             });
 		
 		function OnSuccess(data)
 		{
-		document.getElementById('q{{ detail.deviceid }}').innerHTML = data;
+		document.getElementById('q{{ deviceid }}').innerHTML = data;
 		}
 
 		</script></td>
 </tr>
-<tr><td>Download Rate</td><td><div id="a{{ detail.deviceid }}"></div><script type="text/javascript">
+<tr><td>Download Rate</td><td><div id="a{{ deviceid }}"></div><script type="text/javascript">
 
 		$.ajax({
                 type: "GET",
-                url: "/getDl/{{ detail.deviceid }}/",
+                url: "/getDl/{{ deviceid }}/",
                 success: OnSuccess,
             });
 		
 		function OnSuccess(data)
 		{
-		document.getElementById('a{{ detail.deviceid }}').innerHTML = data  + " kbps";
+		document.getElementById('a{{ deviceid }}').innerHTML = data  + " kbps";
 		}
 
 		</script></td>
 </tr>
-	<tr><td>Upload Rate</td><td><div id="u{{ detail.deviceid }}"></div><script type="text/javascript">
+	<tr><td>Upload Rate</td><td><div id="u{{ deviceid }}"></div><script type="text/javascript">
 
 		$.ajax({
                 type: "GET",
-                url: "/getUl/{{ detail.deviceid }}/",
+                url: "/getUl/{{ deviceid }}/",
                 success: OnSuccess,
             });
 		
 		function OnSuccess(data)
 		{
-		document.getElementById('u{{ detail.deviceid }}').innerHTML = data + " kbps";
+		document.getElementById('u{{ deviceid }}').innerHTML = data + " kbps";
 		}
 
 		</script></td>
 <br/>
 </tr>
 
-<tr><td>First Measurement</td><td><div id="y{{ detail.deviceid }}"></div><script type="text/javascript">
+<tr><td>First Measurement</td><td><div id="y{{ deviceid }}"></div><script type="text/javascript">
 
 		$.ajax({
                 type: "GET",
-                url: "/getFirstUpdate/{{ detail.deviceid }}/",
+                url: "/getFirstUpdate/{{ deviceid }}/",
                 success: OnSuccess,
             });
 		
 		function OnSuccess(data)
 		{
-		document.getElementById('y{{ detail.deviceid }}').innerHTML = data;
+		document.getElementById('y{{ deviceid }}').innerHTML = data;
 		}
 
 		</script></td>
 </tr>
-<tr><td>Last Measurement</td><td><div id="d{{ detail.deviceid }}"></div><script type="text/javascript">
+<tr><td>Last Measurement</td><td><div id="d{{ deviceid }}"></div><script type="text/javascript">
 
 		$.ajax({
                 type: "GET",
-                url: "/getLastUpdate/{{ detail.deviceid }}/",
+                url: "/getLastUpdate/{{ deviceid }}/",
                 success: OnSuccess,
             });
 		
 		function OnSuccess(data)
 		{
-		document.getElementById('d{{ detail.deviceid }}').innerHTML = data;
+		document.getElementById('d{{ deviceid }}').innerHTML = data;
 		}
 
 		</script></td>
 </tr>
-    {% endfor %}
-<tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ detail.deviceid }}">Download XML</a></td></tr>
+ 
+<tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
 </table>
-{% else %}
-    <p>Device info is not available.</p>
-{% endif %}
+
 <br/><br/>
 <script type="text/javascript" src="/static/swfobject.js"></script>
 <script type="text/javascript" src="/static/dygraph-combined.js"></script>
@@ -274,7 +271,7 @@ Loading...
 	$.ajax({
                 type: "GET",
                 url: loc,
-                data: {'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
+                data: {'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
                 success: OnSuccess,
             });
 	}

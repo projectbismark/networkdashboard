@@ -5,8 +5,8 @@ from django.shortcuts import render_to_response
 from networkdashboard.summary.models import *
 from pyofc2 import *
 import random
-from datetime import datetime
-from time import time,mktime
+from datetime import datetime, timedelta
+from time import time,mktime,strftime
 from mx.DateTime.ISO import ParseDateTimeUTC
 
 def index(request):
@@ -18,7 +18,6 @@ def newuser(request):
 def showdevices(request):
     device_list = Devices.objects.all()
     thelist = list()
-    print 'dd'
     for row in  device_list:
 	if(row.deviceid == "NB-Xuzi-Uky"):
 		continue
@@ -46,146 +45,203 @@ def showactivedevices(request):
 
     return render_to_response('devices.html', {'device_list': thelist})
 
-def devicesummary(request, device):
+def devicesummary(request):
+    device = request.POST.get('device')
+    print device
     device_details = Devices.objects.filter(deviceid=device)
-    last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
-    end = datetime.fromtimestamp(last[0].timestamp).strftime("%Y-%m-%d")
-    start = datetime.fromtimestamp(last[0].timestamp - 3600*24*7).strftime("%Y-%m-%d")
-	
-	
-    return render_to_response('device.html', {'device_details': device_details, 'calenderFrom': start,'calenderTo': end})
+    try:
+        device_search = MBitrate.objects.filter(deviceid=device)
+        print device_search
+        if len(device_search)<1:
+            return render_to_response('device_not_found.html', {'deviceid': device})
+    except:
+        return render_to_response('device_not_found.html', {'deviceid': device})
+    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
+    end = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
+    start = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
+
+    return render_to_response('device.html', {'device_details': device_details, 'calenderFrom': start,'calenderTo': end, 'deviceid': device})
     return HttpResponse(output)
 
 def getISP(request, device):
-    UDrow = Userdevice.objects.filter(deviceid=device)
-    if len(UDrow)==0:
-	return HttpResponse(' ')
-    print UDrow[0].userid
-    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
-    if len(USrow)==0:
-	return HttpResponse(' ')
-    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
-    if len(SLArow)==0:
-	return HttpResponse(' ')
-    return HttpResponse(SLArow[0].isp)
+##    UDrow = Userdevice.objects.filter(deviceid=device)
+##    if len(UDrow)==0:
+##	return HttpResponse(' ')
+##    print UDrow[0].userid
+##    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
+##    if len(USrow)==0:
+##	return HttpResponse(' ')
+##    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
+##    if len(SLArow)==0:
+##	return HttpResponse(' ')
+##    return HttpResponse(SLArow[0].isp)
+    return HttpResponse('unavailable')
 
 def getPlan(request, device):
-    UDrow = Userdevice.objects.filter(deviceid=device)
-    if len(UDrow)==0:
-	return HttpResponse(' ')
-    print UDrow[0].userid
-    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
-    if len(USrow)==0:
-	return HttpResponse(' ')
-    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
-    if len(SLArow)==0:
-	return HttpResponse(' ')
-    return HttpResponse(SLArow[0].sla)
+##    UDrow = Userdevice.objects.filter(deviceid=device)
+##    if len(UDrow)==0:
+##	return HttpResponse(' ')
+##    print UDrow[0].userid
+##    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
+##    if len(USrow)==0:
+##	return HttpResponse(' ')
+##    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
+##    if len(SLArow)==0:
+##	return HttpResponse(' ')
+##    return HttpResponse(SLArow[0].sla)
+    return HttpResponse('unavailable')
 
 def getUl(request, device):
-    UDrow = Userdevice.objects.filter(deviceid=device)
-    if len(UDrow)==0:
-	return HttpResponse(' ')
-    print UDrow[0].userid
-    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
-    if len(USrow)==0:
-	return HttpResponse(' ')
-    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
-    if len(SLArow)==0:
-	return HttpResponse(' ')
-    return HttpResponse(SLArow[0].ul)
+##    UDrow = Userdevice.objects.filter(deviceid=device)
+##    if len(UDrow)==0:
+##	return HttpResponse(' ')
+##    print UDrow[0].userid
+##    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
+##    if len(USrow)==0:
+##	return HttpResponse(' ')
+##    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
+##    if len(SLArow)==0:
+##	return HttpResponse(' ')
+##    return HttpResponse(SLArow[0].ul)
+    return HttpResponse('unavailable')
 
 
 def getDl(request, device):
-    UDrow = Userdevice.objects.filter(deviceid=device)
-    if len(UDrow)==0:
-	return HttpResponse(' ')
-    print UDrow[0].userid
-    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
-    if len(USrow)==0:
-	return HttpResponse(' ')
-    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
-    if len(SLArow)==0:
-	return HttpResponse(' ')
-    return HttpResponse(SLArow[0].dl)
+##    UDrow = Userdevice.objects.filter(deviceid=device)
+##    if len(UDrow)==0:
+##	return HttpResponse(' ')
+##    print UDrow[0].userid
+##    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
+##    if len(USrow)==0:
+##	return HttpResponse(' ')
+##    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
+##    if len(SLArow)==0:
+##	return HttpResponse(' ')
+##    return HttpResponse(SLArow[0].dl)
+    return HttpResponse('unavailable')
 
 def getLastUpdate(request, device):
-    last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
-    if len(last)<0:
-	return HttpResponse('not found')
-    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%b %d, %Y")))
-
+##    last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
+##    if len(last)<0:
+##	return HttpResponse('not found')
+##    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%b %d, %Y")))
+    return HttpResponse('unavailable')
 
 def getLastUpdateYMD(request, device):
-    last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
-    if len(last)<0:
-	return HttpResponse('not found')
-    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%m/%d/%y")))
+##    last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
+##    if len(last)<0:
+##	return HttpResponse('not found')
+##    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%m/%d/%y")))
+    return HttpResponse('unavailable')
 
 def getFirstUpdate(request, device):
-    last = Measurements.objects.filter(deviceid=device)[0:3]
-    if len(last)<0:
-	return HttpResponse('not found')
-    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%b %d, %Y")))
+##    last = Measurements.objects.filter(deviceid=device)[0:3]
+##    if len(last)<0:
+##	return HttpResponse('not found')
+##    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%b %d, %Y")))
+    return HttpResponse('unavailable')
 
-def cvs_linegraph(request, device):
-    
-    chosen_param = request.POST.get('param')
-    chosen_limit = request.POST.get('limit')
-    timetype = request.POST.get('type')
+def cvs_linegraph(request):
+    device = request.GET.get('deviceid')
+    chosen_param = request.GET.get('param')
+    chosen_limit = request.GET.get('limit')
+    timetype = request.GET.get('type')
     '''
     chosen_param = 'AGGL3BITRATE'
     chosen_limit = 100000
     timetype = 0
 	'''
 
-    s = request.POST.get('start')
+    s = request.GET.get('start')
     s2 = datetime.strptime(s,"%m/%d/%Y")
     s3 = ParseDateTimeUTC(str(s2))
     s4 = datetime.fromtimestamp(s3)   
-    start = mktime(s4.timetuple())
+    start = s4
 
-    e = request.POST.get('end')
+    e = request.GET.get('end')
     e2 = datetime.strptime(e,"%m/%d/%Y")
     e3 = ParseDateTimeUTC(str(e2))
-    e4 = datetime.fromtimestamp(e3)   
-    end = mktime(e4.timetuple())+24*3600 
-    print start
-    print end
+    
+    e4 = datetime.fromtimestamp(e3)+ timedelta(1,0)
+    end = e4
     if chosen_param == 'AGGL3BITRATE' :
 	  
-	    device_details_down = Measurements.objects.filter(deviceid=device,param=chosen_param,timestamp__gt=start,timestamp__lte=end,avg__lte=chosen_limit,srcip=2413265837)
-	    device_details_up = Measurements.objects.filter(deviceid=device,param=chosen_param,timestamp__gt=start,timestamp__lte=end,avg__lte=chosen_limit,dstip=2413265837)
-	    
-	    tim1 = list()
-            dat1 = list()
-            dat2 = list()
-           
-	    for measure in device_details_down:
-		t = datetime.fromtimestamp(measure.timestamp)
-		tim1.append(t)
-		dat1.append(measure.avg)
+        device_details_down = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,srcip='143.215.131.173')
+        device_details_up = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,dstip='143.215.131.173')
+        
+        tim1 = list()
+        dat1 = list()
+        dat2 = list()
+       
+        for measure in device_details_down:
+            t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
+            tim1.append(t)
+            dat1.append(measure.average)
 
-	    for measure in device_details_up:
-		dat2.append(measure.avg)
+        for measure in device_details_up:
+            dat2.append(measure.average)
 
-	    xVariable = "Date"
-	    yVariable = "Down (kbps)"
-	    y2Variable = "Up (kbps)"
-	    output = xVariable + "," + yVariable + "," +  y2Variable +"\n"
+        xVariable = "Date"
+        yVariable = "Down (kbps)"
+        y2Variable = "Up (kbps)"
+        output = xVariable + "," + yVariable + "," +  y2Variable +"\n"
 
-	    for i in range(0,min(len(dat1),len(dat2))):
-		ret = str(tim1[i]) + "," + str(dat1[i]) + "," + str(dat2[i]) + "\n"
-		output += ret
-    else:
-	    device_details = Measurements.objects.filter(deviceid=device,param=chosen_param,timestamp__gt=start,timestamp__lte=end,avg__lte=chosen_limit)
-	    xVariable = "Date"
-	    yVariable = request.POST.get('unit')
-	    output = xVariable + "," + yVariable +"\n"
-	    for measure in device_details:
-		t = datetime.fromtimestamp(measure.timestamp).strftime("%Y-%m-%d %H:%M:%S")
-		ret = t + "," + str((measure.avg)) + "\n"
-		output += ret
+        for i in range(0,min(len(dat1),len(dat2))):
+            ret = str(tim1[i]) + "," + str(dat1[i]) + "," + str(dat2[i]) + "\n"
+            output += ret
+
+    elif chosen_param == 'RTT' :
+
+        distinct_ips = MRtt.objects.values('dstip').distinct()
+        print (distinct_ips)
+	xVariable = "Date"
+        yVariable = request.GET.get('unit')
+        output = xVariable
+
+        for row_ip in distinct_ips:
+            print row_ip["dstip"]
+            output = output + "," + row_ip["dstip"]
+        output+="\n"
+
+        time = list()
+        data = list()
+        for row_ip in distinct_ips:
+            device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit, dstip = row_ip["dstip"])
+            data1 = list()
+            for row_details in device_details:
+                data1.append(row_details.average)
+
+            data.append(data1)
+            
+        device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit)
+        for row_details in device_details:
+            time.append(row_details.eventstamp)
+
+        for i in range(0,len(time)):
+            ret = str(time[i])
+
+            for temp in data:
+                if i>=len(temp):
+                    continue
+                ret += "," + str(temp[i])
+
+            ret+="\n"
+            output += ret
+        
+        print output
+        
+
+    elif chosen_param == 'LMRTT' :
+
+    
+        device_details = MLmrtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit)
+        xVariable = "Date"
+        yVariable = request.GET.get('unit')
+        output = xVariable + "," + yVariable +"\n"
+        for measure in device_details:
+            t = measure.eventstamp
+            ret = str(t) + "," + str((measure.average)) + "\n"
+            output += ret
 
     return HttpResponse(output)
 

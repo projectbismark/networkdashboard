@@ -3,100 +3,17 @@
 
 {% block content %}
 <h3>BISMark Devices</h3>
-<style>
-table thead tr,
-table tfoot tr {
-	background: #999999;
-}
 
-th, td{
- padding: 0px;
- border: 0px;
-}
-
-table.sortable thead {
-    background-color:#eee;
-    color:#222222;
-    font-weight: bold;
-    cursor: default;
-}
-</style>
-<script src="/static/jquery-latest.js"></script>
-<script src="/static/sorttable.js" type="text/javascript"></script>
-{% if device_list %}
-    <ul>
-	
-<table border="1" class="sortable" width="500" >
-	<tr>
-		<th >Device</th>
-		<th>Last Update</th>
-		<th>ISP</th>
-		<th>Plan</th>
-	</tr>
-    {% for device in device_list %}        
-
-	<tr>
-		<td align="center"><a href="/device/{{ device.deviceid }}/">{{ device.deviceid }}</a></td>
-		<td align="center"><div id="d{{ device.deviceid }}"></div><script type="text/javascript">
-
-		$.ajax({
-                type: "GET",
-                url: "/getLastUpdateYMD/{{ device.deviceid }}/",
-                success: OnSuccess,
-            });
-		
-		function OnSuccess(data)
-		{
-		document.getElementById('d{{ device.deviceid }}').innerHTML = data;
-		}
-
-		</script></td>
-
-
-		<td align="center"><div id="p{{ device.deviceid }}"></div><script type="text/javascript">
-
-		$.ajax({
-                type: "GET",
-                url: "/getISP/{{ device.deviceid }}/",
-                success: OnSuccess,
-            });
-		
-		function OnSuccess(data)
-		{
-		document.getElementById('p{{ device.deviceid }}').innerHTML = data;
-		}
-		</script></td>
-
-
-		<td align="center"><div id="i{{ device.deviceid }}"></div><script type="text/javascript">
-
-		$.ajax({
-                type: "GET",
-                url: "/getPlan/{{ device.deviceid }}/",
-                success: OnSuccess,
-            });
-		
-		function OnSuccess(data)
-		{
-		document.getElementById('i{{ device.deviceid }}').innerHTML = data;
-		}
-		</script></td>
-
-
-	</tr>
-    {% endfor %}
-     </table>
-	</td>
-	<td>
-
-
-
-    </ul>
-
-
-{% else %}
-    <p>No devices are available.</p>
-{% endif %}
+   <script type ="text/javascript">
+   function changeAction(url) {
+	document.device_form.action = "/device/";
+   }
+   </script>
+   
+   <form method = "POST" name="device_form" action = "">
+   <input type = "text" name = "device" onChange = "changeAction(this.value)"/>
+   <input type = "submit" value = "search">
+   </form>
 
   
 

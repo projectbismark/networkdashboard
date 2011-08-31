@@ -11,12 +11,12 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'bismark_live_v1'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'bismark_live_ro'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'f8d74cf689'         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+DATABASE_ENGINE = 'mysql' # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'bismark_live_v1' # Or path to database file if using sqlite3.
+DATABASE_USER = 'bismark_live_ro' # Not used with sqlite3.
+DATABASE_PASSWORD = 'f8d74cf689' # Not used with sqlite3.
+DATABASE_HOST = '' # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = '' # Set to empty string for default. Not used with sqlite3.
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -56,7 +56,7 @@ SECRET_KEY = '44i#g=mway31-d8lj=nx&s-6_c0mf%n%i819fe3w&774mycc+k'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
     'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+# 'django.template.loaders.eggs.load_template_source',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -84,12 +84,7 @@ INSTALLED_APPS = (
 )
 
 
-try:			
-   	from settings_dev import *
+try:
+    from settings_dev import *
 except ImportError, e:
-	pass
-
-		
-
-
-	
+    pass
