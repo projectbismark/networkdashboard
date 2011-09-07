@@ -1,6 +1,7 @@
 # Create your views here.
 
 from django.http import HttpResponse
+import urllib2, urllib, json
 from django.shortcuts import render_to_response
 from networkdashboard.summary.models import *
 from pyofc2 import *
@@ -200,9 +201,16 @@ def cvs_linegraph(request):
 
         for row_ip in distinct_ips:
             print row_ip["dstip"]
-            output = output + "," + row_ip["dstip"]
-        output+="\n"
 
+	    urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + row_ip['dstip'] + "&format=json")
+	
+	    r1 = urlobj.read()
+	    urlobj.close()
+	    datadict = json.loads(r1)
+	    print datadict
+            output = output + ",\t" + datadict['cityName']+"-" + datadict['countryCode']
+        output+="\n"
+	print output
         time = list()
         data = list()
         for row_ip in distinct_ips:
@@ -227,8 +235,6 @@ def cvs_linegraph(request):
 
             ret+="\n"
             output += ret
-        
-        print output
         
 
     elif chosen_param == 'LMRTT' :
