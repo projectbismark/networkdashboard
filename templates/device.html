@@ -155,11 +155,11 @@
 <input type="radio" name="g1" id="g1rb2" value="talk" dojoType="dijit.form.RadioButton">
 
 <label for="g1rb2">Last-Mile Latency (ms)</label><br/><br/>
-
+<!--
 <input type="radio" name="g1" id="g1rb4" value="weather" dojoType="dijit.form.RadioButton">
 
 <label for="g1rb4">Passive Usage</label><br/><br/>
-
+-->
 <input type="radio" name="g1" id="g1rb1" value="news" dojoType="dijit.form.RadioButton">
 
 <label for="g1rb1">Round Trip Time (ms)</label><br/><br/>
@@ -256,17 +256,7 @@ Loading...
 	{
 	createStyle();
 	OpenProgressBar();
-	if(g1rb4.checked)
-		{
-		   swfobject.embedSWF(
-     "/static/open-flash-chart.swf", "chart_demo",
-     "620", "350", "9.0.0", "/static/expressInstall.swf",
-     {"data-file":"/data/"} );
-		var chart_container = document.getElementById("chart_demo");
-		chart_container.style.display="block";
-		CloseProgressBar();
-		}
-	else{
+	
 	
 	$.ajax({
                 type: "GET",
@@ -274,8 +264,6 @@ Loading...
                 data: {'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
                 success: OnSuccess,
             });
-	}
-
 	}
 
 	function CloseProgressBar() {
