@@ -122,10 +122,11 @@ def getDl(request, device):
     return HttpResponse('unavailable')
 
 def getLastUpdate(request, device):
-##    last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
-##    if len(last)<0:
-##	return HttpResponse('not found')
-##    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%b %d, %Y")))
+    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
+    if len(last)>0:
+        end = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
+	return HttpResponse(end)
+    
     return HttpResponse('unavailable')
 
 def getLastUpdateYMD(request, device):
@@ -136,10 +137,11 @@ def getLastUpdateYMD(request, device):
     return HttpResponse('unavailable')
 
 def getFirstUpdate(request, device):
-##    last = Measurements.objects.filter(deviceid=device)[0:3]
-##    if len(last)<0:
-##	return HttpResponse('not found')
-##    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%b %d, %Y")))
+    last = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
+    if len(last)>0:
+        end = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
+	return HttpResponse(end)
+    
     return HttpResponse('unavailable')
 
 def cvs_linegraph(request):
@@ -208,7 +210,7 @@ def cvs_linegraph(request):
 	    urlobj.close()
 	    datadict = json.loads(r1)
 	    print datadict
-            output = output + ",\t" + datadict['cityName']+"-" + datadict['countryCode']
+            output = output + "," + datadict['cityName']+"-" + datadict['countryCode'] + "test"
         output+="\n"
 	print output
         time = list()

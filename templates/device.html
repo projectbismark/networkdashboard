@@ -285,6 +285,109 @@ Loading...
 
 
 </script>
+<script type="text/javascript">
+
+	
+	
+	var content="[not loaded]";
+	var limit = 9999999;
+	var units = "val";
+	var paramselect = "RTT";
+	
+	var loc = window.location.href;
+	spl = loc.split('/');
+
+	if(spl[spl.length-1].length>2) loc="/data_chart/"+spl[spl.length-1];
+	else loc="/data_chart/"+spl[spl.length-2];
+       	
+	function start()
+	{
+	CloseProgressBar();
+	}
+
+	function createStyle()
+	{
+
+		if(g1rb1.checked)
+		{
+			limit = 1000;
+			units = "msec"
+			paramselect = "RTT"
+		}
+		else if(g1rb2.checked)
+		{
+			limit = 1000;
+			units = "msec"
+			paramselect = "LMRTT"
+		}
+		else if(g1rb3.checked)
+		{
+			limit = 200000;
+			units = "kbps"
+			paramselect = "AGGL3BITRATE"
+		}
+	}
+
+        function OnSuccess(data)
+        {
+          content=data;
+
+	  
+	  
+	         g = new Dygraph(document.getElementById("graph_div"),
+			   content,
+			   {
+	      		   rollPeriod: 1,
+	      		   showRoller: true,
+	    		   }
+			   );
+
+
+		loading.innerHTML = "";
+	  
+	 CloseProgressBar();
+	  
+	  	
+        }
+	
+        function OnError(data)
+        {
+	  alert("data loading failed");
+        }
+	
+	function render()
+	{
+	createStyle();
+	OpenProgressBar();
+	
+	
+	$.ajax({
+                type: "GET",
+                url: loc,
+                data: {'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
+                success: OnSuccess,
+            });
+	}
+
+	function CloseProgressBar() {
+		    var progressbar_container = document.getElementById("progress");
+                progressbar_container.style.display="none";
+		
+        }
+
+	function OpenProgressBar() {
+		    var progressbar_container = document.getElementById("progress");
+                progressbar_container.style.display="block";
+		var chart_container = document.getElementById("chart_demo");
+		chart_container.style.display="none";
+		
+		loading.innerHTML = "loading...";
+
+            
+        }
+
+
+</script>
 
 </body>
 
