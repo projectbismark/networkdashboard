@@ -440,3 +440,13 @@ class MCapacity(models.Model):
     class Meta:
         db_table = u'm_capacity'
 
+class Devicedetails(models.Model):
+    deviceid = models.TextField() # This field type is a guess.
+    isp = models.CharField(max_length=30)
+    serviceplan = models.CharField(max_length=30)
+    uploadrate = models.IntegerField()
+    downloadrate = models.IntegerField()
+    eventstamp = models.DateTimeField()
+    class Meta:
+        db_table = u'devicedetails'
+
