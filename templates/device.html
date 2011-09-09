@@ -10,67 +10,30 @@
         <tr><td>MAC Address</td><td>{{ detail.macid }}</td></tr>
         <tr><td>Type</td><td>{{ detail.type }}</td></tr>
         <tr><td>Operating System</td><td>{{ detail.os }}</td></tr> -->
-	<tr><td>ISP</td><td><div id="s{{ deviceid }}"></div><script type="text/javascript">
+        <tr><td>Name</td><td>{{ full_name }}</td></tr>
+        <tr><td>ISP</td><td>{{ isp }}</td></tr>
+        <tr><td>Location</td><td><div id="location{{ deviceid }}"></div><script type="text/javascript">
 
 		$.ajax({
                 type: "GET",
-                url: "/getISP/{{ deviceid }}/",
+                url: "/getLocation/{{ deviceid }}/",
                 success: OnSuccess,
             });
 		
 		function OnSuccess(data)
 		{
-		document.getElementById('s{{ deviceid }}').innerHTML = data;
+		document.getElementById('location{{ deviceid }}').innerHTML = data;
 		}
 
 		</script></td>
-</tr>
-<tr><td>Service Plan</td><td><div id="q{{ deviceid }}"></div><script type="text/javascript">
-
-		$.ajax({
-                type: "GET",
-                url: "/getPlan/{{ deviceid }}/",
-                success: OnSuccess,
-            });
-		
-		function OnSuccess(data)
-		{
-		document.getElementById('q{{ deviceid }}').innerHTML = data;
-		}
-
-		</script></td>
-</tr>
-<tr><td>Download Rate</td><td><div id="a{{ deviceid }}"></div><script type="text/javascript">
-
-		$.ajax({
-                type: "GET",
-                url: "/getDl/{{ deviceid }}/",
-                success: OnSuccess,
-            });
-		
-		function OnSuccess(data)
-		{
-		document.getElementById('a{{ deviceid }}').innerHTML = data  + " kbps";
-		}
-
-		</script></td>
-</tr>
-	<tr><td>Upload Rate</td><td><div id="u{{ deviceid }}"></div><script type="text/javascript">
-
-		$.ajax({
-                type: "GET",
-                url: "/getUl/{{ deviceid }}/",
-                success: OnSuccess,
-            });
-		
-		function OnSuccess(data)
-		{
-		document.getElementById('u{{ deviceid }}').innerHTML = data + " kbps";
-		}
-
-		</script></td>
-<br/>
-</tr>
+        </tr>     
+        <tr><td>Service Plan</td><td>{{ service_plan }}</td></tr>
+        <tr><td>Download Rate</td><td>{{ download_rate}}</td></tr>
+        <tr><td>Upload Rate</td><td>{{ upload_rate}}</td></tr>
+ 
+  
+        
+	
 
 <tr><td>First Measurement</td><td><div id="y{{ deviceid }}"></div><script type="text/javascript">
 

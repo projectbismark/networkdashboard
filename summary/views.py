@@ -60,8 +60,12 @@ def devicesummary(request):
     last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
     end = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
     start = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
-
-    return render_to_response('device.html', {'device_details': device_details, 'calenderFrom': start,'calenderTo': end, 'deviceid': device})
+    fullname = 'not available'
+    isp = 'not available'
+    serviceplan = 'not available'
+    drate = 'not available'
+    urate = 'not available'
+    return render_to_response('device.html', {'device_details': device_details, 'calenderFrom': start,'calenderTo': end, 'deviceid': device, 'full_name': fullname, 'isp' : isp, 'service_plan' : serviceplan, 'download_rate' : drate, 'upload_rate' : urate})
     return HttpResponse(output)
 
 def getISP(request, device):
@@ -141,6 +145,20 @@ def getFirstUpdate(request, device):
     if len(last)>0:
         end = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
 	return HttpResponse(end)
+    
+    return HttpResponse('unavailable')
+
+def getLocation(request, device):
+    dev = MBitrate.objects.filter(deviceid=device, srcip ='143.215.131.173' )
+    if len(dev)>0:
+        ip = str(dev[0].dstip)
+        urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + ip + "&format=json")
+        r1 = urlobj.read()
+        urlobj.close()
+        datadict = json.loads(r1)
+        print "\n" + ip
+        res = datadict["cityName"] + "," + datadict["countryName"]
+        return HttpResponse(res)  
     
     return HttpResponse('unavailable')
 
