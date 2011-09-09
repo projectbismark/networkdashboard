@@ -442,6 +442,7 @@ class MCapacity(models.Model):
 
 class Devicedetails(models.Model):
     deviceid = models.TextField() # This field type is a guess.
+    name = models.CharField(max_length=50)
     isp = models.CharField(max_length=30)
     serviceplan = models.CharField(max_length=30)
     city = models.CharField(max_length=30)
