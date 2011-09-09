@@ -444,6 +444,9 @@ class Devicedetails(models.Model):
     deviceid = models.TextField() # This field type is a guess.
     isp = models.CharField(max_length=30)
     serviceplan = models.CharField(max_length=30)
+    city = models.CharField(max_length=30)
+    state = models.CharField(max_length=30)
+    country = models.CharField(max_length=30)
     uploadrate = models.IntegerField()
     downloadrate = models.IntegerField()
     eventstamp = models.DateTimeField()
