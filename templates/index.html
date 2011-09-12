@@ -11,15 +11,9 @@
   Internet Service Provider to a centralized database, which the user
   can access via this portal.</p><br/>
 
-
-   <script type ="text/javascript">
-   function changeAction(url) {
-	document.device_form.action = "/device/";
-   }
-   </script>
    
-   <form method = "POST" name="device_form" action = "">
-   <input type = "text" name = "device" onChange = "changeAction(this.value)"/>
+   <form method = "POST" name="device_form" action = "/device/">
+   <input type = "text" name = "device" />
    <input type = "submit" value = "search">
    </form>
 {% endblock %}

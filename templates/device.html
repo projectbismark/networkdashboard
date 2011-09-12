@@ -3,15 +3,15 @@
 
 
 
-    <h3>BISMark Device: {{ deviceid }}</h3>
+    <h3>BISMark Device: {{ detail.deviceid }}</h3>
 <script src="/static/jquery-latest.js"></script>
     <table>
 	<!--
         <tr><td>MAC Address</td><td>{{ detail.macid }}</td></tr>
         <tr><td>Type</td><td>{{ detail.type }}</td></tr>
         <tr><td>Operating System</td><td>{{ detail.os }}</td></tr> -->
-        <tr><td>Name</td><td>{{ full_name }}</td></tr>
-        <tr><td>ISP</td><td>{{ isp }}</td></tr>
+        <tr><td>Name</td><td>{{ detail.name }}</td></tr>
+        <tr><td>ISP</td><td>{{ detail.isp }}</td></tr>
         <tr><td>Location</td><td><div id="location{{ deviceid }}"></div><script type="text/javascript">
 
 		$.ajax({
@@ -27,47 +27,23 @@
 
 		</script></td>
         </tr>     
-        <tr><td>Service Plan</td><td>{{ service_plan }}</td></tr>
-        <tr><td>Download Rate</td><td>{{ download_rate}}</td></tr>
-        <tr><td>Upload Rate</td><td>{{ upload_rate}}</td></tr>
+        <tr><td>Service Plan</td><td>{{ detail.serviceplan }}</td></tr>
+        <tr><td>Download Rate</td><td>{{ detail.downloadrate}} kbps</td></tr>
+        <tr><td>Upload Rate</td><td>{{ detail.uploadrate}} kbps</td></tr>
  
   
         
 	
 
-<tr><td>First Measurement</td><td><div id="y{{ deviceid }}"></div><script type="text/javascript">
+<tr><td>First Measurement</td><td>{{ firstUpdate }}</td></tr>
+<tr><td>Last Measurement</td><td>{{ lastUpdate }}</td></tr>
 
-		$.ajax({
-                type: "GET",
-                url: "/getFirstUpdate/{{ deviceid }}/",
-                success: OnSuccess,
-            });
-		
-		function OnSuccess(data)
-		{
-		document.getElementById('y{{ deviceid }}').innerHTML = data;
-		}
-
-		</script></td>
-</tr>
-<tr><td>Last Measurement</td><td><div id="d{{ deviceid }}"></div><script type="text/javascript">
-
-		$.ajax({
-                type: "GET",
-                url: "/getLastUpdate/{{ deviceid }}/",
-                success: OnSuccess,
-            });
-		
-		function OnSuccess(data)
-		{
-		document.getElementById('d{{ deviceid }}').innerHTML = data;
-		}
-
-		</script></td>
-</tr>
  
 <tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
 </table>
+
+<br />
+<a href ="/editDevicePage/{{deviceid}}/">Edit Device </a>
 
 <br/><br/>
 <script type="text/javascript" src="/static/swfobject.js"></script>

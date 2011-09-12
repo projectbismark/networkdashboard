@@ -13,8 +13,48 @@ from mx.DateTime.ISO import ParseDateTimeUTC
 def index(request):
     return render_to_response('index.html')
 
+def editDevicePage(request, device):
+    device_details = Devicedetails.objects.filter(deviceid=device)
+    print device_details[0].name
+    return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device})
+
+def editDevice(request, device):
+    dname = request.POST.get('name')
+    disp = request.POST.get('isp')
+    dlocation = request.POST.get('location')
+    dsp = request.POST.get('sp')
+    durate = int(request.POST.get('urate'))
+    ddrate = int(request.POST.get('drate'))
+    dcity = request.POST.get('city')
+    dstate = request.POST.get('state')
+    dcountry = request.POST.get('country')           
+    print durate
+    device_details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now())
+    device_details.save()
+    try:
+        device_search = MBitrate.objects.filter(deviceid=device)
+        if len(device_search)<1:
+            return render_to_response('device_not_found.html', {'deviceid': device})
+    except:
+        return render_to_response('device_not_found.html', {'deviceid': device})
+    first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
+    first = datetime.fromtimestamp(mktime(first[0].eventstamp.timetuple())).strftime("%B %d, %Y")
+    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
+    
+    calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
+    calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
+    last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
+    return render_to_response('device.html', {'detail': device_details,'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderTo,'calenderTo': calenderFrom, 'deviceid': device})                                
+    
+def invalidEdit(request, device):
+    return render_to_response('invalid_edit.html', {'deviceid' : device})
+
 def newuser(request):
     return render_to_response('newuser.html')
+
+def submitchanges(request, device, isp, loc, serv, dr, ur):
+    return
+    
  
 def showdevices(request):
     device_list = Devices.objects.all()
@@ -48,25 +88,21 @@ def showactivedevices(request):
 
 def devicesummary(request):
     device = request.POST.get('device')
-    print device
-    device_details = Devices.objects.filter(deviceid=device)
+    device_details = Devicedetails.objects.filter(deviceid=device)
     try:
         device_search = MBitrate.objects.filter(deviceid=device)
-        print device_search
         if len(device_search)<1:
             return render_to_response('device_not_found.html', {'deviceid': device})
     except:
         return render_to_response('device_not_found.html', {'deviceid': device})
+    first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
+    first = datetime.fromtimestamp(mktime(first[0].eventstamp.timetuple())).strftime("%B %d, %Y")
     last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-    end = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
-    start = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
-    fullname = 'not available'
-    isp = 'not available'
-    serviceplan = 'not available'
-    drate = 'not available'
-    urate = 'not available'
-    return render_to_response('device.html', {'device_details': device_details, 'calenderFrom': start,'calenderTo': end, 'deviceid': device, 'full_name': fullname, 'isp' : isp, 'service_plan' : serviceplan, 'download_rate' : drate, 'upload_rate' : urate})
-    return HttpResponse(output)
+    
+    calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
+    calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
+    last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
+    return render_to_response('device.html', {'detail': device_details,'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderTo,'calenderTo': calenderFrom, 'deviceid': device}) 
 
 def getISP(request, device):
 ##    UDrow = Userdevice.objects.filter(deviceid=device)
@@ -149,6 +185,11 @@ def getFirstUpdate(request, device):
     return HttpResponse('unavailable')
 
 def getLocation(request, device):
+    details = Devicedetails.objects.filter(deviceid=device)
+
+    if len(details)>0:
+        return HttpResponse(details[0].city + ", " + details[0].country)
+    
     dev = MBitrate.objects.filter(deviceid=device, srcip ='143.215.131.173' )
     if len(dev)>0:
         ip = str(dev[0].dstip)

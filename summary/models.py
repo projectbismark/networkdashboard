@@ -441,7 +441,7 @@ class MCapacity(models.Model):
         db_table = u'm_capacity'
 
 class Devicedetails(models.Model):
-    deviceid = models.TextField() # This field type is a guess.
+    deviceid = models.TextField(primary_key=True) # This field type is a guess.
     name = models.CharField(max_length=50)
     isp = models.CharField(max_length=30)
     serviceplan = models.CharField(max_length=30)
