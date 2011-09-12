@@ -15,6 +15,11 @@ def index(request):
 
 def editDevicePage(request, device):
     device_details = Devicedetails.objects.filter(deviceid=device)
+    if len(device_details) < 1:
+	device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
+	device_entry.save()
+	return render_to_response('edit_device.html', {'detail' : device_entry, 'deviceid': device})
+
     return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device})
 
 def editDevice(request, device):
