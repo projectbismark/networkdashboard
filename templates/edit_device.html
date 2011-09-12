@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1> Edit Device {{deviceid}} </h1> <br />
+
+<form name ="edit" action="/editDevice/{{deviceid}}/" method="POST">
+    Name: <input type ="text" name ="name" value = "{{detail.name}}" /><br />
+    ISP: <input type ="text" name ="isp" value = "{{detail.isp}}" /><br />
+    Service Plan: <input type ="text" name ="sp" value = "{{detail.serviceplan}}"/><br />
+    Upload Rate: <input type = "text" name ="urate" value = "{{detail.uploadrate}}" /> kbps<br />
+    Download Rate: <input type ="text" name ="drate" value = "{{detail.downloadrate}}" /> kbps<br />
+    City: <input type ="text" name ="city" value = "{{detail.city}}" /><br />
+    State: <input type ="text" name ="state" value = "{{detail.state}}" /><br />
+    Country: <input type ="text" name ="country" value = "{{detail.country}}"/><br /><br />
+    <input type ="submit" value ="Submit Changes"/><br />
+    
+    
+</form>
+
+
+
+{% endblock %}
