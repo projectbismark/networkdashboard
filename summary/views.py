@@ -15,7 +15,6 @@ def index(request):
 
 def editDevicePage(request, device):
     device_details = Devicedetails.objects.filter(deviceid=device)
-    print device_details[0].name
     return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device})
 
 def editDevice(request, device):
@@ -28,7 +27,6 @@ def editDevice(request, device):
     dcity = request.POST.get('city')
     dstate = request.POST.get('state')
     dcountry = request.POST.get('country')           
-    print durate
     device_details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now())
     device_details.save()
     try:
