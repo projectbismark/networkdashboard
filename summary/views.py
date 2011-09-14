@@ -1,6 +1,6 @@
 # Create your views here.
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 import urllib2, urllib, json
 from django.shortcuts import render_to_response
 from networkdashboard.summary.models import *
@@ -23,6 +23,7 @@ def editDevicePage(request, device):
     return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device})
 
 def editDevice(request, device):
+    print "editing \n"
     dname = request.POST.get('name')
     disp = request.POST.get('isp')
     dlocation = request.POST.get('location')
@@ -32,22 +33,23 @@ def editDevice(request, device):
     dcity = request.POST.get('city')
     dstate = request.POST.get('state')
     dcountry = request.POST.get('country')           
-    device_details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now())
-    device_details.save()
-    try:
-        device_search = MBitrate.objects.filter(deviceid=device)
-        if len(device_search)<1:
-            return render_to_response('device_not_found.html', {'deviceid': device})
-    except:
-        return render_to_response('device_not_found.html', {'deviceid': device})
-    first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
-    first = datetime.fromtimestamp(mktime(first[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-    
-    calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
-    calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
-    last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-    return render_to_response('device.html', {'detail': device_details,'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderTo,'calenderTo': calenderFrom, 'deviceid': device})                                
+    details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now())
+    details.save()
+##    try:
+##        device_details = Devicedetails.objects.filter(deviceid=device)
+##        device_search = MBitrate.objects.filter(deviceid=device)
+##        if (len(device_search)<1 or len(device_details)<1):
+##            return render_to_response('device_not_found.html', {'deviceid': device})
+##    except:
+##        return render_to_response('device_not_found.html', {'deviceid': device})
+##    first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
+##    first = datetime.fromtimestamp(mktime(first[0].eventstamp.timetuple())).strftime("%B %d, %Y")
+##    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
+##    
+##    calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
+##    calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
+##    last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
+##    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderTo,'calenderTo': calenderFrom, 'deviceid': device})                                
     
 def invalidEdit(request, device):
     return render_to_response('invalid_edit.html', {'deviceid' : device})
@@ -90,11 +92,33 @@ def showactivedevices(request):
     return render_to_response('devices.html', {'device_list': thelist})
 
 def devicesummary(request):
-    device = request.POST.get('device')
-    device_details = Devicedetails.objects.filter(deviceid=device)
+    device = request.POST.get("device")
+    if(request.POST.get("edit")):
+        try:
+            dname = request.POST.get('name')
+            disp = request.POST.get('isp')
+            dlocation = request.POST.get('location')
+            dsp = request.POST.get('sp')
+            durate = int(request.POST.get('urate'))
+            ddrate = int(request.POST.get('drate'))
+            dcity = request.POST.get('city')
+            dstate = request.POST.get('state')
+            dcountry = request.POST.get('country')           
+            details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now())
+            details.save()
+        except:
+            return render_to_response('invalid_edit.html', {'deviceid' : device})
+
+
+    device_details = Devicedetails.objects.filter(deviceid=device) 
+    if len(device_details)<1:
+        device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
+        device_entry.save()
+        device_details = Devicedetails.objects.filter(deviceid=device)
+    
     try:
         device_search = MBitrate.objects.filter(deviceid=device)
-        if len(device_search)<1:
+        if (len(device_search)<1):
             return render_to_response('device_not_found.html', {'deviceid': device})
     except:
         return render_to_response('device_not_found.html', {'deviceid': device})
@@ -105,7 +129,7 @@ def devicesummary(request):
     calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
     calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
     last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-    return render_to_response('device.html', {'detail': device_details,'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderTo,'calenderTo': calenderFrom, 'deviceid': device}) 
+    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device}) 
 
 def getISP(request, device):
 ##    UDrow = Userdevice.objects.filter(deviceid=device)
@@ -222,7 +246,6 @@ def cvs_linegraph(request):
     s3 = ParseDateTimeUTC(str(s2))
     s4 = datetime.fromtimestamp(s3)   
     start = s4
-
     e = request.GET.get('end')
     e2 = datetime.strptime(e,"%m/%d/%Y")
     e3 = ParseDateTimeUTC(str(e2))
@@ -230,7 +253,6 @@ def cvs_linegraph(request):
     e4 = datetime.fromtimestamp(e3)+ timedelta(1,0)
     end = e4
     if chosen_param == 'AGGL3BITRATE' :
-	  
         device_details_down = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,srcip='143.215.131.173')
         device_details_up = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,dstip='143.215.131.173')
         
@@ -252,13 +274,13 @@ def cvs_linegraph(request):
         output = xVariable + "," + yVariable + "," +  y2Variable +"\n"
 
         for i in range(0,min(len(dat1),len(dat2))):
+            print "appending \n"
             ret = str(tim1[i]) + "," + str(dat1[i]) + "," + str(dat2[i]) + "\n"
             output += ret
 
     elif chosen_param == 'RTT' :
 
         distinct_ips = MRtt.objects.values('dstip').distinct()
-        print (distinct_ips)
 	xVariable = "Date"
         yVariable = request.GET.get('unit')
         output = xVariable
@@ -271,10 +293,8 @@ def cvs_linegraph(request):
 	    r1 = urlobj.read()
 	    urlobj.close()
 	    datadict = json.loads(r1)
-	    print datadict
             output = output + "," + datadict['cityName']+"-" + datadict['countryCode'] + "test"
         output+="\n"
-	print output
         time = list()
         data = list()
         for row_ip in distinct_ips:
@@ -314,6 +334,7 @@ def cvs_linegraph(request):
             output += ret
 
     return HttpResponse(output)
+
 
 
 def pie_chart(request):

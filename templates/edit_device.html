@@ -1,22 +1,66 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1> Edit Device {{deviceid}} </h1> <br />
+<h3> Edit Device {{deviceid}} </h3> <br />
 
-<form name ="edit" action="/editDevice/{{deviceid}}/" method="POST">
-    Name: <input type ="text" name ="name" value = "{{detail.name}}" /><br />
-    ISP: <input type ="text" name ="isp" value = "{{detail.isp}}" /><br />
-    Service Plan: <input type ="text" name ="sp" value = "{{detail.serviceplan}}"/><br />
-    Upload Rate: <input type = "text" name ="urate" value = "{{detail.uploadrate}}" /> kbps<br />
-    Download Rate: <input type ="text" name ="drate" value = "{{detail.downloadrate}}" /> kbps<br />
-    City: <input type ="text" name ="city" value = "{{detail.city}}" /><br />
-    State: <input type ="text" name ="state" value = "{{detail.state}}" /><br />
-    Country: <input type ="text" name ="country" value = "{{detail.country}}"/><br /><br />
+
+<form name ="edit" action="/device/" method="POST">
+    <table border="0">
+        <tr>
+            <td>Name</td>
+            <td>
+                <input type ="text" name ="name" value = "{{detail.name}}" size ="20"/>
+            </td>
+        </tr>
+        <tr>
+            <td>ISP</td>
+            <td>
+                <input type ="text" name ="isp" value = "{{detail.isp}}" size ="20" />
+            </td>
+        </tr>
+        <tr>
+            <td>Service Plan</td>
+            <td>
+                <input type ="text" name ="sp" value = "{{detail.serviceplan}}" size ="20"/>
+            </td>
+        </tr>
+        <tr>
+            <td>Upload Rate (kbps)</td>
+            <td>
+                <input type = "text" name ="urate" value = "{{detail.uploadrate}}" size ="20" />
+            </td>
+        </tr>
+        <tr>
+            <td>Download Rate (kbps)</td>
+            <td>
+                <input type ="text" name ="drate" value = "{{detail.downloadrate}}" size ="20" />
+            </td>
+        </tr>
+        <tr>
+            <td>City</td>
+            <td>
+                <input type ="text" name ="city" value = "{{detail.city}}" size="20"/>
+            </td>
+        </tr>
+        <tr>
+            <td>State</td>
+            <td>
+                <input type ="text" name ="state" value = "{{detail.state}}" size="20"/>
+            </td>
+        </tr>
+        <tr>
+            <td>Country</td>
+            <td>
+                <input type ="text" name ="country" value = "{{detail.country}}" size="20"/>
+            </td>
+        </tr>
+        
+    </table>
+    <input type ="hidden" name ="device" value = "{{deviceid}}"/>
+    <input type ="hidden" name ="edit" value ="edit"/>
     <input type ="submit" value ="Submit Changes"/><br />
     
-    
 </form>
-
 
 
 {% endblock %}
