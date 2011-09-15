@@ -240,10 +240,10 @@ def cvs_linegraph(request):
         for measure in device_details_down:
             t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
             tim1.append(t)
-            dat1.append(measure.average)
+            dat1.append(str(measure.average) + ", " + str(measure.std))
 
         for measure in device_details_up:
-            dat2.append(measure.average)
+            dat2.append(str(measure.average) + ", " + str(measure.std))
 
         xVariable = "Date"
         yVariable = "Down (kbps)"
@@ -277,8 +277,8 @@ def cvs_linegraph(request):
         for row_ip in distinct_ips:
             device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit, dstip = row_ip["dstip"])
             data1 = list()
-            for row_details in device_details:
-                data1.append(row_details.average)
+            for measure in device_details:
+                data1.append(str(measure.average) + ", " + str(measure.std))
 
             data.append(data1)
             
@@ -307,7 +307,7 @@ def cvs_linegraph(request):
         output = xVariable + "," + yVariable +"\n"
         for measure in device_details:
             t = measure.eventstamp
-            ret = str(t) + "," + str((measure.average)) + "\n"
+            ret = str(t) + "," + str(measure.average) + ", " + str(measure.std) + "\n"
             output += ret
 
     return HttpResponse(output)

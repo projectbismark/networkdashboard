@@ -3,7 +3,7 @@
 
 
 
-    <h3>BISMark Device: {{ deviceid }}</h3>
+    <h1>BISMark Device: {{ deviceid }}            <a href ="/editDevicePage/{{deviceid}}/"> Edit </a></h1>
 <script src="/static/jquery-latest.js"></script>
     <table>
 	<!--
@@ -42,9 +42,6 @@
 <tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
 </table>
 
-<br />
-<a href ="/editDevicePage/{{deviceid}}/">Edit Device </a>
-
 <br/><br/>
 <script type="text/javascript" src="/static/swfobject.js"></script>
 <script type="text/javascript" src="/static/dygraph-combined.js"></script>
@@ -62,6 +59,7 @@
             dojo.require("dijit.form.Button");
             dojo.require("dijit.TitlePane");
             dojo.require("dijit.layout.ContentPane");
+	   dojo.require("dijit.form.Textarea");
         </script>
         <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/claro/claro.css"
         />
@@ -98,6 +96,7 @@
 <input type="radio" name="g1" id="g1rb4" value="weather" dojoType="dijit.form.RadioButton">
 
 <label for="g1rb4">Passive Usage</label><br/><br/>
+<div class="chart" id="chart_demo" style="display:block;" ></div>
 -->
 <input type="radio" name="g1" id="g1rb1" value="news" dojoType="dijit.form.RadioButton">
 
@@ -107,10 +106,7 @@
 </td>
 <td>
 
-<label id="loading" for="progressShow" style="display:none;">
-Loading...
-</label>
-<div id="progress" style="width:400px;" indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
+
 
 </td>
 <tr/>
@@ -118,9 +114,10 @@ Loading...
 </table>
 
 <button dojoType="dijit.form.Button" type="submit" name="submit" onClick="render()">Display</button><br/><br/>
-
-<div class="chart" id="chart_demo" style="display:block;" ></div>
-<div id="graph_div" style="width:600px; height:300px;"></div>
+<div id="progress" style="width:400px;" indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
+<div id="display_tag">
+	<div id="graph_div" style="width:600px; height:300px;"></div>
+</div>
 <script type="text/javascript">
 
 	
@@ -169,17 +166,16 @@ Loading...
           content=data;
 
 	  
-	  
+
 	         g = new Dygraph(document.getElementById("graph_div"),
 			   content,
 			   {
 	      		   rollPeriod: 1,
 	      		   showRoller: true,
+ 			   errorBars: true,
+
 	    		   }
 			   );
-
-
-		loading.innerHTML = "";
 	  
 	 CloseProgressBar();
 	  
@@ -208,17 +204,16 @@ Loading...
 	function CloseProgressBar() {
 		    var progressbar_container = document.getElementById("progress");
                 progressbar_container.style.display="none";
+		    document.getElementById("graph_div").display = "block";
 		
         }
 
 	function OpenProgressBar() {
 		    var progressbar_container = document.getElementById("progress");
                 progressbar_container.style.display="block";
-		var chart_container = document.getElementById("chart_demo");
-		chart_container.style.display="none";
-		
-		loading.innerHTML = "loading...";
 
+		     g = new Dygraph(document.getElementById("graph_div"),0);
+		    
             
         }
 
