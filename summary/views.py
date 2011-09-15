@@ -17,40 +17,16 @@ def editDevicePage(request, device):
     device_details = Devicedetails.objects.filter(deviceid=device)
     if len(device_details) < 1:
 	device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
-	device_entry.save()
-	return render_to_response('edit_device.html', {'detail' : device_entry, 'deviceid': device})
-
-    return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device})
-
-def editDevice(request, device):
-    print "editing \n"
-    dname = request.POST.get('name')
-    disp = request.POST.get('isp')
-    dlocation = request.POST.get('location')
-    dsp = request.POST.get('sp')
-    durate = int(request.POST.get('urate'))
-    ddrate = int(request.POST.get('drate'))
-    dcity = request.POST.get('city')
-    dstate = request.POST.get('state')
-    dcountry = request.POST.get('country')           
-    details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now())
-    details.save()
-##    try:
-##        device_details = Devicedetails.objects.filter(deviceid=device)
-##        device_search = MBitrate.objects.filter(deviceid=device)
-##        if (len(device_search)<1 or len(device_details)<1):
-##            return render_to_response('device_not_found.html', {'deviceid': device})
-##    except:
-##        return render_to_response('device_not_found.html', {'deviceid': device})
-##    first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
-##    first = datetime.fromtimestamp(mktime(first[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-##    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-##    
-##    calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
-##    calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
-##    last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-##    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderTo,'calenderTo': calenderFrom, 'deviceid': device})                                
+    else:
+	device_entry = device_details[0]
     
+    isp_options = ["Comcast","Verizon","At&t"]
+    isp_options.sort()
+    country_options = ['United States','South Africa','France']
+    country_options.sort()
+    
+    return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device, 'isp_options': isp_options, 'country_options': country_options})
+
 def invalidEdit(request, device):
     return render_to_response('invalid_edit.html', {'deviceid' : device})
 
@@ -129,6 +105,7 @@ def devicesummary(request):
     calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
     calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
     last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
+
     return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device}) 
 
 def getISP(request, device):

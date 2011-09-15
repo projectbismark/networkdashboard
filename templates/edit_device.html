@@ -12,10 +12,22 @@
                 <input type ="text" name ="name" value = "{{detail.name}}" size ="20"/>
             </td>
         </tr>
-        <tr>
+  	<tr>
             <td>ISP</td>
             <td>
-                <input type ="text" name ="isp" value = "{{detail.isp}}" size ="20" />
+		<select name = "isp">
+
+	   		{% for isp in isp_options %}
+				{% if isp == detail.isp %}
+ 					<option selected>{{isp}}</option>
+				{% endif %}
+				{% if isp != detail.isp %}
+ 					<option>{{isp}}</option>
+				{% endif %}
+				
+	   		{% endfor %}
+		</select>
+
             </td>
         </tr>
         <tr>
@@ -51,7 +63,19 @@
         <tr>
             <td>Country</td>
             <td>
-                <input type ="text" name ="country" value = "{{detail.country}}" size="20"/>
+		<select name = "country">
+
+	   		{% for country in country_options %}
+				{% if country == detail.country %}
+ 					<option selected>{{country}}</option>
+				{% endif %}
+				{% if country != detail.country %}
+ 					<option>{{country}}</option>
+				{% endif %}
+				
+	   		{% endfor %}
+		</select>
+
             </td>
         </tr>
         
