@@ -117,11 +117,11 @@
 <div id="progress" style="width:400px;" indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
 <div id="display_tag">
 	<div id="graph_div" style="width:600px; height:300px;"></div>
+
 </div>
 <script type="text/javascript">
 
-	
-	
+
 	var content="[not loaded]";
 	var limit = 9999999;
 	var units = "val";
@@ -178,6 +178,25 @@
 			   );
 	  
 	 CloseProgressBar();
+        }
+         
+         function OnSuccess2(data)
+        {
+          content=data;
+
+	  
+
+	         g2 = new Dygraph(document.getElementById("graph_div2"),
+			   content,
+			   {
+	      		   rollPeriod: 1,
+	      		   showRoller: true,
+ 			   errorBars: true,
+
+	    		   }
+			   );
+	  
+	 CloseProgressBar();
 	  
 	  	
         }
@@ -186,9 +205,30 @@
         {
 	  alert("data loading failed");
         }
+        
+        function deleteDiv(){
+            if (document.getElementById('graph_div2')){
+                var dtag = document.getElementById('display_tag');
+                var gd2 = document.getElementById('graph_div2');
+                dtag.removeChild(gd2);
+            }
+        }
+        
+        function createDiv(){
+            var dtag = document.getElementById('display_tag');
+            var gd2 = document.createElement('div');
+            var divName = 'graph_div2';
+            var divStyle = 'width:600px; height:300px;';
+            gd2.setAttribute('id',divName);
+            gd2.setAttribute('style',divStyle);
+            dtag.appendChild(gd2);
+            
+        }
 	
 	function render()
 	{
+            
+        deleteDiv();
 	createStyle();
 	OpenProgressBar();
 	
@@ -196,10 +236,20 @@
 	$.ajax({
                 type: "GET",
                 url: loc,
-                data: {'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
+                data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
                 success: OnSuccess,
             });
-	}
+        
+        if(paramselect=="AGGL3BITRATE"){
+            createDiv();
+            $.ajax({
+                type: "GET",
+                url: loc,
+                data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
+                success: OnSuccess2,
+            });
+        }
+        }
 
 	function CloseProgressBar() {
 		    var progressbar_container = document.getElementById("progress");

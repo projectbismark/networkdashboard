@@ -212,6 +212,7 @@ def cvs_linegraph(request):
     chosen_param = request.GET.get('param')
     chosen_limit = request.GET.get('limit')
     timetype = request.GET.get('type')
+    graphno = int(request.GET.get('graphno'))
     '''
     chosen_param = 'AGGL3BITRATE'
     chosen_limit = 100000
@@ -247,13 +248,20 @@ def cvs_linegraph(request):
 
         xVariable = "Date"
         yVariable = "Down (kbps)"
-        y2Variable = "Up (kbps)"
-        output = xVariable + "," + yVariable + "," +  y2Variable +"\n"
+        if(graphno==2):
+            yVariable = "Up (kbps)"
+            
+        output = xVariable + "," + yVariable + "\n"
 
-        for i in range(0,min(len(dat1),len(dat2))):
-            print "appending \n"
-            ret = str(tim1[i]) + "," + str(dat1[i]) + "," + str(dat2[i]) + "\n"
-            output += ret
+        if(graphno==1):
+            for i in range(0,min(len(dat1),len(dat2))):
+                ret = str(tim1[i]) + "," + str(dat1[i]) +"\n"
+                output += ret
+        elif(graphno==2):
+            for i in range(0,min(len(dat1),len(dat2))):
+                ret = str(tim1[i]) + "," + str(dat2[i]) + "\n"
+                output += ret
+        
 
     elif chosen_param == 'RTT' :
 
@@ -309,7 +317,6 @@ def cvs_linegraph(request):
             t = measure.eventstamp
             ret = str(t) + "," + str(measure.average) + ", " + str(measure.std) + "\n"
             output += ret
-
     return HttpResponse(output)
 
 
