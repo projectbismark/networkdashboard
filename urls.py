@@ -10,7 +10,7 @@ urlpatterns = patterns('',
     # Example:
     # (r'^dashboard/', include('dashboard.foo.urls')),
 
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
+    # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
@@ -32,7 +32,7 @@ urlpatterns = patterns('',
      (r'^getLastUpdate/(?P<device>\w+)', 'networkdashboard.summary.views.getLastUpdate'),
      (r'^getLastUpdateYMD/(?P<device>\w+)', 'networkdashboard.summary.views.getLastUpdateYMD'),
      (r'^getFirstUpdate/(?P<device>\w+)', 'networkdashboard.summary.views.getFirstUpdate'),
-     (r'^getLocation/(?P<device>\w+)', 'networkdashboard.summary.views.getLocation'),                  
+     (r'^getLocation/(?P<device>\w+)', 'networkdashboard.summary.views.getLocation'),
      (r'^data/(?P<device>\w+)', 'networkdashboard.summary.views.line_data2'),
      (r'^data_chart/', 'networkdashboard.summary.views.cvs_linegraph'),
      (r'^data/', 'networkdashboard.summary.views.pie_chart'),
@@ -40,4 +40,6 @@ urlpatterns = patterns('',
      (r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root':settings.MEDIA_ROOT})
 
 )
+
+
 
