@@ -235,6 +235,7 @@ def cvs_linegraph(request):
         device_details_up = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,dstip='143.215.131.173')
         
         tim1 = list()
+        tim2 = list()
         dat1 = list()
         dat2 = list()
        
@@ -244,6 +245,8 @@ def cvs_linegraph(request):
             dat1.append(str(measure.average) + ", " + str(measure.std))
 
         for measure in device_details_up:
+            t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
+            tim2.append(t)
             dat2.append(str(measure.average) + ", " + str(measure.std))
 
         xVariable = "Date"
@@ -259,7 +262,7 @@ def cvs_linegraph(request):
                 output += ret
         elif(graphno==2):
             for i in range(0,min(len(dat1),len(dat2))):
-                ret = str(tim1[i]) + "," + str(dat2[i]) + "\n"
+                ret = str(tim2[i]) + "," + str(dat2[i]) + "\n"
                 output += ret
         
 
