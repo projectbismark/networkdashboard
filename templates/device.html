@@ -102,6 +102,15 @@
 
 <label for="g1rb1">Round Trip Time (ms)</label><br/><br/>
 
+<input type="radio" name = "mode" id="lin" dojoType="dijit.form.RadioButton" checked>
+<label for="lin">Linear</label>
+
+<input type="radio" name = "mode" id="log" dojoType ="dijit.form.RadioButton">
+<label for="log">Log</label><br /><br />
+
+
+
+
 
 </td>
 <td>
@@ -113,11 +122,12 @@
 
 </table>
 
-<button dojoType="dijit.form.Button" type="submit" name="submit" onClick="render()">Display</button><br/><br/>
-<div id="progress" style="width:400px;" indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
-<div id="display_tag">
-	<div id="graph_div" style="width:600px; height:300px;"></div>
+<button dojoType="dijit.form.Button" type="submit" name="submit" onClick="render()">Display</button>
 
+        
+<div id="progress" style="width:400px;" indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
+<div id="display_tag" style ="width:600px;">
+    <div id="graph_div" style="width:600px; height:300px;"></div>
 </div>
 <script type="text/javascript">
 
@@ -126,6 +136,8 @@
 	var limit = 9999999;
 	var units = "val";
 	var paramselect = "RTT";
+        var logdisplay = false;
+
 	
 	var loc = window.location.href;
 	spl = loc.split('/');
@@ -159,6 +171,13 @@
 			units = "kbps"
 			paramselect = "AGGL3BITRATE"
 		}
+                if(lin.checked){
+                    logdisplay = false;
+                }
+                else if(log.checked){
+                    logdisplay = true;
+                }
+                 
 	}
 
         function OnSuccess(data)
@@ -167,15 +186,17 @@
 
 	  
 
-	         g = new Dygraph(document.getElementById("graph_div"),
-			   content,
-			   {
-	      		   rollPeriod: 1,
-	      		   showRoller: true,
- 			   errorBars: true,
+             g = new Dygraph(document.getElementById("graph_div"),
+                       content,
+                       {
+                       rollPeriod: 1,
+                       showRoller: true,
+                       errorBars: true,
+                       logscale: logdisplay,
 
-	    		   }
-			   );
+                       }
+                       );
+
 	  
 	 CloseProgressBar();
         }
@@ -192,26 +213,44 @@
 	      		   rollPeriod: 1,
 	      		   showRoller: true,
  			   errorBars: true,
-
+                           logscale: logdisplay,
 	    		   }
 			   );
 	  
 	 CloseProgressBar();
-	  
-	  	
         }
+        
+        function setDisplayMode(log) {
+            g0.updateOptions({ logscale: val });
+            g1.updateOptions({ logscale: val });
+            document.getElementById("linear").disabled = !val;
+            document.getElementById("log").disabled = val;
+      }
+
 	
         function OnError(data)
         {
 	  alert("data loading failed");
         }
         
-        function deleteDiv(){
-            if (document.getElementById('graph_div2')){
-                var dtag = document.getElementById('display_tag');
-                var gd2 = document.getElementById('graph_div2');
+        function deleteDivs(){
+            
+            var dtag = document.getElementById('display_tag');
+            var l1 = document.getElementById('label1');
+            var l2 = document.getElementById('label2');
+            var gd2 = document.getElementById('graph_div2');
+            
+            if (l1){
+                dtag.removeChild(l1);
+            }
+            if (l2){
+                dtag.removeChild(l2);
+            }
+            if (gd2){
                 dtag.removeChild(gd2);
             }
+            
+   
         }
         
         function createDiv(){
@@ -224,11 +263,45 @@
             dtag.appendChild(gd2);
             
         }
+        
+        
+        function addLabels(){
+            
+            
+            var display = document.getElementById('display_tag');
+            var label1 = document.createElement('div');
+            
+            if(paramselect == "AGGL3BITRATE"){
+                label1.innerHTML = '<b>Download Throughput (kbps)</b> <br />';
+                var label2 = document.createElement('div');
+                label2.innerHTML = '<br/><br/><b>Upload Throughput (kbps)</b><br /><br />';
+                var lname2 = 'label2';
+                label2.setAttribute('id',lname2);
+                label2.setAttribute('align','center');
+                display.insertBefore(label2,display.lastChild);
+            }
+            else if(paramselect == "RTT"){
+                label1.innerHTML = '<b> Round Trip Time (msec)</b><br /><br />';
+            }
+            else if(paramselect == "LMRTT"){
+                label1.innerHTML = '<b> Last-Mile Latency (msec)</b><br /><br />';
+            }
+            
+            var lname1 = 'label1';
+            label1.setAttribute('id',lname1);
+            label1.setAttribute('align','center');
+            display.insertBefore(label1,display.firstChild);  
+            
+    
+        }
+            
+            
+        
 	
 	function render()
 	{
             
-        deleteDiv();
+        deleteDivs();
 	createStyle();
 	OpenProgressBar();
 	
@@ -249,6 +322,8 @@
                 success: OnSuccess2,
             });
         }
+        
+        addLabels();
         }
 
 	function CloseProgressBar() {
