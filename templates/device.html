@@ -199,6 +199,7 @@
                        showRoller: true,
                        errorBars: true,
                        logscale: logdisplay,
+                       connectSeperatedPoints: true
 
                        }
                        );
@@ -223,6 +224,7 @@
 	      		   showRoller: true,
  			   errorBars: true,
                            logscale: logdisplay,
+                           connectSeperatedPoints: true
 	    		   }
 			   );
 	  
@@ -332,7 +334,7 @@
                 type: "GET",
                 url: loc,
                 data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
-                success: OnSuccess,
+                success: OnSuccess
             });
         
         if(paramselect=="AGGL3BITRATE"){
@@ -341,7 +343,7 @@
                 type: "GET",
                 url: loc,
                 data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
-                success: OnSuccess2,
+                success: OnSuccess2
             });
         }
         
