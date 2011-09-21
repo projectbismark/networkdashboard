@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-
-
+<div class ="section">
     <h1>BISMark Device: {{ deviceid }}            <a href ="/editDevicePage/{{deviceid}}/"> Edit </a></h1>
 <script src="/static/jquery-latest.js"></script>
     <table>
@@ -30,6 +29,7 @@
         <tr><td>Service Plan</td><td>{{ detail.serviceplan }}</td></tr>
         <tr><td>Download Rate</td><td>{{ detail.downloadrate}} kbps</td></tr>
         <tr><td>Upload Rate</td><td>{{ detail.uploadrate}} kbps</td></tr>
+    
  
   
         
@@ -42,7 +42,11 @@
 <tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
 </table>
 
-<br/><br/>
+</div>
+<br />
+
+<div class="section">
+
 <script type="text/javascript" src="/static/swfobject.js"></script>
 <script type="text/javascript" src="/static/dygraph-combined.js"></script>
 
@@ -102,11 +106,6 @@
 
 <label for="g1rb1">Round Trip Time (ms)</label><br/><br/>
 
-<input type="radio" name = "mode" id="lin" dojoType="dijit.form.RadioButton" checked>
-<label for="lin">Linear</label>
-
-<input type="radio" name = "mode" id="log" dojoType ="dijit.form.RadioButton">
-<label for="log">Log</label><br /><br />
 
 
 
@@ -123,11 +122,23 @@
 </table>
 
 <button dojoType="dijit.form.Button" type="submit" name="submit" onClick="render()">Display</button>
+</div>
 
         
 <div id="progress" style="width:400px;" indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
-<div id="display_tag" style ="width:600px;">
-    <div id="graph_div" style="width:600px; height:300px;"></div>
+<br />
+
+<div class ="graphdisplay" id = "display_tag" >
+    <div class ="radiodiv" id ="radio_div">
+    </div>
+<!--    <div class ="radiodiv"
+    <input type="radio" name = "mode" id="lin" onClick="setDisplayMode(false)" checked>
+    <label for="lin">Linear</label>
+
+    <input type="radio" name = "mode" id="log" onClick ="setDisplayMode(true)">
+    <label for="log">Log</label><br /><br />
+    </div>-->
+    <div class ="graphdiv"id="graph_div"></div>
 </div>
 <script type="text/javascript">
 
@@ -147,7 +158,7 @@
        	
 	function start()
 	{
-	CloseProgressBar();
+            CloseProgressBar();
 	}
 
 	function createStyle()
@@ -171,12 +182,6 @@
 			units = "kbps"
 			paramselect = "AGGL3BITRATE"
 		}
-                if(lin.checked){
-                    logdisplay = false;
-                }
-                else if(log.checked){
-                    logdisplay = true;
-                }
                  
 	}
 
@@ -220,12 +225,11 @@
 	 CloseProgressBar();
         }
         
-        function setDisplayMode(log) {
-            g0.updateOptions({ logscale: val });
-            g1.updateOptions({ logscale: val });
-            document.getElementById("linear").disabled = !val;
-            document.getElementById("log").disabled = val;
-      }
+        function setDisplayMode(log){
+            g.updateOptions({logscale:log})
+            g2.updateOptions({logscale:log})
+        }
+        
 
 	
         function OnError(data)
@@ -235,6 +239,7 @@
         
         function deleteDivs(){
             
+            graphs = [];
             var dtag = document.getElementById('display_tag');
             var l1 = document.getElementById('label1');
             var l2 = document.getElementById('label2');
@@ -257,11 +262,23 @@
             var dtag = document.getElementById('display_tag');
             var gd2 = document.createElement('div');
             var divName = 'graph_div2';
-            var divStyle = 'width:600px; height:300px;';
+            var divStyle = 'width:600px; height:300px; margin-left:auto; margin-right: auto;';
             gd2.setAttribute('id',divName);
             gd2.setAttribute('style',divStyle);
             dtag.appendChild(gd2);
             
+        }
+        
+        function addRadios(){
+            if(!document.getElementById('lin')){
+                var rdiv = document.getElementById('radio_div');
+                var r1 = "<input type='radio' name = 'mode' id='lin' onClick='setDisplayMode(false)' checked>"
+                var r2 = "<input type='radio' name = 'mode' id='log' onClick='setDisplayMode(true)'>"
+                rdiv.innerHTML = "Linear: ";
+                rdiv.innerHTML += r1;
+                rdiv.innerHTML += "Log: ";
+                rdiv.innerHTML += r2;
+            }
         }
         
         
@@ -290,7 +307,8 @@
             var lname1 = 'label1';
             label1.setAttribute('id',lname1);
             label1.setAttribute('align','center');
-            display.insertBefore(label1,display.firstChild);  
+            display.insertBefore(label1,display.firstChild);
+            
             
     
         }
@@ -300,7 +318,7 @@
 	
 	function render()
 	{
-            
+        addRadios();    
         deleteDivs();
 	createStyle();
 	OpenProgressBar();
