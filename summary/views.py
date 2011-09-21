@@ -231,41 +231,49 @@ def cvs_linegraph(request):
     e4 = datetime.fromtimestamp(e3)+ timedelta(1,0)
     end = e4
     if chosen_param == 'AGGL3BITRATE' :
-        device_details_down = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,srcip='143.215.131.173')
-        device_details_up = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,dstip='143.215.131.173')
-        
-        tim1 = list()
+
+	tim1 = list()
         tim2 = list()
         dat1 = list()
         dat2 = list()
-       
-        for measure in device_details_down:
-            t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
-            tim1.append(t)
-            dat1.append(str(measure.average) + ", " + str(measure.std))
 
-        for measure in device_details_up:
-            t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
-            tim2.append(t)
-            dat2.append(str(measure.average) + ", " + str(measure.std))
+	xVariable = "Date"
 
-        xVariable = "Date"
-        yVariable = "Down (kbps)"
-        if(graphno==2):
-            yVariable = "Up (kbps)"
-            
-        output = xVariable + "," + yVariable + "\n"
+	if (graphno==1):
+		device_details_down = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,srcip='143.215.131.173')
 
-        if(graphno==1):
-            for i in range(0,min(len(dat1),len(dat2))):
-                ret = str(tim1[i]) + "," + str(dat1[i]) +"\n"
-                output += ret
-        elif(graphno==2):
-            for i in range(0,min(len(dat1),len(dat2))):
-                ret = str(tim2[i]) + "," + str(dat2[i]) + "\n"
-                output += ret
+		for measure in device_details_down:
+            		t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
+		        tim1.append(t)
+	
+        	    	dat1.append(str(measure.average) + ", " + str(measure.std))
+
+	        yVariable = "Down (kbps)"
+
+		output = xVariable + "," + yVariable + "\n"
+		
+		for i in range(0,len(dat1)):
+	                ret = str(tim1[i]) + "," + str(dat1[i]) +"\n"
+        	        output += ret
+			print ret
+
+	elif (graphno==2): 
+        	device_details_up = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,dstip='143.215.131.173')
         
+	        for measure in device_details_up:
+        		t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
+	        	tim2.append(t)
+        		dat2.append(str(measure.average) + ", " + str(measure.std))
 
+		yVariable = "Up (kbps)"
+
+		output = xVariable + "," + yVariable + "\n"
+			
+		for i in range(0,len(dat2)):
+                	ret = str(tim2[i]) + "," + str(dat2[i]) + "\n"
+                	output += ret
+
+		
     elif chosen_param == 'RTT' :
 
         distinct_ips = MRtt.objects.values('dstip').distinct()
@@ -320,6 +328,7 @@ def cvs_linegraph(request):
             t = measure.eventstamp
             ret = str(t) + "," + str(measure.average) + ", " + str(measure.std) + "\n"
             output += ret
+
     return HttpResponse(output)
 
 
