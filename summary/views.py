@@ -308,7 +308,7 @@ def cvs_linegraph(request):
 	    if(measure.average <= 0):
 	    	continue
             t = measure.eventstamp
-            ret = str(t) + "," + str(measure.average) + ", " + str(measure.std) + "\n"
+            ret = str(t) + "," + str(measure.average) +"\n"
             output += ret
 
     return HttpResponse(output)
