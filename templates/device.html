@@ -149,6 +149,7 @@
 	var units = "val";
 	var paramselect = "RTT";
         var logdisplay = false;
+        var errors;
 
 	
 	var loc = window.location.href;
@@ -170,18 +171,21 @@
 			limit = 1000;
 			units = "msec"
 			paramselect = "RTT"
+                        errors = true;
 		}
 		else if(g1rb2.checked)
 		{
 			limit = 1000;
 			units = "msec"
 			paramselect = "LMRTT"
+                        errors = true;
 		}
 		else if(g1rb3.checked)
 		{
 			limit = 200000;
 			units = "kbps"
 			paramselect = "AGGL3BITRATE"
+                        errors = false;
 		}
                  
 	}
@@ -197,7 +201,7 @@
                        {
                        rollPeriod: 1,
                        showRoller: true,
-                       errorBars: true,
+                       errorBars: errors,
                        logscale: logdisplay,
                        connectSeparatedPoints: true
 
@@ -206,7 +210,6 @@
 
 	  
 	 CloseProgressBar();
-         addRadios();
          addLabels();
          
         }
@@ -222,7 +225,7 @@
 			   {
 	      		   rollPeriod: 1,
 	      		   showRoller: true,
- 			   errorBars: true,
+ 			   errorBars: errors,
                            logscale: logdisplay,
                            connectSeparatedPoints: true
 	    		   }
@@ -328,6 +331,7 @@
         deleteDivs();
 	createStyle();
 	OpenProgressBar();
+        addRadios();
 	
 	
 	$.ajax({
