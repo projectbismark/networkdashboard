@@ -63,6 +63,13 @@ DIV.graphdisplay {
     margin-right: auto;
 }
 
+DIV.progressbar {
+    width: 500px;
+    margin-left:auto;
+    margin-right:auto;
+    text-align:center;
+}
+
 
 DIV.graphdiv {
     margin-left:auto;

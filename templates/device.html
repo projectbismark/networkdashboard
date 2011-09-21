@@ -125,10 +125,11 @@
 </div>
 
         
-<div id="progress" style="width:400px;" indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
+
 <br />
 
 <div class ="graphdisplay" id = "display_tag" >
+    <div class="progressbar" id="progress"  indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
     <div class ="radiodiv" id ="radio_div">
     </div>
 <!--    <div class ="radiodiv"
@@ -204,6 +205,9 @@
 
 	  
 	 CloseProgressBar();
+         addRadios();
+         addLabels();
+         
         }
          
          function OnSuccess2(data)
@@ -318,7 +322,7 @@
 	
 	function render()
 	{
-        addRadios();    
+            
         deleteDivs();
 	createStyle();
 	OpenProgressBar();
@@ -341,7 +345,6 @@
             });
         }
         
-        addLabels();
         }
 
 	function CloseProgressBar() {
@@ -354,8 +357,6 @@
 	function OpenProgressBar() {
 		    var progressbar_container = document.getElementById("progress");
                 progressbar_container.style.display="block";
-
-		     g = new Dygraph(document.getElementById("graph_div"),0);
 		    
             
         }
