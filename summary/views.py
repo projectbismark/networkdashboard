@@ -243,9 +243,11 @@ def cvs_linegraph(request):
 
 	for measure in device_details:
             	t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
-		print measure.toolid
-		if(measure.toolid=='NETPERF_3'):
+		if(measure.average <= 0):
+			continue
+		if(str(measure.toolid)=='NETPERF'):
 			ret = str(t) + "," + str(measure.average) + "," + str(measure.std) +"," +","
+
 		else:
 			ret = str(t) + "," + "," + ","+ str(measure.average) + "," + str(measure.std)
 		output+=ret+"\n"			
