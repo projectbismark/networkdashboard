@@ -20,7 +20,7 @@ def editDevicePage(request, device):
     else:
 	device_entry = device_details[0]
     
-    isp_options = ["Comcast","Verizon","At&t"]
+    isp_options = ["Comcast","Time Warner Cable","At&t","Cox Optimum","Charter","Verizon","CenturyLink","SuddenLink","EarthLink","Windstream","Cable One","Frontier","NetZero Juno","Basic ISP","ISP.com","PeoplePC","AOL MSN","Fairpoint","Qwest","CableVision","MEdiaCom"]
     isp_options.sort()
     country_options = ['United States','South Africa','France']
     country_options.sort()
