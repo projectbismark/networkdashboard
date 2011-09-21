@@ -239,12 +239,11 @@ def cvs_linegraph(request):
 	if (graphno==1):
 		device_details = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,srcip='143.215.131.173')		
 	elif (graphno==2): 
-        	device_details_up = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,dstip='143.215.131.173')
+        	device_details = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,dstip='143.215.131.173')
 
 	for measure in device_details:
             	t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
-        	dat1.append(str(measure.average) + ", " + str(measure.std))
-
+		print measure.toolid
 		if(measure.toolid=='NETPERF_3'):
 			ret = str(t) + "," + str(measure.average) + "," + str(measure.std) +"," +","
 		else:
