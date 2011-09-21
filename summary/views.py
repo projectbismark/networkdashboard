@@ -246,10 +246,10 @@ def cvs_linegraph(request):
 		if(measure.average <= 0):
 			continue
 		if(str(measure.toolid)=='NETPERF_3'):
-			ret = str(t) + "," + str(measure.average) + "," + str(measure.std) +"," +","
+			ret = str(t) + "," + str(measure.average) + "," + str(measure.std) +",null,null"
 
 		else:
-			ret = str(t) + "," + "," + ","+ str(measure.average) + "," + str(measure.std)
+			ret = str(t) + ",null,null,"+ str(measure.average) + "," + str(measure.std)
 		output+=ret+"\n"			
 		
     elif chosen_param == 'RTT' :
