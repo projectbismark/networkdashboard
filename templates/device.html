@@ -148,8 +148,8 @@
 	var limit = 9999999;
 	var units = "val";
 	var paramselect = "RTT";
-        var logdisplay = false;
-        var errors;
+        var logdisplay = log.checked;
+        var connectpoints = false;;
 
 	
 	var loc = window.location.href;
@@ -171,21 +171,21 @@
 			limit = 1000;
 			units = "msec"
 			paramselect = "RTT"
-                        errors = true;
+                        connectpoints = true;
 		}
 		else if(g1rb2.checked)
 		{
 			limit = 1000;
 			units = "msec"
 			paramselect = "LMRTT"
-                        errors = true;
+                        connectpoints = true;
 		}
 		else if(g1rb3.checked)
 		{
 			limit = 200000;
 			units = "kbps"
 			paramselect = "AGGL3BITRATE"
-                        errors = false;
+                        connectpoints = false;
 		}
                  
 	}
@@ -201,9 +201,8 @@
                        {
                        rollPeriod: 1,
                        showRoller: true,
-                       errorBars: errors,
                        logscale: logdisplay,
-                       connectSeparatedPoints: true
+                       connectSeparatedPoints: connectpoints
 
                        }
                        );
@@ -225,7 +224,6 @@
 			   {
 	      		   rollPeriod: 1,
 	      		   showRoller: true,
- 			   errorBars: errors,
                            logscale: logdisplay,
                            connectSeparatedPoints: true
 	    		   }
