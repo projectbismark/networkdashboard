@@ -245,7 +245,7 @@ def cvs_linegraph(request):
             	t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
 		if(measure.average <= 0):
 			continue
-		if(str(measure.toolid)=='NETPERF'):
+		if(str(measure.toolid)=='NETPERF_3'):
 			ret = str(t) + "," + str(measure.average) + "," + str(measure.std) +"," +","
 
 		else:
