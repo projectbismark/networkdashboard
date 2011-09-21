@@ -148,8 +148,8 @@
 	var limit = 9999999;
 	var units = "val";
 	var paramselect = "RTT";
-        var connectpoints = false;
         var logdisplay = false;
+        var special = true;
 
 	
 	var loc = window.location.href;
@@ -171,21 +171,21 @@
 			limit = 1000;
 			units = "msec"
 			paramselect = "RTT"
-                        connectpoints = true;
+                        special = true;
 		}
 		else if(g1rb2.checked)
 		{
 			limit = 1000;
 			units = "msec"
 			paramselect = "LMRTT"
-                        connectpoints = true;
+                        special = true;
 		}
 		else if(g1rb3.checked)
 		{
 			limit = 200000;
 			units = "kbps"
 			paramselect = "AGGL3BITRATE"
-                        connectpoints = false;
+                        special = false;
 		}
                  
 	}
@@ -201,8 +201,9 @@
                        {
                        rollPeriod: 1,
                        showRoller: true,
-                       logscale: logdisplay,
-                       connectSeparatedPoints: connectpoints
+                       logscale: (logdisplay&&special),
+                       errorBars: false,
+                       connectSeparatedPoints: true,
 
                        }
                        );
@@ -224,8 +225,9 @@
 			   {
 	      		   rollPeriod: 1,
 	      		   showRoller: true,
-                           logscale: logdisplay,
-                           connectSeparatedPoints: true
+                           logscale: (logdisplay&&special),
+                           connectSeparatedPoints: true,
+                           errorBars: false,
 	    		   }
 			   );
 	  
@@ -235,6 +237,7 @@
         function setDisplayMode(log){
             g.updateOptions({logscale:log})
             g2.updateOptions({logscale:log})
+            logdisplay = log;
         }
         
 
@@ -276,8 +279,18 @@
             
         }
         
+        function deleteRadios(){
+            if(document.getElementById('lin')){
+                logdisplay = false;
+                var rdiv = document.getElementById('radio_div');
+                rdiv.innerHTML = "";
+                
+            }
+        }
+        
         function addRadios(){
             if(!document.getElementById('lin')){
+                logdisplay = false;
                 var rdiv = document.getElementById('radio_div');
                 var r1 = "<input type='radio' name = 'mode' id='lin' onClick='setDisplayMode(false)' checked>"
                 var r2 = "<input type='radio' name = 'mode' id='log' onClick='setDisplayMode(true)'>"
@@ -340,6 +353,7 @@
             });
         
         if(paramselect=="AGGL3BITRATE"){
+            deleteRadios();
             createDiv();
             $.ajax({
                 type: "GET",

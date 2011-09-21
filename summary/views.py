@@ -1,7 +1,6 @@
 # Create your views here.
 
-from django.http import HttpResponse, HttpResponseRedirect
-import urllib2, urllib, json
+from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from networkdashboard.summary.models import *
 from pyofc2 import *
@@ -13,29 +12,8 @@ from mx.DateTime.ISO import ParseDateTimeUTC
 def index(request):
     return render_to_response('index.html')
 
-def editDevicePage(request, device):
-    device_details = Devicedetails.objects.filter(deviceid=device)
-    if len(device_details) < 1:
-	device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
-    else:
-	device_entry = device_details[0]
-    
-    isp_options = ["Comcast","Time Warner Cable","At&t","Cox Optimum","Charter","Verizon","CenturyLink","SuddenLink","EarthLink","Windstream","Cable One","Frontier","NetZero Juno","Basic ISP","ISP.com","PeoplePC","AOL MSN","Fairpoint","Qwest","CableVision","MEdiaCom"]
-    isp_options.sort()
-    country_options = ['United States','South Africa','France']
-    country_options.sort()
-    
-    return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device, 'isp_options': isp_options, 'country_options': country_options})
-
-def invalidEdit(request, device):
-    return render_to_response('invalid_edit.html', {'deviceid' : device})
-
 def newuser(request):
     return render_to_response('newuser.html')
-
-def submitchanges(request, device, isp, loc, serv, dr, ur):
-    return
-    
  
 def showdevices(request):
     device_list = Devices.objects.all()
@@ -68,45 +46,22 @@ def showactivedevices(request):
     return render_to_response('devices.html', {'device_list': thelist})
 
 def devicesummary(request):
-    device = request.POST.get("device")
-    if(request.POST.get("edit")):
-        try:
-            dname = request.POST.get('name')
-            disp = request.POST.get('isp')
-            dlocation = request.POST.get('location')
-            dsp = request.POST.get('sp')
-            durate = int(request.POST.get('urate'))
-            ddrate = int(request.POST.get('drate'))
-            dcity = request.POST.get('city')
-            dstate = request.POST.get('state')
-            dcountry = request.POST.get('country')           
-            details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now())
-            details.save()
-        except:
-            return render_to_response('invalid_edit.html', {'deviceid' : device})
-
-
-    device_details = Devicedetails.objects.filter(deviceid=device) 
-    if len(device_details)<1:
-        device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
-        device_entry.save()
-        device_details = Devicedetails.objects.filter(deviceid=device)
-    
+    device = request.POST.get('device')
+    print device
+    device_details = Devices.objects.filter(deviceid=device)
     try:
         device_search = MBitrate.objects.filter(deviceid=device)
-        if (len(device_search)<1):
+        print device_search
+        if len(device_search)<1:
             return render_to_response('device_not_found.html', {'deviceid': device})
     except:
         return render_to_response('device_not_found.html', {'deviceid': device})
-    first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
-    first = datetime.fromtimestamp(mktime(first[0].eventstamp.timetuple())).strftime("%B %d, %Y")
     last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-    
-    calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
-    calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
-    last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
+    end = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
+    start = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
 
-    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device}) 
+    return render_to_response('device.html', {'device_details': device_details, 'calenderFrom': start,'calenderTo': end, 'deviceid': device})
+    return HttpResponse(output)
 
 def getISP(request, device):
 ##    UDrow = Userdevice.objects.filter(deviceid=device)
@@ -166,11 +121,10 @@ def getDl(request, device):
     return HttpResponse('unavailable')
 
 def getLastUpdate(request, device):
-    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-    if len(last)>0:
-        end = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-	return HttpResponse(end)
-    
+##    last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
+##    if len(last)<0:
+##	return HttpResponse('not found')
+##    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%b %d, %Y")))
     return HttpResponse('unavailable')
 
 def getLastUpdateYMD(request, device):
@@ -181,30 +135,10 @@ def getLastUpdateYMD(request, device):
     return HttpResponse('unavailable')
 
 def getFirstUpdate(request, device):
-    last = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
-    if len(last)>0:
-        end = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-	return HttpResponse(end)
-    
-    return HttpResponse('unavailable')
-
-def getLocation(request, device):
-    details = Devicedetails.objects.filter(deviceid=device)
-
-    if len(details)>0:
-        return HttpResponse(details[0].city + ", " + details[0].country)
-    
-    dev = MBitrate.objects.filter(deviceid=device, srcip ='143.215.131.173' )
-    if len(dev)>0:
-        ip = str(dev[0].dstip)
-        urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + ip + "&format=json")
-        r1 = urlobj.read()
-        urlobj.close()
-        datadict = json.loads(r1)
-        print "\n" + ip
-        res = datadict["cityName"] + "," + datadict["countryName"]
-        return HttpResponse(res)  
-    
+##    last = Measurements.objects.filter(deviceid=device)[0:3]
+##    if len(last)<0:
+##	return HttpResponse('not found')
+##    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%b %d, %Y")))
     return HttpResponse('unavailable')
 
 def cvs_linegraph(request):
@@ -212,7 +146,6 @@ def cvs_linegraph(request):
     chosen_param = request.GET.get('param')
     chosen_limit = request.GET.get('limit')
     timetype = request.GET.get('type')
-    graphno = int(request.GET.get('graphno'))
     '''
     chosen_param = 'AGGL3BITRATE'
     chosen_limit = 100000
@@ -224,6 +157,7 @@ def cvs_linegraph(request):
     s3 = ParseDateTimeUTC(str(s2))
     s4 = datetime.fromtimestamp(s3)   
     start = s4
+
     e = request.GET.get('end')
     e2 = datetime.strptime(e,"%m/%d/%Y")
     e3 = ParseDateTimeUTC(str(e2))
@@ -231,57 +165,55 @@ def cvs_linegraph(request):
     e4 = datetime.fromtimestamp(e3)+ timedelta(1,0)
     end = e4
     if chosen_param == 'AGGL3BITRATE' :
+	  
+        device_details_down = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,srcip='143.215.131.173')
+        device_details_up = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,dstip='143.215.131.173')
+        
+        tim1 = list()
+        dat1 = list()
+        dat2 = list()
+       
+        for measure in device_details_down:
+            t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
+            tim1.append(t)
+            dat1.append(measure.average)
 
-	xVariable = "Date"
-	yVariable = "Multi Thread, Single Thread"
-	output = xVariable + "," + yVariable + "\n"
+        for measure in device_details_up:
+            dat2.append(measure.average)
 
-	if (graphno==1):
-		device_details = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,srcip='143.215.131.173')		
-	elif (graphno==2): 
-        	device_details = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,dstip='143.215.131.173')
+        xVariable = "Date"
+        yVariable = "Down (kbps)"
+        y2Variable = "Up (kbps)"
+        output = xVariable + "," + yVariable + "," +  y2Variable +"\n"
 
-	for measure in device_details:
-            	t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
-		if(measure.average <= 0):
-			continue
-		if(str(measure.toolid)=='NETPERF_3'):
-			ret = str(t) + "," + str(measure.average) + ","
+        for i in range(0,min(len(dat1),len(dat2))):
+            ret = str(tim1[i]) + "," + str(dat1[i]) + "," + str(dat2[i]) + "\n"
+            output += ret
 
-		else:
-			ret = str(t) + ",,"+ str(measure.average)
-		output+=ret+"\n"			
-		
     elif chosen_param == 'RTT' :
 
         distinct_ips = MRtt.objects.values('dstip').distinct()
+        print (distinct_ips)
 	xVariable = "Date"
         yVariable = request.GET.get('unit')
         output = xVariable
 
         for row_ip in distinct_ips:
             print row_ip["dstip"]
-
-	    urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + row_ip['dstip'] + "&format=json")
-	
-	    r1 = urlobj.read()
-	    urlobj.close()
-	    datadict = json.loads(r1)
-            output = output + "," + datadict['cityName']+"-" + datadict['countryCode'] + "test"
+            output = output + "," + row_ip["dstip"]
         output+="\n"
+
         time = list()
         data = list()
         for row_ip in distinct_ips:
             device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit, dstip = row_ip["dstip"])
             data1 = list()
-            for measure in device_details:
-		if(measure.average <= 0):
-			continue
-                data1.append(str(measure.average))
+            for row_details in device_details:
+                data1.append(row_details.average)
 
             data.append(data1)
             
-        device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,dstip='143.215.131.173')
+        device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit)
         for row_details in device_details:
             time.append(row_details.eventstamp)
 
@@ -296,6 +228,8 @@ def cvs_linegraph(request):
             ret+="\n"
             output += ret
         
+        print output
+        
 
     elif chosen_param == 'LMRTT' :
 
@@ -305,14 +239,11 @@ def cvs_linegraph(request):
         yVariable = request.GET.get('unit')
         output = xVariable + "," + yVariable +"\n"
         for measure in device_details:
-	    if(measure.average <= 0):
-	    	continue
             t = measure.eventstamp
-            ret = str(t) + "," + str(measure.average) +"\n"
+            ret = str(t) + "," + str((measure.average)) + "\n"
             output += ret
 
     return HttpResponse(output)
-
 
 
 def pie_chart(request):
