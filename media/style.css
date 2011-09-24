@@ -77,10 +77,16 @@ DIV.progressbar {
 
 
 DIV.graphdiv {
+    margin-bottom: 5px;
     margin-left:auto;
     margin-right: auto;
     width: 600px;
     height: 300px;
+    border: 1px solid;
+    border-color: rgb(60,63,89);
+/*    background: -moz-linear-gradient(top, rgb(249,249,255),rgb(230,234,240));*/
+    
+    
 }
 DIV.projects ul {
 	list-style-type: circle;

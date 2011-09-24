@@ -128,10 +128,12 @@
 
 <br />
 
+<div class="progressbar" id="progress"  indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
+
 <div class ="graphdisplay" id = "display_tag" >
-    <div class="progressbar" id="progress"  indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
-    <div class ="radiodiv" id ="radio_div">
-    </div>
+    <div id="graph_place_holder" style="width:600px; height: 300px;"></div>
+</div>
+    
 <!--    <div class ="radiodiv"
     <input type="radio" name = "mode" id="lin" onClick="setDisplayMode(false)" checked>
     <label for="lin">Linear</label>
@@ -139,8 +141,6 @@
     <input type="radio" name = "mode" id="log" onClick ="setDisplayMode(true)">
     <label for="log">Log</label><br /><br />
     </div>-->
-    <div class ="graphdiv"id="graph_div"></div>
-</div>
 <script type="text/javascript">
 
 
@@ -196,7 +196,7 @@
 
 	  
 
-             g = new Dygraph(document.getElementById("graph_div"),
+             g = new Dygraph(document.getElementById("graph_div_1"),
                        content,
                        {
                        rollPeriod: 1,
@@ -210,6 +210,7 @@
 
 	  
 	 CloseProgressBar();
+         addRadios();
          addLabels();
          
         }
@@ -220,7 +221,7 @@
 
 	  
 
-	         g2 = new Dygraph(document.getElementById("graph_div2"),
+	         g2 = new Dygraph(document.getElementById("graph_div_2"),
 			   content,
 			   {
 	      		   rollPeriod: 1,
@@ -236,7 +237,6 @@
         
         function setDisplayMode(log){
             g.updateOptions({logscale:log})
-            g2.updateOptions({logscale:log})
             logdisplay = log;
         }
         
@@ -249,78 +249,65 @@
         
         function deleteDivs(){
             
-            graphs = [];
             var dtag = document.getElementById('display_tag');
-            var l1 = document.getElementById('label1');
-            var l2 = document.getElementById('label2');
-            var gd2 = document.getElementById('graph_div2');
-            
-            if (l1){
-                dtag.removeChild(l1);
-            }
-            if (l2){
-                dtag.removeChild(l2);
-            }
-            if (gd2){
-                dtag.removeChild(gd2);
-            }
-            
-   
+            while(dtag.hasChildNodes()){
+                dtag.removeChild(dtag.lastChild);
+            }  
         }
         
-        function createDiv(){
+        function createGraphDivs(){
             var dtag = document.getElementById('display_tag');
-            var gd2 = document.createElement('div');
-            var divName = 'graph_div2';
-            var divStyle = 'width:600px; height:300px; margin-left:auto; margin-right: auto;';
-            gd2.setAttribute('id',divName);
-            gd2.setAttribute('style',divStyle);
-            dtag.appendChild(gd2);
+            var gd1 = document.createElement('div');
+            gd1.setAttribute('id','graph_div_1');
+            gd1.setAttribute('class','graphdiv');
+            dtag.appendChild(gd1);
+            if (paramselect == 'AGGL3BITRATE'){
+                var gd2 = document.createElement('div');
+                gd2.setAttribute('id','graph_div_2');
+                gd2.setAttribute('class','graphdiv');
+                dtag.appendChild(gd2);
+            }
             
         }
         
-        function deleteRadios(){
-            if(document.getElementById('lin')){
-                logdisplay = false;
-                var rdiv = document.getElementById('radio_div');
-                rdiv.innerHTML = "";
-                
-            }
-        }
         
         function addRadios(){
-            if(!document.getElementById('lin')){
-                logdisplay = false;
-                var rdiv = document.getElementById('radio_div');
-                var r1 = "<input type='radio' name = 'mode' id='lin' onClick='setDisplayMode(false)' checked>"
-                var r2 = "<input type='radio' name = 'mode' id='log' onClick='setDisplayMode(true)'>"
-                rdiv.innerHTML = "Linear: ";
-                rdiv.innerHTML += r1;
-                rdiv.innerHTML += "Log: ";
-                rdiv.innerHTML += r2;
+            setDisplayMode(false);
+            if(document.getElementById('lin')){
+                return;
             }
+            if(paramselect=='AGGL3BITRATE'){
+                return;
+            }
+            var dtag = document.getElementById('display_tag');
+            var rdiv = document.createElement('div');
+            rdiv.setAttribute('class','radiodiv');
+            rdiv.setAttribute('id', 'radio_div');
+            var r1 = "<input type='radio' name = 'mode' id='lin' onClick='setDisplayMode(false)' checked>";
+            var r2 = "<input type='radio' name = 'mode' id='log' onClick='setDisplayMode(true)'> <br />";
+            rdiv.innerHTML = "Linear: ";
+            rdiv.innerHTML += r1;
+            rdiv.innerHTML += "Log: ";
+            rdiv.innerHTML += r2;
+            dtag.insertBefore(rdiv,dtag.firstChild);
         }
         
         
         function addLabels(){
-            var l1,l2;
-            l1 = document.getElementById('label1');
-            l2 = document.getElementById('label2');
-            if(l1 || l2){
+            
+            if(document.getElementById('label_1')){
                 return;
             }
-            
-            var display = document.getElementById('display_tag');
+            var dtag = document.getElementById('display_tag');
             var label1 = document.createElement('div');
             
             if(paramselect == "AGGL3BITRATE"){
                 label1.innerHTML = '<b>Download Throughput (kbps)</b> <br />';
                 var label2 = document.createElement('div');
-                label2.innerHTML = '<br/><br/><b>Upload Throughput (kbps)</b><br /><br />';
-                var lname2 = 'label2';
-                label2.setAttribute('id',lname2);
+                label2.innerHTML = '<br/><br/><b>Upload Throughput (kbps)</b><br />';
+                label2.setAttribute('id','label_2');
                 label2.setAttribute('align','center');
-                display.insertBefore(label2,display.lastChild);
+                dtag.insertBefore(label2,dtag.lastChild);
             }
             else if(paramselect == "RTT"){
                 label1.innerHTML = '<b> Round Trip Time (msec)</b><br /><br />';
@@ -329,13 +316,10 @@
                 label1.innerHTML = '<b> Last-Mile Latency (msec)</b><br /><br />';
             }
             
-            var lname1 = 'label1';
-            label1.setAttribute('id',lname1);
+            label1.setAttribute('id','label_1');
             label1.setAttribute('align','center');
-            display.insertBefore(label1,display.firstChild);
+            dtag.insertBefore(label1,dtag.firstChild);
             
-            
-    
         }
             
             
@@ -343,11 +327,10 @@
 	
 	function render()
 	{
-            
+        createStyle();
         deleteDivs();
-	createStyle();
+        createGraphDivs();
 	OpenProgressBar();
-        addRadios();
 	
 	
 	$.ajax({
@@ -358,8 +341,6 @@
             });
         
         if(paramselect=="AGGL3BITRATE"){
-            deleteRadios();
-            createDiv();
             $.ajax({
                 type: "GET",
                 url: loc,
@@ -372,13 +353,13 @@
 
 	function CloseProgressBar() {
 		    var progressbar_container = document.getElementById("progress");
-                progressbar_container.style.display="none";
-		    document.getElementById("graph_div").display = "block";
+                    progressbar_container.style.display="none";
+		    //document.getElementById("graph_div").display = "block";
 		
         }
 
 	function OpenProgressBar() {
-		    var progressbar_container = document.getElementById("progress");
+		var progressbar_container = document.getElementById("progress");
                 progressbar_container.style.display="block";
 		    
             
