@@ -1,6 +1,7 @@
 body, html { 
   color: #000000;
-  background: #ffffff;
+/*  background: #ffffff;*/
+  background: rgb(249,249,255);
   padding-left: 1.5em;
   width: 90%;
 }
@@ -20,7 +21,8 @@ h3 {
 a {
         text-decoration: none ;
         color: #991133 ;
-	background: #ffffff;	
+/*	background: #ffffff;	*/
+        background: rgb(230,234,240);
 }
 
 a:hover {
@@ -29,7 +31,8 @@ a:hover {
 
 body {
         font-family: arial, sans-serif ;
-        background-color: #ffffff ;
+/*        background-color: #ffffff ;*/
+        background: rgb(249,249,255);
         font-size: 9pt ;
         margin: 25
 }
@@ -44,9 +47,11 @@ li {
 }
 
 DIV.section {
-    border: 1.5px solid red;
+    border: 3px solid;
+    border-color: rgb(60,63,89);
     border-radius:10px;
     -moz-border-radius:10px;
+    background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(230,234,240));
     margin-left: auto;
     padding: 5px;
     margin-right: auto;

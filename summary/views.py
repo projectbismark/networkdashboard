@@ -69,6 +69,7 @@ def showactivedevices(request):
 
 def devicesummary(request):
     device = request.POST.get("device")
+    print device
     if(request.POST.get("edit")):
         try:
             dname = request.POST.get('name')
@@ -85,13 +86,16 @@ def devicesummary(request):
         except:
             return render_to_response('invalid_edit.html', {'deviceid' : device})
 
-
-    device_details = Devicedetails.objects.filter(deviceid=device) 
-    if len(device_details)<1:
-        device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
-        device_entry.save()
-        device_details = Devicedetails.objects.filter(deviceid=device)
+    device_details = Devicedetails.objects.filter(deviceid=device)
+    try:
     
+        if len(device_details)<1:
+            device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
+            device_entry.save()
+            device_details = Devicedetails.objects.filter(deviceid=device)
+    except:
+        return render_to_response('device_not_found.html', {'deviceid': device})
+     
     try:
         device_search = MBitrate.objects.filter(deviceid=device)
         if (len(device_search)<1):
