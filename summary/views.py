@@ -67,9 +67,39 @@ def showactivedevices(request):
 
     return render_to_response('devices.html', {'device_list': thelist})
 
+
+
+def sharedDeviceSummary(request,device):
+    print "shared"
+    device_details = Devicedetails.objects.filter(deviceid=device)
+    try:
+    
+        if len(device_details)<1:
+            device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
+            device_entry.save()
+            device_details = Devicedetails.objects.filter(deviceid=device)
+    except:
+        return render_to_response('device_not_found.html', {'deviceid': device})
+     
+    try:
+        device_search = MBitrate.objects.filter(deviceid=device)
+        if (len(device_search)<1):
+            return render_to_response('device_not_found.html', {'deviceid': device})
+    except:
+        return render_to_response('device_not_found.html', {'deviceid': device})
+    first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
+    first = datetime.fromtimestamp(mktime(first[0].eventstamp.timetuple())).strftime("%B %d, %Y")
+    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
+    
+    calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
+    calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
+    last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
+
+    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device})
+    
+
 def devicesummary(request):
     device = request.POST.get("device")
-    print device
     if(request.POST.get("edit")):
         try:
             dname = request.POST.get('name')

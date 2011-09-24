@@ -40,7 +40,9 @@
 
  
 <tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
+<tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/{{ deviceid }}" dojoType="dijit.form.TextBox" /></td>
 </table>
+
 
 </div>
 <br />
@@ -310,10 +312,10 @@
                 dtag.insertBefore(label2,dtag.lastChild);
             }
             else if(paramselect == "RTT"){
-                label1.innerHTML = '<b> Round Trip Time (msec)</b><br /><br />';
+                label1.innerHTML = '<b> Round Trip Time (msec)</b><br />';
             }
             else if(paramselect == "LMRTT"){
-                label1.innerHTML = '<b> Last-Mile Latency (msec)</b><br /><br />';
+                label1.innerHTML = '<b> Last-Mile Latency (msec)</b><br />';
             }
             
             label1.setAttribute('id','label_1');

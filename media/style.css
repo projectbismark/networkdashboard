@@ -59,6 +59,7 @@ DIV.section {
     text-align: left;
 }
 
+
 DIV.radiodiv {
     text-align: center;
 }
@@ -80,6 +81,7 @@ DIV.graphdiv {
     margin-bottom: 5px;
     margin-left:auto;
     margin-right: auto;
+    padding-bottom:2px;
     width: 600px;
     height: 300px;
     border: 1px solid;
