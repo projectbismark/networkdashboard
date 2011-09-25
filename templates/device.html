@@ -260,15 +260,23 @@
         
         function createGraphDivs(){
             var dtag = document.getElementById('display_tag');
+            var outer = document.createElement('div');
+            outer.setAttribute('id','graph_div_outer');
+            outer.setAttribute('class','outergraphdiv');
             var gd1 = document.createElement('div');
             gd1.setAttribute('id','graph_div_1');
             gd1.setAttribute('class','graphdiv');
-            dtag.appendChild(gd1);
+            outer.appendChild(gd1);
+            dtag.appendChild(outer);
             if (paramselect == 'AGGL3BITRATE'){
+                outer = document.createElement('div');
+                outer.setAttribute('id','graph_div_outer');
+                outer.setAttribute('class','outergraphdiv');
                 var gd2 = document.createElement('div');
                 gd2.setAttribute('id','graph_div_2');
                 gd2.setAttribute('class','graphdiv');
-                dtag.appendChild(gd2);
+                outer.appendChild(gd2);
+                dtag.appendChild(outer);
             }
             
         }
