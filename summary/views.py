@@ -47,7 +47,7 @@ def showdevices(request):
 	if len(last)>1:
 		if time()-last[0].timestamp < 3600*24*170:
 			thelist.append(row)
-			print(datetime.fromtimestamp(last[0].timestamp).strftime("%Y-%m-%d %H:%M:%S"))
+
 
     return render_to_response('devices.html', {'device_list': thelist})
 
@@ -55,7 +55,6 @@ def showdevices(request):
 def showactivedevices(request):
     device_list = Devices.objects.all()
     thelist = list()
-    print 'dd'
     for row in  device_list:
 	if(row.deviceid == "NB-Xuzi-Uky"):
 		continue
@@ -63,14 +62,27 @@ def showactivedevices(request):
 	if len(last)>1:
 		if time()-last[0].timestamp < 3600*24*7:
 			thelist.append(row)
-			print(datetime.fromtimestamp(last[0].timestamp).strftime("%Y-%m-%d %H:%M:%S"))
 
     return render_to_response('devices.html', {'device_list': thelist})
 
-
+def getCoordinates(request):
+    coordstring = ""
+    distinct_ips = MRtt.objects.values('dstip').distinct()
+    for row_ip in distinct_ips:
+        ip = row_ip['dstip']
+        urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + ip + "&format=json")
+        r1 = urlobj.read()
+        urlobj.close()
+        datadict = json.loads(r1)
+        res = list()
+        coordstring += str(datadict["latitude"])
+        coordstring += ","
+        coordstring += str(datadict["longitude"])
+        coordstring += "\n"
+    return HttpResponse(coordstring)
+        
 
 def sharedDeviceSummary(request,device):
-    print "shared"
     device_details = Devicedetails.objects.filter(deviceid=device)
     try:
     
@@ -235,7 +247,6 @@ def getLocation(request, device):
         r1 = urlobj.read()
         urlobj.close()
         datadict = json.loads(r1)
-        print "\n" + ip
         res = datadict["cityName"] + "," + datadict["countryName"]
         return HttpResponse(res)  
     
@@ -294,7 +305,6 @@ def cvs_linegraph(request):
         output = xVariable
 
         for row_ip in distinct_ips:
-            print row_ip["dstip"]
 
 	    urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + row_ip['dstip'] + "&format=json")
 	

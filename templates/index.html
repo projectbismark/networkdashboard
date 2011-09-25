@@ -16,4 +16,60 @@
        <b>Enter Device MAC Address:</b><br /> <input type = "text" name = "device" value ="c43dc7a376d3"/>
    <input type = "submit" value = "Search">
    </form>
+
+<script src="/static/jquery-latest.js"></script>
+<script language="Javascript" src="http://gd.geobytes.com/gd?after=-1&variables=GeobytesCountry,GeobytesCity,GeobytesRegion,GeobytesLatitude,GeobytesLongitude">
+    </script>
+<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<body onload="load()" onunload="GUnload()">
+<div class ="label">
+    <b>Device Map</b>
+</div>
+<div id="map" class="map"></div>
+
+<script type="text/javascript">
+
+   function load()
+    {
+     var mid = new google.maps.LatLng(0,0);
+     var options = {
+     zoom: 1,
+     center: mid,
+     mapTypeId: google.maps.MapTypeId.HYBRID
+     };
+
+     map = new google.maps.Map(document.getElementById("map"),options);
+  
+         
+      
+      $.ajax({
+                type: "GET",
+                url: "/getCoordinates/",
+                success: OnSuccess
+            });            
+   }
+   
+   function OnSuccess(data){
+        coordstring = data.split("\n");
+        for (var i=0; i<coordstring.length-1; i++){
+            var coords = coordstring[i].split(",");
+            var point = new google.maps.LatLng(parseFloat(coords[0]),parseFloat(coords[1]));
+            var marker = new google.maps.Marker({
+            position: point
+            });
+            marker.setMap(map);
+
+        }
+   }
+
+   function GUnload(){
+      if (window.GUnloadApi)
+      {
+         GUnloadApi();
+      }
+   }
+</script>
+</body>
+
+
 {% endblock %}
