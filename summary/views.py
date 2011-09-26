@@ -302,13 +302,10 @@ def cvs_linegraph(request):
         output = xVariable
 
         for row_ip in distinct_ips:
+	    ip_lookup = IPResolver.objects.filter(ip=row_ip['dstip'])[0]
 
-	    urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + row_ip['dstip'] + "&format=json")
-	
-	    r1 = urlobj.read()
-	    urlobj.close()
-	    datadict = json.loads(r1)
-            output = output + "," + datadict['cityName']+"-" + datadict['countryCode'] + "test"
+            output = output + "," + ip_lookup.location
+
         output+="\n"
         time = list()
         data = list()
