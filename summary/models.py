@@ -460,4 +460,4 @@ class IPResolver(models.Model):
     longitude=models.FloatField()
     location=models.TextField()
     class Meta:
-	db_table=u'ip_resolver'
+	db_table=u'ip_resitolver'
