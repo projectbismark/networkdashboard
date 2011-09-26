@@ -454,3 +454,10 @@ class Devicedetails(models.Model):
     class Meta:
         db_table = u'devicedetails'
 
+class IPResolver(models.Model):
+    ip = models.IPAddressField(primary_key=True)
+    latitude=models.FloatField()
+    longitude=models.FloatField()
+    location=models.TextField()
+    class Meta:
+	db_table=u'ip_resolver'

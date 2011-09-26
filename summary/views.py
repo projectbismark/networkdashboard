@@ -70,6 +70,7 @@ def getCoordinates(request):
     distinct_ips = MRtt.objects.values('dstip').distinct()
     for row_ip in distinct_ips:
         ip = row_ip['dstip']
+	
         urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + ip + "&format=json")
         r1 = urlobj.read()
         urlobj.close()
