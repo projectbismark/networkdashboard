@@ -27,7 +27,7 @@
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 <body onload="load()" onunload="GUnload()">
 <div class ="label">
-    <b>Server Map</b>
+    <b>Device Map</b>
 </div>
 <div id="map" class="map"></div>
 
@@ -39,7 +39,7 @@
      var options = {
      zoom: 1,
      center: mid,
-     mapTypeId: google.maps.MapTypeId.HYBRID
+     mapTypeId: google.maps.MapTypeId.ROADMAP
      };
 
      map = new google.maps.Map(document.getElementById("map"),options);
