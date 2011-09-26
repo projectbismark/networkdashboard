@@ -67,10 +67,11 @@ def showactivedevices(request):
 
 def getCoordinates(request):
     coordstring = ""
-    distinct_ips = IPResolver.objects.values('ip').distinct()
+    distinct_ips = IPResolver.objects.all()
     for row_ip in distinct_ips:
-	lat = str(row_ip['latitude'])
-	lon = str(row_ip['longitude'])
+
+	lat = str(row_ip.latitude)
+	lon = str(row_ip.longitude)
         coordstring += lat
         coordstring += ","
         coordstring += lon
