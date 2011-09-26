@@ -72,9 +72,12 @@ def getCoordinates(request):
 
 	lat = str(row_ip.latitude)
 	lon = str(row_ip.longitude)
+	devtype = str(row_ip.type)
         coordstring += lat
         coordstring += ","
         coordstring += lon
+        coordstring += ","
+        coordstring += devtype
         coordstring += "\n"
     return HttpResponse(coordstring)
         
