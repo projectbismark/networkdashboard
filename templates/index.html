@@ -2,7 +2,7 @@
 
 {% block content %}
 
-
+<div class="about">
 <h3>Network Dashboard</h3>
 <p><b>What is network dashboard?  </b>The <em>network dashboard</em> is
   a portal designed to help home users visualize properties of their
@@ -10,7 +10,8 @@
   install a BISMark-enabled gateway device in their home network.  The
   gateway device periodically uploads measurements of the user's
   Internet Service Provider to a centralized database, which the user
-  can access via this portal.</p><br/>
+  can access via this portal.</p><br/><br/>
+
 
 
    <form method = "POST" name="device_form" action ="/device/">
@@ -18,13 +19,15 @@
    <input type = "submit" value = "Search">
    </form>
 
+</div>
+
 <script src="/static/jquery-latest.js"></script>
 <script language="Javascript" src="http://gd.geobytes.com/gd?after=-1&variables=GeobytesCountry,GeobytesCity,GeobytesRegion,GeobytesLatitude,GeobytesLongitude">
     </script>
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 <body onload="load()" onunload="GUnload()">
 <div class ="label">
-    <b>Device Map</b>
+    <b>Server Map</b>
 </div>
 <div id="map" class="map"></div>
 
