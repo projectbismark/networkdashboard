@@ -67,18 +67,13 @@ def showactivedevices(request):
 
 def getCoordinates(request):
     coordstring = ""
-    distinct_ips = MRtt.objects.values('dstip').distinct()
+    distinct_ips = IPResolver.objects.values('ip').distinct()
     for row_ip in distinct_ips:
-        ip = row_ip['dstip']
-	
-        urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + ip + "&format=json")
-        r1 = urlobj.read()
-        urlobj.close()
-        datadict = json.loads(r1)
-        res = list()
-        coordstring += str(datadict["latitude"])
+	lat = str(row_ip['latitude'])
+	lon = str(row_ip['longitude'])
+        coordstring += lat
         coordstring += ","
-        coordstring += str(datadict["longitude"])
+        coordstring += lon
         coordstring += "\n"
     return HttpResponse(coordstring)
         
