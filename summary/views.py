@@ -65,6 +65,7 @@ def showactivedevices(request):
 
     return render_to_response('devices.html', {'device_list': thelist})
 
+
 def getCoordinates(request):
     coordstring = ""
     distinct_ips = IPResolver.objects.all()
@@ -111,6 +112,10 @@ def sharedDeviceSummary(request,device):
     
 
 def devicesummary(request):
+    deviceid = DeviceIds.objects.filter(username=user)
+    if len(deviceid)<1:
+        return render_to_response('device_not_found.html'), {'deviceid' : device})
+    
     device = request.POST.get("device")
     if(request.POST.get("edit")):
         try:
