@@ -128,10 +128,11 @@ def devicesummary(request):
             return render_to_response('invalid_edit.html', {'deviceid' : device})
 
     device_details = Devicedetails.objects.filter(deviceid=device)
+
     try:
     
         if len(device_details)<1:
-            device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
+            device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now(),name=str(device[6:8]) + ":" + str(device[8:10]) + ":" + str(device[10:12]))
             device_entry.save()
             device_details = Devicedetails.objects.filter(deviceid=device)
     except:
