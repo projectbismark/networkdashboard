@@ -57,7 +57,6 @@
         coordstring = data.split("\n");
         for (var i=0; i<coordstring.length-1; i++){
             var coords = coordstring[i].split(",");
-            var markerIcon = new google.maps.MarkerImage();
             var point = new google.maps.LatLng(parseFloat(coords[0]),parseFloat(coords[1]));
             var marker = new google.maps.Marker({
             position: point
