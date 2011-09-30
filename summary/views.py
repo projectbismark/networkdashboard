@@ -13,11 +13,13 @@ from mx.DateTime.ISO import ParseDateTimeUTC
 def index(request):
     return render_to_response('index.html')
 
-def editDevicePage(request, device):
-    device_details = Devicedetails.objects.filter(deviceid=device)
+def editDevicePage(request, devicename):
+    device_details = Devicedetails.objects.filter(name=devicename)
     if len(device_details) < 1:
-	device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
+##	device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
+        return render_to_response('device_not_found.html', {'devicename' : devicename})
     else:
+        device = str(device_details[0].deviceid)
 	device_entry = device_details[0]
     
     isp_options = ["Comcast","Time Warner Cable","At&t","Cox Optimum","Charter","Verizon","CenturyLink","SuddenLink","EarthLink","Windstream","Cable One","Frontier","NetZero Juno","Basic ISP","ISP.com","PeoplePC","AOL MSN","Fairpoint","Qwest","CableVision","MEdiaCom"]
@@ -83,21 +85,17 @@ def getCoordinates(request):
     return HttpResponse(coordstring)
         
 
-def sharedDeviceSummary(request,device):
-    device_details = Devicedetails.objects.filter(deviceid=device)
-    try:
-    
-        if len(device_details)<1:
-            device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
-            device_entry.save()
-            device_details = Devicedetails.objects.filter(deviceid=device)
-    except:
-        return render_to_response('device_not_found.html', {'deviceid': device})
+def sharedDeviceSummary(request,devicename):
+    print devicename
+    device_details = Devicedetails.objects.filter(name=devicename)
+    if len(device_details)<1:
+        return render_to_response('device_not_found.html', {'devicename' : devicename})
+    device = device_details[0].deviceid
      
     try:
         device_search = MBitrate.objects.filter(deviceid=device)
         if (len(device_search)<1):
-            return render_to_response('device_not_found.html', {'deviceid': device})
+            return render_to_response('device_not_found.html', {'deviceid': devicename})
     except:
         return render_to_response('device_not_found.html', {'deviceid': device})
     first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
@@ -112,10 +110,6 @@ def sharedDeviceSummary(request,device):
     
 
 def devicesummary(request):
-    deviceid = DeviceIds.objects.filter(username=user)
-    if len(deviceid)<1:
-        return render_to_response('device_not_found.html'), {'deviceid' : device})
-    
     device = request.POST.get("device")
     if(request.POST.get("edit")):
         try:

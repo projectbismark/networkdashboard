@@ -2,14 +2,14 @@
 {% block content %}
 
 <div class ="section">
-    <h1>BISMark Device: {{ deviceid }}            <a href ="/editDevicePage/{{deviceid}}/"> Edit </a></h1>
+    <h1>BISMark Device           <a href ="/editDevicePage/{{ detail.name }}/"> Edit </a></h1>
 <script src="/static/jquery-latest.js"></script>
     <table>
 	<!--
         <tr><td>MAC Address</td><td>{{ detail.macid }}</td></tr>
         <tr><td>Type</td><td>{{ detail.type }}</td></tr>
         <tr><td>Operating System</td><td>{{ detail.os }}</td></tr> -->
-        <tr><td>Name</td><td>{{ detail.name }}</td></tr>
+        <tr><td><b>Name</b></td><td><b>{{ detail.name }}</b></td></tr>
         <tr><td>ISP</td><td>{{ detail.isp }}</td></tr>
         <tr><td>Location</td><td><div id="location{{ deviceid }}"></div><script type="text/javascript">
 
@@ -40,7 +40,7 @@
 
  
 <tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
-<tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/{{ deviceid }}" dojoType="dijit.form.TextBox" /></td>
+<tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/{{ detail.name }}" dojoType="dijit.form.TextBox" /></td>
 </table>
 
 
