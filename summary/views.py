@@ -2,7 +2,7 @@
 
 from django.http import HttpResponse, HttpResponseRedirect
 import urllib2, urllib, json
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 from networkdashboard.summary.models import *
 from pyofc2 import *
 import random
@@ -84,29 +84,11 @@ def getCoordinates(request):
         coordstring += "\n"
     return HttpResponse(coordstring)
         
-
 def sharedDeviceSummary(request,devicename):
-    device_details = Devicedetails.objects.filter(name=devicename)
+	print "hello"
+	return redirect('networkdashboard.summary.views.devicesummary')
 
-    if len(device_details)<1:
-        return render_to_response('device_not_found.html', {'devicename' : devicename})
-    device = device_details[0].deviceid
-     
-    try:
-        device_search = MBitrate.objects.filter(deviceid=device)
-        if (len(device_search)<1):
-            return render_to_response('device_not_found.html', {'deviceid': devicename})
-    except:
-        return render_to_response('device_not_found.html', {'deviceid': device})
-    first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
-    first = datetime.fromtimestamp(mktime(first[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-    
-    calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
-    calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
-    last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
 
-    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device})
     
 
 def devicesummary(request):

@@ -451,6 +451,7 @@ class Devicedetails(models.Model):
     uploadrate = models.IntegerField()
     downloadrate = models.IntegerField()
     eventstamp = models.DateTimeField()
+    hashkey = models.CharField(max_length=50)
     class Meta:
         db_table = u'devicedetails'
 
