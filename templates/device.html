@@ -6,8 +6,10 @@
     <script src="/static/jquery-latest.js"></script>
     <script type="text/javascript">
         var l = document.getElementById('editlink');
-        var dname = String(encodeURIComponent('{{ detail.name }}'));
-        l.setAttribute('href','/editDevicePage/'+ dname);
+        var newuri = '/editDevicePage/' + '{{detail.name}}';
+        var newuri2 = String(encodeURI(newuri));
+//        l.setAttribute('href',newuri2);
+        document.write(l.getAttribute('href'));
     </script>
 
     <table>
@@ -197,7 +199,7 @@
 		}
 		else if(g1rb3.checked)
 		{
-			limit = 200000;
+			limit = 1000000;
 			units = "kbps"
 			paramselect = "AGGL3BITRATE"
                         special = false;
