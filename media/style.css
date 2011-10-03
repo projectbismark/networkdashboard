@@ -54,7 +54,10 @@ DIV.section {
     margin-right: auto;
     width:500px;
     text-align: left;
-    -moz-box-shadow:inset 0 0 5px rgb(17,0,54);
+/*    -moz-box-shadow:inset 0 0 5px rgb(17,0,54);*/
+    -moz-box-shadow:2px 2px 2px #333333;
+    box-shadow:2px 2px 2px #333333;
+    background-image: -o-linear-gradient(left,rgb(249,249,255),rgb(230,234,240));
 }
 
 DIV.about {
@@ -70,7 +73,9 @@ DIV.about {
     padding: 10px;
     margin-right: auto;
     text-align: left;
-    -moz-box-shadow:inset 0 0 5px black;
+    -moz-box-shadow:2px 2px 2px #333333;
+/*    -moz-box-shadow:inset 0 0 5px black;*/
+    box-shadow:2px 2px 2px #333333;
 }
 
 DIV.about h3{
