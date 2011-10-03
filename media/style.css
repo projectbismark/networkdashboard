@@ -46,7 +46,7 @@ li {
 DIV.section {
     border-radius:10px;
     -moz-border-radius:10px;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc', endColorstr='#000000');
+    background-image: -o-linear-gradient(left,rgba(249,249,255),rgba(230,234,240));
     background: -webkit-gradient(linear, left top, right bottom, from(rgb(249,249,255)), to(rgb(230,234,240)));
     background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(230,234,240));
     margin-left: auto;
@@ -63,6 +63,7 @@ DIV.about {
     border-radius:10px;
     -moz-border-radius:10px;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc', endColorstr='#000000');
+    background-image: -o-linear-gradient(left,rgb(249,249,255),rgb(230,234,240));
     background: -webkit-gradient(linear, left top, right bottom, from(rgb(249,249,255)), to(rgb(230,234,240)));
     background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(230,234,240));
     margin-left: auto;

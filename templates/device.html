@@ -40,7 +40,12 @@
 
  
 <tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
-<tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/{{ detail.name }}" dojoType="dijit.form.TextBox" /></td>
+<script type="text/javascript">
+    function convertURL(name){
+        return encodeURIComponent(name);
+    }
+</script>
+<tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/convertURL({{ detail.name }})" dojoType="dijit.form.TextBox" /></td>
 </table>
 
 
@@ -72,7 +77,7 @@
 
 <body class=" claro " onload="CloseProgressBar();">
 
-<label for="fraomDate">
+<label for="fromDate">
             From:
         </label>
         
@@ -165,6 +170,7 @@
 	{
             CloseProgressBar();
 	}
+        
 
 	function createStyle()
 	{
@@ -241,6 +247,10 @@
         function setDisplayMode(log){
             g.updateOptions({logscale:log})
             logdisplay = log;
+        }
+        
+        function convertURL(name){
+            return encodeURIComponent(name);
         }
         
 
@@ -342,12 +352,15 @@
         deleteDivs();
         createGraphDivs();
 	OpenProgressBar();
+        var startDate = document.getElementById('fromDate').value;
+        var endDate = document.getElementById('toDate').value;
+        
 	
 	
 	$.ajax({
                 type: "GET",
                 url: loc,
-                data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
+                data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate},
                 success: OnSuccess
             });
         
@@ -355,7 +368,7 @@
             $.ajax({
                 type: "GET",
                 url: loc,
-                data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': fromDate.value, 'end': toDate.value},
+                data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate},
                 success: OnSuccess2
             });
         }

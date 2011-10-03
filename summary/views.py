@@ -86,7 +86,6 @@ def getCoordinates(request):
         
 
 def sharedDeviceSummary(request,devicename):
-    print devicename
     device_details = Devicedetails.objects.filter(name=devicename)
     if len(device_details)<1:
         return render_to_response('device_not_found.html', {'devicename' : devicename})
