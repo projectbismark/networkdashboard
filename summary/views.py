@@ -9,6 +9,7 @@ import random
 from datetime import datetime, timedelta
 from time import time,mktime,strftime
 from mx.DateTime.ISO import ParseDateTimeUTC
+import hashlib
 
 def index(request):
     return render_to_response('index.html')
@@ -114,7 +115,7 @@ def devicesummary(request):
         if (len(device_search)<1):
             return render_to_response('device_not_found.html', {'deviceid': device})
     except:
-	device_details = Devicedetails.objects.filter(name=device)
+	device_details = Devicedetails.objects.filter(hashkey=device)
 	if len(device_details)>0:
 		device = device_details[0].deviceid		
 	else:
@@ -124,8 +125,10 @@ def devicesummary(request):
     try:
     
         if len(device_details)<1:
-
-            device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now(),name=str(device[6:8]) + ":" + str(device[8:10]) + ":" + str(device[10:12]))
+	    m = hashlib.md5()
+	    m.update(device.replace(':', ''))
+	    hashing = m.hexdigest()
+            device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now(),name="default name",hashkey=hashing)
             device_entry.save()
             device_details = Devicedetails.objects.filter(deviceid=device)
     except:
