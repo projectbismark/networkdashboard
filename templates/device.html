@@ -2,8 +2,14 @@
 {% block content %}
 
 <div class ="section">
-    <h1>BISMark Device           <a href ="/editDevicePage/{{ detail.name }}/"> Edit </a></h1>
-<script src="/static/jquery-latest.js"></script>
+    <h1>BISMark Device           <a id ="editlink" href =""> Edit </a></h1>
+    <script src="/static/jquery-latest.js"></script>
+    <script type="text/javascript">
+        var l = document.getElementById('editlink');
+        var dname = String(encodeURIComponent('{{ detail.name }}'));
+        l.setAttribute('href','/editDevicePage/'+ dname);
+    </script>
+
     <table>
 	<!--
         <tr><td>MAC Address</td><td>{{ detail.macid }}</td></tr>
@@ -16,7 +22,7 @@
 		$.ajax({
                 type: "GET",
                 url: "/getLocation/{{ deviceid }}/",
-                success: OnSuccess,
+                success: OnSuccess
             });
 		
 		function OnSuccess(data)
@@ -237,7 +243,7 @@
 	      		   showRoller: true,
                            logscale: (logdisplay&&special),
                            connectSeparatedPoints: true,
-                           errorBars: false,
+                           errorBars: false
 	    		   }
 			   );
 	  
@@ -343,8 +349,6 @@
             
         }
             
-            
-        
 	
 	function render()
 	{
