@@ -94,6 +94,7 @@ def sharedDeviceSummary(request,devicehash):
 
 def devicesummary(request):
     device = request.POST.get("device")
+    device = device.replace(':', '')
 
     if(request.POST.get("edit")):
         try:
@@ -105,8 +106,12 @@ def devicesummary(request):
             ddrate = int(request.POST.get('drate'))
             dcity = request.POST.get('city')
             dstate = request.POST.get('state')
-            dcountry = request.POST.get('country')           
-            details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now())
+            dcountry = request.POST.get('country') 
+	    m = hashlib.md5()
+	    m.update(device)
+	    hashing = m.hexdigest()
+                  
+            details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now(),hashkey=hashing)
             details.save()
         except:
             return render_to_response('invalid_edit.html', {'deviceid' : device})
