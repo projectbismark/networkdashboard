@@ -14,11 +14,11 @@ import hashlib
 def index(request):
     return render_to_response('index.html')
 
-def editDevicePage(request, devicename):
-    device_details = Devicedetails.objects.filter(hashkey=devicename)
+def editDevicePage(request, devicehash):
+    device_details = Devicedetails.objects.filter(hashkey=devicehash)
     if len(device_details) < 1:
 ##	device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
-        return render_to_response('device_not_found.html', {'devicename' : devicename})
+        return render_to_response('device_not_found.html', {'devicename' : devicehash})
     else:
         device = str(device_details[0].deviceid)
 	device_entry = device_details[0]
@@ -85,7 +85,7 @@ def getCoordinates(request):
         coordstring += "\n"
     return HttpResponse(coordstring)
         
-def sharedDeviceSummary(request,devicename):
+def sharedDeviceSummary(request,devicehash):
 	print "hello"
 	return redirect('networkdashboard.summary.views.devicesummary')
 
