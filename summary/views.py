@@ -15,7 +15,7 @@ def index(request):
     return render_to_response('index.html')
 
 def editDevicePage(request, devicename):
-    device_details = Devicedetails.objects.filter(name=devicename)
+    device_details = Devicedetails.objects.filter(hashkey=devicename)
     if len(device_details) < 1:
 ##	device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
         return render_to_response('device_not_found.html', {'devicename' : devicename})
@@ -94,6 +94,7 @@ def sharedDeviceSummary(request,devicename):
 
 def devicesummary(request):
     device = request.POST.get("device")
+
     if(request.POST.get("edit")):
         try:
             dname = request.POST.get('name')
