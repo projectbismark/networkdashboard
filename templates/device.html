@@ -4,6 +4,19 @@
 <div class ="section">
     <h1>BISMark Device           <a href ="/editDevicePage/{{detail.hashkey}}"> Edit </a></h1>
     <script src="/static/jquery-latest.js"></script>
+ <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojo/dojo.xd.js"
+        djConfig="parseOnLoad: true">
+        </script>
+        <script type="text/javascript">
+            dojo.require("dijit.form.DateTextBox");http://danvk.org/dygraphs/dygraph-combined.js
+            dojo.require("dijit.ProgressBar");
+            dojo.require("dijit.form.RadioButton");
+            dojo.require("dijit.form.Button");
+
+        </script>
+        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/claro/claro.css"
+        />
+
 
     <table>
 	<!--
@@ -59,24 +72,7 @@
 <script type="text/javascript" src="/static/dygraph-combined.js"></script>
 
 
-        <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojo/dojo.xd.js"
-        djConfig="parseOnLoad: true">
-        </script>
-        <script type="text/javascript">
-            dojo.require("dijit.form.DateTextBox");http://danvk.org/dygraphs/dygraph-combined.js
-            dojo.require("dijit.ProgressBar");
-            dojo.require("dijit.Menu");
-            dojo.require("dijit.MenuItem");
-            dojo.require("dijit.form.RadioButton");
-            dojo.require("dijit.form.Button");
-            dojo.require("dijit.TitlePane");
-            dojo.require("dijit.layout.ContentPane");
-	   dojo.require("dijit.form.Textarea");
-        </script>
-        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/claro/claro.css"
-        />
-
-<body class=" claro " onload="CloseProgressBar(); render();">
+<body class=" claro " onload="CloseProgressBar(); show_initial_graph();">
 
 <label for="fromDate">
             From:
@@ -97,31 +93,16 @@
 
 <tr>
 <td>
-<input type="radio" name="g1" id="g1rb3" value="weather" dojoType="dijit.form.RadioButton" checked>
-
+<input type="radio" name="g1" id="g1rb3" dojoType="dijit.form.RadioButton" checked>
 <label for="g1rb3">Upload and Download Throughput (kbps)</label><br/><br/>
-
-<input type="radio" name="g1" id="g1rb2" value="talk" dojoType="dijit.form.RadioButton">
-
+<input type="radio" name="g1" id="g1rb2" dojoType="dijit.form.RadioButton">
 <label for="g1rb2">Last-Mile Latency (ms)</label><br/><br/>
-<!--
-<input type="radio" name="g1" id="g1rb4" value="weather" dojoType="dijit.form.RadioButton">
-
-<label for="g1rb4">Passive Usage</label><br/><br/>
-<div class="chart" id="chart_demo" style="display:block;" ></div>
--->
-<input type="radio" name="g1" id="g1rb1" value="news" dojoType="dijit.form.RadioButton">
-
+<input type="radio" name="g1" id="g1rb1" dojoType="dijit.form.RadioButton">
 <label for="g1rb1">Round Trip Time (ms)</label><br/><br/>
-
-
-
-
 
 
 </td>
 <td>
-
 
 
 </td>
@@ -153,11 +134,11 @@
 <script type="text/javascript">
 
 	var content="[not loaded]";
-	var limit = 9999999;
-	var units = "val";
-	var paramselect = "RTT";
+	var limit = 1000000;
+	var units = "kbps";
+	var paramselect = "AGGL3BITRATE";
         var logdisplay = false;
-        var special = true;
+        var special = false;
 
 	
 	var loc = window.location.href;
@@ -347,7 +328,7 @@
 	
 	function render()
 	{
-           
+
         createStyle();
         deleteDivs();
         createGraphDivs();
@@ -389,10 +370,13 @@
             
         }
 
+		
+	function show_initial_graph(){
+		
+		dojo.addOnLoad(render);
+	}
 
 </script>
-    
-
 </body>
 
 

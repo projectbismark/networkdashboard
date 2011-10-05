@@ -283,10 +283,10 @@ def cvs_linegraph(request):
     s3 = ParseDateTimeUTC(str(s2))
     s4 = datetime.fromtimestamp(s3)   
     start = s4
+    
     e = request.GET.get('end')
     e2 = datetime.strptime(e,"%m/%d/%Y")
     e3 = ParseDateTimeUTC(str(e2))
-    
     e4 = datetime.fromtimestamp(e3)+ timedelta(1,0)
     end = e4
     if chosen_param == 'AGGL3BITRATE' :
