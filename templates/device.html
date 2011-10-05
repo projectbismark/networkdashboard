@@ -76,7 +76,7 @@
         <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/claro/claro.css"
         />
 
-<body class=" claro " onload="CloseProgressBar();">
+<body class=" claro " onload="CloseProgressBar(); render();">
 
 <label for="fromDate">
             From:
@@ -129,7 +129,7 @@
 
 </table>
 
-<button dojoType="dijit.form.Button" type="submit" name="submit" onClick="render()">Display</button>
+<button dojoType="dijit.form.Button" type="submit" name="submit" onClick=" render()">Display</button>
 </div>
 
         
@@ -152,7 +152,6 @@
     </div>-->
 <script type="text/javascript">
 
-
 	var content="[not loaded]";
 	var limit = 9999999;
 	var units = "val";
@@ -166,6 +165,7 @@
 
 	if(spl[spl.length-1].length>2) loc="/data_chart/"+spl[spl.length-1];
 	else loc="/data_chart/"+spl[spl.length-2];
+        
        	
 	function start()
 	{
@@ -347,6 +347,7 @@
 	
 	function render()
 	{
+           
         createStyle();
         deleteDivs();
         createGraphDivs();
@@ -390,6 +391,8 @@
 
 
 </script>
+    
+
 </body>
 
 
