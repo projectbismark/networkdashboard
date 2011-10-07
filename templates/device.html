@@ -13,6 +13,8 @@
             dojo.require("dijit.form.RadioButton");
             dojo.require("dijit.form.Button");
 
+
+
         </script>
         <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/claro/claro.css"
         />
@@ -79,14 +81,14 @@
         </label>
         
         <input id="fromDate" type="text" value="{{calenderFrom}}" name="fromDate" dojoType="dijit.form.DateTextBox"
-        required="true" onChange="dijit.byId('toDate').constraints.min = arguments[0];" 
+        required="true" constraints="{datePattern:'MM/dd/yyyy', strict:true}" onChange="dijit.byId('toDate').constraints.min = arguments[0];" 
         />
         
         <label for="toDate">
             To:
         </label>
         <input id="toDate" type="text" value="{{calenderTo}}" name="toDate" dojoType="dijit.form.DateTextBox"
-        required="true" onChange="dijit.byId('fromDate').constraints.max = arguments[0];"
+        required="true" constraints="{datePattern:'MM/dd/yyyy', strict:true}" onChange="dijit.byId('fromDate').constraints.max = arguments[0];"
         /><br/><br/>
 
 <table border="0"> 
