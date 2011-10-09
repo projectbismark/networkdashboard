@@ -191,6 +191,7 @@
 		g = "insufficient data available";		
 
 		}
+	  else{
 
              g = new Dygraph(document.getElementById("graph_div_1"),
                        content,
@@ -203,7 +204,7 @@
 		       colorValue: 0.0 
                        }
                        );
-
+		}
 	  
 	 CloseProgressBar();
          addRadios();
@@ -219,7 +220,7 @@
 		g = "insufficient data available";		
 
 		}	  
-
+	  else{
 	         g2 = new Dygraph(document.getElementById("graph_div_2"),
 			   content,
 			   {
@@ -230,7 +231,7 @@
                            errorBars: false
 	    		   }
 			   );
-	  
+	  }
 	 CloseProgressBar();
         }
         
