@@ -267,7 +267,7 @@ def cvs_linegraph(request):
             device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit, dstip = row_ip["dstip"])
             data1 = list()
             for measure in device_details:
-		if(measure.average < 0):
+		if(measure.average <= 0):
 			continue
                 data1.append(str(measure.average))
 
@@ -297,7 +297,7 @@ def cvs_linegraph(request):
         yVariable = request.GET.get('unit')
         output = xVariable + "," + yVariable +"\n"
         for measure in device_details:
-	    if(measure.average < 0):
+	    if(measure.average <= 0):
 	    	continue
             t = measure.eventstamp
             ret = str(t) + "," + str(measure.average) +"\n"

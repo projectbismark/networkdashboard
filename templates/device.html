@@ -187,7 +187,10 @@
         {
           content=data;
 
-	  
+	  if(len(content)<=20){
+		g = "insufficient data available";		
+
+		}
 
              g = new Dygraph(document.getElementById("graph_div_1"),
                        content,
@@ -212,7 +215,10 @@
         {
           content=data;
 
-	  
+	  if(len(content)<=20){
+		g = "insufficient data available";		
+
+		}	  
 
 	         g2 = new Dygraph(document.getElementById("graph_div_2"),
 			   content,
@@ -269,6 +275,7 @@
                 var gd2 = document.createElement('div');
                 gd2.setAttribute('id','graph_div_2');
                 gd2.setAttribute('class','graphdiv');
+
                 outer.appendChild(gd2);
                 dtag.appendChild(outer);
             }
