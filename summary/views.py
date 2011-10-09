@@ -168,62 +168,6 @@ def devicesummary(request):
 
     return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device}) 
 
-def getISP(request, device):
-##    UDrow = Userdevice.objects.filter(deviceid=device)
-##    if len(UDrow)==0:
-##	return HttpResponse(' ')
-##    print UDrow[0].userid
-##    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
-##    if len(USrow)==0:
-##	return HttpResponse(' ')
-##    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
-##    if len(SLArow)==0:
-##	return HttpResponse(' ')
-##    return HttpResponse(SLArow[0].isp)
-    return HttpResponse('unavailable')
-
-def getPlan(request, device):
-##    UDrow = Userdevice.objects.filter(deviceid=device)
-##    if len(UDrow)==0:
-##	return HttpResponse(' ')
-##    print UDrow[0].userid
-##    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
-##    if len(USrow)==0:
-##	return HttpResponse(' ')
-##    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
-##    if len(SLArow)==0:
-##	return HttpResponse(' ')
-##    return HttpResponse(SLArow[0].sla)
-    return HttpResponse('unavailable')
-
-def getUl(request, device):
-##    UDrow = Userdevice.objects.filter(deviceid=device)
-##    if len(UDrow)==0:
-##	return HttpResponse(' ')
-##    print UDrow[0].userid
-##    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
-##    if len(USrow)==0:
-##	return HttpResponse(' ')
-##    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
-##    if len(SLArow)==0:
-##	return HttpResponse(' ')
-##    return HttpResponse(SLArow[0].ul)
-    return HttpResponse('unavailable')
-
-
-def getDl(request, device):
-##    UDrow = Userdevice.objects.filter(deviceid=device)
-##    if len(UDrow)==0:
-##	return HttpResponse(' ')
-##    print UDrow[0].userid
-##    USrow = Usersla.objects.filter(userid=UDrow[0].userid)
-##    if len(USrow)==0:
-##	return HttpResponse(' ')
-##    SLArow = Sla.objects.filter(slaid=USrow[0].slaid)
-##    if len(SLArow)==0:
-##	return HttpResponse(' ')
-##    return HttpResponse(SLArow[0].dl)
-    return HttpResponse('unavailable')
 
 def getLastUpdate(request, device):
     last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
@@ -231,13 +175,6 @@ def getLastUpdate(request, device):
         end = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
 	return HttpResponse(end)
     
-    return HttpResponse('unavailable')
-
-def getLastUpdateYMD(request, device):
-##    last = Measurements.objects.filter(deviceid=device).order_by('-timestamp')[0:3]
-##    if len(last)<0:
-##	return HttpResponse('not found')
-##    return HttpResponse(str(datetime.fromtimestamp(last[0].timestamp).strftime("%m/%d/%y")))
     return HttpResponse('unavailable')
 
 def getFirstUpdate(request, device):
@@ -330,7 +267,7 @@ def cvs_linegraph(request):
             device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit, dstip = row_ip["dstip"])
             data1 = list()
             for measure in device_details:
-		if(measure.average <= 0):
+		if(measure.average < 0):
 			continue
                 data1.append(str(measure.average))
 
@@ -360,7 +297,7 @@ def cvs_linegraph(request):
         yVariable = request.GET.get('unit')
         output = xVariable + "," + yVariable +"\n"
         for measure in device_details:
-	    if(measure.average <= 0):
+	    if(measure.average < 0):
 	    	continue
             t = measure.eventstamp
             ret = str(t) + "," + str(measure.average) +"\n"
