@@ -60,6 +60,16 @@ DIV.section {
     background-image: -o-linear-gradient(left,rgb(249,249,255),rgb(230,234,240));
 }
 
+#section_1{
+    position: absolute;
+    left:10px;
+    top: 10px;
+}
+#section_1{
+    position: absolute;
+    left: 600px;
+    top:10px;
+}
 DIV.about {
 /*    color:rgb(38,0,117);*/
     color:black;

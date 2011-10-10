@@ -294,8 +294,8 @@
             var menu = document.getElementById('drop_menu_1');
             var sel = document.createElement('select');
             sel.id = "selection";
-            sel.options[0] = new Option("location ({{detail.locnum}})",0);
-            sel.options[1] = new Option("provider ({{detail.provnum}})",1);
+            sel.options[0] = new Option("location ({{num_location}})",0);
+            sel.options[1] = new Option("provider ({{num_provider}})",1);
             menu.innerHTML = "Show Devices Based on:<br/> <br/>"
             menu.appendChild(sel);
         }
