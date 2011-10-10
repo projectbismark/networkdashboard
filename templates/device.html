@@ -271,10 +271,14 @@
             gd1.setAttribute('id','graph_div_1');
             gd1.setAttribute('class','graphdiv');
             outer.appendChild(gd1);
+            var menu = document.createElement('div');
+            menu.setAttribute('id','drop_menu_1');
+            menu.setAttribute('class','menu');
+            outer.appendChild(menu);
             dtag.appendChild(outer);
             if (paramselect == 'AGGL3BITRATE'){
                 outer = document.createElement('div');
-                outer.setAttribute('id','graph_div_outer');
+                outer.setAttribute('id','graph_div_outer2');
                 outer.setAttribute('class','outergraphdiv');
                 var gd2 = document.createElement('div');
                 gd2.setAttribute('id','graph_div_2');
@@ -286,6 +290,15 @@
             
         }
         
+        function createMenu(){
+            var menu = document.getElementById('drop_menu_1');
+            var sel = document.createElement('select');
+            sel.id = "selection";
+            sel.options[0] = new Option("location ({{detail.locnum}})",0);
+            sel.options[1] = new Option("provider ({{detail.provnum}})",1);
+            menu.innerHTML = "Show Devices Based on:<br/> <br/>"
+            menu.appendChild(sel);
+        }
         
         function addRadios(){
             setDisplayMode(false);
@@ -295,7 +308,7 @@
             if(paramselect=='AGGL3BITRATE'){
                 return;
             }
-            var dtag = document.getElementById('display_tag');
+            var dtag = document.getElementById('graph_div_outer');
             var rdiv = document.createElement('div');
             rdiv.setAttribute('class','radiodiv');
             rdiv.setAttribute('id', 'radio_div');
@@ -305,7 +318,7 @@
             rdiv.innerHTML += r1;
             rdiv.innerHTML += "Log: ";
             rdiv.innerHTML += r2;
-            dtag.insertBefore(rdiv,dtag.firstChild);
+            dtag.appendChild(rdiv);
         }
         
         
@@ -345,6 +358,7 @@
         createStyle();
         deleteDivs();
         createGraphDivs();
+        createMenu();
 	OpenProgressBar();
         var startDate = document.getElementById('fromDate').value;
         var endDate = document.getElementById('toDate').value;

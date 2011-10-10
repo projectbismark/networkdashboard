@@ -125,12 +125,14 @@ Div.label{
 }
 
 DIV.radiodiv {
-    text-align: center;
+    position:absolute;
+    top:-15%;
+    left: 45%
 }
 
 DIV.graphdisplay {
-    margin-left:auto;
-    margin-right: auto;
+    position:relative;
+    height: 800px;
 }
 
 DIV.progressbar {
@@ -149,6 +151,32 @@ DIV.graphdiv {
     
 }
 
+DIV.menu {
+    color:black;
+    padding: 3px;
+    border-radius:5px;
+    border: 1px solid rgb(0,0,100);
+    text-align: center;
+    -moz-border-radius:5px;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc', endColorstr='#000000');
+    background-image: -o-linear-gradient(left,rgb(249,249,255),rgb(230,234,240));
+    background: -webkit-gradient(linear, left top, right bottom, from(rgb(249,249,255)), to(rgb(230,234,240)));
+    background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(230,234,240));
+/*    -moz-box-shadow:2px 2px 2px #333333;
+    -moz-box-shadow:inset 0 0 5px black;
+    box-shadow:2px 2px 2px #333333;*/
+}
+
+#drop_menu_1 {
+    position:absolute;
+    left: 110%;
+    top: 30%;
+    width: 150px;
+}
+#drop_menu_2 {
+    position:relative;
+}
+
 DIV.outergraphdiv {
     margin-left:auto;
     margin-right:auto;
@@ -157,6 +185,31 @@ DIV.outergraphdiv {
     border: 2px solid;
     border-color: rgb(38,0,117);
     padding: 2px;
+}
+
+#graph_div_outer {
+    position:absolute;
+    left:15%;
+    top:5%;
+    
+}
+#graph_div_outer2 {
+    position:absolute;
+    left:15%;
+    top:47%;
+}
+
+#label_1 {
+    position:absolute;
+    top:3%;
+    left:40%;
+    
+}
+
+#label_2 {
+    position: absolute;
+    top:42%;
+    left:40%;
 }
 DIV.projects ul {
 	list-style-type: circle;
