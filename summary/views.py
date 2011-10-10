@@ -139,11 +139,14 @@ def devicesummary(request):
         if (len(device_search)<1):
             return render_to_response('device_not_found.html', {'deviceid': device})
     except:
-	device_details = Devicedetails.objects.filter(hashkey=device)
-	if len(device_details)>0:
-		device = device_details[0].deviceid		
-	else:
-		return render_to_response('device_not_found.html', {'deviceid': device})
+        try:
+		device_details = Devicedetails.objects.filter(hashkey=device)
+		if len(device_details)>0:
+			device = device_details[0].deviceid		
+		else:
+			return render_to_response('device_not_found.html', {'deviceid': device})
+	except:
+		return render_to_response('invalid_edit.html', {'deviceid' : hashing})
 
     device_details = Devicedetails.objects.filter(deviceid=device)
     try:
@@ -186,6 +189,7 @@ def getFirstUpdate(request, device):
     return HttpResponse('unavailable')
 
 def getLocation(request, device):
+    device = device.replace(':', '')
     details = Devicedetails.objects.filter(deviceid=device)
 
     if len(details)>0:
@@ -267,7 +271,7 @@ def cvs_linegraph(request):
             device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit, dstip = row_ip["dstip"])
             data1 = list()
             for measure in device_details:
-		if(measure.average <= 0):
+		if(measure.average < 0):
 			continue
                 data1.append(str(measure.average))
 
@@ -297,7 +301,7 @@ def cvs_linegraph(request):
         yVariable = request.GET.get('unit')
         output = xVariable + "," + yVariable +"\n"
         for measure in device_details:
-	    if(measure.average <= 0):
+	    if(measure.average < 0):
 	    	continue
             t = measure.eventstamp
             ret = str(t) + "," + str(measure.average) +"\n"

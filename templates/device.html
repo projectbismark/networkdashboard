@@ -187,9 +187,10 @@
         {
           content=data;
 
-	  if(content.length<=20){
-		document.getElementById("graph_div_1").value = "insufficient data available";		
-
+	  if(content.length<=60){
+		deleteDivs();
+		var dtag = document.getElementById('display_tag');
+		dtag.setAttribute('value', 'Insufficient Data');
 		}
 	  else{
 
@@ -204,11 +205,13 @@
 		       colorValue: 0.0 
                        }
                        );
+		
+		addRadios();
+        	addLabels();
+
 		}
 	  
 	 CloseProgressBar();
-         addRadios();
-         addLabels();
          
         }
          
@@ -216,8 +219,8 @@
         {
           content=data;
 
-	  if(content.length<=20){
-		document.getElementById("graph_div_2").value = "insufficient data available";		
+	  if(content.length<=50){
+
 
 		}	  
 	  else{
