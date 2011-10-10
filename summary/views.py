@@ -342,9 +342,9 @@ def compare_cvs_linegraph(request):
 
 	all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit).order_by('eventstamp')		
 
-	if filter_by = 'location':
+	if (filter_by == 'location'):
 		all_device_details.filter(location=value)
-	elif filter_by = 'provider':
+	elif (filter_by == 'provider'):
 		all.device_details.filter(provider=value)
 	
 	if (graphno==1):
