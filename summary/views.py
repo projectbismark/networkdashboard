@@ -171,8 +171,9 @@ def devicesummary(request):
     
     num_location = len(Devicedetails.objects.filter(city=device_details[0].city).exclude(deviceid=device_details[0].deviceid))
     num_provider = len(Devicedetails.objects.filter(isp=device_details[0].isp).exclude(deviceid=device_details[0].deviceid))
+    num_all = len(Devicedetails.objects.exclude(deviceid=device_details[0].deviceid))
 	
-    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device, 'num_location' : num_location, 'num_provider' : num_provider}) 
+    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device, 'num_location' : num_location, 'num_provider' : num_provider, 'num_all' : num_all}) 
 
 
 def getLastUpdate(request, device):
@@ -243,9 +244,10 @@ def cvs_linegraph(request):
 		device_details = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,srcip='143.215.131.173')		
 	elif (graphno==2): 
         	device_details = MBitrate.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,dstip='143.215.131.173')
-
+	
 	for measure in device_details:
             	t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
+
 		if(measure.average <= 0):
 			continue
 		if(str(measure.toolid)=='NETPERF_3'):
@@ -312,6 +314,181 @@ def cvs_linegraph(request):
 
     return HttpResponse(output)
 
+def compare_cvs_linegraph(request):
+    device = request.GET.get('deviceid')
+    chosen_param = request.GET.get('param')
+    chosen_limit = request.GET.get('limit')
+    timetype = request.GET.get('type')
+    graphno = int(request.GET.get('graphno'))
+    filter_by = request.GET.get('filter_by')
+    '''
+    chosen_param = 'AGGL3BITRATE'
+    chosen_limit = 100000
+    timetype = 0
+	'''
+
+    s = request.GET.get('start')
+    s2 = datetime.strptime(s,"%m/%d/%Y")
+    s3 = ParseDateTimeUTC(str(s2))
+    s4 = datetime.fromtimestamp(s3)   
+    start = s4
+    
+    e = request.GET.get('end')
+    e2 = datetime.strptime(e,"%m/%d/%Y")
+    e3 = ParseDateTimeUTC(str(e2))
+    e4 = datetime.fromtimestamp(e3)+ timedelta(1,0)
+    end = e4
+    if chosen_param == 'AGGL3BITRATE' :
+	#COMPARE
+	xVariable = "Date"
+	yVariable = "Multi, Single, Median_Multi,Median_Single"
+	output = xVariable + "," + yVariable + "\n"
+
+	all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit).order_by('eventstamp')		
+	
+	if (graphno==1):
+		all_device_details = all_device_details.filter(srcip='143.215.131.173')		
+	elif (graphno==2): 
+        	all_device_details = all_device_details.filter(dstip='143.215.131.173')
+
+	my_device_details = all_device_details.filter(deviceid=device)
+
+	other_device_details = all_device_details
+
+	other_device_details_netperf_3 = all_device_details.exclude(deviceid=device).filter(toolid='NETPERF_3')
+
+	other_device_details_other = all_device_details.exclude(deviceid=device).exclude(toolid='NETPERF_3')
+
+	for measure in my_device_details:
+            	t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
+		if(measure.average <= 0):
+			continue
+		if(str(measure.toolid)=='NETPERF_3'):
+			ret = str(t) + "," + str(measure.average) + ",,,"
+
+		else:
+			ret = str(t) + ",,"+ str(measure.average)+",,"
+
+		output+=ret+"\n"
+	
+	bucket_width = 12*3600
+	try:
+		start_time = mktime(other_device_details_netperf_3[0].eventstamp.timetuple())
+		print "starttime" + str(start_time)
+		end_time = start_time + bucket_width
+		bucket = []
+		for measure in other_device_details_netperf_3:
+			time = mktime(measure.eventstamp.timetuple())
+			#print str(time) + "/" + str(end_time)+ " " + str(bucket) + " " + str(measure.average)
+			if time < end_time:
+				bucket.append(int(measure.average))
+			else:
+			   	mid_time = (start_time + end_time)/2
+
+			   	n = len(bucket)
+				if n!=0:
+			   		mean = sum(bucket) / n
+					output+=  str(datetime.fromtimestamp(mid_time)) + ",,," + str(mean) + ",\n"
+			   		#sd = sqrt(sum((x-mean)**2 for x in a) / n)
+			  	
+				print mean 
+			   	bucket = []
+			   
+			   	while(time>end_time):
+			   		start_time = end_time+1;
+			   		end_time = start_time+bucket_width
+			  
+			   		bucket.append(int(measure.average))
+	except:
+		 print "fail"
+
+	try:
+		start_time = mktime(other_device_details_other[0].eventstamp.timetuple())
+		print "starttime" + str(start_time)
+		end_time = start_time + bucket_width
+		bucket = []
+		for measure in other_device_details_other:
+			time = mktime(measure.eventstamp.timetuple())
+			#print str(time) + "/" + str(end_time)+ " " + str(bucket) + " " + str(measure.average)
+			if time < end_time:
+				bucket.append(int(measure.average))
+			else:
+			   	mid_time = (start_time + end_time)/2
+
+			   	n = len(bucket)
+				if n!=0:
+			   		mean = sum(bucket) / n
+					output+=  str(datetime.fromtimestamp(mid_time)) + ",,,," + str(mean) + "\n"
+			   		#sd = sqrt(sum((x-mean)**2 for x in a) / n)
+			  	
+				print mean 
+			   	bucket = []
+			   
+			   	while(time>end_time):
+			   		start_time = end_time+1;
+			   		end_time = start_time+bucket_width
+			  
+			   		bucket.append(int(measure.average))
+	except:
+		 print "fail"		
+			   
+		
+    elif chosen_param == 'RTT' :
+
+        distinct_ips = MRtt.objects.values('dstip').distinct()
+	xVariable = "Date"
+        yVariable = request.GET.get('unit')
+        output = xVariable
+
+        for row_ip in distinct_ips:
+	    ip_lookup = IPResolver.objects.filter(ip=row_ip['dstip'])[0]
+
+            output = output + "," + ip_lookup.location
+
+        output+="\n"
+        time = list()
+        data = list()
+        for row_ip in distinct_ips:
+            device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit, dstip = row_ip["dstip"])
+            data1 = list()
+            for measure in device_details:
+		if(measure.average < 0):
+			continue
+                data1.append(str(measure.average))
+
+            data.append(data1)
+            
+        device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit,dstip='143.215.131.173')
+        for row_details in device_details:
+            time.append(row_details.eventstamp)
+
+        for i in range(0,len(time)):
+            ret = str(time[i])
+
+            for temp in data:
+                if i>=len(temp):
+                    continue
+                ret += "," + str(temp[i])
+
+            ret+="\n"
+            output += ret
+        
+
+    elif chosen_param == 'LMRTT' :
+
+    
+        device_details = MLmrtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit)
+        xVariable = "Date"
+        yVariable = request.GET.get('unit')
+        output = xVariable + "," + yVariable +"\n"
+        for measure in device_details:
+	    if(measure.average < 0):
+	    	continue
+            t = measure.eventstamp
+            ret = str(t) + "," + str(measure.average) +"\n"
+            output += ret
+
+    return HttpResponse(output)
 
 
 def pie_chart(request):
