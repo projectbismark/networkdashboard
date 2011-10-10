@@ -142,13 +142,6 @@
         var logdisplay = false;
         var special = false;
 
-	
-	var loc = window.location.href;
-	spl = loc.split('/');
-
-	if(spl[spl.length-1].length>2) loc="/data_chart/"+spl[spl.length-1];
-	else loc="/data_chart/"+spl[spl.length-2];
-        
        	
 	function start()
 	{
@@ -367,7 +360,7 @@
 	
 	$.ajax({
                 type: "GET",
-                url: loc,
+                url: "/data_chart/{{deviceid}}",
                 data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate},
                 success: OnSuccess
             });
@@ -375,7 +368,7 @@
         if(paramselect=="AGGL3BITRATE"){
             $.ajax({
                 type: "GET",
-                url: loc,
+                url: "/data_chart/{{deviceid}}",
                 data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate},
                 success: OnSuccess2
             });
