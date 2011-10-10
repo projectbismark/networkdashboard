@@ -146,7 +146,7 @@ def devicesummary(request):
 		else:
 			return render_to_response('device_not_found.html', {'deviceid': device})
 	except:
-		return render_to_response('device_not_found.html', {'deviceid': devicehash})
+		return render_to_response('device_not_found.html', {'deviceid': device})
 
     device_details = Devicedetails.objects.filter(deviceid=device)
     try:
