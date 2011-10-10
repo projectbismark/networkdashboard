@@ -321,11 +321,7 @@ def compare_cvs_linegraph(request):
     timetype = request.GET.get('type')
     graphno = int(request.GET.get('graphno'))
     filter_by = request.GET.get('filter_by')
-    '''
-    chosen_param = 'AGGL3BITRATE'
-    chosen_limit = 100000
-    timetype = 0
-	'''
+    value = request.GET.get('value')
 
     s = request.GET.get('start')
     s2 = datetime.strptime(s,"%m/%d/%Y")
@@ -345,6 +341,11 @@ def compare_cvs_linegraph(request):
 	output = xVariable + "," + yVariable + "\n"
 
 	all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit).order_by('eventstamp')		
+
+	if filter_by = 'location':
+		all_device_details.filter(location=value)
+	elif filter_by = 'provider':
+		all.device_details.filter(provider=value)
 	
 	if (graphno==1):
 		all_device_details = all_device_details.filter(srcip='143.215.131.173')		
