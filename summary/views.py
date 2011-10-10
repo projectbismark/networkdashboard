@@ -168,8 +168,11 @@ def devicesummary(request):
     calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
     calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
     last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-
-    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device}) 
+    
+    num_location = len(Devicedetails.objects.filter(city=device_details[0].city).exclude(deviceid=device_details[0].deviceid))
+    num_provider = len(Devicedetails.objects.filter(isp=device_details[0].isp).exclude(deviceid=device_details[0].deviceid))
+	
+    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device, 'num_location' : num_location, 'num_provider' : num_provider}) 
 
 
 def getLastUpdate(request, device):
