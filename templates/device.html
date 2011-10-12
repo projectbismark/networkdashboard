@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class ="section">
+<div class ="section" id="section_1">
     <h1>BISMark Device           <a href ="/editDevicePage/{{detail.hashkey}}"> Edit </a></h1>
     <script src="/static/jquery-latest.js"></script>
  <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojo/dojo.xd.js"
@@ -64,11 +64,8 @@
 <tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}" dojoType="dijit.form.TextBox" /></td>
 </table>
 
-
 </div>
-<br />
-
-<div class="section">
+<div class="section" id="section_2">
 
 <script type="text/javascript" src="/static/dygraph-combined.js"></script>
 
@@ -110,9 +107,19 @@
 <tr/>
 
 </table>
-
-<button dojoType="dijit.form.Button" type="submit" name="submit" onClick=" render()">Display</button>
+<div class="menu" id="drop_menu_1">
+    Compare to other devices based on:
+    <select id="select_menu_1">
+        <option value = "none" selected>Don't Compare</option>
+        <option value ="location">Location({{num_location}})</option>
+        <option value ="provider">Provider({{num_provider}})</option>
+    </select>
 </div>
+<br />
+<button dojoType="dijit.form.Button" type="submit" name="submit" onClick=" render()">Display</button>
+
+</div>
+
 
         
 
@@ -140,8 +147,7 @@
 	var paramselect = "AGGL3BITRATE";
         var logdisplay = false;
         var special = false;
-        var compare = false;
-        var filter = '';
+        var filter = "none";
 
        	
 	function start()
@@ -152,6 +158,8 @@
 
 	function createStyle()
 	{
+            var sel = document.getElementById("select_menu_1");
+            filter = sel.options[sel.selectedIndex].value;
 
 		if(g1rb1.checked)
 		{
@@ -265,10 +273,6 @@
             gd1.setAttribute('id','graph_div_1');
             gd1.setAttribute('class','graphdiv');
             outer.appendChild(gd1);
-            var menu = document.createElement('div');
-            menu.setAttribute('id','drop_menu_1');
-            menu.setAttribute('class','menu');
-            outer.appendChild(menu);
             dtag.appendChild(outer);
             if (paramselect == 'AGGL3BITRATE'){
                 outer = document.createElement('div');
@@ -282,24 +286,6 @@
                 dtag.appendChild(outer);
             }
             
-        }
-        
-        function createMenu(){
-            var menu = document.getElementById('drop_menu_1');
-            var sel = document.createElement('select');
-            var button = document.createElement('input');
-            button.id = 'compare_button';
-            button.type = 'button';
-            button.value = 'Display';
-            button.name ='compareButton';
-            button.setAttribute('onclick','compareRender()');
-            sel.id = 'selection';
-            sel.options[0] = new Option('location ({{num_location}})','location');
-            sel.options[1] = new Option('provider ({{num_provider}})','provider');
-            menu.innerHTML = 'Show Devices Based on:<br/> <br/>';
-            menu.appendChild(sel);
-            menu.innerHTML += '<br/>';
-            menu.appendChild(button);
         }
         
         function addRadios(){
@@ -329,16 +315,17 @@
             if(document.getElementById('label_1')){
                 return;
             }
-            var dtag = document.getElementById('display_tag');
+            var outer1 = document.getElementById('graph_div_outer');
             var label1 = document.createElement('div');
             
             if(paramselect == "AGGL3BITRATE"){
+                var outer2 = document.getElementById('graph_div_outer2');
                 label1.innerHTML = '<b>Download Throughput (kbps)</b> <br />';
                 var label2 = document.createElement('div');
                 label2.innerHTML = '<br/><br/><b>Upload Throughput (kbps)</b><br />';
                 label2.setAttribute('id','label_2');
                 label2.setAttribute('align','center');
-                dtag.insertBefore(label2,dtag.lastChild);
+                outer2.appendChild(label2);
             }
             else if(paramselect == "RTT"){
                 label1.innerHTML = '<b> Round Trip Time (msec)</b><br />';
@@ -349,63 +336,35 @@
             
             label1.setAttribute('id','label_1');
             label1.setAttribute('align','center');
-            dtag.insertBefore(label1,dtag.firstChild);
+            outer1.appendChild(label1);
             
         }
-            
-	
-        function compareRender(){
-            compare = true;
-            var sel = document.getElementById('selection');
-            filter = sel.options[sel.selectedIndex].value; 
-            render();
-        }
+           
 	function render()
 	{
 
         createStyle();
         deleteDivs();
         createGraphDivs();
-        createMenu();
 	OpenProgressBar();
         var startDate = document.getElementById('fromDate').value;
         var endDate = document.getElementById('toDate').value;
         
 	
-	if(compare==true){
-            $.ajax({
+	$.ajax({
                     type: "GET",
                     url: "/compare_data_chart/{{deviceid}}",
                     data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate,'filter_by': filter, 'value': "{{detail.city}}"},
                     success: OnSuccess
                 });
-        }
-        else{
-            $.ajax({
-                    type: "GET",
-                    url: "/data_chart/{{deviceid}}",
-                    data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate},
-                    success: OnSuccess
-                });
-        }
         
         if(paramselect=="AGGL3BITRATE"){
-            if(compare==true){
-                $.ajax({
+            $.ajax({
                     type: "GET",
                     url: "/compare_data_chart/{{deviceid}}",
                     data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate ,'filter_by': filter, 'value': "{{detail.city}}"},
                     success: OnSuccess2
                 });
-            }
-            else{
-                $.ajax({
-                    type: "GET",
-                    url: "/data_chart/{{deviceid}}",
-                    data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate},
-                    success: OnSuccess2
-                });
-            }
         }
         
         }
