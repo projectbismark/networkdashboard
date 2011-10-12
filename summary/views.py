@@ -350,11 +350,13 @@ def compare_cvs_linegraph(request):
 		
 		for row in filtered_deviceids:
 			all_device_details.exclude(deviceid=row.deviceid)
+			output+=row.deviceid;
 	elif (filter_by == 'provider'):
 		filtered_deviceids = Devicedetails.objects.exclude(isp=value)
 
 		for row in filtered_deviceids:
 			all_device_details.exclude(deviceid=row.deviceid)
+			output+=row.deviceid;
 	else:
 		return HttpResponse(output)
 	
