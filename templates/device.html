@@ -354,7 +354,7 @@
 	$.ajax({
                     type: "GET",
                     url: "/compare_data_chart/{{deviceid}}",
-                    data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate,'filter_by': filter, 'value': "{{detail.city}}"},
+                    data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate,'filter_by': filter},
                     success: OnSuccess
                 });
         
@@ -362,7 +362,7 @@
             $.ajax({
                     type: "GET",
                     url: "/compare_data_chart/{{deviceid}}",
-                    data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate ,'filter_by': filter, 'value': "{{detail.city}}"},
+                    data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate ,'filter_by': filter},
                     success: OnSuccess2
                 });
         }
