@@ -323,6 +323,9 @@ def compare_cvs_linegraph(request):
     filter_by = request.GET.get('filter_by')
     value = request.GET.get('value')
 
+    print filter_by
+    print value
+
     s = request.GET.get('start')
     s2 = datetime.strptime(s,"%m/%d/%Y")
     s3 = ParseDateTimeUTC(str(s2))
