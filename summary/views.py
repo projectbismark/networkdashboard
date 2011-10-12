@@ -347,13 +347,14 @@ def compare_cvs_linegraph(request):
 
 	if (filter_by == 'location'):
 		filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
-		print len(filtered_deviceids)
-		
-		for row in filtered_deviceids:
+	if (filter_by == 'provider'):
+		filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
+	
 
-			other_device_details_other.extend(all_device_details.filter(deviceid=row.deviceid).exclude(toolid='NETPERF_3'))
-			other_device_details_netperf_3.extend(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))
-			print len(other_device_details_netperf_3)
+	for row in filtered_deviceids:
+		other_device_details_other.extend(all_device_details.filter(deviceid=row.deviceid).exclude(toolid='NETPERF_3'))
+		other_device_details_netperf_3.extend(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))
+	
 	
 	if (graphno==1):
 		all_device_details = all_device_details.filter(srcip='143.215.131.173')		
