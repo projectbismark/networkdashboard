@@ -342,14 +342,20 @@ def compare_cvs_linegraph(request):
 	output = xVariable + "," + yVariable + "\n"
 
 	all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit).order_by('eventstamp')		
-
+	
 	if (filter_by == 'location'):
-		filtered_deviceids = all_device_details('deviceid').distinct()
-
+		filtered_deviceids = all_device_details.values('deviceid').distinct()
+		print len(filtered_deviceids)
 		for row in filtered_deviceids:
-			filtered_deviceid_details=Devicedetails.objects.filter(deviceid=row.deviceid)[0]
-			if (filtered_deviceid_details.city!=details.city)			
-				all_device_details=all_device_details.exclude(deviceid=row.deviceid)
+			print row
+			try:
+				filtered_device_details = Devicedetails.objects.filter(deviceid=row['deviceid'])[0]
+
+				if (filtered_device_details.city!=details.city):			
+					all_device_details=all_device_details.exclude(deviceid=row['deviceid'])
+					print "        excluded"
+			except:
+				all_device_details=all_device_details.exclude(deviceid=row['deviceid'])
 
 				
 	elif (filter_by == 'provider'):
