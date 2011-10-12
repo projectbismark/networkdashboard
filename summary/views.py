@@ -355,7 +355,8 @@ def compare_cvs_linegraph(request):
 
 		for row in filtered_deviceids:
 			all_device_details.exclude(deviceid=row.deviceid)
-	
+	else:
+		return HttpResponse(output)
 	
 	if (graphno==1):
 		all_device_details = all_device_details.filter(srcip='143.215.131.173')		
