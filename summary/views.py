@@ -346,9 +346,10 @@ def compare_cvs_linegraph(request):
 	all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit).order_by('eventstamp')		
 
 	if (filter_by == 'location'):
-		all_device_details.filter(location=value)
+		all_device_details.filter(city=value)
 	elif (filter_by == 'provider'):
 		all.device_details.filter(provider=value)
+	
 	
 	if (graphno==1):
 		all_device_details = all_device_details.filter(srcip='143.215.131.173')		
@@ -359,9 +360,9 @@ def compare_cvs_linegraph(request):
 
 	other_device_details = all_device_details
 
-	other_device_details_netperf_3 = all_device_details.exclude(deviceid=device).filter(toolid='NETPERF_3')
+	other_device_details_netperf_3 = other_device_details.exclude(deviceid=device).filter(toolid='NETPERF_3')
 
-	other_device_details_other = all_device_details.exclude(deviceid=device).exclude(toolid='NETPERF_3')
+	other_device_details_other = other_device_details.exclude(deviceid=device).exclude(toolid='NETPERF_3')
 
 	for measure in my_device_details:
             	t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
@@ -375,66 +376,68 @@ def compare_cvs_linegraph(request):
 
 		output+=ret+"\n"
 	
-	bucket_width = 12*3600
-	try:
-		start_time = mktime(other_device_details_netperf_3[0].eventstamp.timetuple())
-		print "starttime" + str(start_time)
-		end_time = start_time + bucket_width
-		bucket = []
-		for measure in other_device_details_netperf_3:
-			time = mktime(measure.eventstamp.timetuple())
-			#print str(time) + "/" + str(end_time)+ " " + str(bucket) + " " + str(measure.average)
-			if time < end_time:
-				bucket.append(int(measure.average))
-			else:
-			   	mid_time = (start_time + end_time)/2
+	if (filter_by != 'none'):	
 
-			   	n = len(bucket)
-				if n!=0:
-			   		mean = sum(bucket) / n
-					output+=  str(datetime.fromtimestamp(mid_time)) + ",,," + str(mean) + ",\n"
-			   		#sd = sqrt(sum((x-mean)**2 for x in a) / n)
-			  	
-				print mean 
-			   	bucket = []
-			   
-			   	while(time>end_time):
-			   		start_time = end_time+1;
-			   		end_time = start_time+bucket_width
-			  
-			   		bucket.append(int(measure.average))
-	except:
-		 print "fail"
+		bucket_width = 12*3600
+		try:
+			start_time = mktime(other_device_details_netperf_3[0].eventstamp.timetuple())
+			print "starttime" + str(start_time)
+			end_time = start_time + bucket_width
+			bucket = []
+			for measure in other_device_details_netperf_3:
+				time = mktime(measure.eventstamp.timetuple())
+				#print str(time) + "/" + str(end_time)+ " " + str(bucket) + " " + str(measure.average)
+				if time < end_time:
+					bucket.append(int(measure.average))
+				else:
+				   	mid_time = (start_time + end_time)/2
 
-	try:
-		start_time = mktime(other_device_details_other[0].eventstamp.timetuple())
-		print "starttime" + str(start_time)
-		end_time = start_time + bucket_width
-		bucket = []
-		for measure in other_device_details_other:
-			time = mktime(measure.eventstamp.timetuple())
-			#print str(time) + "/" + str(end_time)+ " " + str(bucket) + " " + str(measure.average)
-			if time < end_time:
-				bucket.append(int(measure.average))
-			else:
-			   	mid_time = (start_time + end_time)/2
+				   	n = len(bucket)
+					if n!=0:
+				   		mean = sum(bucket) / n
+						output+=  str(datetime.fromtimestamp(mid_time)) + ",,," + str(mean) + ",\n"
+				   		#sd = sqrt(sum((x-mean)**2 for x in a) / n)
+				  	
+					print mean 
+				   	bucket = []
+				   
+				   	while(time>end_time):
+				   		start_time = end_time+1;
+				   		end_time = start_time+bucket_width
+				  
+				   		bucket.append(int(measure.average))
+		except:
+			 print "fail"
 
-			   	n = len(bucket)
-				if n!=0:
-			   		mean = sum(bucket) / n
-					output+=  str(datetime.fromtimestamp(mid_time)) + ",,,," + str(mean) + "\n"
-			   		#sd = sqrt(sum((x-mean)**2 for x in a) / n)
-			  	
-				print mean 
-			   	bucket = []
-			   
-			   	while(time>end_time):
-			   		start_time = end_time+1;
-			   		end_time = start_time+bucket_width
-			  
-			   		bucket.append(int(measure.average))
-	except:
-		 print "fail"		
+		try:
+			start_time = mktime(other_device_details_other[0].eventstamp.timetuple())
+			print "starttime" + str(start_time)
+			end_time = start_time + bucket_width
+			bucket = []
+			for measure in other_device_details_other:
+				time = mktime(measure.eventstamp.timetuple())
+				#print str(time) + "/" + str(end_time)+ " " + str(bucket) + " " + str(measure.average)
+				if time < end_time:
+					bucket.append(int(measure.average))
+				else:
+				   	mid_time = (start_time + end_time)/2
+
+				   	n = len(bucket)
+					if n!=0:
+				   		mean = sum(bucket) / n
+						output+=  str(datetime.fromtimestamp(mid_time)) + ",,,," + str(mean) + "\n"
+				   		#sd = sqrt(sum((x-mean)**2 for x in a) / n)
+				  	
+					print mean 
+				   	bucket = []
+				   
+				   	while(time>end_time):
+				   		start_time = end_time+1;
+				   		end_time = start_time+bucket_width
+				  
+				   		bucket.append(int(measure.average))
+		except:
+			 print "fail"		
 			   
 		
     elif chosen_param == 'RTT' :
