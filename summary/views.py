@@ -321,10 +321,8 @@ def compare_cvs_linegraph(request):
     timetype = request.GET.get('type')
     graphno = int(request.GET.get('graphno'))
     filter_by = request.GET.get('filter_by')
-    value = request.GET.get('value')
 
-    print filter_by
-    print value
+    details = Devicedetails.objects.filter(deviceid=device)[0]
 
     s = request.GET.get('start')
     s2 = datetime.strptime(s,"%m/%d/%Y")
@@ -346,16 +344,20 @@ def compare_cvs_linegraph(request):
 	all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit).order_by('eventstamp')		
 
 	if (filter_by == 'location'):
-		filtered_deviceids = Devicedetails.objects.exclude(city=value)
-		
-		for row in filtered_deviceids:
-			all_device_details=all_device_details.exclude(deviceid=row.deviceid)
-		
-	elif (filter_by == 'provider'):
-		filtered_deviceids = Devicedetails.objects.exclude(isp=value)
+		filtered_deviceids = Devicedetails.objects.exclude(city=details.city)
 
 		for row in filtered_deviceids:
 			all_device_details=all_device_details.exclude(deviceid=row.deviceid)
+
+				
+	elif (filter_by == 'provider'):
+		filtered_deviceids = Devicedetails.objects.exclude(isp=details.isp)
+
+		for row in filtered_deviceids:
+			all_device_details=all_device_details.exclude(deviceid=row.deviceid)
+
+		
+		
 
 
 	
@@ -512,7 +514,7 @@ def pie_chart(request):
 	l.values = []
 	l.values.append(pie_value(value=495,label='IMAPS'))
 	l.values.append(pie_value(value=295,label='55005'))
-	l.values.append(pie_value(value=8442,label='alternate HTTP'))
+	l.values.append(pie_value(value=8442,label='alternpate HTTP'))
 	l.values.append(pie_value(value=753,label='SSH'))
 	l.values.append(pie_value(value=226,label='53108'))
 	l.values.append(pie_value(value=2044,label='HTTPS'))
