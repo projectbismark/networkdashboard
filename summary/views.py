@@ -347,7 +347,7 @@ def compare_cvs_linegraph(request):
 
 	if (filter_by == 'location'):
 		filtered_deviceids = Devicedetails.objects.exclude(city=value)
-
+		
 		for row in filtered_deviceids:
 			all_device_details.exclude(deviceid=row.deviceid)
 	elif (filter_by == 'provider'):
