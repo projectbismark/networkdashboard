@@ -378,7 +378,7 @@ def compare_cvs_linegraph(request):
 	
 
 	if (filter_by != 'none'):
-		bucket_width = 12*3600
+		bucket_width = 24*3600
 		try:	
 			
 			start_time = mktime(other_device_details_netperf_3[0].eventstamp.timetuple())
