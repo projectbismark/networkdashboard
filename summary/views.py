@@ -349,16 +349,15 @@ def compare_cvs_linegraph(request):
 		filtered_deviceids = Devicedetails.objects.exclude(city=value)
 		
 		for row in filtered_deviceids:
-			all_device_details.exclude(deviceid=row.deviceid)
-			output+=row.deviceid;
+			all_device_details=all_device_details.exclude(deviceid=row.deviceid)
+		
 	elif (filter_by == 'provider'):
 		filtered_deviceids = Devicedetails.objects.exclude(isp=value)
 
 		for row in filtered_deviceids:
-			all_device_details.exclude(deviceid=row.deviceid)
-			output+=row.deviceid;
-	else:
-		return HttpResponse(output)
+			all_device_details=all_device_details.exclude(deviceid=row.deviceid)
+
+
 	
 	if (graphno==1):
 		all_device_details = all_device_details.filter(srcip='143.215.131.173')		
