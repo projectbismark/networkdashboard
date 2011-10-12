@@ -344,9 +344,12 @@ def compare_cvs_linegraph(request):
 	all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit).order_by('eventstamp')		
 	other_device_details_netperf_3 = []
 	other_device_details_other = []
+	filtered_deviceids = []
+	
 
 	if (filter_by == 'location'):
 		filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
+
 	if (filter_by == 'provider'):
 		filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
 	
