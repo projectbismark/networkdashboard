@@ -347,9 +347,13 @@ def compare_cvs_linegraph(request):
 
 	if (filter_by == 'location'):
 		filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
+		print len(filtered_deviceids)
+		
 		for row in filtered_deviceids:
-			other_device_details_other.append(all_device_details.filter(deviceid=row.deviceid).exclude(toolid='NETPERF_3'))
-			other_device_details_netperf_3.append(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))
+
+			other_device_details_other.extend(all_device_details.filter(deviceid=row.deviceid).exclude(toolid='NETPERF_3'))
+			other_device_details_netperf_3.extend(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))
+			print len(other_device_details_netperf_3)
 	
 	if (graphno==1):
 		all_device_details = all_device_details.filter(srcip='143.215.131.173')		
@@ -370,10 +374,12 @@ def compare_cvs_linegraph(request):
 
 		output+=ret+"\n"
 	
-	if (filter_by != 'none'):	
+	
 
+	if (filter_by != 'none'):
 		bucket_width = 12*3600
-		try:
+		try:	
+			
 			start_time = mktime(other_device_details_netperf_3[0].eventstamp.timetuple())
 
 			end_time = start_time + bucket_width
