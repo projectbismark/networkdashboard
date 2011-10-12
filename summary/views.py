@@ -342,28 +342,14 @@ def compare_cvs_linegraph(request):
 	output = xVariable + "," + yVariable + "\n"
 
 	all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit).order_by('eventstamp')		
-	
+	other_device_details_netperf_3 = []
+	other_device_details_other = []
+
 	if (filter_by == 'location'):
-		filtered_deviceids = all_device_details.values('deviceid').distinct()
-		print len(filtered_deviceids)
+		filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
 		for row in filtered_deviceids:
-			print row
-			try:
-				filtered_device_details = Devicedetails.objects.filter(deviceid=row['deviceid'])[0]
-
-				if (filtered_device_details.city!=details.city):			
-					all_device_details=all_device_details.exclude(deviceid=row['deviceid'])
-					print "        excluded"
-			except:
-				all_device_details=all_device_details.exclude(deviceid=row['deviceid'])
-
-				
-	elif (filter_by == 'provider'):
-		filtered_deviceids = Devicedetails.objects.exclude(isp=details.isp)
-
-		for row in filtered_deviceids:
-			all_device_details=all_device_details.exclude(deviceid=row.deviceid)
-
+			other_device_details_other.append(all_device_details.filter(deviceid=row.deviceid).exclude(toolid='NETPERF_3'))
+			other_device_details_netperf_3.append(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))
 	
 	if (graphno==1):
 		all_device_details = all_device_details.filter(srcip='143.215.131.173')		
@@ -371,12 +357,6 @@ def compare_cvs_linegraph(request):
         	all_device_details = all_device_details.filter(dstip='143.215.131.173')
 
 	my_device_details = all_device_details.filter(deviceid=device)
-
-	other_device_details = all_device_details
-
-	other_device_details_netperf_3 = other_device_details.exclude(deviceid=device).filter(toolid='NETPERF_3')
-
-	other_device_details_other = other_device_details.exclude(deviceid=device).exclude(toolid='NETPERF_3')
 
 	for measure in my_device_details:
             	t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
@@ -395,7 +375,7 @@ def compare_cvs_linegraph(request):
 		bucket_width = 12*3600
 		try:
 			start_time = mktime(other_device_details_netperf_3[0].eventstamp.timetuple())
-			print "starttime" + str(start_time)
+
 			end_time = start_time + bucket_width
 			bucket = []
 			for measure in other_device_details_netperf_3:
