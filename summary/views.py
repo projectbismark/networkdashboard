@@ -344,10 +344,12 @@ def compare_cvs_linegraph(request):
 	all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit).order_by('eventstamp')		
 
 	if (filter_by == 'location'):
-		filtered_deviceids = Devicedetails.objects.exclude(city=details.city)
+		filtered_deviceids = all_device_details('deviceid').distinct()
 
 		for row in filtered_deviceids:
-			all_device_details=all_device_details.exclude(deviceid=row.deviceid)
+			filtered_deviceid_details=Devicedetails.objects.filter(deviceid=row.deviceid)[0]
+			if (filtered_deviceid_details.city!=details.city)			
+				all_device_details=all_device_details.exclude(deviceid=row.deviceid)
 
 				
 	elif (filter_by == 'provider'):
@@ -355,10 +357,6 @@ def compare_cvs_linegraph(request):
 
 		for row in filtered_deviceids:
 			all_device_details=all_device_details.exclude(deviceid=row.deviceid)
-
-		
-		
-
 
 	
 	if (graphno==1):
