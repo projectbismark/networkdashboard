@@ -314,6 +314,136 @@ def cvs_linegraph(request):
 
     return HttpResponse(output)
 
+def linegraph_bitrate(request):
+    device = request.GET.get('deviceid')
+    graphno = int(request.GET.get('graphno'))
+    filter_by = request.GET.get('filter_by')
+
+    details = Devicedetails.objects.filter(deviceid=device)[0]
+
+    s = request.GET.get('start')
+    s2 = datetime.strptime(s,"%m/%d/%Y")
+    s3 = ParseDateTimeUTC(str(s2))
+    s4 = datetime.fromtimestamp(s3)   
+    start = s4
+    
+    e = request.GET.get('end')
+    e2 = datetime.strptime(e,"%m/%d/%Y")
+    e3 = ParseDateTimeUTC(str(e2))
+    e4 = datetime.fromtimestamp(e3)+ timedelta(1,0)
+    end = e4
+
+    xVariable = "Date"
+    yVariable = "Multi, Single, Median_Multi,Median_Single"
+    output = xVariable + "," + yVariable + "\n"
+
+    all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit).order_by('eventstamp')		
+
+    other_device_details_netperf_3 = []
+    other_device_details_other = []
+    filtered_deviceids = []
+	
+
+    if (filter_by == 'location'):
+	filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
+
+    if (filter_by == 'provider'):
+	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
+
+
+    for row in filtered_deviceids:
+	other_device_details_other.extend(all_device_details.filter(deviceid=row.deviceid).exclude(toolid='NETPERF_3'))
+	other_device_details_netperf_3.extend(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))
+	
+	
+    if (graphno==1):
+	all_device_details = all_device_details.filter(srcip='143.215.131.173')		
+    elif (graphno==2): 
+        all_device_details = all_device_details.filter(dstip='143.215.131.173')
+
+    my_device_details = all_device_details.filter(deviceid=device)
+
+    for measure in my_device_details:
+	t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
+	if(measure.average <= 0):
+		continue
+	if(str(measure.toolid)=='NETPERF_3'):
+		ret = str(t) + "," + str(measure.average) + ",,,"
+
+	else:
+		ret = str(t) + ",,"+ str(measure.average)+",,"
+
+	output+=ret+"\n"
+	
+	
+
+    if (filter_by != 'none'):
+	bucket_width = 24*3600
+	try:	
+			
+		start_time = mktime(other_device_details_netperf_3[0].eventstamp.timetuple())
+
+		end_time = start_time + bucket_width
+		bucket = []
+		for measure in other_device_details_netperf_3:
+			time = mktime(measure.eventstamp.timetuple())
+			#print str(time) + "/" + str(end_time)+ " " + str(bucket) + " " + str(measure.average)
+			if time < end_time:
+				bucket.append(int(measure.average))
+			else:
+			   	mid_time = (start_time + end_time)/2
+
+			   	n = len(bucket)
+				if n!=0:
+			   		mean = sum(bucket) / n
+					output+=  str(datetime.fromtimestamp(mid_time)) + ",,," + str(mean) + ",\n"
+			   		#sd = sqrt(sum((x-mean)**2 for x in a) / n)
+
+				  	
+				print mean 
+			   	bucket = []
+				   
+			   	while(time>end_time):
+			   		start_time = end_time+1;
+			   		end_time = start_time+bucket_width
+			  
+			   		bucket.append(int(measure.average))
+	except:
+		 print "fail"
+
+	try:
+		start_time = mktime(other_device_details_other[0].eventstamp.timetuple())
+		print "starttime" + str(start_time)
+		end_time = start_time + bucket_width
+		bucket = []
+		for measure in other_device_details_other:
+			time = mktime(measure.eventstamp.timetuple())
+			#print str(time) + "/" + str(end_time)+ " " + str(bucket) + " " + str(measure.average)
+			if time < end_time:
+				bucket.append(int(measure.average))
+			else:
+			   	mid_time = (start_time + end_time)/2
+
+				n = len(bucket)
+				if n!=0:
+				   	mean = sum(bucket) / n
+					output+=  str(datetime.fromtimestamp(mid_time)) + ",,,," + str(mean) + "\n"
+				   	#sd = sqrt(sum((x-mean)**2 for x in a) / n)
+				  	
+				print mean 
+			   	bucket = []
+				   
+			   	while(time>end_time):
+			   		start_time = end_time+1;
+			   		end_time = start_time+bucket_width
+			  
+			   		bucket.append(int(measure.average))
+	except:
+		print "fail"		
+			   
+    return HttpResponse(output)
+
+
 def compare_cvs_linegraph(request):
     device = request.GET.get('deviceid')
     chosen_param = request.GET.get('param')
