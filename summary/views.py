@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from time import time,mktime,strftime
 from mx.DateTime.ISO import ParseDateTimeUTC
 import hashlib
+import cvs_helper,datetime_helper
 
 def index(request):
     return render_to_response('index.html')
@@ -327,6 +328,7 @@ def linegraph_bitrate(request):
     s3 = ParseDateTimeUTC(str(s2))
     s4 = datetime.fromtimestamp(s3)   
     start = s4
+    print start
     
     e = request.GET.get('end')
     e2 = datetime.strptime(e,"%m/%d/%Y")
@@ -380,67 +382,8 @@ def linegraph_bitrate(request):
 
     if (filter_by != 'none'):
 	bucket_width = 24*3600
-	try:	
-			
-		start_time = mktime(other_device_details_netperf_3[0].eventstamp.timetuple())
-
-		end_time = start_time + bucket_width
-		bucket = []
-		for measure in other_device_details_netperf_3:
-			time = mktime(measure.eventstamp.timetuple())
-			#print str(time) + "/" + str(end_time)+ " " + str(bucket) + " " + str(measure.average)
-			if time < end_time:
-				bucket.append(int(measure.average))
-			else:
-			   	mid_time = (start_time + end_time)/2
-
-			   	n = len(bucket)
-				if n!=0:
-			   		mean = sum(bucket) / n
-					output+=  str(datetime.fromtimestamp(mid_time)) + ",,," + str(mean) + ",\n"
-			   		#sd = sqrt(sum((x-mean)**2 for x in a) / n)
-
-				  	
-				print mean 
-			   	bucket = []
-				   
-			   	while(time>end_time):
-			   		start_time = end_time+1;
-			   		end_time = start_time+bucket_width
-			  
-			   		bucket.append(int(measure.average))
-	except:
-		 print "fail"
-
-	try:
-		start_time = mktime(other_device_details_other[0].eventstamp.timetuple())
-		print "starttime" + str(start_time)
-		end_time = start_time + bucket_width
-		bucket = []
-		for measure in other_device_details_other:
-			time = mktime(measure.eventstamp.timetuple())
-			#print str(time) + "/" + str(end_time)+ " " + str(bucket) + " " + str(measure.average)
-			if time < end_time:
-				bucket.append(int(measure.average))
-			else:
-			   	mid_time = (start_time + end_time)/2
-
-				n = len(bucket)
-				if n!=0:
-				   	mean = sum(bucket) / n
-					output+=  str(datetime.fromtimestamp(mid_time)) + ",,,," + str(mean) + "\n"
-				   	#sd = sqrt(sum((x-mean)**2 for x in a) / n)
-				  	
-				print mean 
-			   	bucket = []
-				   
-			   	while(time>end_time):
-			   		start_time = end_time+1;
-			   		end_time = start_time+bucket_width
-			  
-			   		bucket.append(int(measure.average))
-	except:
-		print "fail"		
+	output+=cvs_helper.linegraph_bitrate_compare_data(other_device_details_netperf_3,bucket_width)
+	output+=cvs_helper.linegraph_bitrate_compare_data(other_device_details_other,bucket_width)
 			   
     return HttpResponse(output)
 
