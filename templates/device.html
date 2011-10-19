@@ -423,7 +423,7 @@
 				});
 
         }
-        else{
+        else {
             $.ajax({
                         type: "GET",
                         url: "/compare_data_chart/{{deviceid}}",
@@ -434,11 +434,12 @@
             if(paramselect=="AGGL3BITRATE"){
                 $.ajax({
                         type: "GET",
-                        url: "/compare_data_chart/{{deviceid}}",
-                        data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate ,'filter_by': filter},
+                        url: "/linegraph_bitrate/",
+                        data: {'graphno' : 2, 'deviceid': "{{deviceid}}",  'start': startDate, 'end': endDate ,'filter_by': filter},
                         success: OnSuccess2
                     });
             }
+            
         }
         
         }
