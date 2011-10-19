@@ -318,6 +318,7 @@ def linegraph_bitrate(request):
     device = request.GET.get('deviceid')
     graphno = int(request.GET.get('graphno'))
     filter_by = request.GET.get('filter_by')
+    chosen_limit = 10000000
 
     details = Devicedetails.objects.filter(deviceid=device)[0]
 
