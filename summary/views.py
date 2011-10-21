@@ -301,7 +301,7 @@ def compare_cvs_linegraph(request):
         output = xVariable
 
         for row_ip in distinct_ips:
-	    ip_lookup = IPResolver.objects.filter(ip=row_ip['dstip'])[0]
+	    ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0]
 
             output = output + "," + ip_lookup.location
 
