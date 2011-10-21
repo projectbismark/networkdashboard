@@ -1903,7 +1903,7 @@
             $.ajax({
                         type: "GET",
                         url: "/compare_data_chart/{{deviceid}}",
-                        data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
+                        data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'start': "08/01/2011", 'end': "12/01/2011", 'filter_by': filter, 'bucket_size': bucket},
                         success: OnSuccess
                     });
 
