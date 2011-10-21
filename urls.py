@@ -39,7 +39,7 @@ urlpatterns = patterns('',
      (r'^data/(?P<device>\w+)', 'networkdashboard.summary.views.line_data2'),
      (r'^data_chart/', 'networkdashboard.summary.views.cvs_linegraph'),
      (r'^compare_data_chart/', 'networkdashboard.summary.views.compare_cvs_linegraph'),
-     (r'^linegraph_bitrate/', 'networkdashboard.summary.views.linegraph_bitrate'),
+     (r'^compare_line_bitrate/', 'networkdashboard.summary.views.linegraph_bitrate'),
      (r'^data/', 'networkdashboard.summary.views.pie_chart'),
      (r'^newuser.html', 'networkdashboard.summary.views.newuser'),
      (r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root':settings.MEDIA_ROOT})

@@ -322,25 +322,12 @@ def linegraph_bitrate(request):
     chosen_limit = 10000000
 
     details = Devicedetails.objects.filter(deviceid=device)[0]
-
-    s = request.GET.get('start')
-    s2 = datetime.strptime(s,"%m/%d/%Y")
-    s3 = ParseDateTimeUTC(str(s2))
-    s4 = datetime.fromtimestamp(s3)   
-    start = s4
-    print start
-    
-    e = request.GET.get('end')
-    e2 = datetime.strptime(e,"%m/%d/%Y")
-    e3 = ParseDateTimeUTC(str(e2))
-    e4 = datetime.fromtimestamp(e3)+ timedelta(1,0)
-    end = e4
-
+		
     xVariable = "Date"
     yVariable = "Multi, Single, Median_Multi,Median_Single"
     output = xVariable + "," + yVariable + "\n"
 
-    all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit).order_by('eventstamp')		
+    all_device_details= MBitrate.objects.filter(average__lte=chosen_limit).order_by('eventstamp')		
 
     other_device_details_netperf_3 = []
     other_device_details_other = []
@@ -391,7 +378,6 @@ def linegraph_bitrate(request):
 def compare_cvs_linegraph(request):
     device = request.GET.get('deviceid')
     chosen_param = request.GET.get('param')
-    chosen_limit = request.GET.get('limit')
     timetype = request.GET.get('type')
     graphno = int(request.GET.get('graphno'))
     filter_by = request.GET.get('filter_by')
@@ -409,13 +395,16 @@ def compare_cvs_linegraph(request):
     e3 = ParseDateTimeUTC(str(e2))
     e4 = datetime.fromtimestamp(e3)+ timedelta(1,0)
     end = e4
+
+    output = ""
+
     if chosen_param == 'AGGL3BITRATE' :
 	#COMPARE
 	xVariable = "Date"
 	yVariable = "Multi, Single, Median_Multi,Median_Single"
 	output = xVariable + "," + yVariable + "\n"
 
-	all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end,average__lte=chosen_limit).order_by('eventstamp')		
+	all_device_details= MBitrate.objects.filter(eventstamp__gt=start,eventstamp__lte=end).order_by('eventstamp')		
 	other_device_details_netperf_3 = []
 	other_device_details_other = []
 	filtered_deviceids = []
