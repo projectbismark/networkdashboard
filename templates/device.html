@@ -4,21 +4,7 @@
 <div class ="section" id="section_1">
     <h1>BISMark Device           <a href ="/editDevicePage/{{detail.hashkey}}"> Edit </a></h1>
     <script src="/static/jquery-latest.js"></script>
-    <script src="/static/highcharts.js"</script>
- <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojo/dojo.xd.js"
-        djConfig="parseOnLoad: true">
-        </script>
-        <script type="text/javascript">
-            dojo.require("dijit.form.DateTextBox");http://danvk.org/dygraphs/dygraph-combined.js
-            dojo.require("dijit.ProgressBar");
-            dojo.require("dijit.form.RadioButton");
-            dojo.require("dijit.form.Button");
-
-
-
-        </script>
-        <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/claro/claro.css"
-        />
+    <script src="/static/highcharts.js"></script>
 
 
     <table>
@@ -62,7 +48,7 @@
         return encodeURIComponent(name);
     }
 </script>
-<tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}" dojoType="dijit.form.TextBox" /></td>
+<tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}" ></td>
 </table>
 
 </div>
@@ -71,34 +57,20 @@
 <script type="text/javascript" src="/static/dygraph-combined.js"></script>
 
 
-<body class=" claro " onload="CloseProgressBar(); show_initial_graph();">
+<body class=" claro " onload="CloseProgressBar()">
 
-<label for="fromDate">
-            From:
-        </label>
-        
-        <input id="fromDate" type="text" value="{{calenderFrom}}" name="fromDate" dojoType="dijit.form.DateTextBox"
-        required="true" constraints="{datePattern:'MM/dd/yyyy', strict:true}" onChange="dijit.byId('toDate').constraints.min = arguments[0];" 
-        />
-        
-        <label for="toDate">
-            To:
-        </label>
-        <input id="toDate" type="text" value="{{calenderTo}}" name="toDate" dojoType="dijit.form.DateTextBox"
-        required="true" constraints="{datePattern:'MM/dd/yyyy', strict:true}" onChange="dijit.byId('fromDate').constraints.max = arguments[0];"
-        /><br/><br/>
 
 <table border="0"> 
 
 <tr>
 <td>
-<input type="radio" name="g1" id="g1rb3" dojoType="dijit.form.RadioButton" checked>
+<input type="radio" name="g1" id="g1rb3" checked>
 <label for="g1rb3">Upload and Download Throughput (kbps)</label><br/><br/>
-<input type="radio" name="g1" id="g1rb2" dojoType="dijit.form.RadioButton">
+<input type="radio" name="g1" id="g1rb2">
 <label for="g1rb2">Last-Mile Latency (ms)</label><br/><br/>
-<input type="radio" name="g1" id="g1rb1" dojoType="dijit.form.RadioButton">
+<input type="radio" name="g1" id="g1rb1">
 <label for="g1rb1">Round Trip Time (ms)</label><br/><br/>
-<input type="radio" name="g1" id="g1rb4" dojoType="dijit.form.RadioButton">
+<input type="radio" name="g1" id="g1rb4">
 <label for="g1rb1">Passive Measurements</label><br/><br/>
 
 
@@ -111,15 +83,24 @@
 
 </table>
 <div class="menu" id="drop_menu_1">
-    Compare to other devices based on:
+    Compare to other devices based on:<br/>
     <select id="select_menu_1">
         <option value = "none" selected>Don't Compare</option>
         <option value ="location">Location({{num_location}})</option>
         <option value ="provider">Provider({{num_provider}})</option>
     </select>
 </div>
+<div class="menu" id ="drop_menu_2">
+    Bucket Size:<br/>
+    <select id="select_menu_2">
+        <option value = "hourly" selected>Hourly</option>
+        <option value ="daily"> Daily </option>
+        <option value ="weekly"> Weekly </option>
+    </select>
+</div>
+        
 <br />
-<button dojoType="dijit.form.Button" type="submit" name="submit" onClick=" render()">Display</button>
+<button type="submit" name="submit" onClick=" render()">Display</button>
 
 </div>
 
@@ -128,7 +109,7 @@
 
 <br />
 <div class="progresscontainer">
-    <div class="progressbar" id="progress" indeterminate="true" title="loading" dojoType="dijit.ProgressBar"></div>
+    <div class="progressbar" id="progress" indeterminate="true" title="loading" ></div>
 </div>
 <br /><br /><br />
 <div class ="graphdisplay" id = "display_tag" >
@@ -151,6 +132,7 @@
         var logdisplay = false;
         var special = false;
         var filter = "none";
+        var bucket = "hourly";
 
        	
 	function start()
@@ -162,7 +144,9 @@
 	function createStyle()
 	{
             var sel = document.getElementById("select_menu_1");
+            var sel2 = document.getElementById("select_menu_2");
             filter = sel.options[sel.selectedIndex].value;
+            bucket = sel2.options[sel2.selectedIndex].value;
 
 		if(g1rb1.checked)
 		{
@@ -245,6 +229,64 @@
 			   );
 	  }
 	 CloseProgressBar();
+        }
+        
+        function OnSuccess3(data){
+            CloseProgressBar();
+            chart = new Highcharts.Chart({
+                chart: {
+                        renderTo: 'graph_div_1',
+                        defaultSeriesType: 'bar'
+                },
+                title: {
+                        text: 'Passive Data'
+                },
+                
+                xAxis: {
+                        categories: ['cat1', 'cat2', 'cat3', 'cat4', 'cat5'],
+                        title: {
+                                text: null
+                        }
+                },
+                yAxis: {
+                        min: 0,
+                        title: {
+                                text: 'Population (millions)',
+                                align: 'high'
+                        }
+                },
+                tooltip: {
+                        formatter: function() {
+                                return ''+
+                                         this.series.name +': '+ this.y +' millions';
+                        }
+                },
+                plotOptions: {
+                        bar: {
+                                dataLabels: {
+                                        enabled: true
+                                }
+                        }
+                },
+                legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'top',
+                        x: -100,
+                        y: 100,
+                        floating: true,
+                        borderWidth: 1,
+                        backgroundColor: '#FFFFFF',
+                        shadow: true
+                },
+                credits: {
+                        enabled: false
+                },
+                series: data
+        });
+		
+
+            
         }
         
         function setDisplayMode(log){
@@ -354,88 +396,29 @@
         deleteDivs();
         createGraphDivs();
 	OpenProgressBar();
-        var startDate = document.getElementById('fromDate').value;
-        var endDate = document.getElementById('toDate').value;
 	
         if (paramselect=="PASSIVE"){
+//            $.ajax({
+//                        type: "GET",
+//                        url: "/passive_data_chart/",
+//                        data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
+//                        success: OnSuccess3
+//                    });
             CloseProgressBar();
-            chart = new Highcharts.Chart({
-					chart: {
-						renderTo: 'graph_div_1',
-						defaultSeriesType: 'bar'
-					},
-					title: {
-						text: 'Historic World Population by Region'
-					},
-					subtitle: {
-						text: 'Source: Wikipedia.org'
-					},
-					xAxis: {
-						categories: ['Africa', 'America', 'Asia', 'Europe', 'Oceania'],
-						title: {
-							text: null
-						}
-					},
-					yAxis: {
-						min: 0,
-						title: {
-							text: 'Population (millions)',
-							align: 'high'
-						}
-					},
-					tooltip: {
-						formatter: function() {
-							return ''+
-								 this.series.name +': '+ this.y +' millions';
-						}
-					},
-					plotOptions: {
-						bar: {
-							dataLabels: {
-								enabled: true
-							}
-						}
-					},
-					legend: {
-						layout: 'vertical',
-						align: 'right',
-						verticalAlign: 'top',
-						x: -100,
-						y: 100,
-						floating: true,
-						borderWidth: 1,
-						backgroundColor: '#FFFFFF',
-						shadow: true
-					},
-					credits: {
-						enabled: false
-					},
-				        series: [{
-						name: 'Year 1800',
-						data: [107, 31, 635, 203, 2]
-					}, {
-						name: 'Year 1900',
-						data: [133, 156, 947, 408, 6]
-					}, {
-						name: 'Year 2008',
-						data: [973, 914, 4054, 732, 34]
-					}]
-				});
-
         }
-        else {
+        else{
             $.ajax({
                         type: "GET",
                         url: "/compare_data_chart/{{deviceid}}",
-                        data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'param': paramselect, 'limit': limit, 'unit': units, 'start': startDate, 'end': endDate,'filter_by': filter},
+                        data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
                         success: OnSuccess
                     });
 
             if(paramselect=="AGGL3BITRATE"){
                 $.ajax({
                         type: "GET",
-                        url: "/linegraph_bitrate/",
-                        data: {'graphno' : 2, 'deviceid': "{{deviceid}}",  'start': startDate, 'end': endDate ,'filter_by': filter},
+                        url: "/compare_line_bitrate/",
+                        data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
                         success: OnSuccess2
                     });
             }
@@ -457,12 +440,6 @@
 		    
             
         }
-
-		
-	function show_initial_graph(){
-		
-		dojo.addOnLoad(render);
-	}
 
 </script>
 </body>

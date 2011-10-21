@@ -123,6 +123,11 @@ DIV.map {
     left: 245px;
     top: 100px;
 }
+#drop_menu_2{
+    position:absolute;
+    left:245px;
+    top: 140px;
+}
 
 Div.label{
     width: 150px;
