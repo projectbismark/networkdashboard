@@ -350,26 +350,3 @@ def compare_cvs_linegraph(request):
 
     return HttpResponse(output)
 
-
-def pie_chart(request):
-	t = title(text='Device Usage (Mbs)')
-	l = pie()
-	l.values = []
-	l.values.append(pie_value(value=495,label='IMAPS'))
-	l.values.append(pie_value(value=295,label='55005'))
-	l.values.append(pie_value(value=8442,label='alternpate HTTP'))
-	l.values.append(pie_value(value=753,label='SSH'))
-	l.values.append(pie_value(value=226,label='53108'))
-	l.values.append(pie_value(value=2044,label='HTTPS'))
-	l.values.append(pie_value(value=109,label='Google Talk'))
-	l.values.append(pie_value(value=12180,label='HTTP'))
-	l.values.append(pie_value(value=669,label='62565'))
-	l.values.append(pie_value(value=1440,label='commplex-link'))
-	l.values.append(pie_value(value=567,label='52552'))
-	chart = open_flash_chart()
-	chart.title = t
-	cols = ['#d01f3c','#356aa0','#C79810']
-	chart.colours=cols
-	chart.add_element(l)
-	return HttpResponse(chart.render())
-
