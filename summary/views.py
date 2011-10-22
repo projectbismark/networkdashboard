@@ -80,12 +80,9 @@ def sharedDeviceSummary(request,devicehash):
     first = datetime.fromtimestamp(mktime(first[0].eventstamp.timetuple())).strftime("%B %d, %Y")
 
     last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-    
-    calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
-    calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
     last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
 
-    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device}) 
+    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'deviceid': device}) 
    
 
 def devicesummary(request):
@@ -143,16 +140,14 @@ def devicesummary(request):
     first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
     first = datetime.fromtimestamp(mktime(first[0].eventstamp.timetuple())).strftime("%B %d, %Y")
     last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-    
-    calenderTo = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%Y-%m-%d")
-    calenderFrom = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple()) - 3600*24*7).strftime("%Y-%m-%d")
+   
     last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
     
     num_location = len(Devicedetails.objects.filter(city=device_details[0].city).exclude(deviceid=device_details[0].deviceid))
     num_provider = len(Devicedetails.objects.filter(isp=device_details[0].isp).exclude(deviceid=device_details[0].deviceid))
     num_all = len(Devicedetails.objects.exclude(deviceid=device_details[0].deviceid))
 	
-    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device, 'num_location' : num_location, 'num_provider' : num_provider, 'num_all' : num_all}) 
+    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'deviceid': device, 'num_location' : num_location, 'num_provider' : num_provider, 'num_all' : num_all}) 
 
 
 def getLastUpdate(request, device):
@@ -251,18 +246,6 @@ def compare_cvs_linegraph(request):
 
     details = Devicedetails.objects.filter(deviceid=device)[0]
 
-    s = request.GET.get('start')
-    s2 = datetime.strptime(s,"%m/%d/%Y")
-    s3 = ParseDateTimeUTC(str(s2))
-    s4 = datetime.fromtimestamp(s3)   
-    start = s4
-    
-    e = request.GET.get('end')
-    e2 = datetime.strptime(e,"%m/%d/%Y")
-    e3 = ParseDateTimeUTC(str(e2))
-    e4 = datetime.fromtimestamp(e3)+ timedelta(1,0)
-    end = e4
-
     output = ""
     if chosen_param == 'RTT' :
 
@@ -280,7 +263,7 @@ def compare_cvs_linegraph(request):
         time = list()
         data = list()
         for row_ip in distinct_ips:
-            device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=3000, dstip = row_ip["dstip"])
+            device_details = MRtt.objects.filter(deviceid=device,average__lte=3000, dstip = row_ip["dstip"])
             data1 = list()
             for measure in device_details:
 		if(measure.average < 0):
@@ -289,7 +272,7 @@ def compare_cvs_linegraph(request):
 
             data.append(data1)
             
-        device_details = MRtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=3000,dstip='143.215.131.173')
+        device_details = MRtt.objects.filter(deviceid=device,average__lte=3000,dstip='143.215.131.173')
         for row_details in device_details:
             time.append(row_details.eventstamp)
 
@@ -308,7 +291,7 @@ def compare_cvs_linegraph(request):
     elif chosen_param == 'LMRTT' :
 
     
-        device_details = MLmrtt.objects.filter(deviceid=device,eventstamp__gt=start,eventstamp__lte=end,average__lte=3000)
+        device_details = MLmrtt.objects.filter(deviceid=device,average__lte=3000)
         xVariable = "Date"
         yVariable = "msec"
         output = xVariable + "," + yVariable +"\n"
