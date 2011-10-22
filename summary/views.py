@@ -136,8 +136,7 @@ def devicesummary(request):
             return render_to_response('invalid_edit.html', {'deviceid' : hashing})
      
     try:
-        device_search = MBitrate.objects.filter(deviceid=device)
-        if (len(device_search)<1):
+        if (!fetch_deviceid_hard(device)):
             return render_to_response('device_not_found.html', {'deviceid': device})
     except:
         try:
