@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from time import time,mktime,strftime
 from mx.DateTime.ISO import ParseDateTimeUTC
 import hashlib
-import cvs_helper,datetime_helper
+import cvs_helper,datetime_helper,database_helper
 
 def index(request):
     return render_to_response('index.html')
@@ -33,12 +33,6 @@ def editDevicePage(request, devicehash):
 
 def invalidEdit(request, device):
     return render_to_response('invalid_edit.html', {'deviceid' : device})
-
-def newuser(request):
-    return render_to_response('newuser.html')
-
-def submitchanges(request, device, isp, loc, serv, dr, ur):
-    return
     
  
 def showdevices(request):
@@ -52,20 +46,6 @@ def showdevices(request):
 		if time()-last[0].timestamp < 3600*24*170:
 			thelist.append(row)
 
-
-    return render_to_response('devices.html', {'device_list': thelist})
-
-
-def showactivedevices(request):
-    device_list = Devices.objects.all()
-    thelist = list()
-    for row in  device_list:
-	if(row.deviceid == "NB-Xuzi-Uky"):
-		continue
-	last = Measurements.objects.filter(deviceid=row.deviceid).order_by('-timestamp')[0:5]
-	if len(last)>1:
-		if time()-last[0].timestamp < 3600*24*7:
-			thelist.append(row)
 
     return render_to_response('devices.html', {'device_list': thelist})
 
@@ -106,9 +86,7 @@ def sharedDeviceSummary(request,devicehash):
     last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
 
     return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'calenderFrom': calenderFrom,'calenderTo': calenderTo, 'deviceid': device}) 
-
-
-    
+   
 
 def devicesummary(request):
     device = request.POST.get("device")
@@ -127,8 +105,7 @@ def devicesummary(request):
             ddrate = int(request.POST.get('drate'))
             dcity = request.POST.get('city')
             dstate = request.POST.get('state')
-            dcountry = request.POST.get('country') 
-	    
+            dcountry = request.POST.get('country')	    
                   
             details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now(),hashkey=hashing)
             details.save()
@@ -136,7 +113,9 @@ def devicesummary(request):
             return render_to_response('invalid_edit.html', {'deviceid' : hashing})
      
     try:
-        if (!fetch_deviceid_hard(device)):
+	
+        if not database_helper.fetch_deviceid_hard(device):
+	    print device
             return render_to_response('device_not_found.html', {'deviceid': device})
     except:
         try:
@@ -184,13 +163,6 @@ def getLastUpdate(request, device):
     
     return HttpResponse('unavailable')
 
-def getFirstUpdate(request, device):
-    last = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
-    if len(last)>0:
-        end = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-	return HttpResponse(end)
-    
-    return HttpResponse('unavailable')
 
 def getLocation(request, device):
     device = device.replace(':', '')
