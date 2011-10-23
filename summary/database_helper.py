@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from time import time,mktime,strftime
 from mx.DateTime.ISO import ParseDateTimeUTC
 import hashlib
+import cvs_helper,datetime_helper
 
 def fetch_deviceid_hard(device):
 
@@ -33,6 +34,23 @@ def list_countries():
 	ret = ['United States','South Africa','France']
 	ret.sort()
 	return ret
+
+def get_num_common_locations(device_details):
+	return len(Devicedetails.objects.filter(city=device_details.city))-1
+
+def get_num_common_providers(device_details):
+	return len(Devicedetails.objects.filter(isp=device_details.isp))-1
+
+def get_num_devices(device_details):
+	return len(Devicedetails.objects.exclude(deviceid=device_details.deviceid))-1
+
+def get_first_measurement(device):
+	first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]	
+    	return first[0].eventstamp.strftime("%B %d, %Y")
+
+def get_last_measurement(device):
+	last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
+    	return last[0].eventstamp.strftime("%B %d, %Y")
 
 def get_coordinates_for_googlemaps():
  	coordstring = ""

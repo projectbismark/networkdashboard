@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 from time import time,mktime,strftime
 from mx.DateTime.ISO import ParseDateTimeUTC
 import hashlib
-import cvs_helper,datetime_helper,database_helper
+import cvs_helper,datetime_helper,database_helper,views_helper
 
 def index(request):
     return render_to_response('index.html')
@@ -25,7 +25,6 @@ def editDevicePage(request, devicehash):
 	device_entry = device_details[0]
     
     isp_options = database_helper.list_isps()
-    
     country_options = database_helper.list_countries()
     
     return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device, 'isp_options': isp_options, 'country_options': country_options})
@@ -38,7 +37,6 @@ def getCoordinates(request):
         
 def sharedDeviceSummary(request,devicehash):
 
-
     device_details = Devicedetails.objects.filter(hashkey=devicehash)
 
     if len(device_details)>0:
@@ -46,14 +44,7 @@ def sharedDeviceSummary(request,devicehash):
     else:
 	return render_to_response('device_not_found.html', {'deviceid': devicehash})
 
-    first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
-    first = datetime.fromtimestamp(mktime(first[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-
-    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-    last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-
-    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'deviceid': device}) 
-   
+    return views_helper.get_response_for_devicehtml(device_details[0])
 
 def devicesummary(request):
     device = request.POST.get("device")
@@ -107,18 +98,7 @@ def devicesummary(request):
     except:
         return render_to_response('device_not_found.html', {'deviceid': device})
 
-    first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]
-    first = datetime.fromtimestamp(mktime(first[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-   
-    last = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-    
-    num_location = len(Devicedetails.objects.filter(city=device_details[0].city).exclude(deviceid=device_details[0].deviceid))
-    num_provider = len(Devicedetails.objects.filter(isp=device_details[0].isp).exclude(deviceid=device_details[0].deviceid))
-    num_all = len(Devicedetails.objects.exclude(deviceid=device_details[0].deviceid))
-	
-    return render_to_response('device.html', {'detail': device_details[0],'firstUpdate': first, 'lastUpdate': last, 'deviceid': device, 'num_location' : num_location, 'num_provider' : num_provider, 'num_all' : num_all}) 
-
+    return views_helper.get_response_for_devicehtml(device_details[0])
 
 def getLastUpdate(request, device):
     last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
