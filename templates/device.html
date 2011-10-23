@@ -173,33 +173,7 @@
 	}
 
         function OnSuccess(data)
-        {
-//          content=data;
-//
-//	  if(content.length<=60){
-//		deleteDivs();
-//		var dtag = document.getElementById('display_tag');
-//		dtag.setAttribute('value', 'Insufficient Data');
-//		}
-//	  else{
-//
-//             g = new Dygraph(document.getElementById("graph_div_1"),
-//                       content,
-//                       {
-//                       rollPeriod: 1,
-//                       showRoller: true,
-//                       logscale: (logdisplay&&special),
-//                       errorBars: false,
-//                       connectSeparatedPoints: true,
-//		       colorValue: 0.0 
-//                       }
-//                       );
-//		
-//		addRadios();
-//        	addLabels();
-//
-//		}
-	  
+        {  
          var content = data;
          chart = new Highcharts.Chart({
             chart: {
@@ -207,14 +181,10 @@
                     type: 'spline'
             },
             title: {
-                    text: 'Download Throughput'
+                    text: 'Upload Throughput'
             },
             xAxis: {
                     type: 'datetime'
-//                    dateTimeLabelFormats: {
-//                            month: '%e. %b',
-//                            year: '%b'
-//                    }
             },
             yAxis: {
                     title: {
@@ -224,8 +194,6 @@
             },
             series: [{
                     name: 'series 1',
-
-//                    data:eval('[["2011-10-19 18:16:35", 0],["2011-10-19 18:17:23", 0.6],["2011-10-19 18:40:52", 0.7],["2011-10-19 18:44:58", 0.8],["2011-10-19 18:48:25", 0.6]]')
                     data:eval(content)
         
                                                         
@@ -239,25 +207,31 @@
          
          function OnSuccess2(data)
         {
-          content=data;
-
-	  if(content.length<=50){
-
-
-		}	  
-	  else{
-	         g2 = new Dygraph(document.getElementById("graph_div_2"),
-			   content,
-			   {
-	      		   rollPeriod: 1,
-	      		   showRoller: true,
-                           logscale: (logdisplay&&special),
-                           connectSeparatedPoints: true,
-                           errorBars: false
-	    		   }
-			   );
-	  }
-	 CloseProgressBar();
+          var content = data;
+         chart = new Highcharts.Chart({
+            chart: {
+                    renderTo: 'graph_div_2',
+                    type: 'spline'
+            },
+            title: {
+                    text: 'Download Throughput'
+            },
+            xAxis: {
+                    type: 'datetime'
+            },
+            yAxis: {
+                    title: {
+                            text: 'Throughput (kbps)'
+                    },
+                    min: 0
+            },
+            series: [{
+                    name: 'series 1',
+                    data:eval(content)
+        
+                                                        
+            }]
+         });
         }
         
         function OnSuccess3(data){
@@ -527,16 +501,16 @@
 
 
 	    if(paramselect=="AGGL3BITRATE"){
-//                $.ajax({
-//                        type: "GET",
-//                        url: "/getThroughput/",
-//                        data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-//                        success: OnSuccess2
-//                    });
+                $.ajax({
+                        type: "GET",
+                        url: "/line_bitrate/",
+                        data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
+                        success: OnSuccess2
+                    });
 
 		$.ajax({
                         type: "GET",
-                        url: "/getThroughput/",
+                        url: "/line_bitrate/",
                         data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
                         success: OnSuccess
                     });
