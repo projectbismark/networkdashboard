@@ -71,6 +71,7 @@ def get_coordinates_for_googlemaps():
     	return HttpResponse(coordstring)
 
 def get_location(device):
+    device = device.replace(':','')
     details = Devicedetails.objects.filter(deviceid=device)
     print details
     if len(details)>0:

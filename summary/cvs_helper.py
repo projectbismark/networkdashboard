@@ -3,7 +3,7 @@ from time import time,mktime,strftime
 import datetime_helper
 from datetime import datetime, timedelta
 
-def linegraph_bitrate_compare_data(data,bucket_size,text_format):
+def linegraph_bucket(data,bucket_size,text_format):
 
 	output=""
 
@@ -26,7 +26,7 @@ def linegraph_bitrate_compare_data(data,bucket_size,text_format):
 					output+=text_format.format(str(datetime_helper.unixtime_to_datetime_format(mid_time)), str(mean))
 					
 			   	bucket = []
-				   
+				
 			   	while(time>end_time):
 			
 			   		start_time = end_time+1;

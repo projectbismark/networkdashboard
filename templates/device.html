@@ -347,7 +347,7 @@
             rdiv.setAttribute('class','radiodiv');
             rdiv.setAttribute('id', 'radio_div');
             var r1 = "<input type='radio' name = 'mode' id='lin' onClick='setDisplayMode(false)' checked>";
-            var r2 = "<input type='radio' name = 'mode' id='log' onClick='setDisplayMode(true)'> <br />";
+            var r2 = "<input type='radio' name = 'mode' id='log' onClick='setDisplayMode(true)'>";
             rdiv.innerHTML = "Linear: ";
             rdiv.innerHTML += r1;
             rdiv.innerHTML += "Log: ";
@@ -490,23 +490,32 @@
 
             CloseProgressBar();
         }
-        else{
-            $.ajax({
-                        type: "GET",
-                        url: "/compare_data_chart/{{deviceid}}",
-                        data: {'graphno' : 1,'param':paramselect, 'deviceid': "{{deviceid}}", 'start': "08/01/2011", 'end': "12/01/2011", 'filter_by': filter, 'bucket_size': bucket},
-                        success: OnSuccess
-                    });
+        else {
 
-            if(paramselect=="AGGL3BITRATE"){
+
+	    if(paramselect=="AGGL3BITRATE"){
                 $.ajax({
                         type: "GET",
                         url: "/compare_line_bitrate/",
                         data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
                         success: OnSuccess2
                     });
+
+		$.ajax({
+                        type: "GET",
+                        url: "/compare_line_bitrate/",
+                        data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
+                        success: OnSuccess
+                    });
             }
-            
+	    else{
+            $.ajax({
+                        type: "GET",
+                        url: "/compare_data_chart/{{deviceid}}",
+                        data: {'graphno' : 1,'param':paramselect, 'deviceid': "{{deviceid}}", 'start': "08/01/2011", 'end': "12/01/2011", 'filter_by': filter, 'bucket_size': bucket},
+                        success: OnSuccess
+                    });
+  		}
         }
         
         }

@@ -18,7 +18,7 @@ def get_response_for_devicehtml(device_details):
     num_location = database_helper.get_num_common_locations(device_details)
     num_provider = database_helper.get_num_common_providers(device_details)
     num_all = database_helper.get_num_devices(device_details)
-
+    print num_location
     device_details.deviceid =  device_details.deviceid.replace(':', '')
 	
     return render_to_response('device.html', {'detail': device_details,'firstUpdate': first, 'lastUpdate': last, 'deviceid': device_details.deviceid, 'num_location' : num_location, 'num_provider' : num_provider, 'num_all' : num_all}) 

@@ -37,12 +37,12 @@ def getCoordinates(request):
 def sharedDeviceSummary(request,devicehash):
 
     device_details = Devicedetails.objects.filter(hashkey=devicehash)
-
+	
     if len(device_details)>0:
 	device = device_details[0].deviceid		
     else:
 	return render_to_response('device_not_found.html', {'deviceid': devicehash})
-
+ 
     return views_helper.get_response_for_devicehtml(device_details[0])
 
 def devicesummary(request):
@@ -104,7 +104,6 @@ def linegraph_bitrate(request):
     if (filter_by == 'location'):
 	filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
 
-
     if (filter_by == 'provider'):
 	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
 
@@ -135,8 +134,8 @@ def linegraph_bitrate(request):
     if (filter_by != 'none'):
 	bucket_width = 24*3600
 	print "starting1"
-	output+=cvs_helper.linegraph_bitrate_compare_data(other_device_details_netperf_3,bucket_width,"{0},,,{1},\n")
-	output+=cvs_helper.linegraph_bitrate_compare_data(other_device_details_other,bucket_width,"{0},,,,{1}\n")
+	output+=cvs_helper.linegraph_bucket(other_device_details_netperf_3,bucket_width,"{0},,,{1},\n")
+	output+=cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"{0},,,,{1}\n")
 			   
     return HttpResponse(output)
 
