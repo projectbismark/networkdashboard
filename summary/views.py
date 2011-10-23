@@ -1,6 +1,7 @@
 # Create your views here.
 
 from django.http import HttpResponse, HttpResponseRedirect
+from django.utils import simplejson
 import urllib2, urllib, json
 from django.shortcuts import render_to_response
 from networkdashboard.summary.models import *
@@ -109,8 +110,6 @@ def linegraph_bitrate(request):
 
     details = Devicedetails.objects.filter(deviceid=device)[0]
 		
-    result = []
-    
     all_device_details= MBitrate.objects.filter(average__lte=chosen_limit).order_by('eventstamp')
     
 
@@ -139,9 +138,9 @@ def linegraph_bitrate(request):
     
     my_device_details_netperf_3 = my_device_details.filter(toolid='NETPERF_3')
     my_device_details_other = my_device_details.exclude(toolid='NETPERF_3')
-    
-    result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"[{0},{1}]\n","multi"))
-    #result.append(cvs_helper.linegraph_normal(my_device_details_other,"[{0},{1}]","single"))
+    result=[]
+    result = (cvs_helper.linegraph_normal(my_device_details_netperf_3,"[{0},{1}]","multi"))
+    result.append(cvs_helper.linegraph_normal(my_device_details_other,"[{0},{1}]","single"))
 	
     if (filter_by != 'none'):
 	bucket_width = 24*3600
