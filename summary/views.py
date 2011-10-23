@@ -18,16 +18,13 @@ def index(request):
 def editDevicePage(request, devicehash):
     device_details = Devicedetails.objects.filter(hashkey=devicehash)
     if len(device_details) < 1:
-##	device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now())
         return render_to_response('device_not_found.html', {'devicename' : devicehash})
     else:
         device = str(device_details[0].deviceid)
 	device_entry = device_details[0]
     
-    isp_options = ["Comcast","Time Warner Cable","At&t","Cox Optimum","Charter","Verizon","CenturyLink","SuddenLink","EarthLink","Windstream","Cable One","Frontier","NetZero Juno","Basic ISP","ISP.com","PeoplePC","AOL MSN","Fairpoint","Qwest","CableVision","MEdiaCom"]
-    isp_options.sort()
-    country_options = ['United States','South Africa','France']
-    country_options.sort()
+    isp_options = database_helper.list_isps()
+    country_options = database_helper.list_countries()
     
     return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device, 'isp_options': isp_options, 'country_options': country_options})
 
