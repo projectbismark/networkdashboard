@@ -54,21 +54,18 @@ def linegraph_bucket(data,bucket_size,text_format,title):
 def linegraph_normal(data,text_format,title):
     result={}
     result['name'] = title
-    output = '['
-    is_first = True
+    output= []
 
     for measure in data:
 
 	if(measure.average <= 0):
 		continue
-	if not is_first:
-		output+=',';
-	else:
-		is_first=False;
-	output+=text_format.format(datetime_helper.datetime_to_JSON(measure.eventstamp), str(int(measure.average))) 
-    output += ']'
-    result['data'] = output
+	temp=[]
+	temp.append(datetime_helper.datetime_format_to_unixtime(measure.eventstamp))
+	temp.append(int(measure.average))
+	output.append(temp)
 
+    result['data'] = output
     return result
 
 

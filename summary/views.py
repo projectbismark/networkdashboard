@@ -139,7 +139,7 @@ def linegraph_bitrate(request):
     my_device_details_netperf_3 = my_device_details.filter(toolid='NETPERF_3')
     my_device_details_other = my_device_details.exclude(toolid='NETPERF_3')
     result=[]
-    result = (cvs_helper.linegraph_normal(my_device_details_netperf_3,"[{0},{1}]","multi"))
+    result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"[{0},{1}]","multi"))
     result.append(cvs_helper.linegraph_normal(my_device_details_other,"[{0},{1}]","single"))
 	
     if (filter_by != 'none'):
@@ -147,7 +147,7 @@ def linegraph_bitrate(request):
 	result.append(cvs_helper.linegraph_bucket(other_device_details_netperf_3,bucket_width,"[{0},{1}]","multi-median"))
 	result.append(cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"[{0},{1}]","single-median"))
   			   
-    return HttpResponse(str(result))
+    return HttpResponse("(" + str(result) + ")")
 
 def linegraph_lmrtt(request):
     device = request.GET.get('deviceid')
