@@ -45,3 +45,15 @@ def linegraph_bucket(data,bucket_size,text_format):
 
 	return ""
 
+def linegraph_normal(data,text_format):
+    
+    output = ''
+    for measure in data:
+
+	if(measure.average <= 0):
+		continue
+	output+=text_format.format(measure.eventstamp, str(int(measure.average)))
+
+    return output
+
+

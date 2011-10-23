@@ -86,7 +86,7 @@ def linegraph_bitrate(request):
     device = request.GET.get('deviceid')
     graphno = int(request.GET.get('graphno'))
     filter_by = request.GET.get('filter_by')
-    chosen_limit = 10000000
+    chosen_limit = 100000000
 
     details = Devicedetails.objects.filter(deviceid=device)[0]
 		
@@ -118,91 +118,138 @@ def linegraph_bitrate(request):
         all_device_details = all_device_details.filter(dstip='143.215.131.173')
 
     my_device_details = all_device_details.filter(deviceid=device)
+    my_device_details_netperf_3 = my_device_details.filter(toolid='NETPERF_3')
+    my_device_details_other = my_device_details.exclude(toolid='NETPERF_3')
 
-    for measure in my_device_details:
-	t = datetime.fromtimestamp(mktime(measure.eventstamp.timetuple()))
-	if(measure.average <= 0):
-		continue
-	if(str(measure.toolid)=='NETPERF_3'):
-		ret = str(t) + "," + str(measure.average) + ",,,"
-
-	else:
-		ret = str(t) + ",,"+ str(measure.average)+",,"
-
-	output+=ret+"\n"
+    output+=cvs_helper.linegraph_normal(my_device_details_netperf_3,"{0},{1},,,\n")
+    output+=cvs_helper.linegraph_normal(my_device_details_other,"{0},,{1},,\n")
 	
     if (filter_by != 'none'):
 	bucket_width = 24*3600
-	print "starting1"
 	output+=cvs_helper.linegraph_bucket(other_device_details_netperf_3,bucket_width,"{0},,,{1},\n")
 	output+=cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"{0},,,,{1}\n")
 			   
     return HttpResponse(output)
 
-
-def compare_cvs_linegraph(request):
+def linegraph_lmrtt(request):
     device = request.GET.get('deviceid')
-    chosen_param = request.GET.get('param')
-    graphno = int(request.GET.get('graphno'))
     filter_by = request.GET.get('filter_by')
 
     details = Devicedetails.objects.filter(deviceid=device)[0]
 
+    all_device_details= MBitrate.objects.filter(average__lte=3000,dstip='143.215.131.173').order_by('eventstamp')
+    device_details = all_device_details.filter(deviceid=device)
+   
+    output = "Date,msec,median\n"
+
+    other_device_details = []
+    filtered_deviceids = []	
+
+    if (filter_by == 'location'):
+	filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
+
+    if (filter_by == 'provider'):
+	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
+
+    for row in filtered_deviceids:
+	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
+
+    output+=cvs_helper.linegraph_normal(device_details,"{0},{1},\n")
+
+    if (filter_by != 'none'):
+	bucket_width = 2*3600
+	output+=cvs_helper.linegraph_bucket(other_device_details,bucket_width,"{0},,{1}\n")
+
+    return HttpResponse(output)
+
+def compare_cvs_linegraph(request):
+    device = request.GET.get('deviceid')
+    filter_by = request.GET.get('filter_by')
+
     output = ""
-    if chosen_param == 'RTT' :
+  
+    details = Devicedetails.objects.filter(deviceid=device)[0]
 
-        distinct_ips = MRtt.objects.values('dstip').distinct()
-	xVariable = "Date"
-        yVariable = "msec"
-        output = xVariable
+    all_device_details= MRtt.objects.filter(average__lte=3000).order_by('eventstamp')
 
-        for row_ip in distinct_ips:
-	    ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0]
+    other_device_details = []
+    filtered_deviceids = []	
 
-            output = output + "," + ip_lookup.location
+    if (filter_by == 'location'):
+	filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
 
-        output+="\n"
-        time = list()
-        data = list()
-        for row_ip in distinct_ips:
-            device_details = MRtt.objects.filter(deviceid=device,average__lte=3000, dstip = row_ip["dstip"])
-            data1 = list()
-            for measure in device_details:
-		if(measure.average < 0):
-			continue
-                data1.append(str(measure.average))
+    if (filter_by == 'provider'):
+	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
 
-            data.append(data1)
-            
-        device_details = MRtt.objects.filter(deviceid=device,average__lte=3000,dstip='143.215.131.173')
-        for row_details in device_details:
-            time.append(row_details.eventstamp)
+    for row in filtered_deviceids:
+	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
 
-        for i in range(0,len(time)):
-            ret = str(time[i])
-
-            for temp in data:
-                if i>=len(temp):
-                    continue
-                ret += "," + str(temp[i])
-
-            ret+="\n"
-            output += ret
-        
-
-    elif chosen_param == 'LMRTT' :
-
+  
+    divides = {}
     
-        device_details = MLmrtt.objects.filter(deviceid=device,average__lte=3000)
-        xVariable = "Date"
-        yVariable = "msec"
-        output = xVariable + "," + yVariable +"\n"
-        for measure in device_details:
-	    if(measure.average < 0):
-	    	continue
-            t = measure.eventstamp
-            ret = str(t) + "," + str(measure.average) +"\n"
-            output += ret
+    for row in other_device_details:
+	ee = str(row.dstip)
+	
+	if not divides.has_key(ee):
+		divides[ee]=[]
 
+	divides[ee].append(row)		
+  
+    distinct_ips = MRtt.objects.values('dstip').distinct()
+    output = "Date"
+    output_first=""
+    output_second=""
+    total=0
+
+
+    for row_ip in distinct_ips:
+	ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0]
+
+        output_first += "," + ip_lookup.location
+	output_second += ",median(" + str(total) + ")"
+	total+=1
+
+    output+=output_first + output_second + "\n"
+
+    count = 1
+    for row_ip in distinct_ips:
+    	device_details = MRtt.objects.filter(deviceid=device,average__lte=3000, dstip = row_ip["dstip"])
+        text_format = "{0}"
+	for i in range(0,count):
+		text_format +=','
+	
+	text_format += "{1}"
+
+	for i in range(count,total-count):
+		text_format +=','
+
+	for i in range(0,total):
+		text_format +=','
+
+	text_format +="\n"
+	print text_format
+	output+=cvs_helper.linegraph_normal(device_details,text_format)
+	
+	
+
+        text_format = "{0}"
+
+	for i in range(0,total):
+		text_format +=','
+
+	for i in range(0,count):
+		text_format +=','
+	
+	text_format += "{1}"
+
+	for i in range(count,total-count+1):
+		text_format +=','
+
+	text_format +="\n"
+
+	output+=cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,text_format)
+
+	count+=1            
+   
     return HttpResponse(output)
 

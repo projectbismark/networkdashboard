@@ -496,18 +496,27 @@
 	    if(paramselect=="AGGL3BITRATE"){
                 $.ajax({
                         type: "GET",
-                        url: "/compare_line_bitrate/",
+                        url: "/line_bitrate/",
                         data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
                         success: OnSuccess2
                     });
 
 		$.ajax({
                         type: "GET",
-                        url: "/compare_line_bitrate/",
+                        url: "/line_bitrate/",
                         data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
                         success: OnSuccess
                     });
             }
+	    else if(paramselect=="LMRTT") {
+            $.ajax({
+                        type: "GET",
+                        url: "/line_lmrtt/",
+                         data: {'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
+                        success: OnSuccess
+                    });
+  		}
+		
 	    else{
             $.ajax({
                         type: "GET",
