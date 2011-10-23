@@ -147,7 +147,7 @@ def linegraph_bitrate(request):
 	bucket_width = 24*3600
 	result.append(cvs_helper.linegraph_bucket(other_device_details_netperf_3,bucket_width,"{0},,,{1},\n","multi-median"))
 	result.append(cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"{0},,,,{1}\n","single-median"))
-    print result			   
+  			   
     return HttpResponse(str(result))
 
 def linegraph_lmrtt(request):
