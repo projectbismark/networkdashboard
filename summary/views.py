@@ -17,6 +17,7 @@ def index(request):
 
 def editDevicePage(request, devicehash):
     device_details = Devicedetails.objects.filter(hashkey=devicehash)
+
     if len(device_details) < 1:
         return render_to_response('device_not_found.html', {'devicename' : devicehash})
     else:
@@ -24,6 +25,7 @@ def editDevicePage(request, devicehash):
 	device_entry = device_details[0]
     
     isp_options = database_helper.list_isps()
+    
     country_options = database_helper.list_countries()
     
     return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device, 'isp_options': isp_options, 'country_options': country_options})
@@ -31,37 +33,8 @@ def editDevicePage(request, devicehash):
 def invalidEdit(request, device):
     return render_to_response('invalid_edit.html', {'deviceid' : device})
     
- 
-def showdevices(request):
-    device_list = Devices.objects.all()
-    thelist = list()
-    for row in  device_list:
-	if(row.deviceid == "NB-Xuzi-Uky"):
-		continue
-	last = Measurements.objects.filter(deviceid=row.deviceid).order_by('-timestamp')[0:5]
-	if len(last)>1:
-		if time()-last[0].timestamp < 3600*24*170:
-			thelist.append(row)
-
-
-    return render_to_response('devices.html', {'device_list': thelist})
-
-
 def getCoordinates(request):
-    coordstring = ""
-    distinct_ips = IPResolver.objects.all()
-    for row_ip in distinct_ips:
-
-	lat = str(row_ip.latitude)
-	lon = str(row_ip.longitude)
-	devtype = str(row_ip.type)
-        coordstring += lat
-        coordstring += ","
-        coordstring += lon
-        coordstring += ","
-        coordstring += devtype
-        coordstring += "\n"
-    return HttpResponse(coordstring)
+    return HttpResponse(database_helper.get_coordinates_for_googlemaps())
         
 def sharedDeviceSummary(request,devicehash):
 
