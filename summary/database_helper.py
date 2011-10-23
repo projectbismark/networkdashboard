@@ -69,6 +69,23 @@ def get_coordinates_for_googlemaps():
         	coordstring += devtype
         	coordstring += "\n"
     	return HttpResponse(coordstring)
-		
+
+def get_location(device):
+    details = Devicedetails.objects.filter(deviceid=device)
+    print details
+    if len(details)>0:
+        return (details[0].city + ", " + details[0].country)
+
+    dev = MBitrate.objects.filter(deviceid=device, srcip ='143.215.131.173' )
+    if len(dev)>0:
+        ip = str(dev[0].dstip)
+        urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + ip + "&format=json")
+        r1 = urlobj.read()
+        urlobj.close()
+        datadict = json.loads(r1)
+        res = datadict["cityName"] + "," + datadict["countryName"]
+        return (res)  
+    
+    return ('unavailable')
 		
 	

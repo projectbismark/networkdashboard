@@ -20,9 +20,8 @@ def editDevicePage(request, devicehash):
 
     if len(device_details) < 1:
         return render_to_response('device_not_found.html', {'devicename' : devicehash})
-    else:
-        device = str(device_details[0].deviceid)
-	device_entry = device_details[0]
+    
+    device = str(device_details[0].deviceid)
     
     isp_options = database_helper.list_isps()
     country_options = database_helper.list_countries()
@@ -109,24 +108,8 @@ def getLastUpdate(request, device):
     return HttpResponse('unavailable')
 
 
-def getLocation(request, device):
-    device = device.replace(':', '')
-    details = Devicedetails.objects.filter(deviceid=device)
-
-    if len(details)>0:
-        return HttpResponse(details[0].city + ", " + details[0].country)
-    
-    dev = MBitrate.objects.filter(deviceid=device, srcip ='143.215.131.173' )
-    if len(dev)>0:
-        ip = str(dev[0].dstip)
-        urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + ip + "&format=json")
-        r1 = urlobj.read()
-        urlobj.close()
-        datadict = json.loads(r1)
-        res = datadict["cityName"] + "," + datadict["countryName"]
-        return HttpResponse(res)  
-    
-    return HttpResponse('unavailable')
+def getLocation(request, device):   
+    return HttpResponse(database_helper.get_location(device))
 
 def linegraph_bitrate(request):
     device = request.GET.get('deviceid')
@@ -177,7 +160,6 @@ def linegraph_bitrate(request):
 		ret = str(t) + ",,"+ str(measure.average)+",,"
 
 	output+=ret+"\n"
-	
 	
     if (filter_by != 'none'):
 	bucket_width = 24*3600

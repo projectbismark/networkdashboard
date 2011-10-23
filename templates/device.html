@@ -19,7 +19,7 @@
 
 		$.ajax({
                 type: "GET",
-                url: "/getLocation/{{ deviceid }}/",
+                url: escape("/getLocation/{{ deviceid }}/"),
                 success: OnSuccess
             });
 		
@@ -275,6 +275,7 @@
                         backgroundColor: '#FFFFFF',
                         shadow: true
                 },
+
                 credits: {
                         enabled: false
                 },
