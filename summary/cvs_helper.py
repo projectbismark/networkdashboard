@@ -3,8 +3,9 @@ from time import time,mktime,strftime
 import datetime_helper
 from datetime import datetime, timedelta
 
-def linegraph_bucket(data,bucket_size,text_format):
-
+def linegraph_bucket(data,bucket_size,text_format,title):
+	result={}
+	result['name'] = title
 	output=""
 
 	try:	
@@ -23,7 +24,7 @@ def linegraph_bucket(data,bucket_size,text_format):
 			   	n = len(bucket)
 				if n!=0:
 			   		mean = sum(bucket) / n
-					output+=text_format.format(str(datetime_helper.unixtime_to_datetime_format(mid_time)), str(mean))
+					output+=text_format.format(datetime_helper.datetime_to_JSON(mid_time), str(mean))
 					
 			   	bucket = []
 				
@@ -37,23 +38,24 @@ def linegraph_bucket(data,bucket_size,text_format):
 		n = len(bucket)
 		if n!=0:
 			mean = sum(bucket) / n
-			output+=text_format.format(str(datetime_helper.unixtime_to_datetime_format(mid_time)), str(mean))
+			output+=text_format.format(datetime_helper.datetime_to_JSON(mid_time), str(mean))
 
-		return output
+		result['data']=output
 	except:
-		 return ""
+		 return result
 
-	return ""
+	return result
 
-def linegraph_normal(data,text_format):
-    
+def linegraph_normal(data,text_format,title):
+    result={}
+    result['name'] = title
     output = ''
     for measure in data:
 
 	if(measure.average <= 0):
 		continue
-	output+=text_format.format(measure.eventstamp, str(int(measure.average)))
-
-    return output
+	output+=text_format.format(datetime_helper.datetime_to_JSON(measure.eventstamp), str(int(measure.average))) 
+    result['data'] = output
+    return result
 
 

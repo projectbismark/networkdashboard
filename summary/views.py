@@ -109,10 +109,8 @@ def linegraph_bitrate(request):
 
     details = Devicedetails.objects.filter(deviceid=device)[0]
 		
-    xVariable = "Date"
-    yVariable = "Multi, Single, Median_Multi,Median_Single"
-    output = xVariable + "," + yVariable + "\n"
-
+    result = []
+    
     all_device_details= MBitrate.objects.filter(average__lte=chosen_limit).order_by('eventstamp')
     
 
@@ -138,18 +136,19 @@ def linegraph_bitrate(request):
         all_device_details = all_device_details.filter(dstip='143.215.131.173')
 
     my_device_details = all_device_details.filter(deviceid=device)
+    
     my_device_details_netperf_3 = my_device_details.filter(toolid='NETPERF_3')
     my_device_details_other = my_device_details.exclude(toolid='NETPERF_3')
-
-    output+=cvs_helper.linegraph_normal(my_device_details_netperf_3,"{0},{1},,,\n")
-    output+=cvs_helper.linegraph_normal(my_device_details_other,"{0},,{1},,\n")
+    
+    result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"[{0},{1}],","multi"))
+    result.append(cvs_helper.linegraph_normal(my_device_details_other,"{0},,{1},,\n","single"))
 	
     if (filter_by != 'none'):
 	bucket_width = 24*3600
-	output+=cvs_helper.linegraph_bucket(other_device_details_netperf_3,bucket_width,"{0},,,{1},\n")
-	output+=cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"{0},,,,{1}\n")
-			   
-    return HttpResponse(output)
+	result.append(cvs_helper.linegraph_bucket(other_device_details_netperf_3,bucket_width,"{0},,,{1},\n","multi-median"))
+	result.append(cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"{0},,,,{1}\n","single-median"))
+    print result			   
+    return HttpResponse(str(result))
 
 def linegraph_lmrtt(request):
     device = request.GET.get('deviceid')
@@ -224,6 +223,7 @@ def compare_cvs_linegraph(request):
 
     for row_ip in distinct_ips:
 	ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0]
+
 
         output_first += "," + ip_lookup.location
 	output_second += ",median(" + str(total) + ")"
