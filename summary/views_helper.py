@@ -23,4 +23,8 @@ def get_response_for_devicehtml(device_details):
 	
     return render_to_response('device.html', {'detail': device_details,'firstUpdate': first, 'lastUpdate': last, 'deviceid': device_details.deviceid, 'num_location' : num_location, 'num_provider' : num_provider, 'num_all' : num_all}) 
 
-
+def get_hash(string):
+    string = string.replace(':', '')  
+    m = hashlib.md5()
+    m.update(string)
+    return m.hexdigest()

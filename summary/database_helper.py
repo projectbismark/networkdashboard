@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from time import time,mktime,strftime
 from mx.DateTime.ISO import ParseDateTimeUTC
 import hashlib
-import cvs_helper,datetime_helper
+import cvs_helper,datetime_helper,views_helper
 
 def fetch_deviceid_hard(device):
 
@@ -88,4 +88,23 @@ def get_location(device):
     
     return ('unavailable')
 		
-	
+def save_device_details_from_request(request,device):
+    hashing = views_helper.get_hash(device)
+    dname = request.POST.get('name')
+    disp = request.POST.get('isp')
+    dlocation = request.POST.get('location')
+    dsp = request.POST.get('sp')
+    durate = int(request.POST.get('urate'))
+    ddrate = int(request.POST.get('drate'))
+    dcity = request.POST.get('city')
+    dstate = request.POST.get('state')
+    dcountry = request.POST.get('country')	    
+       
+    details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now(),hashkey=hashing)
+    details.save()
+
+def save_device_details_from_default(device):
+    hashing = view_helper.get_hash(device)
+    device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now(),name="default name",hashkey=hashing)
+    device_entry.save()
+

@@ -48,31 +48,16 @@ def sharedDeviceSummary(request,devicehash):
 def devicesummary(request):
     device = request.POST.get("device")
     device = device.replace(':', '')
-    m = hashlib.md5()
-    m.update(device)
-    hashing = m.hexdigest()
+    hashing = views_helper.get_hash(device)
 	
     if(request.POST.get("edit")):
         try:
-            dname = request.POST.get('name')
-            disp = request.POST.get('isp')
-            dlocation = request.POST.get('location')
-            dsp = request.POST.get('sp')
-            durate = int(request.POST.get('urate'))
-            ddrate = int(request.POST.get('drate'))
-            dcity = request.POST.get('city')
-            dstate = request.POST.get('state')
-            dcountry = request.POST.get('country')	    
-                  
-            details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now(),hashkey=hashing)
-            details.save()
+            database_helper.save_device_details_from_request(request,device)
         except:
             return render_to_response('invalid_edit.html', {'deviceid' : hashing})
      
-    try:
-	
+    try:	
         if not database_helper.fetch_deviceid_hard(device):
-	    print device
             return render_to_response('device_not_found.html', {'deviceid': device})
     except:
         try:
@@ -85,28 +70,14 @@ def devicesummary(request):
 		return render_to_response('device_not_found.html', {'deviceid': device})
 
     device_details = Devicedetails.objects.filter(deviceid=device)
-    try:
-    
+    try: 
         if len(device_details)<1:
-	    m = hashlib.md5()
-	    m.update(device.replace(':', ''))
-	    hashing = m.hexdigest()
-            device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now(),name="default name",hashkey=hashing)
-            device_entry.save()
+            database_helper.save_device_details_from_default(device)
             device_details = Devicedetails.objects.filter(deviceid=device)
     except:
         return render_to_response('device_not_found.html', {'deviceid': device})
 
     return views_helper.get_response_for_devicehtml(device_details[0])
-
-def getLastUpdate(request, device):
-    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-    if len(last)>0:
-        end = datetime.fromtimestamp(mktime(last[0].eventstamp.timetuple())).strftime("%B %d, %Y")
-	return HttpResponse(end)
-    
-    return HttpResponse('unavailable')
-
 
 def getLocation(request, device):   
     return HttpResponse(database_helper.get_location(device))
