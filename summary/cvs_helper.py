@@ -61,7 +61,7 @@ def linegraph_normal(data,text_format,title):
 	if(measure.average <= 0):
 		continue
 	temp=[]
-	temp.append(datetime_helper.datetime_format_to_unixtime(measure.eventstamp))
+	temp.append(datetime.fromtimestamp(mktime(measure.eventstamp.timetuple())))
 	temp.append(int(measure.average))
 	output.append(temp)
 

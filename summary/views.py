@@ -146,8 +146,10 @@ def linegraph_bitrate(request):
 	bucket_width = 24*3600
 	result.append(cvs_helper.linegraph_bucket(other_device_details_netperf_3,bucket_width,"[{0},{1}]","multi-median"))
 	result.append(cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"[{0},{1}]","single-median"))
-  			   
-    return HttpResponse("(" + str(result) + ")")
+    
+    answer = str(result).replace("datetime.datetime","Date.UTC")
+
+    return HttpResponse("(" + answer + ")")
 
 def linegraph_lmrtt(request):
     device = request.GET.get('deviceid')
