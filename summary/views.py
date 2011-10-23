@@ -87,21 +87,19 @@ def throughputGraph(request):
     graphno = int(request.GET.get('graphno'))
     filter_by = request.GET.get('filter_by')
     chosen_limit = 100000000
-    data = "[\n"
+    data = "["
     all_device_details = MBitrate.objects.filter(average__lte = chosen_limit).order_by('eventstamp')
     if(graphno==1):
         all_device_details = all_device_details.filter(srcip = '143.215.131.173')
     else:
         all_device_details = all_device_details.filter(dstip = '143.215.131.173')
     for entry in all_device_details:
-        if(data!="[\n"):
-            data+= ",\n"
-        print entry.eventstamp
-        data += "[" + str(datetime_helper.mmddYY_to_datetime_format(entry.eventstamp)) + "," + str(entry.average) +"]"
+        if(data!='['):
+            data+= ','
+        data += '[' + datetime_helper.datetime_to_JSON(entry.eventstamp)+ ',' + str(entry.average) +"]"
 
-    data += "\n]"
-    print data
-    return data
+    data += "]"
+    return HttpResponse(data)
         
 def linegraph_bitrate(request):
     device = request.GET.get('deviceid')

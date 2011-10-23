@@ -11,6 +11,10 @@ def mmddYY_to_datetime_format(time):
     s4 = datetime.fromtimestamp(s3)  
     return s4
 
+def datetime_to_JSON(time):
+    x = datetime.fromtimestamp(mktime(time.timetuple()))
+    return "Date.UTC(" + str(x.year) + "," +str(x.month) + "," +str(x.day) + "," +str(x.hour) + "," +str(x.minute) + "," +str(x.second) + "," +str(x.microsecond/1000)+")"
+
 def datetime_format_to_unixtime(time):
     return mktime(time.timetuple())
 

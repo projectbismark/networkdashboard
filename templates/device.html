@@ -210,11 +210,11 @@
                     text: 'Download Throughput'
             },
             xAxis: {
-                    type: 'datetime',
-                    dateTimeLabelFormats: {
-                            month: '%e. %b',
-                            year: '%b'
-                    }
+                    type: 'datetime'
+//                    dateTimeLabelFormats: {
+//                            month: '%e. %b',
+//                            year: '%b'
+//                    }
             },
             yAxis: {
                     title: {
@@ -222,16 +222,13 @@
                     },
                     min: 0
             },
-            tooltip: {
-                    formatter: function() {
-                    return '<b>'+ this.series.name +'</b><br/>'+
-                                    Highcharts.dateFormat('%e. %b', this.x) +': '+ this.y +' m';
-                    }
-            },
             series: [{
                     name: 'series 1',
 
-                    data: content
+//                    data:eval('[["2011-10-19 18:16:35", 0],["2011-10-19 18:17:23", 0.6],["2011-10-19 18:40:52", 0.7],["2011-10-19 18:44:58", 0.8],["2011-10-19 18:48:25", 0.6]]')
+                    data:eval(content)
+        
+                                                        
             }]
          });
 
@@ -530,12 +527,12 @@
 
 
 	    if(paramselect=="AGGL3BITRATE"){
-                $.ajax({
-                        type: "GET",
-                        url: "/getThroughput/",
-                        data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                        success: OnSuccess2
-                    });
+//                $.ajax({
+//                        type: "GET",
+//                        url: "/getThroughput/",
+//                        data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
+//                        success: OnSuccess2
+//                    });
 
 		$.ajax({
                         type: "GET",
