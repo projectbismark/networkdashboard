@@ -6,8 +6,8 @@ from datetime import datetime, timedelta
 def linegraph_bucket(data,bucket_size,text_format,title):
 	result={}
 	result['name'] = title
-	output=""
-
+	output="["
+	is_first = True
 	try:	
 		start_time = datetime_helper.datetime_format_to_unixtime(data[0].eventstamp)
 		end_time = start_time + bucket_size
@@ -24,7 +24,12 @@ def linegraph_bucket(data,bucket_size,text_format,title):
 			   	n = len(bucket)
 				if n!=0:
 			   		mean = sum(bucket) / n
+					if not is_first:
+						output+=',';
+					else:
+						is_first=False;
 					output+=text_format.format(datetime_helper.datetime_to_JSON(mid_time), str(mean))
+					
 					
 			   	bucket = []
 				
@@ -39,7 +44,7 @@ def linegraph_bucket(data,bucket_size,text_format,title):
 		if n!=0:
 			mean = sum(bucket) / n
 			output+=text_format.format(datetime_helper.datetime_to_JSON(mid_time), str(mean))
-
+    		output += ']'
 		result['data']=output
 	except:
 		 return result
@@ -49,13 +54,21 @@ def linegraph_bucket(data,bucket_size,text_format,title):
 def linegraph_normal(data,text_format,title):
     result={}
     result['name'] = title
-    output = ''
+    output = '['
+    is_first = True
+
     for measure in data:
 
 	if(measure.average <= 0):
 		continue
+	if not is_first:
+		output+=',';
+	else:
+		is_first=False;
 	output+=text_format.format(datetime_helper.datetime_to_JSON(measure.eventstamp), str(int(measure.average))) 
+    output += ']'
     result['data'] = output
+
     return result
 
 
