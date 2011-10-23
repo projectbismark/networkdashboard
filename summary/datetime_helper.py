@@ -5,8 +5,8 @@ from mx.DateTime.ISO import ParseDateTimeUTC
 
 
 def mmddYY_to_datetime_format(time):
-    s = time
-    s2 = datetime.strptime(s,"%m/%d/%Y")
+    s = str(time)
+    s2 = datetime.strptime(s,"%Y-%m-%d %H:%M:%S")
     s3 = ParseDateTimeUTC(str(s2))
     s4 = datetime.fromtimestamp(s3)  
     return s4

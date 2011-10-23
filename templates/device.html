@@ -174,32 +174,68 @@
 
         function OnSuccess(data)
         {
-          content=data;
-
-	  if(content.length<=60){
-		deleteDivs();
-		var dtag = document.getElementById('display_tag');
-		dtag.setAttribute('value', 'Insufficient Data');
-		}
-	  else{
-
-             g = new Dygraph(document.getElementById("graph_div_1"),
-                       content,
-                       {
-                       rollPeriod: 1,
-                       showRoller: true,
-                       logscale: (logdisplay&&special),
-                       errorBars: false,
-                       connectSeparatedPoints: true,
-		       colorValue: 0.0 
-                       }
-                       );
-		
-		addRadios();
-        	addLabels();
-
-		}
+//          content=data;
+//
+//	  if(content.length<=60){
+//		deleteDivs();
+//		var dtag = document.getElementById('display_tag');
+//		dtag.setAttribute('value', 'Insufficient Data');
+//		}
+//	  else{
+//
+//             g = new Dygraph(document.getElementById("graph_div_1"),
+//                       content,
+//                       {
+//                       rollPeriod: 1,
+//                       showRoller: true,
+//                       logscale: (logdisplay&&special),
+//                       errorBars: false,
+//                       connectSeparatedPoints: true,
+//		       colorValue: 0.0 
+//                       }
+//                       );
+//		
+//		addRadios();
+//        	addLabels();
+//
+//		}
 	  
+         var content = data;
+         chart = new Highcharts.Chart({
+            chart: {
+                    renderTo: 'graph_div_1',
+                    type: 'spline'
+            },
+            title: {
+                    text: 'Download Throughput'
+            },
+            xAxis: {
+                    type: 'datetime',
+                    dateTimeLabelFormats: {
+                            month: '%e. %b',
+                            year: '%b'
+                    }
+            },
+            yAxis: {
+                    title: {
+                            text: 'Throughput (kbps)'
+                    },
+                    min: 0
+            },
+            tooltip: {
+                    formatter: function() {
+                    return '<b>'+ this.series.name +'</b><br/>'+
+                                    Highcharts.dateFormat('%e. %b', this.x) +': '+ this.y +' m';
+                    }
+            },
+            series: [{
+                    name: 'series 1',
+
+                    data: content
+            }]
+         });
+
+
 	 CloseProgressBar();
          
         }
@@ -496,14 +532,14 @@
 	    if(paramselect=="AGGL3BITRATE"){
                 $.ajax({
                         type: "GET",
-                        url: "/line_bitrate/",
+                        url: "/getThroughput/",
                         data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
                         success: OnSuccess2
                     });
 
 		$.ajax({
                         type: "GET",
-                        url: "/line_bitrate/",
+                        url: "/getThroughput/",
                         data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
                         success: OnSuccess
                     });

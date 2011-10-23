@@ -19,11 +19,11 @@ urlpatterns = patterns('',
 
     # site URLs
      (r'^$', 'networkdashboard.summary.views.index'),
-
      (r'^devices/', 'networkdashboard.summary.views.showdevices'),
      (r'^activedevices/', 'networkdashboard.summary.views.showactivedevices'),
      (r'^device', 'networkdashboard.summary.views.devicesummary'),
      (r'^getCoordinates', 'networkdashboard.summary.views.getCoordinates'),
+     (r'^getThroughput', 'networkdashboard.summary.views.throughputGraph'),
      (r'^displayDevice/(?P<devicehash>\w+)', 'networkdashboard.summary.views.sharedDeviceSummary'),
      (r'^editDevicePage/(?P<devicehash>\w+)', 'networkdashboard.summary.views.editDevicePage'),
      (r'^editDevice/(?P<device>\w+)', 'networkdashboard.summary.views.editDevice'),
