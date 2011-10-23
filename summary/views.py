@@ -139,13 +139,13 @@ def linegraph_bitrate(request):
     my_device_details_netperf_3 = my_device_details.filter(toolid='NETPERF_3')
     my_device_details_other = my_device_details.exclude(toolid='NETPERF_3')
     result=[]
-    result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"[{0},{1}]","multi"))
-    result.append(cvs_helper.linegraph_normal(my_device_details_other,"[{0},{1}]","single"))
+    result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"multi"))
+    result.append(cvs_helper.linegraph_normal(my_device_details_other,"single"))
 	
     if (filter_by != 'none'):
 	bucket_width = 24*3600
-	result.append(cvs_helper.linegraph_bucket(other_device_details_netperf_3,bucket_width,"[{0},{1}]","multi-median"))
-	result.append(cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"[{0},{1}]","single-median"))
+	result.append(cvs_helper.linegraph_bucket(other_device_details_netperf_3,bucket_width,"multi-median"))
+	result.append(cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"single-median"))
     
     answer = str(result).replace("datetime.datetime","Date.UTC")
 
@@ -160,8 +160,6 @@ def linegraph_lmrtt(request):
     all_device_details= MBitrate.objects.filter(average__lte=3000,dstip='143.215.131.173').order_by('eventstamp')
     device_details = all_device_details.filter(deviceid=device)
    
-    output = "Date,msec,median\n"
-
     other_device_details = []
     filtered_deviceids = []	
 
@@ -173,14 +171,15 @@ def linegraph_lmrtt(request):
 
     for row in filtered_deviceids:
 	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
-
-    output+=cvs_helper.linegraph_normal(device_details,"{0},{1},\n")
+    result=[]
+    result.append(cvs_helper.linegraph_normal(device_details,'last-minute Rtt'))
 
     if (filter_by != 'none'):
 	bucket_width = 2*3600
-	output+=cvs_helper.linegraph_bucket(other_device_details,bucket_width,"{0},,{1}\n")
+	result.append(cvs_helper.linegraph_bucket(other_device_details,bucket_width,'median'))
+    answer = str(result).replace("datetime.datetime","Date.UTC")
 
-    return HttpResponse(output)
+    return HttpResponse("(" + answer + ")")
 
 def compare_cvs_linegraph(request):
     device = request.GET.get('deviceid')

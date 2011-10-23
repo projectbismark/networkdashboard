@@ -3,11 +3,12 @@ from time import time,mktime,strftime
 import datetime_helper
 from datetime import datetime, timedelta
 
-def linegraph_bucket(data,bucket_size,text_format,title):
+def linegraph_bucket(data,bucket_size,title):
 	result={}
 	result['name'] = title
-	output="["
-	is_first = True
+	result['type'] = "spline"
+	output=[]
+
 	try:	
 		start_time = datetime_helper.datetime_format_to_unixtime(data[0].eventstamp)
 		end_time = start_time + bucket_size
@@ -24,11 +25,10 @@ def linegraph_bucket(data,bucket_size,text_format,title):
 			   	n = len(bucket)
 				if n!=0:
 			   		mean = sum(bucket) / n
-					if not is_first:
-						output+=',';
-					else:
-						is_first=False;
-					output+=text_format.format(datetime_helper.datetime_to_JSON(mid_time), str(mean))
+					temp=[]
+					temp.append(datetime.fromtimestamp(mid_time))
+					temp.append(int(mean))
+					output.append(temp)
 					
 					
 			   	bucket = []
@@ -43,17 +43,21 @@ def linegraph_bucket(data,bucket_size,text_format,title):
 		n = len(bucket)
 		if n!=0:
 			mean = sum(bucket) / n
-			output+=text_format.format(datetime_helper.datetime_to_JSON(mid_time), str(mean))
-    		output += ']'
+			temp=[]
+			temp.append(datetime.fromtimestamp(mid_time))
+			temp.append(int(mean))
+			output.append(temp)
+
 		result['data']=output
 	except:
 		 return result
 
 	return result
 
-def linegraph_normal(data,text_format,title):
+def linegraph_normal(data,title):
     result={}
     result['name'] = title
+    result['type'] = "spline"
     output= []
 
     for measure in data:
