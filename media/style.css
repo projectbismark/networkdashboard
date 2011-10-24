@@ -20,7 +20,7 @@ h3 {
 a {
         text-decoration: none ;
         color: #991133 ;
-        background: rgb(230,234,240);
+        background: transparent;
 }
 
 a:hover {
@@ -46,13 +46,12 @@ li {
 DIV.section {
     border-radius:10px;
     -moz-border-radius:10px;
-    border-color: rgb(13,17,137);
-    border: 2px solid;
-    color: rgb(255,255,255);
-/*    background-image: -o-linear-gradient(left,rgba(249,249,255),rgba(230,234,240));
-    background: -webkit-gradient(linear, left top, right bottom, from(rgb(249,249,255)), to(rgb(230,234,240)));
-    background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(230,234,240));*/
-    background-color: rgb(180,198,220);
+    border-style: solid;
+    border-color: white;
+    border-width: 2px;
+    background-image: -o-linear-gradient(left,rgba(249,249,255),rgba(180,198,220));
+    background: -webkit-gradient(linear, left top, right bottom, from(rgb(249,249,255)), to(rgb(180,198,220)));
+    background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(180,198,220));
     padding: 10px;
     margin-left:auto;
     margin-right:auto;
@@ -62,7 +61,7 @@ DIV.section {
 /*    -moz-box-shadow:inset 0 0 5px rgb(17,0,54);*/
     -moz-box-shadow:2px 2px 2px #333333;
     box-shadow:2px 2px 2px #333333;
-    background-image: -o-linear-gradient(left,rgb(249,249,255),rgb(230,234,240));
+/*    background-image: -o-linear-gradient(left,rgb(249,249,255),rgb(230,234,240));*/
 }
 
 #section_2{
@@ -71,7 +70,6 @@ DIV.section {
 }
 DIV.about {
 /*    color:rgb(38,0,117);*/
-    color:black;
     border-radius:10px;
     -moz-border-radius:10px;
     filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cccccc', endColorstr='#000000');
