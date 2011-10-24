@@ -184,11 +184,9 @@ def linegraph_lmrtt(request):
 
     return HttpResponse("(" + answer + ")")
 
-def compare_cvs_linegraph(request):
+def linegraph_rtt(request):
     device = request.GET.get('deviceid')
     filter_by = request.GET.get('filter_by')
-
-    output = ""
   
     details = Devicedetails.objects.filter(deviceid=device)[0]
 
@@ -200,7 +198,7 @@ def compare_cvs_linegraph(request):
     if (filter_by == 'location'):
 	filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
 
-    if (filter_by == 'provider'):
+    else:
 	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
 
     for row in filtered_deviceids:
@@ -216,63 +214,24 @@ def compare_cvs_linegraph(request):
 		divides[ee]=[]
 
 	divides[ee].append(row)		
-  
+    
+
     distinct_ips = MRtt.objects.values('dstip').distinct()
-    output = "Date"
-    output_first=""
-    output_second=""
-    total=0
-
-
-    for row_ip in distinct_ips:
-	ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0]
-
-
-        output_first += "," + ip_lookup.location
-	output_second += ",median(" + str(total) + ")"
-	total+=1
-
-    output+=output_first + output_second + "\n"
+ 
+    result=[]
 
     count = 1
     for row_ip in distinct_ips:
+	ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0]
+        
     	device_details = MRtt.objects.filter(deviceid=device,average__lte=3000, dstip = row_ip["dstip"])
-        text_format = "{0}"
-	for i in range(0,count):
-		text_format +=','
-	
-	text_format += "{1}"
+	result.append(cvs_helper.linegraph_normal(device_details,ip_lookup.location))
 
-	for i in range(count,total-count):
-		text_format +=','
+	result.append(cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,"median("+str(count)+")"))
+	count+=1
 
-	for i in range(0,total):
-		text_format +=','
+    answer = str(result).replace("['","[")
+    answer = answer.replace(")'",")")
 
-	text_format +="\n"
-	print text_format
-	output+=cvs_helper.linegraph_normal(device_details,text_format)
-	
-	
-
-        text_format = "{0}"
-
-	for i in range(0,total):
-		text_format +=','
-
-	for i in range(0,count):
-		text_format +=','
-	
-	text_format += "{1}"
-
-	for i in range(count,total-count+1):
-		text_format +=','
-
-	text_format +="\n"
-
-	output+=cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,text_format)
-
-	count+=1            
-   
-    return HttpResponse(output)
+    return HttpResponse("(" + answer + ")")
 
