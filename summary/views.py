@@ -225,8 +225,9 @@ def linegraph_rtt(request):
 	ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0]
         
     	device_details = MRtt.objects.filter(deviceid=device,average__lte=3000, dstip = row_ip["dstip"])
-	result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup.location))
-	if not (filter_by == "none"):
+	result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup.location)))
+
+    	if (filter_by != 'none'):
 		result.append(cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,"median"+str(count)))
 
 	count+=1
