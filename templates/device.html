@@ -6,11 +6,10 @@
     <script src="/static/jquery-latest.js"></script>
     <script src="/static/highcharts.js"></script>
     <script src="/static/js/modules/exporting.js"></script>
-    <script src="static/highstock.js"</script>
+    <script src="static/highstock.js"></script>
 
 
     <table>
-	<!--
         <tr><td>MAC Address</td><td>{{ detail.macid }}</td></tr>
         <tr><td>Type</td><td>{{ detail.type }}</td></tr>
         <tr><td>Operating System</td><td>{{ detail.os }}</td></tr> -->
@@ -271,63 +270,30 @@
 
         }
         
-        function OnSuccess3(data){
-            CloseProgressBar();
-            chart = new Highcharts.Chart({
-                chart: {
-                        renderTo: 'graph_div_1',
-                        defaultSeriesType: 'bar'
-                },
-                title: {
-                        text: 'Passive Data'
-                },
-                
-                xAxis: {
-                        categories: ['cat1', 'cat2', 'cat3', 'cat4', 'cat5'],
-                        title: {
-                                text: null
-                        }
-                },
-                yAxis: {
-                        min: 0,
-                        title: {
-                                text: 'Population (millions)',
-                                align: 'high'
-                        }
-                },
-                tooltip: {
-                        formatter: function() {
-                                return ''+
-                                         this.series.name +': '+ this.y +' millions';
-                        }
-                },
-                plotOptions: {
-                        bar: {
-                                dataLabels: {
-                                        enabled: true
-                                }
-                        }
-                },
-                legend: {
-                        layout: 'vertical',
-                        align: 'right',
-                        verticalAlign: 'top',
-                        x: -100,
-                        y: 100,
-                        floating: true,
-                        borderWidth: 1,
-                        backgroundColor: '#FFFFFF',
-                        shadow: true
-                },
+        function on_success_passive(data){
+            window.chart = new Highcharts.StockChart({
+            chart: {
+                renderTo: 'graph_div_1'
+            },
 
-                credits: {
-                        enabled: false
-                },
-                series: data
+            rangeSelector: {
+                selected: 1
+            },
+
+            title: {
+                text: 'Passive Data'
+            },
+
+            xAxis: {
+                maxZoom: 14 * 24 * 3600000 // fourteen days
+            },
+
+            series: eval(data)
         });
+            
 		
 
-            
+           CloseProgressBar(); 
         }
         
         function setDisplayMode(log){
@@ -439,153 +405,64 @@
 	OpenProgressBar();
 	
         if (paramselect=="PASSIVE"){
-//            $.ajax({
-//                        type: "GET",
-//                        url: "/passive_data_chart/",
-//                        data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-//                        success: OnSuccess3
-//                    });
-				
-            $.get('/static/total.csv', function(data) {
-				// Split the lines
-				var lines = data.split('\n');
-                var points = [];
-
-				$.each(lines, function(lineNo, line) {
-					var items = line.split(',');
-                    if (items.length == 6) {
-                        points.push([ Date.UTC(parseInt(items[0]),
-                                               parseInt(items[1]),
-                                               parseInt(items[2]),
-                                               parseInt(items[3]),
-                                               parseInt(items[4])),
-                                    parseFloat(items[5]) ]);
-                    }
-				});
-
-				var chart = new Highcharts.StockChart({
-				    chart: {
-				    	renderTo: 'graph_div_1',
-                        alignTicks: false
-				    },
-                    rangeSelector: {
-                        buttons: [{
-                            type: 'day',
-                            count: 1,
-                            text: 'day'
-                        }, {
-                            type: 'week',
-                            count: 1,
-                            text: 'week'
-                        }, {
-                            type: 'all',
-                            count: 1,
-                            text: 'all'
-                        }],
-                        selected: 1
-                    },
-				    title: {
-				    	text: 'Aggregate home network traffic'
-				    },
-				    xAxis: {
-                        title: {
-                            text: 'Time'
-                        },
-                        type: 'datetime',
-                        maxZoom: 86400 * 1000
-                    },
-                    yAxis: {
-                        title: {
-                            text: 'Bytes transferred'
-                        },
-                    },
-                    tooltip: {
-                        formatter: function() {
-                            var format = '%A, %b %e, %Y, %H:%M';
-                            var value = this.points[0].y;
-                            var unit = 'bytes';
-                            if (value > 1000) {
-                                value /= 1000;
-                                unit = 'KiB';
-                            }
-                            if (value > 1000) {
-                                value /= 1000;
-                                unit = 'MiB';
-                            }
-                            if (value > 1000) {
-                                value /= 1000;
-                                unit = 'GiB';
-                            }
-                            return '<b>'
-                                + Highcharts.dateFormat(format, this.x)
-                                + '</b><br/>' + value.toFixed(1) + ' ' + unit;
-                        }
-                    },
-                    series: [{
-                        type: 'column',
-                        name: 'traffic',
-                        data: points
-                    }]
-                });
-            });
-
-
-
-
-            CloseProgressBar();
-        }
-        else {
-
-
-	    if(paramselect=="AGGL3BITRATE"){
-                $.ajax({
+            $.ajax({
                         type: "GET",
-                        url: "/line_bitrate/",
-                        data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                        success: on_success_download
-                    });
-
-		$.ajax({
-                        type: "GET",
-                        url: "/line_bitrate/",
+                        url: "/line_passive/",
                         data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                        success: on_success_upload
+                        success: OnSuccess3
                     });
-            }
-	    else if(paramselect=="LMRTT") {
-            $.ajax({
-                        type: "GET",
-                        url: "/line_lmrtt/",
-                         data: {'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                        success: on_success_lmrtt
-                    });
-  		}
-		
-	    else{
-            $.ajax({
-                        type: "GET",
-                        url: "/line_rtt/",
-                        data: {'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                        success: on_success_rtt
-                    });
-  		}
-        }
-        
-        }
-
-	function CloseProgressBar() {
-		    var progressbar_container = document.getElementById("progress");
-                    progressbar_container.style.display="none";
-		    //document.getElementById("graph_div").display = "block";
-		
-        }
-
-	function OpenProgressBar() {
-		var progressbar_container = document.getElementById("progress");
-                progressbar_container.style.display="block";
-		    
+				
             
         }
+
+
+       else if(paramselect=="AGGL3BITRATE"){
+            $.ajax({
+                    type: "GET",
+                    url: "/line_bitrate/",
+                    data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
+                    success: on_success_download
+                });
+
+            $.ajax({
+                    type: "GET",
+                    url: "/line_bitrate/",
+                    data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
+                    success: on_success_upload
+                });
+        }
+        else if(paramselect=="LMRTT") {
+        $.ajax({
+                type: "GET",
+                url: "/line_lmrtt/",
+                 data: {'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
+                success: on_success_lmrtt
+            });
+        }
+
+        else{
+        $.ajax({
+                    type: "GET",
+                    url: "/line_rtt/",
+                    data: {'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
+                    success: on_success_rtt
+                });
+            }
+    }
+
+    function CloseProgressBar() {
+                var progressbar_container = document.getElementById("progress");
+                progressbar_container.style.display="none";
+                //document.getElementById("graph_div").display = "block";
+
+    }
+
+    function OpenProgressBar() {
+            var progressbar_container = document.getElementById("progress");
+            progressbar_container.style.display="block";
+
+
+    }
 
 </script>
 </body>
