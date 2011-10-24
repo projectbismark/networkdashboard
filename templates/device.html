@@ -223,6 +223,54 @@
 
         }
         
+        function on_success_lmrtt(data)
+        {
+          window.chart = new Highcharts.StockChart({
+            chart: {
+                renderTo: 'graph_div_1'
+            },
+
+            rangeSelector: {
+                selected: 1
+            },
+
+            title: {
+                text: 'Last Mile Latency'
+            },
+
+            xAxis: {
+                maxZoom: 14 * 24 * 3600000 // fourteen days
+            },
+
+            series: eval(data)
+        });
+
+        }
+        
+        function on_success_rtt(data)
+        {
+          window.chart = new Highcharts.StockChart({
+            chart: {
+                renderTo: 'graph_div_1'
+            },
+
+            rangeSelector: {
+                selected: 1
+            },
+
+            title: {
+                text: 'Round-Trip Time'
+            },
+
+            xAxis: {
+                maxZoom: 14 * 24 * 3600000 // fourteen days
+            },
+
+            series: eval(data)
+        });
+
+        }
+        
         function OnSuccess3(data){
             CloseProgressBar();
             chart = new Highcharts.Chart({
@@ -476,7 +524,7 @@
                     series: [{
                         type: 'column',
                         name: 'traffic',
-                        data: points,
+                        data: points
                     }]
                 });
             });
@@ -509,16 +557,16 @@
                         type: "GET",
                         url: "/line_lmrtt/",
                          data: {'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                        success: OnSuccess
+                        success: on_success_lmrtt
                     });
   		}
 		
 	    else{
             $.ajax({
                         type: "GET",
-                        url: "/compare_data_chart/{{deviceid}}",
-                        data: {'graphno' : 1,'param':paramselect, 'deviceid': "{{deviceid}}", 'start': "08/01/2011", 'end': "12/01/2011", 'filter_by': filter, 'bucket_size': bucket},
-                        success: OnSuccess
+                        url: "/line_rtt/",
+                        data: {'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
+                        success: on_success_rtt
                     });
   		}
         }

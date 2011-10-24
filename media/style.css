@@ -46,13 +46,18 @@ li {
 DIV.section {
     border-radius:10px;
     -moz-border-radius:10px;
-    background-image: -o-linear-gradient(left,rgba(249,249,255),rgba(230,234,240));
+    border-color: rgb(13,17,137);
+    border: 2px solid;
+    color: rgb(255,255,255);
+/*    background-image: -o-linear-gradient(left,rgba(249,249,255),rgba(230,234,240));
     background: -webkit-gradient(linear, left top, right bottom, from(rgb(249,249,255)), to(rgb(230,234,240)));
-    background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(230,234,240));
+    background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(230,234,240));*/
+    background-color: rgb(180,198,220);
     padding: 10px;
     margin-left:auto;
     margin-right:auto;
     width:500px;
+    width:900px;
     text-align: left;
 /*    -moz-box-shadow:inset 0 0 5px rgb(17,0,54);*/
     -moz-box-shadow:2px 2px 2px #333333;
@@ -62,7 +67,7 @@ DIV.section {
 
 #section_2{
     position:relative;
-    top:10px;
+    top:30px;
 }
 DIV.about {
 /*    color:rgb(38,0,117);*/
@@ -147,7 +152,7 @@ DIV.radiodiv {
 }
 
 DIV.graphdisplay {
-    height: 800px;
+    height: 1200px;
 }
 
 DIV.progressbar {
