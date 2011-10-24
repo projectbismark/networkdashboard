@@ -26,7 +26,7 @@ def linegraph_bucket(data,bucket_size,title):
 				if n!=0:
 			   		mean = sum(bucket) / n
 					temp=[]
-					temp.append(datetime.fromtimestamp(mid_time))
+					temp.append(datetime_helper.datetime_to_JSON(measure.eventstamp))
 					temp.append(int(mean))
 					output.append(temp)
 					
@@ -44,7 +44,7 @@ def linegraph_bucket(data,bucket_size,title):
 		if n!=0:
 			mean = sum(bucket) / n
 			temp=[]
-			temp.append(datetime.fromtimestamp(mid_time))
+			temp.append(datetime_helper.datetime_to_JSON(measure.eventstamp))
 			temp.append(int(mean))
 			output.append(temp)
 
@@ -65,7 +65,8 @@ def linegraph_normal(data,title):
 	if(measure.average <= 0):
 		continue
 	temp=[]
-	temp.append(datetime.fromtimestamp(mktime(measure.eventstamp.timetuple())))
+
+	temp.append(datetime_helper.datetime_to_JSON(measure.eventstamp))
 	temp.append(int(measure.average))
 	output.append(temp)
 
