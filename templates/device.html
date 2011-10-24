@@ -8,8 +8,8 @@
     <script src="/static/js/modules/exporting.js"></script>
     <script src="static/highstock.js"></script>
 
-
     <table>
+        <!--
         <tr><td>MAC Address</td><td>{{ detail.macid }}</td></tr>
         <tr><td>Type</td><td>{{ detail.type }}</td></tr>
         <tr><td>Operating System</td><td>{{ detail.os }}</td></tr> -->
@@ -174,7 +174,6 @@
 
         function on_success_upload(data)
         { 
-         var content = data;
          window.chart = new Highcharts.StockChart({
             chart: {
                 renderTo: 'graph_div_2'
@@ -409,7 +408,7 @@
                         type: "GET",
                         url: "/line_passive/",
                         data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                        success: OnSuccess3
+                        success: on_success_passive
                     });
 				
             
