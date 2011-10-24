@@ -159,8 +159,8 @@ DIV.progressbar {
 
 
 DIV.graphdiv {
-    width: 600px;
-    height: 300px;
+    width: 900px;
+    height: 450px;
     
 }
 
@@ -168,8 +168,8 @@ DIV.graphdiv {
 DIV.outergraphdiv {
     margin-left:auto;
     margin-right:auto;
-    width:602px;
-    height: 302px;
+    width:902px;
+    height: 452px;
     border: 2px solid;
     border-color: rgb(38,0,117);
     padding: 2px;

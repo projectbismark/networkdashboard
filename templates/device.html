@@ -6,6 +6,7 @@
     <script src="/static/jquery-latest.js"></script>
     <script src="/static/highcharts.js"></script>
     <script src="/static/js/modules/exporting.js"></script>
+    <script src="static/highstock.js"</script>
 
 
     <table>
@@ -172,56 +173,54 @@
                  
 	}
 
-        function OnSuccess(data)
-        {  
+        function on_success_upload(data)
+        { 
          var content = data;
-         chart = new Highcharts.Chart({
+         window.chart = new Highcharts.StockChart({
             chart: {
-                    renderTo: 'graph_div_1',
-                    type: 'spline'
+                renderTo: 'graph_div_2'
             },
+
+            rangeSelector: {
+                selected: 1
+            },
+
             title: {
-                    text: 'Upload Throughput'
+                text: 'Upload Throughput'
             },
+
             xAxis: {
-                    type: 'datetime'
+                maxZoom: 14 * 24 * 3600000 // fourteen days
             },
-            yAxis: {
-                    title: {
-                            text: 'Throughput (kbps)'
-                    },
-                    min: 0
-            },
-            series: eval(content)
-         });
 
-
+            series: eval(data)
+        });
 	 CloseProgressBar();
          
         }
          
-         function OnSuccess2(data)
+         function on_success_download(data)
         {
-          var content = data;
-         chart = new Highcharts.Chart({
+          window.chart = new Highcharts.StockChart({
             chart: {
-                    renderTo: 'graph_div_2',
-                    type: 'spline'
+                renderTo: 'graph_div_1'
             },
+
+            rangeSelector: {
+                selected: 1
+            },
+
             title: {
-                    text: 'Download Throughput'
+                text: 'Download Throughput'
             },
+
             xAxis: {
-                    type: 'datetime'
+                maxZoom: 14 * 24 * 3600000 // fourteen days
             },
-            yAxis: {
-                    title: {
-                            text: 'Throughput (kbps)'
-                    },
-                    min: 0
-            },
-            series: eval(content)
-         });
+
+            series: eval(data)
+        });
+
         }
         
         function OnSuccess3(data){
@@ -495,14 +494,14 @@
                         type: "GET",
                         url: "/line_bitrate/",
                         data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                        success: OnSuccess2
+                        success: on_success_download
                     });
 
 		$.ajax({
                         type: "GET",
                         url: "/line_bitrate/",
                         data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                        success: OnSuccess
+                        success: on_success_upload
                     });
             }
 	    else if(paramselect=="LMRTT") {
