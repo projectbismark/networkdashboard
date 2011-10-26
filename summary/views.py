@@ -222,16 +222,52 @@ def linegraph_rtt(request):
 
     count = 1
     for row_ip in distinct_ips:
-	ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0]
+	try:
+		ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0].location
+	except:
+		continue
         
     	device_details = MRtt.objects.filter(deviceid=device,average__lte=3000, dstip = row_ip["dstip"])
-	result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup.location)))
+	result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup)))
 
     	if (filter_by != 'none'):
 		result.append(cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,"median"+str(count)))
 
 	count+=1
 
+    answer = str(result).replace("['","[")
+    answer = answer.replace(")'",")")
+
+    return HttpResponse("(" + answer + ")")
+
+def linegraph_bytes_hour(request):
+    device = request.GET.get('deviceid')
+    filter_by = request.GET.get('filter_by')
+
+    details = Devicedetails.objects.filter(deviceid=device)[0]
+
+    all_device_details= BytesPerHour.objects.filter(dstip='143.215.131.173')
+    device_details = all_device_details.filter(deviceid=device)
+   
+    other_device_details = []
+    filtered_deviceids = []	
+
+    if (filter_by == 'location'):
+	filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
+
+    if (filter_by == 'provider'):
+	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
+
+    for row in filtered_deviceids:
+	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
+
+    result=[]
+    result.append(cvs_helper.linegraph_normal(device_details,'bytes-per-minute'))
+
+
+    if (filter_by != 'none'):
+	bucket_width = 2*3600
+	result.append(cvs_helper.linegraph_bucket(other_device_details,bucket_width,'median'))
     answer = str(result).replace("['","[")
     answer = answer.replace(")'",")")
 
