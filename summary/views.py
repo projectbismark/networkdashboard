@@ -159,7 +159,7 @@ def linegraph_lmrtt(request):
 
     details = Devicedetails.objects.filter(deviceid=device)[0]
 
-    all_device_details= MLmrtt.objects.filter(average__lte=3000,dstip='143.215.131.173').order_by('eventstamp')
+    all_device_details= MLmrtt.objects.filter(average__lte=3000)
     device_details = all_device_details.filter(deviceid=device)
    
     other_device_details = []
