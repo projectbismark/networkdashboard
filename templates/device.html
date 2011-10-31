@@ -52,6 +52,7 @@
 </div>
 <div class="section" id="section_2">
     <div class ="banner" id ="banner_1"></div>
+    <div id ="section_text">
 
 <script type="text/javascript" src="/static/dygraph-combined.js"></script>
 
@@ -93,6 +94,7 @@
 <br />
 <button type="submit" name="submit" onClick=" render()">Display</button>
 
+</div>
 </div>
 
 
@@ -173,7 +175,8 @@
         function OnSuccess(data){
             window.chart = new Highcharts.StockChart({
             chart: {
-                renderTo: divid
+                renderTo: divid,
+                backgroundColor: "rgb(249,249,255)"
             },
             
             legend: {
@@ -209,7 +212,8 @@
         function OnSuccess2(data){
             window.chart = new Highcharts.StockChart({
             chart: {
-                renderTo: "graph_div_2"
+                renderTo: "graph_div_2",
+                backgroundColor: "rgb(249,249,255)"
             },
             
             legend: {
