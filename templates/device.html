@@ -2,6 +2,8 @@
 {% block content %}
 
 <div class ="section" id="section_1">
+    <div class ="banner" id ="banner_1"></div>
+    <div id="section_text">
     <h1>BISMark Device           <a href ="/editDevicePage/{{detail.hashkey}}"> Edit </a></h1>
     <script src="/static/jquery-latest.js"></script>
     <script src="/static/highcharts.js"></script>
@@ -43,16 +45,13 @@
 
  
 <tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
-<script type="text/javascript">
-    function convertURL(name){
-        return encodeURIComponent(name);
-    }
-</script>
+
 <tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}" ></td>
 </table>
-
+</div>
 </div>
 <div class="section" id="section_2">
+    <div class ="banner" id ="banner_1"></div>
 
 <script type="text/javascript" src="/static/dygraph-combined.js"></script>
 

@@ -1,6 +1,6 @@
 body, html { 
   color: #000000;
-  background: rgb(249,249,255);
+  background: rgb(230,234,240);
   padding-left: 1.5em;
   width: 90%;
 }
@@ -28,7 +28,7 @@ a:hover {
 
 body {
         font-family: arial, sans-serif ;
-        background: rgb(249,249,255);
+        background: rgb(234,234,240);
         font-size: 9pt ;
         margin: 25
 }
@@ -43,24 +43,32 @@ li {
 }
 
 DIV.section {
-    border-radius:10px;
-    -moz-border-radius:10px;
+    border-left:3px solid rgb(44,44,88);
 /*    border-style: solid;
     border-color: white;
     border-width: 2px;*/
-    background-image: -o-linear-gradient(left,rgba(249,249,255),rgba(180,198,220));
+/*    background-image: -o-linear-gradient(left,rgba(249,249,255),rgba(180,198,220));
     background: -webkit-gradient(linear, left top, right bottom, from(rgb(249,249,255)), to(rgb(180,198,220)));
-    background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(180,198,220));
-    padding: 10px;
+    background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(180,198,220));*/
+    padding: 0px;
     margin-left:auto;
     margin-right:auto;
+    background-color:rgb(249,249,255);
     width:500px;
     width:900px;
-    text-align: left;
 /*    -moz-box-shadow:inset 0 0 5px rgb(17,0,54);*/
     -moz-box-shadow:2px 2px 2px #333333;
     box-shadow:2px 2px 2px #333333;
 /*    background-image: -o-linear-gradient(left,rgb(249,249,255),rgb(230,234,240));*/
+}
+#section_text{
+    padding: 10px;
+    text-align:left;
+}
+#banner_1{
+    position: relative;
+    background-color: rgb(44,44,88);
+    height: 30px;
 }
 
 #section_2{
