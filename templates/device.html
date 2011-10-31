@@ -173,6 +173,7 @@
 
      
         function OnSuccess(data){
+            if(data.length>200){
             window.chart = new Highcharts.StockChart({
             chart: {
                 renderTo: divid,
@@ -205,11 +206,18 @@
             
             series: eval(data)
         });
+            }
+            
+            else{
+                var div = document.getElementById(divid);
+                div.innerHTML="<div id = 'error'><b>Insufficient Data</b></div>";
+            }
         
         CloseProgressBar();
         }
         
         function OnSuccess2(data){
+            if (data.length>200){
             window.chart = new Highcharts.StockChart({
             chart: {
                 renderTo: "graph_div_2",
@@ -243,6 +251,11 @@
             
             series: eval(data)
         });
+            }
+        else{
+            var div = document.getElementById('graph_div_2');
+            div.innerHTML="<div id = 'error'><b>Insufficient Data</b></div>";
+        }
             
         }
         

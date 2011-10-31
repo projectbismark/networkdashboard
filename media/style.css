@@ -158,6 +158,16 @@ DIV.progressbar {
     text-align:center;
 }
 
+#error{
+    position:relative;
+    margin-left:auto;
+    margin-right:auto;
+    top:200px;
+    width:200px;
+    height:200px;
+    font-size: 20px;
+}
+
 
 DIV.graphdiv {
     width: 900px;
