@@ -6,7 +6,6 @@
     <script src="/static/jquery-latest.js"></script>
     <script src="/static/highcharts.js"></script>
     <script src="/static/js/modules/exporting.js"></script>
-    <script src="static/highstock.js"></script>
 
     <table>
         <!--
@@ -91,14 +90,6 @@
         <option value ="provider">Provider({{num_provider}})</option>
     </select>
 </div>
-<div class="menu" id ="drop_menu_2">
-    Bucket Size:<br/>
-    <select id="select_menu_2">
-        <option value = "hourly" selected>Hourly</option>
-        <option value ="daily"> Daily </option>
-        <option value ="weekly"> Weekly </option>
-    </select>
-</div>
         
 <br />
 <button type="submit" name="submit" onClick=" render()">Display</button>
@@ -133,7 +124,8 @@
         var logdisplay = false;
         var special = false;
         var filter = "none";
-        var bucket = "hourly";
+        var divid = "graph_div_1";
+        var titlename ="Download Throughput";
 
        	render();
 	
@@ -142,7 +134,6 @@
             var sel = document.getElementById("select_menu_1");
             var sel2 = document.getElementById("select_menu_2");
             filter = sel.options[sel.selectedIndex].value;
-            bucket = sel2.options[sel2.selectedIndex].value;
 
 		if(g1rb1.checked)
 		{
@@ -150,6 +141,8 @@
 			units = "msec";
 			paramselect = "RTT";
                         special = true;
+                        titlename = "Round-Trip Time";
+                        divid = "graph_div_1";
 		}
 		else if(g1rb2.checked)
 		{
@@ -157,6 +150,8 @@
 			units = "msec";
 			paramselect = "LMRTT";
                         special = true;
+                        titlename = "Last Mile Latency";
+                        divid = "graph_div_1";
 		}
 		else if(g1rb3.checked)
 		{
@@ -164,139 +159,74 @@
 			units = "kbps";
 			paramselect = "AGGL3BITRATE";
                         special = false;
+                        titlename = "Download Throughput";
+                        divid = "graph_div_1";
 		}
                 else if(g1rb4.checked)
                 {
                         paramselect = "PASSIVE";
+                        titlename = "Passive Data";
+                        divid = "graph_div_1";
                 }
                  
 	}
 
-        function on_success_upload(data)
-        { 
-         window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'graph_div_2'
-            },
-
-            rangeSelector: {
-                selected: 1
-            },
-
-            title: {
-                text: 'Upload Throughput'
-            },
-
-            xAxis: {
-                maxZoom: 14 * 24 * 3600000 // fourteen days
-            },
-
-            series: eval(data)
-        });
-	 CloseProgressBar();
-         
-        }
-         
-         function on_success_download(data)
-        {
-          window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'graph_div_1'
-            },
-
-            rangeSelector: {
-                selected: 1
-            },
-
-            title: {
-                text: 'Download Throughput'
-            },
-
-            xAxis: {
-                maxZoom: 14 * 24 * 3600000 // fourteen days
-            },
-
-            series: eval(data)
-        });
-
-        }
-        
-        function on_success_lmrtt(data)
-        {
-          window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'graph_div_1'
-            },
-
-            rangeSelector: {
-                selected: 1
-            },
-
-            title: {
-                text: 'Last Mile Latency'
-            },
-
-            xAxis: {
-                maxZoom: 14 * 24 * 3600000 // fourteen days
-            },
-
-            series: eval(data)
-        });
-
-        }
-        
-        function on_success_rtt(data)
-        {
-          window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'graph_div_1'
-            },
-
-            rangeSelector: {
-                selected: 1
-            },
-
-            title: {
-                text: 'Round-Trip Time'
-            },
-
-            xAxis: {
-                maxZoom: 14 * 24 * 3600000 // fourteen days
-            },
-
-            series: eval(data)
-        });
-
-        }
-        
-        function on_success_passive(data){
+     
+        function OnSuccess(data){
             window.chart = new Highcharts.StockChart({
             chart: {
-                renderTo: 'graph_div_1'
+                renderTo: divid
             },
 
             rangeSelector: {
-                selected: 1
+                selected: 0
             },
 
             title: {
-                text: 'Passive Data'
+                text: titlename
             },
 
             xAxis: {
                 maxZoom: 14 * 24 * 3600000 // fourteen days
             },
+            
+            series: eval(data)
+        });
+        
+        CloseProgressBar();
+        }
+        
+        function OnSuccess2(data){
+            window.chart = new Highcharts.StockChart({
+            chart: {
+                renderTo: "graph_div_2"
+            },
 
+            rangeSelector: {
+                selected: 0
+            },
+
+            title: {
+                text: "Upload Throughput"
+            },
+
+            xAxis: {
+                maxZoom: 14 * 24 * 3600000 // fourteen days
+            },
+            
             series: eval(data)
         });
             
-		
-
-           CloseProgressBar(); 
         }
         
+  
+            
+		
+
+   
+        
         function setDisplayMode(log){
-            g.updateOptions({logscale:log})
+            g.updateOptions({logscale:log});
             logdisplay = log;
         }
         
@@ -407,8 +337,8 @@
             $.ajax({
                         type: "GET",
                         url: "/line_passive/",
-                        data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                        success: on_success_passive
+                        data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter},
+                        success: OnSuccess
                     });
 				
             
@@ -419,23 +349,23 @@
             $.ajax({
                     type: "GET",
                     url: "/line_bitrate/",
-                    data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                    success: on_success_download
+                    data: {'graphno' : 2, 'deviceid': "{{deviceid}}", 'filter_by': filter},
+                    success: OnSuccess
                 });
 
             $.ajax({
                     type: "GET",
                     url: "/line_bitrate/",
-                    data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                    success: on_success_upload
+                    data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter},
+                    success: OnSuccess2
                 });
         }
         else if(paramselect=="LMRTT") {
         $.ajax({
                 type: "GET",
                 url: "/line_lmrtt/",
-                 data: {'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                success: on_success_lmrtt
+                 data: {'deviceid': "{{deviceid}}", 'filter_by': filter},
+                success: OnSuccess
             });
         }
 
@@ -443,8 +373,8 @@
         $.ajax({
                     type: "GET",
                     url: "/line_rtt/",
-                    data: {'deviceid': "{{deviceid}}", 'filter_by': filter, 'bucket_size': bucket},
-                    success: on_success_rtt
+                    data: {'deviceid': "{{deviceid}}", 'filter_by': filter},
+                    success: OnSuccess
                 });
             }
     }

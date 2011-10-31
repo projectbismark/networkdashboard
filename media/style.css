@@ -120,12 +120,7 @@ DIV.map {
 #drop_menu_1{
     position:absolute;
     left: 245px;
-    top: 100px;
-}
-#drop_menu_2{
-    position:absolute;
-    left:245px;
-    top: 140px;
+    top: 50px;
 }
 
 Div.label{
