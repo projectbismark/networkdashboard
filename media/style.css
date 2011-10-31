@@ -120,7 +120,7 @@ DIV.map {
 #drop_menu_1{
     position:absolute;
     left: 245px;
-    top: 50px;
+    top: 100px;
 }
 
 Div.label{
@@ -164,7 +164,9 @@ DIV.outergraphdiv {
     margin-right:auto;
     width:902px;
     height: 452px;
-    border: 2px solid;
+    border: 3px solid;
+    border-radius:4px;
+    -moz-border-radius:4px;
     border-color: rgb(38,0,117);
     padding: 2px;
 }

@@ -132,7 +132,6 @@
 	function createStyle()
 	{
             var sel = document.getElementById("select_menu_1");
-            var sel2 = document.getElementById("select_menu_2");
             filter = sel.options[sel.selectedIndex].value;
 
 		if(g1rb1.checked)
@@ -177,6 +176,18 @@
             chart: {
                 renderTo: divid
             },
+            
+            legend: {
+            enabled: true,
+            align: 'right',
+            backgroundColor: '#FCFFC5',
+            borderColor: 'black',
+            borderWidth: 2,
+            layout: 'vertical',
+            verticalAlign: 'top',
+            y: 100,
+            shadow: true
+        },
 
             rangeSelector: {
                 selected: 0
@@ -201,6 +212,19 @@
             chart: {
                 renderTo: "graph_div_2"
             },
+            
+            legend: {
+            enabled: true,
+            align: 'right',
+            backgroundColor: '#FCFFC5',
+            borderColor: 'black',
+            borderWidth: 2,
+            layout: 'vertical',
+            verticalAlign: 'top',
+            y: 100,
+            shadow: true
+        },
+
 
             rangeSelector: {
                 selected: 0
