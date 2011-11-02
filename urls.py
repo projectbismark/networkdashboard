@@ -41,6 +41,7 @@ urlpatterns = patterns('',
      (r'^line_rtt', 'networkdashboard.summary.views.linegraph_rtt'),
      (r'^line_bitrate/', 'networkdashboard.summary.views.linegraph_bitrate'),
      (r'^line_lmrtt/', 'networkdashboard.summary.views.linegraph_lmrtt'),
+     (r'^line_passive/', 'networkdashboard.summary.views.linegraph_bytes_hour'),
      (r'^data/', 'networkdashboard.summary.views.pie_chart'),
      (r'^newuser.html', 'networkdashboard.summary.views.newuser'),
      (r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root':settings.MEDIA_ROOT})

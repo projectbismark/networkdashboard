@@ -10,20 +10,43 @@ from mx.DateTime.ISO import ParseDateTimeUTC
 import hashlib
 import cvs_helper,datetime_helper,views_helper
 
-def fetch_deviceid_hard(device):
-
-	device_search = MBitrate.objects.filter(deviceid=device)[0:1]
+def fetch_deviceid_soft(device):
+	device_search = Devicedetails.objects.filter(deviceid=device)
+	try:
+		if len(device_search)>0:
+			print "soft found"
+			return True
+	except:
+		pass
 	
-	if (len(device_search)<1):
-		device_search = MRtt.objects.filter(deviceid=device)[0:1]
+	return False
+	
 
-	if (len(device_search)<1):
-		device_search = MLmrtt.objects.filter(deviceid=device)[0:1]
+def fetch_deviceid_hard(device):
+	
+	device_search = MBitrate.objects.filter(deviceid=device)
+	print device
 
-	if (len(device_search)<1):
-		return False
-	else:
-		return True
+	try:
+		if (len(device_search)>0):
+			return True
+	except:
+		device_search = MRtt.objects.filter(deviceid=device)
+
+	try:
+		if (len(device_search)>0):
+			return True
+	except:
+		device_search = MLmrtt.objects.filter(deviceid=device)
+
+
+	try:
+		if (len(device_search)>0):
+			return True
+	except:
+		pass
+	
+	return False
 
 def list_isps():
 	ret = ["Comcast","Time Warner Cable","At&t","Cox Optimum","Charter","Verizon","CenturyLink","SuddenLink","EarthLink","Windstream","Cable One","Frontier","NetZero Juno","Basic ISP","ISP.com","PeoplePC","AOL MSN","Fairpoint","Qwest","CableVision","MEdiaCom"]
@@ -109,3 +132,5 @@ def save_device_details_from_default(device):
     device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now(),name="default name",hashkey=hashing)
     device_entry.save()
 
+def deviceid_to_nodeid(device):
+    return "OW" + device.upper()

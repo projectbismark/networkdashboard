@@ -47,10 +47,15 @@ def sharedDeviceSummary(request,devicehash):
     return views_helper.get_response_for_devicehtml(device_details[0])
 
 def devicesummary(request):
+<<<<<<< HEAD
     device = str(request.POST.get("device"))
+=======
+
+    device = request.POST.get("device")
+>>>>>>> experiment
     device = device.replace(':', '')
     hashing = views_helper.get_hash(device)
-	
+    
     if(request.POST.get("edit")):
         try:
             database_helper.save_device_details_from_request(request,device)
@@ -58,8 +63,9 @@ def devicesummary(request):
             return render_to_response('invalid_edit.html', {'deviceid' : hashing})
      
     try:	
-        if not database_helper.fetch_deviceid_hard(device):
-            return render_to_response('device_not_found.html', {'deviceid': device})
+        if not database_helper.fetch_deviceid_soft(device):
+		if not database_helper.fetch_deviceid_hard(device):
+            		return render_to_response('device_not_found.html', {'deviceid': device})
     except:
         try:
 		device_details = Devicedetails.objects.filter(hashkey=device)
@@ -190,7 +196,7 @@ def linegraph_rtt(request):
   
     details = Devicedetails.objects.filter(deviceid=device)[0]
 
-    all_device_details= MRtt.objects.filter(average__lte=3000).order_by('eventstamp')
+    all_device_details= MRtt.objects.filter(average__lte=3000)
 
     other_device_details = []
     filtered_deviceids = []	
@@ -246,9 +252,12 @@ def linegraph_bytes_hour(request):
 
     details = Devicedetails.objects.filter(deviceid=device)[0]
 
-    all_device_details= BytesPerHour.objects.filter(dstip='143.215.131.173')
-    device_details = all_device_details.filter(deviceid=device)
-   
+    node = database_helper.deviceid_to_nodeid(device)
+
+    all_device_details= BytesPerMinute.objects.all()
+    print node
+    device_details = all_device_details.filter(node_id=node)
+    print len(device_details)
     other_device_details = []
     filtered_deviceids = []	
 
@@ -260,16 +269,19 @@ def linegraph_bytes_hour(request):
 
     for row in filtered_deviceids:
 	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
-
+    
     result=[]
-    result.append(cvs_helper.linegraph_normal(device_details,'bytes-per-minute'))
+    result.append(cvs_helper.linegraph_normal_timestamp(device_details,'bytes-per-minute'))
 
-
+    '''
     if (filter_by != 'none'):
 	bucket_width = 2*3600
 	result.append(cvs_helper.linegraph_bucket(other_device_details,bucket_width,'median'))
+    '''
     answer = str(result).replace("['","[")
     answer = answer.replace(")'",")")
 
     return HttpResponse("(" + answer + ")")
+    
+
 
