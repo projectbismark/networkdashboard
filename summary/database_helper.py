@@ -14,11 +14,10 @@ def fetch_deviceid_soft(device):
 	device_search = Devicedetails.objects.filter(deviceid=device)
 	try:
 		if len(device_search)>0:
-			print "soft found"
 			return True
 	except:
 		pass
-	
+
 	return False
 	
 
@@ -31,6 +30,7 @@ def fetch_deviceid_hard(device):
 		if (len(device_search)>0):
 			return True
 	except:
+
 		device_search = MRtt.objects.filter(deviceid=device)
 
 	try:
@@ -128,7 +128,7 @@ def save_device_details_from_request(request,device):
     details.save()
 
 def save_device_details_from_default(device):
-    hashing = view_helper.get_hash(device)
+    hashing = views_helper.get_hash(device)
     device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now(),name="default name",hashkey=hashing)
     device_entry.save()
 

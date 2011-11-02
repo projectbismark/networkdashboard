@@ -47,12 +47,8 @@ def sharedDeviceSummary(request,devicehash):
     return views_helper.get_response_for_devicehtml(device_details[0])
 
 def devicesummary(request):
-<<<<<<< HEAD
-    device = str(request.POST.get("device"))
-=======
 
-    device = request.POST.get("device")
->>>>>>> experiment
+    device = str(request.POST.get("device"))
     device = device.replace(':', '')
     hashing = views_helper.get_hash(device)
     
@@ -62,23 +58,17 @@ def devicesummary(request):
         except:
             return render_to_response('invalid_edit.html', {'deviceid' : hashing})
      
-    try:	
-        if not database_helper.fetch_deviceid_soft(device):
-		if not database_helper.fetch_deviceid_hard(device):
-            		return render_to_response('device_not_found.html', {'deviceid': device})
-    except:
-        try:
-		device_details = Devicedetails.objects.filter(hashkey=device)
-		if len(device_details)>0:
-			device = device_details[0].deviceid		
-		else:
-			return render_to_response('device_not_found.html', {'deviceid': device})
-	except:
+ 
+    if not database_helper.fetch_deviceid_soft(device):
+	if not database_helper.fetch_deviceid_hard(device):
 		return render_to_response('device_not_found.html', {'deviceid': device})
 
+       
+    
     device_details = Devicedetails.objects.filter(deviceid=device)
     try: 
         if len(device_details)<1:
+	    
             database_helper.save_device_details_from_default(device)
             device_details = Devicedetails.objects.filter(deviceid=device)
     except:
