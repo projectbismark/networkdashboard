@@ -77,7 +77,7 @@ def linegraph_normal(data,title):
 def linegraph_normal_passive(data,title):
     result={}
     result['name'] = title
-    result['type'] = "bar"
+    result['type'] = "column"
     output= []
    
     for measure in data:
