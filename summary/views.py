@@ -261,7 +261,7 @@ def linegraph_bytes_hour(request):
 	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
     
     result=[]
-    result.append(cvs_helper.linegraph_normal_timestamp(device_details,'bytes-per-minute'))
+    result.append(cvs_helper.linegraph_normal_passive(device_details,'bytes per hour'))
 
     '''
     if (filter_by != 'none'):

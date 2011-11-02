@@ -74,10 +74,10 @@ def linegraph_normal(data,title):
     return result
 
 
-def linegraph_normal_timestamp(data,title):
+def linegraph_normal_passive(data,title):
     result={}
     result['name'] = title
-    result['type'] = "spline"
+    result['type'] = "bar"
     output= []
    
     for measure in data:
