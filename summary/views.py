@@ -47,7 +47,7 @@ def sharedDeviceSummary(request,devicehash):
     return views_helper.get_response_for_devicehtml(device_details[0])
 
 def devicesummary(request):
-    device = request.POST.get("device")
+    device = str(request.POST.get("device"))
     device = device.replace(':', '')
     hashing = views_helper.get_hash(device)
 	
