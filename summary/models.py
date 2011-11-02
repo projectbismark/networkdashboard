@@ -494,3 +494,19 @@ class MUlrttup(models.Model):
     class Meta:
         db_table = u'm_ulrttup'
 
+class BytesPerHour_mem(models.Model):
+    node_id = models.TextField()
+    eventstamp = models.DateTimeField()
+    bytes_transferred = models.TextField()
+    class Meta:
+	db_table = u'"bismark_passive"."bytes_per_hour_memoized"'
+
+
+class BytesPerMinute(models.Model):
+    node_id = models.TextField()
+    timestamp = models.DateTimeField()
+    bytes_transferred = models.TextField()
+    class Meta:
+	db_table = u'"bismark_passive"."bytes_per_minute"'
+
+
