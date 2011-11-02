@@ -79,14 +79,14 @@ def linegraph_normal_timestamp(data,title):
     result['name'] = title
     result['type'] = "spline"
     output= []
-
+   
     for measure in data:
 
 	if(measure.bytes_transferred <= 0):
 		continue
 	temp=[]
 	
-	temp.append(datetime_helper.datetime_to_JSON(measure.timestamp))
+	temp.append(datetime_helper.datetime_to_JSON(measure.eventstamp))
 	temp.append(int(measure.bytes_transferred))
 	output.append(temp)
 

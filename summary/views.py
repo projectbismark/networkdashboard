@@ -241,10 +241,10 @@ def linegraph_bytes_hour(request):
     filter_by = request.GET.get('filter_by')
 
     details = Devicedetails.objects.filter(deviceid=device)[0]
-
+	
     node = database_helper.deviceid_to_nodeid(device)
 
-    all_device_details= BytesPerMinute.objects.all()
+    all_device_details= BytesPerHour_mem.objects.all()
     print node
     device_details = all_device_details.filter(node_id=node)
     print len(device_details)
