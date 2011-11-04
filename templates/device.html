@@ -127,6 +127,51 @@
         var filter = "none";
         var divid = "graph_div_1";
         var titlename ="Download Throughput";
+        var legend = {
+            enabled: true,
+            align: 'right',
+            backgroundColor: '#FCFFC5',
+            borderColor: 'black',
+            borderWidth: 2,
+            layout: 'vertical',
+            verticalAlign: 'top',
+            y: 100,
+            shadow: true
+        };
+        var rangeselector={
+                buttons: [{
+                        type: 'day',
+                        count: 1,
+                        text: '1d'
+                }, {
+                        type: 'week',
+                        count: 1,
+                        text: '1w'
+                }, {
+                        type: 'month',
+                        count: 1,
+                        text: '1m'
+                }, {
+                        type: 'month',
+                        count: 3,
+                        text: '3m'
+                }, {
+                        type: 'month',
+                        count: 6,
+                        text: '6m'
+                }, {
+                        type: 'ytd',
+                        text: 'YTD'
+                }, {
+                        type: 'year',
+                        count: 1,
+                        text: '1y'
+                }, {
+                        type: 'all',
+                        text: 'All'
+                }],
+                selected: 1
+            };
 
        	render();
 	
@@ -180,52 +225,9 @@
                 backgroundColor: "rgb(249,249,255)"
             },
             
-            legend: {
-            enabled: true,
-            align: 'right',
-            backgroundColor: '#FCFFC5',
-            borderColor: 'black',
-            borderWidth: 2,
-            layout: 'vertical',
-            verticalAlign: 'top',
-            y: 100,
-            shadow: true
-        },
+            legend: legend,
 
-            rangeSelector: {
-                buttons: [{
-                        type: 'day',
-                        count: 1,
-                        text: '1d'
-                }, {
-                        type: 'week',
-                        count: 1,
-                        text: '1w'
-                }, {
-                        type: 'month',
-                        count: 1,
-                        text: '1m'
-                }, {
-                        type: 'month',
-                        count: 3,
-                        text: '3m'
-                }, {
-                        type: 'month',
-                        count: 6,
-                        text: '6m'
-                }, {
-                        type: 'ytd',
-                        text: 'YTD'
-                }, {
-                        type: 'year',
-                        count: 1,
-                        text: '1y'
-                }, {
-                        type: 'all',
-                        text: 'All'
-                }],
-                selected: 1
-            },
+            rangeSelector: rangeselector,
 
             title: {
                 text: titlename
@@ -255,53 +257,9 @@
                 backgroundColor: "rgb(249,249,255)"
             },
             
-            legend: {
-            enabled: true,
-            align: 'right',
-            backgroundColor: '#FCFFC5',
-            borderColor: 'black',
-            borderWidth: 2,
-            layout: 'vertical',
-            verticalAlign: 'top',
-            y: 100,
-            shadow: true
-        },
+            legend: legend,
 
-
-            rangeSelector: {
-                buttons: [{
-                        type: 'day',
-                        count: 1,
-                        text: '1d'
-                }, {
-                        type: 'week',
-                        count: 1,
-                        text: '1w'
-                }, {
-                        type: 'month',
-                        count: 1,
-                        text: '1m'
-                }, {
-                        type: 'month',
-                        count: 3,
-                        text: '3m'
-                }, {
-                        type: 'month',
-                        count: 6,
-                        text: '6m'
-                }, {
-                        type: 'ytd',
-                        text: 'YTD'
-                }, {
-                        type: 'year',
-                        count: 1,
-                        text: '1y'
-                }, {
-                        type: 'all',
-                        text: 'All'
-                }],
-                selected: 1
-            },
+            rangeSelector: rangeselector,
 
             title: {
                 text: "Upload Throughput"
