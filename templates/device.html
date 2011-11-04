@@ -234,8 +234,26 @@
             },
 
             xAxis: {
-                maxZoom: 14 * 24 * 3600000 // fourteen days
+                maxZoom: 1 * 24 * 3600000 // fourteen days
             },
+            yAxis: {
+                min: 0,
+                maxZoom: 10000,
+                title: {
+                    text: units,
+                    style:{
+                        fontSize: 15
+                    }
+                }
+              
+            },
+            
+            tooltip: {
+                                       formatter: function() {
+                                       return ''+
+                                                       Highcharts.dateFormat('%e. %b %Y, %H:00', this.x) +': '+ this.yAxis.maxZoom +' m/s';
+                                       }
+                               },
             
             series: eval(data)
         });
