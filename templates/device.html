@@ -127,6 +127,9 @@
         var filter = "none";
         var divid = "graph_div_1";
         var titlename ="Download Throughput";
+        var formatter = function(){
+            return ''+ Highcharts.dateFormat('%e. %b %Y, %l %p', this.x) +': <br/> <br/><b>'+ this.points[0].y +'</b> m/s';
+        };
         var legend = {
             enabled: true,
             align: 'right',
@@ -188,6 +191,9 @@
                         special = true;
                         titlename = "Round-Trip Time";
                         divid = "graph_div_1";
+                        formatter = function(){
+                            return ''+ Highcharts.dateFormat('%e. %b %Y, %l %p', this.x) +': <br/> <br/><b>'+ this.points[0].y +'</b> msec';
+                        }
 		}
 		else if(g1rb2.checked)
 		{
@@ -197,21 +203,31 @@
                         special = true;
                         titlename = "Last Mile Latency";
                         divid = "graph_div_1";
+                        formatter = function(){
+                            return ''+ Highcharts.dateFormat('%e. %b %Y, %l %p', this.x) +': <br/> <br/><b>'+ this.points[0].y +'</b> msec';
+                        }
 		}
 		else if(g1rb3.checked)
 		{
 			limit = 1000000;
-			units = "kbps";
+			units = "KBps";
 			paramselect = "AGGL3BITRATE";
                         special = false;
                         titlename = "Download Throughput";
                         divid = "graph_div_1";
+                        formatter = function(){
+                            return ''+ Highcharts.dateFormat('%e. %b %Y, %l %p', this.x) +': <br/> <br/><b>'+ this.points[0].y+'</b> KBps';
+                        }
 		}
                 else if(g1rb4.checked)
                 {
                         paramselect = "PASSIVE";
                         titlename = "Passive Data";
                         divid = "graph_div_1";
+                        units = "MB"
+                        formatter = function(){
+                            return ''+ Highcharts.dateFormat('%e. %b %Y, %l %p', this.x) +': <br/> <br/><b>'+ parseInt(this.points[0].y/1000/1000) +'</b> MB';
+                        }
                 }
                  
 	}
@@ -249,11 +265,8 @@
             },
             
             tooltip: {
-                                       formatter: function() {
-                                       return ''+
-                                                       Highcharts.dateFormat('%e. %b %Y, %l %p', this.x) +': <br/> <br/><b>'+ this.points[0].y +'</b> m/s';
-                                       }
-                               },
+                                       formatter: formatter
+            },
             
             series: eval(data)
         });
@@ -287,6 +300,9 @@
                 maxZoom: 14 * 24 * 3600000 // fourteen days
             },
             
+            tooltip: {
+                                       formatter: formatter
+            },
             series: eval(data)
         });
             }
