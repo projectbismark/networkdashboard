@@ -251,7 +251,7 @@
             tooltip: {
                                        formatter: function() {
                                        return ''+
-                                                       Highcharts.dateFormat('%e. %b %Y, %H:00', this.x) +': '+ this.yAxis.maxZoom +' m/s';
+                                                       Highcharts.dateFormat('%e. %b %Y, %l %p', this.x) +': <br/> <br/><b>'+ this.points[0].y +'</b> m/s';
                                        }
                                },
             
