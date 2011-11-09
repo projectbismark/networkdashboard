@@ -277,16 +277,29 @@ def feedback(request):
 	return render_to_response('feedback.html', {'device' : request.GET.get('device')})
 
 def send_feedback(request):
-	#device = request.POST.get('device')
-	message = "test"#request.POST.get('message')
+
+	device = request.POST.get('device')
 	sender = "abhishekjain95@gmail.com"#request.POST.get('sender')
+	message = request.POST.get('message')
+
+	details = Devicedetails.objects.filter(deviceid=device)[0]
+
+	displayURL = "http://networkdashboard.org/displayDevice/" + details.hashkey
+	
+	message = "URL: " + displayURL + "\n" +
+		  "email: " + sender + "\n\n" +
+		  "message: " + message
+
+	subject = "feedback: " + device
+
 	receivers = ['bismarkfeedback@gmail.com']
+
 	try:
-		email_helper.send_email(sender,receivers,message)
+		email_helper.send_email(sender,receivers,subject,message)
 	except:
-		print "failed"
+	
 		return HttpResponse("fail")
-	print "worked"
+	
 	return HttpResponse("success")
 
 	
