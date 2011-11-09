@@ -8,7 +8,7 @@ def send_email(has,sender,message):
 
 	displayURL = "http://networkdashboard.org/displayDevice/" + has
 	
-	message = "URL: " + displayURL + "\n" + "email: " + sender + "\n\n" +"message: " + message
+	message = "URL: " + displayURL + "\n" + "email: " + sender + "\n\n"  + message
 
 	subject = "feedback: " + details.deviceid
 

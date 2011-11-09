@@ -279,7 +279,7 @@ def feedback(request):
 def send_feedback(request):
 
 	has = request.POST.get('hashkey')
-	sender = "abhishekjain95@gmail.com"#request.POST.get('sender')
+	sender = request.POST.get('sender')
 	message = request.POST.get('message')
 
 	try:
