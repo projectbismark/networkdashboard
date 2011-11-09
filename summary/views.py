@@ -135,8 +135,8 @@ def linegraph_bitrate(request):
     my_device_details_netperf_3 = my_device_details.filter(toolid='NETPERF_3')
     my_device_details_other = my_device_details.exclude(toolid='NETPERF_3')
     result=[]
-    result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"multi"))
-    result.append(cvs_helper.linegraph_normal(my_device_details_other,"single"))
+    result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"multi-threaded tcp"))
+    result.append(cvs_helper.linegraph_normal(my_device_details_other,"single-threaded tcp"))
 	
     if (filter_by != 'none'):
 	bucket_width = 24*3600
