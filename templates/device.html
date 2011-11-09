@@ -46,7 +46,9 @@
  
 <tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
 
-<tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}" ></td>
+<tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}" ></td></tr>
+<tr><td><a href ="/feedback.html/?device={{device}}" onClick ="return popup(this, 'feedback')"><b>Feedback</b></a></td></tr>
+    
 </table>
 </div>
 </div>
@@ -233,6 +235,21 @@
 	}
 
      
+        function feedback(link,windowname){
+            if (! window.focus){
+                return true;
+            }
+            var href;
+            if (typeof(mylink) == 'string'){
+               href=link;
+            }
+            else{
+               href=link.href;
+            }
+            window.open(href, windowname, 'width=400,height=200,scrollbars=yes');
+            return false;
+        }
+        
         function OnSuccess(data){
             if(data.length>200){
             window.chart = new Highcharts.StockChart({
