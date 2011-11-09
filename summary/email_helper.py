@@ -1,7 +1,20 @@
 import smtplib
 from email.mime.text import MIMEText
+from networkdashboard.summary.models import *
 
-def send_email(sender,receivers,subject,message):
+def send_email(has,sender,message):
+
+	details = Devicedetails.objects.filter(hashkey=has)[0]
+
+	displayURL = "http://networkdashboard.org/displayDevice/" + has
+	
+	message = "URL: " + displayURL + "\n" +
+		  "email: " + sender + "\n\n" +
+		  "message: " + message
+
+	subject = "feedback: " + details.deviceid
+
+	receivers = ['bismarkfeedback@gmail.com']
 
 	smtpserver = 'smtp.gmail.com'
 	AUTHREQUIRED = 1 

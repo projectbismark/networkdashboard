@@ -278,24 +278,12 @@ def feedback(request):
 
 def send_feedback(request):
 
-	hash = request.POST.get('hashkey')
+	has = request.POST.get('hashkey')
 	sender = "abhishekjain95@gmail.com"#request.POST.get('sender')
 	message = request.POST.get('message')
 
-	details = Devicedetails.objects.filter(hashkey=hasg)[0]
-
-	displayURL = "http://networkdashboard.org/displayDevice/" + hash
-	
-	message = "URL: " + displayURL + "\n" +
-		  "email: " + sender + "\n\n" +
-		  "message: " + message
-
-	subject = "feedback: " + details.deviceid
-
-	receivers = ['bismarkfeedback@gmail.com']
-
 	try:
-		email_helper.send_email(sender,receivers,subject,message)
+		email_helper.send_email(has,sender,message)
 	except:
 	
 		return HttpResponse("fail")
