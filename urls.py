@@ -17,6 +17,8 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
      (r'^admin/', include(admin.site.urls)),
 
+#feedback.html?device=231425325
+
     # site URLs
      (r'^$', 'networkdashboard.summary.views.index'),
      (r'^devices/', 'networkdashboard.summary.views.showdevices'),
@@ -44,7 +46,8 @@ urlpatterns = patterns('',
      (r'^line_passive/', 'networkdashboard.summary.views.linegraph_bytes_hour'),
      (r'^data/', 'networkdashboard.summary.views.pie_chart'),
      (r'^newuser.html', 'networkdashboard.summary.views.newuser'),
-     (r'^feedback/', 'networkdashboard.summary.views.feedback'),
+     (r'^feedback.html', 'networkdashboard.summary.views.feedback'),
+     (r'^send_feedback/', 'networkdashboard.summary.views.send_feedback'),
      (r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root':settings.MEDIA_ROOT})
 
 )

@@ -272,9 +272,12 @@ def linegraph_bytes_hour(request):
     answer = answer.replace(")'",")")
 
     return HttpResponse("(" + answer + ")")
-    
-
+  
 def feedback(request):
+	return render_to_response('feedback.html', {'device' : request.GET.get('device')})
+
+def send_feedback(request):
+	#device = request.POST.get('device')
 	message = "test"#request.POST.get('message')
 	sender = "abhishekjain95@gmail.com"#request.POST.get('sender')
 	receivers = ['bismarkfeedback@gmail.com']

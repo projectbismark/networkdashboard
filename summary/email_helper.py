@@ -9,7 +9,7 @@ def send_email(sender,receivers,message):
 	smtppass = 'password89'
 	
 	RECIPIENTS = receivers
-	SENDER = receivers[0]
+	SENDER = sender
 	
 	msg = MIMEText(message)
 	msg['Subject'] = 'Bismark Feedback'
