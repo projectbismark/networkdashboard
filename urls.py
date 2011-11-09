@@ -20,6 +20,7 @@ urlpatterns = patterns('',
     # site URLs
      (r'^$', 'networkdashboard.summary.views.index'),
      (r'^devices/', 'networkdashboard.summary.views.showdevices'),
+     (r'^feedback/', 'networkdashboard.summary.views.showdevices'),
      (r'^activedevices/', 'networkdashboard.summary.views.showactivedevices'),
      (r'^device', 'networkdashboard.summary.views.devicesummary'),
      (r'^getCoordinates', 'networkdashboard.summary.views.getCoordinates'),
