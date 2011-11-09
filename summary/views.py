@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from time import time,mktime,strftime
 from mx.DateTime.ISO import ParseDateTimeUTC
 import hashlib
-import cvs_helper,datetime_helper,database_helper,views_helper
+import cvs_helper,datetime_helper,database_helper,views_helper,email_helper
 
 def index(request):
     return render_to_response('index.html')
@@ -155,7 +155,7 @@ def linegraph_lmrtt(request):
 
     details = Devicedetails.objects.filter(deviceid=device)[0]
 
-    all_device_details= MLmrtt.objects.filter(average__lte=3000)
+    all_device_details= MLmrtt.objects.filter(average__lte=3000).order_by('eventstamp')
     device_details = all_device_details.filter(deviceid=device)
    
     other_device_details = []
@@ -186,7 +186,7 @@ def linegraph_rtt(request):
   
     details = Devicedetails.objects.filter(deviceid=device)[0]
 
-    all_device_details= MRtt.objects.filter(average__lte=3000)
+    all_device_details= MRtt.objects.filter(average__lte=3000).order_by('eventstamp')
 
     other_device_details = []
     filtered_deviceids = []	
@@ -274,4 +274,15 @@ def linegraph_bytes_hour(request):
     return HttpResponse("(" + answer + ")")
     
 
+def feedback(request):
+	message = request.POST.get('message')
+	sender = request.POST.get('sender')
+	receivers = ['bismarkfeedback@gmail.com']
+	try:
+		email_helper.send_email(sender,receivers,message)
+	except:
+		return HttpResponse("fail")
 
+	return HttpResponse("success")
+
+	
