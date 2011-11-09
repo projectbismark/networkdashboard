@@ -60,6 +60,11 @@ DIV.section {
     box-shadow:2px 2px 2px #333333;
 /*    background-image: -o-linear-gradient(left,rgb(249,249,255),rgb(230,234,240));*/
 }
+
+
+#feedback_link{
+    text-align:right;
+}
 #section_text{
     padding: 10px;
     text-align:left;
