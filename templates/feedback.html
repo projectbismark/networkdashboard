@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form name="feedbackForm" action="/feedback/?device={{device.hashkey}}" method="POST">
+
+    <textarea name="message" cols="40" rows="5">Please any issues or suggestions here. Thanks!
+    </textarea></br>
+    <input type = "text" name = "sender" value ="test"/>
+    <input type ="submit" value ="Submit"/>
+</form>
+
+
+{% endblock %}
+
+
