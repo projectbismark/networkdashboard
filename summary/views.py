@@ -274,23 +274,23 @@ def linegraph_bytes_hour(request):
     return HttpResponse("(" + answer + ")")
   
 def feedback(request):
-	return render_to_response('feedback.html', {'device' : request.GET.get('device')})
+	return render_to_response('feedback.html', {'hashkey' : request.GET.get('hashkey')})
 
 def send_feedback(request):
 
-	device = request.POST.get('device')
+	hash = request.POST.get('hashkey')
 	sender = "abhishekjain95@gmail.com"#request.POST.get('sender')
 	message = request.POST.get('message')
 
-	details = Devicedetails.objects.filter(deviceid=device)[0]
+	details = Devicedetails.objects.filter(hashkey=hasg)[0]
 
-	displayURL = "http://networkdashboard.org/displayDevice/" + details.hashkey
+	displayURL = "http://networkdashboard.org/displayDevice/" + hash
 	
 	message = "URL: " + displayURL + "\n" +
 		  "email: " + sender + "\n\n" +
 		  "message: " + message
 
-	subject = "feedback: " + device
+	subject = "feedback: " + details.deviceid
 
 	receivers = ['bismarkfeedback@gmail.com']
 
