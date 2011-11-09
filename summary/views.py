@@ -286,8 +286,8 @@ def send_feedback(request):
 		email_helper.send_email(has,sender,message)
 	except:
 	
-		return HttpResponse("fail")
+		return HttpResponse("your feedback is on its way. Thank you!")
 	
-	return HttpResponse("success")
+	return HttpResponse("feedback received. Thank you!")
 
 	
