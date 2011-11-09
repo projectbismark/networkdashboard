@@ -275,14 +275,15 @@ def linegraph_bytes_hour(request):
     
 
 def feedback(request):
-	message = request.POST.get('message')
-	sender = request.POST.get('sender')
+	message = "test"#request.POST.get('message')
+	sender = "abhishekjain95@gmail.com"#request.POST.get('sender')
 	receivers = ['bismarkfeedback@gmail.com']
 	try:
 		email_helper.send_email(sender,receivers,message)
 	except:
+		print "failed"
 		return HttpResponse("fail")
-
+	print "worked"
 	return HttpResponse("success")
 
 	
