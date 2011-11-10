@@ -170,7 +170,7 @@ def linegraph_lmrtt(request):
     for row in filtered_deviceids:
 	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
     result=[]
-    result.append(cvs_helper.linegraph_normal(device_details,'last-minute Rtt'))
+    result.append(cvs_helper.linegraph_normal(device_details,'last-mile Rtt'))
 
     if (filter_by != 'none'):
 	bucket_width = 2*3600
