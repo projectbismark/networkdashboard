@@ -12,7 +12,7 @@ def send_email(has,sender,message):
 
 	subject = "feedback: " + details.deviceid
 
-	receivers = ['bismarkfeedback@gmail.com']
+	receivers = ['bismarkfeedback@gmail.com','bismark-core@projectbismark.net']
 
 	smtpserver = 'smtp.gmail.com'
 	AUTHREQUIRED = 1 
