@@ -143,6 +143,8 @@
             y: 100,
             shadow: true
         };
+        
+        
         var rangeselector={
                 buttons: [{
                         type: 'day',
@@ -177,6 +179,8 @@
                 }],
                 selected: 1
             };
+            
+        var plotoptions = {};
 
        	render();
 	
@@ -196,6 +200,7 @@
                         formatter = function(){
                             return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />' + Highcharts.dateFormat('%A, %e. %b %Y, %l:%M %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y) +'</b> msec';
                         }
+                        plotoptions = {};
 		}
 		else if(g1rb2.checked)
 		{
@@ -208,6 +213,7 @@
                         formatter = function(){
                             return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A, %e. %b %Y, %l:%M %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y) +'</b> msec';
                         }
+                        plotoptions = {};
 		}
 		else if(g1rb3.checked)
 		{
@@ -220,6 +226,7 @@
                         formatter = function(){
                             return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y)+'</b> KBps';
                         }
+                        plotoptions = {};
 		}
                 else if(g1rb4.checked)
                 {
@@ -230,6 +237,26 @@
                         formatter = function(){
                             return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y/1000/1000) +'</b> MB';
                         }
+                        plotoptions ={
+                            series:{
+                               dataGrouping:{
+                                   groupPixelWidth: 50,
+                                   units: [[
+                                            'hour',
+                                            [1]
+                                    ], [
+                                            'day',
+                                            [1]
+                                    ], [
+                                            'week',
+                                            [1]
+                                    ], [
+                                            'month',
+                                            [1, 3, 6]
+                                    ]]
+                               } 
+                            }
+                        };
                 }
                  
 	}
@@ -266,26 +293,7 @@
                 text: titlename
             },
             
-            plotOptions:{
-                series:{
-                   dataGrouping:{
-                       groupPixelWidth: 50,
-                       units: [[
-                                'hour',
-                                [1]
-                        ], [
-                                'day',
-                                [1]
-                        ], [
-                                'week',
-                                [1]
-                        ], [
-                                'month',
-                                [1, 3, 6]
-                        ]]
-                   } 
-                }
-            },
+            plotOptions: plotoptions,
 
             xAxis: {
                 maxZoom: 1 * 24 * 3600000 // fourteen days
