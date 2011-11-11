@@ -260,7 +260,25 @@
                             column: {
                               borderWidth: 0,
                               stacking: "normal"
-                            }
+                            },
+                            series:{
+                               dataGrouping:{
+                                   groupPixelWidth: 50,
+                                   units: [[
+                                            'hour',
+                                            [1]
+                                    ], [
+                                            'day',
+                                            [1]
+                                    ], [
+                                            'week',
+                                            [1]
+                                    ], [
+                                            'month',
+                                            [1, 3, 6]
+                                    ]]
+                               } 
+                            }                            
                         };
                 }
                  
