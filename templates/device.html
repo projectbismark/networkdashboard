@@ -194,7 +194,7 @@
                         titlename = "Round-Trip Time";
                         divid = "graph_div_1";
                         formatter = function(){
-                            return ''+ Highcharts.dateFormat('%e. %b %Y, %l %p', this.x) +': <br/> <br/><b>'+ this.points[0].y +'</b> msec';
+                            return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />' + Highcharts.dateFormat('%A, %e. %b %Y, %l:%M %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y) +'</b> msec';
                         }
 		}
 		else if(g1rb2.checked)
@@ -206,7 +206,7 @@
                         titlename = "Last Mile Latency";
                         divid = "graph_div_1";
                         formatter = function(){
-                            return ''+ Highcharts.dateFormat('%e. %b %Y, %l %p', this.x) +': <br/> <br/><b>'+ this.points[0].y +'</b> msec';
+                            return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A, %e. %b %Y, %l:%M %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y) +'</b> msec';
                         }
 		}
 		else if(g1rb3.checked)
@@ -218,7 +218,7 @@
                         titlename = "Download Throughput";
                         divid = "graph_div_1";
                         formatter = function(){
-                            return ''+ Highcharts.dateFormat('%e. %b %Y, %l %p', this.x) +': <br/> <br/><b>'+ this.points[0].y+'</b> KBps';
+                            return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y)+'</b> KBps';
                         }
 		}
                 else if(g1rb4.checked)
@@ -228,7 +228,7 @@
                         divid = "graph_div_1";
                         units = "MB"
                         formatter = function(){
-                            return ''+ Highcharts.dateFormat('%e. %b %Y, %l %p', this.x) +': <br/> <br/><b>'+ parseInt(this.points[0].y/1000/1000) +'</b> MB';
+                            return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y/1000/1000) +'</b> MB';
                         }
                 }
                  
@@ -269,9 +269,10 @@
             plotOptions:{
                 series:{
                    dataGrouping:{
+                       groupPixelWidth: 50,
                        units: [[
                                 'hour',
-                                [1,12]
+                                [1]
                         ], [
                                 'day',
                                 [1]
@@ -331,6 +332,27 @@
 
             title: {
                 text: "Upload Throughput"
+            },
+            
+            plotOptions:{
+                series:{
+                   dataGrouping:{
+                       groupPixelWidth: 50,
+                       units: [[
+                                'hour',
+                                [1]
+                        ], [
+                                'day',
+                                [1]
+                        ], [
+                                'week',
+                                [1]
+                        ], [
+                                'month',
+                                [1, 3, 6]
+                        ]]
+                   } 
+                }
             },
 
             xAxis: {
