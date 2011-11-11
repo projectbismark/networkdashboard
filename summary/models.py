@@ -502,6 +502,15 @@ class BytesPerHour_mem(models.Model):
 	db_table = u'"bismark_passive"."bytes_per_hour_memoized"'
 
 
+class BytesPerPortPerHour_mem(models.Model):
+    node_id = models.TextField()
+    eventstamp = models.DateTimeField()
+    port = models.TextField()
+    bytes_transferred = models.TextField()
+    class Meta:
+	db_table = u'"bismark_passive"."bytes_per_port_per_hour_memoized"'
+
+
 class BytesPerMinute(models.Model):
     node_id = models.TextField()
     eventstamp = models.DateTimeField()

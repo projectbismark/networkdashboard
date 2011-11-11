@@ -272,6 +272,44 @@ def linegraph_bytes_hour(request):
     answer = answer.replace(")'",")")
 
     return HttpResponse("(" + answer + ")")
+
+def linegraph_bytes_port_hour(request):
+    device = request.GET.get('deviceid')
+    filter_by = request.GET.get('filter_by')
+
+    details = Devicedetails.objects.filter(deviceid=device)[0]
+	
+    node = database_helper.deviceid_to_nodeid(device)
+
+    all_device_details= BytesPerPortPerHour_mem.objects.all().order_by('eventstamp')
+    print node
+    device_details = all_device_details.filter(node_id=node)
+    print len(device_details)
+    other_device_details = []
+    filtered_deviceids = []	
+
+    if (filter_by == 'location'):
+	filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
+
+    if (filter_by == 'provider'):
+	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
+
+    for row in filtered_deviceids:
+	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
+    
+    result=[]
+    result.append(cvs_helper.linegraph_normal_passive(device_details,'bytes per hour'))
+
+    '''
+    if (filter_by != 'none'):
+	bucket_width = 2*3600
+	result.append(cvs_helper.linegraph_bucket(other_device_details,bucket_width,'median'))
+    '''
+    answer = str(result).replace("['","[")
+    answer = answer.replace(")'",")")
+
+    return HttpResponse("(" + answer + ")")
+
   
 def feedback(request):
 	return render_to_response('feedback.html', {'hashkey' : request.GET.get('hashkey')})
@@ -290,4 +328,14 @@ def send_feedback(request):
 	
 	return HttpResponse("feedback received. Thank you!")
 
-	
+'''
+80	80	Web
+443	443	HTTPS
+993	993	IMAPS
+587	587	SMTPS
+995	995	POP3S
+5223	5223	JABBER
+53	53	DNS
+25	25	SMTP
+22	22	SSH
+'''
