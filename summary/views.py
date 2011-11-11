@@ -277,6 +277,10 @@ def linegraph_bytes_port_hour(request):
     device = request.GET.get('deviceid')
     filter_by = request.GET.get('filter_by')
 
+    port_names = ['Web','HTTPS','IMAPS','SMTPS','POP3S','JABBER','DNS','SMTP','SSH']
+    port_high = [80,443,993,587,995,5223,53,25,22] 
+    port_low = [80,443,993,587,995,5223,53,25,22] 
+
     details = Devicedetails.objects.filter(deviceid=device)[0]
 	
     node = database_helper.deviceid_to_nodeid(device)
@@ -298,7 +302,8 @@ def linegraph_bytes_port_hour(request):
 	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
     
     result=[]
-    result.append(cvs_helper.linegraph_normal_passive(device_details,'bytes per hour'))
+    for i in range(0,len(port_names)):
+    	result.append(cvs_helper.linegraph_normal_passive(device_details.filter(port=port_high[i]),port_names[i]))
 
     '''
     if (filter_by != 'none'):
