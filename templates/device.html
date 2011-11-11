@@ -247,6 +247,22 @@
                             }
                         };
                 }
+                else if(g1rb5.checked)
+                {
+                        paramselect = "PASSIVE_PORT";
+                        titlename = "Passive Data By Port";
+                        divid = "graph_div_1";
+                        units = "MB"
+                        formatter = function(){
+                            return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y/1000/1000) +'</b> MB';
+                        }
+                        plotoptions ={
+                            column: {
+                              borderWidth: 0,
+                              stacking: "normal"
+                            }
+                        };
+                }
                  
 	}
 
@@ -463,8 +479,15 @@
         deleteDivs();
         createGraphDivs();
 	OpenProgressBar();
-	
-        if (paramselect=="PASSIVE"){
+	if(paramselect=="PASSIVE_PORT"){
+            $.ajax({
+                        type: "GET",
+                        url: "/line_passive_port/",
+                        data: {'graphno' : 1, 'deviceid': "{{deviceid}}", 'filter_by': filter},
+                        success: OnSuccess
+                    });
+        }
+        else if (paramselect=="PASSIVE"){
             $.ajax({
                         type: "GET",
                         url: "/line_passive/",
