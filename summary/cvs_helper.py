@@ -57,7 +57,7 @@ def linegraph_bucket(data,bucket_size,title):
 def linegraph_normal(data,title):
     result={}
     result['name'] = title
-    result['type'] = "spline"
+    result['type'] = "line"
     output= []
 
     for measure in data:
