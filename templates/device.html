@@ -73,17 +73,9 @@
 <input type="radio" name="g1" id="g1rb1">
 <label for="g1rb1">Round Trip Time (ms)</label><br/><br/>
 <input type="radio" name="g1" id="g1rb4">
-<label for="g1rb1">Passive Measurements<p style="font-size: 12;">Note: Passive Data not collected without explicit permission by user</p></label><br/>
-
-
-</td>
-<td>
-
-
-</td>
-<tr/>
-
-</table>
+<label for="g1rb1">Passive Measurements</label><br/><br/>
+<input type="radio" name="g1" id="g1rb5">
+<label for="g1rb5">Passive Measurement By Port<p style="font-size: 12;">Note: Passive Data not collected without explicit permission by user</p></label>
 <div class="menu" id="drop_menu_1">
     Compare to other devices based on:<br/>
     <select id="select_menu_1">
@@ -92,9 +84,10 @@
         <option value ="provider">Provider({{num_provider}})</option>
     </select>
 </div>
-        
-<br />
 <button type="submit" name="submit" onClick=" render()">Display</button>
+</td>
+</tr>
+</table>
 
 </div>
 </div>
@@ -125,7 +118,6 @@
 	var units = "kbps";
 	var paramselect = "AGGL3BITRATE";
         var logdisplay = false;
-        var special = false;
         var filter = "none";
         var divid = "graph_div_1";
         var titlename ="Download Throughput";
@@ -194,7 +186,6 @@
 			limit = 1000;
 			units = "msec";
 			paramselect = "RTT";
-                        special = true;
                         titlename = "Round-Trip Time";
                         divid = "graph_div_1";
                         formatter = function(){
@@ -207,7 +198,6 @@
 			limit = 1000;
 			units = "msec";
 			paramselect = "LMRTT";
-                        special = true;
                         titlename = "Last Mile Latency";
                         divid = "graph_div_1";
                         formatter = function(){
@@ -220,7 +210,6 @@
 			limit = 1000000;
 			units = "KBps";
 			paramselect = "AGGL3BITRATE";
-                        special = false;
                         titlename = "Download Throughput";
                         divid = "graph_div_1";
                         formatter = function(){
