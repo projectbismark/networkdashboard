@@ -130,41 +130,11 @@
     <label for="log">Log</label><br /><br />
     </div>-->
 <script type="text/javascript">
-
-	var content="[not loaded]";
-	var limit = 1000000;
-	
-	var paramselect = "AGGL3BITRATE";
-        var logdisplay = false;
         var filter = "none";
-        
-        var formatter = function(){
-            return ''+ Highcharts.dateFormat('%e. %b %Y, %l %p', this.x) +': <br/> <br/><b>'+ this.points[0].y +'</b> m/s';
-        };
-        var legend = {
-            enabled: true,
-            align: 'right',
-            backgroundColor: '#FCFFC5',
-            borderColor: 'black',
-            borderWidth: 2,
-            layout: 'vertical',
-            verticalAlign: 'top',
-            y: 100,
-            shadow: true
-        };
-        
-        
-        
-            
-        var plotoptions = {};
+       
 
        	render();
 	
-	function createStyle()
-	{
-            var sel = document.getElementById("select_menu_1");
-            filter = sel.options[sel.selectedIndex].value;         
-	}
 
      
         function feedback(link,windowname){
@@ -394,118 +364,11 @@
                     div.innerHTML="<div id = 'error'><b>Insufficient Data</b></div>";
                 }
             }
-            
-            
-        
-        CloseProgressBar();
         }
-        
-  
-            
-		
-
-   
-        
-        function setDisplayMode(log){
-            g.updateOptions({logscale:log});
-            logdisplay = log;
-        }
-        
-        function convertURL(name){
-            return encodeURIComponent(name);
-        }
-        
-
-	
         function OnError(data)
         {
 	  alert("data loading failed");
         }
-        
-        function deleteDivs(){
-            
-            var dtag = document.getElementById('display_tag');
-            while(dtag.hasChildNodes()){
-                dtag.removeChild(dtag.lastChild);
-            }  
-        }
-        
-        function createGraphDivs(){
-            var dtag = document.getElementById('display_tag');
-            var outer = document.createElement('div');
-            outer.setAttribute('id','graph_div_outer');
-            outer.setAttribute('class','outergraphdiv');
-            var gd1 = document.createElement('div');
-            gd1.setAttribute('id','graph_div_1');
-            gd1.setAttribute('class','graphdiv');
-            outer.appendChild(gd1);
-            dtag.appendChild(outer);
-            if (paramselect == 'AGGL3BITRATE'){
-                outer = document.createElement('div');
-                outer.setAttribute('id','graph_div_outer2');
-                outer.setAttribute('class','outergraphdiv');
-                var gd2 = document.createElement('div');
-                gd2.setAttribute('id','graph_div_2');
-                gd2.setAttribute('class','graphdiv');
-
-                outer.appendChild(gd2);
-                dtag.appendChild(outer);
-            }
-            
-        }
-        
-        function addRadios(){
-            setDisplayMode(false);
-            if(document.getElementById('lin')){
-                return;
-            }
-            if(paramselect=='AGGL3BITRATE'){
-                return;
-            }
-            var dtag = document.getElementById('graph_div_outer');
-            var rdiv = document.createElement('div');
-            rdiv.setAttribute('class','radiodiv');
-            rdiv.setAttribute('id', 'radio_div');
-            var r1 = "<input type='radio' name = 'mode' id='lin' onClick='setDisplayMode(false)' checked>";
-            var r2 = "<input type='radio' name = 'mode' id='log' onClick='setDisplayMode(true)'>";
-            rdiv.innerHTML = "Linear: ";
-            rdiv.innerHTML += r1;
-            rdiv.innerHTML += "Log: ";
-            rdiv.innerHTML += r2;
-            dtag.appendChild(rdiv);
-        }
-        
-        
-        function addLabels(){
-            
-            if(document.getElementById('label_1')){
-                return;
-            }
-            var outer1 = document.getElementById('graph_div_outer');
-            var label1 = document.createElement('div');
-            
-            if(paramselect == "AGGL3BITRATE"){
-                var outer2 = document.getElementById('graph_div_outer2');
-                label1.innerHTML = '<b>Download Throughput (kbps)</b> <br />';
-                var label2 = document.createElement('div');
-                label2.innerHTML = '<br/><br/><b>Upload Throughput (kbps)</b><br />';
-                label2.setAttribute('id','label_2');
-                label2.setAttribute('align','center');
-                outer2.appendChild(label2);
-            }
-            else if(paramselect == "RTT"){
-                label1.innerHTML = '<b> Round Trip Time (msec)</b><br />';
-            }
-            else if(paramselect == "LMRTT"){
-                label1.innerHTML = '<b> Last-Mile Latency (msec)</b><br />';
-            }
-            
-            label1.setAttribute('id','label_1');
-            label1.setAttribute('align','center');
-            outer1.appendChild(label1);
-            
-        }
-       
         
         function createGraphs(){
             for (var i =0; i<6; i++){
@@ -521,27 +384,8 @@
 
 	function render()
 	{
-
-        //createStyle();
-        //deleteDivs();
-        //createGraphDivs();
         createGraphs();
-        
         }
-
-    function CloseProgressBar() {
-                var progressbar_container = document.getElementById("progress");
-                progressbar_container.style.display="none";
-                //document.getElementById("graph_div").display = "block";
-
-    }
-
-    function OpenProgressBar() {
-            var progressbar_container = document.getElementById("progress");
-            progressbar_container.style.display="block";
-
-
-    }
 
 </script>
 </body>
