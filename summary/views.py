@@ -223,7 +223,7 @@ def linegraph_rtt(request):
 	except:
 		continue
         
-    	device_details = MRtt.objects.filter(deviceid=device,average__lte=3000, dstip = row_ip["dstip"])
+    	device_details = MRtt.objects.filter(deviceid=device,average__lte=3000, dstip = row_ip["dstip"]).order_by('eventstamp')
 	result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup)))
 
     	if (filter_by != 'none'):
