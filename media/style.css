@@ -153,7 +153,6 @@ DIV.radiodiv {
 }
 
 DIV.graphdisplay {
-    height: 1000px;
 }
 
 DIV.progressbar {
@@ -182,6 +181,7 @@ DIV.graphdiv {
 
 
 DIV.outergraphdiv {
+    margin-top: 50px;
     margin-left:auto;
     margin-right:auto;
     width:901px;
@@ -195,7 +195,7 @@ DIV.outergraphdiv {
     box-shadow:2px 2px 2px #333333;*/
 }
 
-#graph_div_outer {
+/*#graph_div_outer_1 {
     margin-left:auto;
     margin-right:auto;
     position:relative;
@@ -205,7 +205,7 @@ DIV.outergraphdiv {
 #graph_div_outer2 {
     position: relative;
     top:40px;
-}
+}*/
 
 #label_1 {
     position:absolute;
