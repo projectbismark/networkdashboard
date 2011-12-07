@@ -52,50 +52,11 @@
 </table>
 </div>
 </div>
-<div class="section" id="section_2">
-    <div class ="banner" id ="banner_1"></div>
-    <div id ="section_text">
-
-<script type="text/javascript" src="/static/dygraph-combined.js"></script>
-
-
-<body class=" claro " onload="CloseProgressBar()">
-
-
-<table border="0"> 
-
-<tr>
-<td>
-<input type="radio" name="g1" id="g1rb3" checked>
-<label for="g1rb3">Upload and Download Throughput (kbps)</label><br/><br/>
-<input type="radio" name="g1" id="g1rb2">
-<label for="g1rb2">Last-Mile Latency (ms)</label><br/><br/>
-<input type="radio" name="g1" id="g1rb1">
-<label for="g1rb1">Round Trip Time (ms)</label><br/><br/>
-<input type="radio" name="g1" id="g1rb4">
-<label for="g1rb1">Passive Measurements</label><br/><br/>
-<input type="radio" name="g1" id="g1rb5">
-<label for="g1rb5">Passive Measurement By Port<p style="font-size: 12;">Note: Passive Data not collected without explicit permission by user</p></label>
-<div class="menu" id="drop_menu_1">
-    Compare to other devices based on:<br/>
-    <select id="select_menu_1">
-        <option value = "none" selected>Don't Compare</option>
-        <option value ="location">Location({{num_location}})</option>
-        <option value ="provider">Provider({{num_provider}})</option>
-    </select>
-</div>
-<button type="submit" name="submit" onClick=" render()">Display</button>
-</td>
-</tr>
-</table>
-
-</div>
-</div>
 
 
         
 
-<br />
+
 <div class="progresscontainer">
     <div class="progressbar" id="progress" indeterminate="true" title="loading" ></div>
 </div>

@@ -62,8 +62,8 @@ TEMPLATE_LOADERS = (
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/var/tmp/django_cache',
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache_table',
 	'TIMEOUT': 7200,
         'OPTIONS': {
             'MAX_ENTRIES': 2000
