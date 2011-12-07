@@ -61,6 +61,7 @@
     <div class="progressbar" id="progress" indeterminate="true" title="loading" ></div>
 </div>
 <br /><br /><br />
+
 <div class ="graphdisplay" id = "display_tag" >
     <div class ="outergraphdiv" id="graph_div_outer_1">
         <div class ="graphdiv" id="graph_div_1"></div>
@@ -74,12 +75,13 @@
     <div class ="outergraphdiv" id="graph_div_outer_4">
         <div class ="graphdiv" id="graph_div_4"></div>
     </div>
+    <!--
     <div class ="outergraphdiv" id="graph_div_outer_5">
         <div class ="graphdiv" id="graph_div_5"></div>
     </div>
     <div class ="outergraphdiv" id="graph_div_outer_6">
         <div class ="graphdiv" id="graph_div_6"></div>
-    </div>
+    </div>-->
         
 </div>
     
@@ -328,7 +330,7 @@
         }
         
         function createGraphs(){
-            for (var i =0; i<6; i++){
+            for (var i =0; i<4; i++){
                 var params = createParameters(i);
                 $.ajax({
                         type: "GET",
