@@ -125,9 +125,9 @@ def linegraph_bitrate(request):
 	other_device_details_other.extend(all_device_details.filter(deviceid=row.deviceid).exclude(toolid='NETPERF_3'))
 	other_device_details_netperf_3.extend(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))	
 	
-    if (graphno==2):
+    if (graphno==1):
 	all_device_details = all_device_details.filter(srcip='143.215.131.173')		
-    elif (graphno==1): 
+    elif (graphno==2): 
         all_device_details = all_device_details.filter(dstip='143.215.131.173')
 
     my_device_details = all_device_details.filter(deviceid=device)
