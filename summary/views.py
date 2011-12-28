@@ -5,11 +5,10 @@ from django.utils import simplejson
 import urllib2, urllib, json
 from django.shortcuts import render_to_response
 from networkdashboard.summary.models import *
-from pyofc2 import *
 import random
 from datetime import datetime, timedelta
 from time import time,mktime,strftime
-from mx.DateTime.ISO import ParseDateTimeUTC
+#from mx.DateTime.ISO import ParseDateTimeUTC
 import hashlib
 import cvs_helper,datetime_helper,database_helper,views_helper,email_helper
 
