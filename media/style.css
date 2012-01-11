@@ -1,8 +1,7 @@
 body, html { 
   color: #000000;
-  background: rgb(230,234,240);
+  background: rgb(234,234,240);
   padding-left: 1.5em;
-  width: 90%;
 }
 
 img {  
@@ -30,7 +29,7 @@ body {
         font-family: arial, sans-serif ;
         background: rgb(234,234,240);
         font-size: 9pt ;
-        margin: 25
+        width:90%;
 }
 
 ul {
@@ -42,7 +41,7 @@ li {
 	padding-bottom: 20px
 }
 
-DIV.tabs{
+div.tabs{
     height:500px;
     width: 901px;
     position:relative;
@@ -51,7 +50,7 @@ DIV.tabs{
     padding-top:20px;
 }
 
-DIV.tabs div a { 
+div.tabs div a { 
     margin-left: -1px; 
     position: relative; 
     left: 1px; 
@@ -65,27 +64,29 @@ DIV.tabs div a {
     border-bottom: 1px solid white; 
 }
 
-DIV.tabs div:not(target) a 
+div.tabs div:not(target) a 
 { 
   border-bottom: 0; 
-  background: -moz-linear-gradient(top, white, #eee);
+  background: -moz-linear-gradient(top, white, #c7c7cc);
+  background: -webkit-gradient(linear, center top, center bottom, from(#fff), to(#c7c7cc));
+  background-image: -o-linear-gradient(rgb(255,255,255),rgb(199,199,204));
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#c7c7cc');
+  
 }
 
-DIV.tabs div:target a{
+div.tabs div:target a{
   background:white;
+  background-color:rgb(255,255,255);
 }
 
-DIV.tabs div div{
-    z-index: -2;
+
+div.tabs div div{
+    position:absolute;
+    display:none;
 }
 
-DIV.tabs div:not(target) div{
-    position: absolute;
-}
-
-DIV.tabs div:target div{
-    position: absolute;
-    z-index:1;
+div.tabs div:target div, #tab1 div{
+    display:block;
 }
 
 
@@ -135,6 +136,7 @@ DIV.about {
     background-image: -o-linear-gradient(left,rgb(249,249,255),rgb(230,234,240));
     background: -webkit-gradient(linear, left top, right bottom, from(rgb(249,249,255)), to(rgb(230,234,240)));
     background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(230,234,240));*/
+    width:900px;
     background-color:rgb(249,249,255);
     border-left: solid 3px rgb(44,44,88);
     margin-left: auto;
@@ -166,6 +168,7 @@ DIV.progresscontainer {
 }
 
 DIV.map {
+    position: relative;
     width: 500px;
     height: 300px;
     text-align: center;
