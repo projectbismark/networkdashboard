@@ -38,21 +38,121 @@ ul {
 }
 
 li {
-	padding-bottom: 20px
+	/*padding-bottom: 20px*/
 }
 
-div.tabs{
+div.display{
+    width:901px;
     height:500px;
-    width: 901px;
+    margin-top:20px;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+ul.tabrow{
+    line-height:24px;
+    width: 100%;
     position:relative;
     margin-left:auto;
     margin-right:auto;
-    padding-top:20px;
+    padding-bottom:0;
 }
 
-div.tabs div a { 
-    margin-left: -1px; 
-    position: relative; 
+ul.tabrow:before {
+    z-index:1;
+}
+ul.tabrow li{
+    display:inline-block;
+    position:relative;
+    z-index:0;
+    text-align:center;
+    list-style:none;
+    border: 1px solid #AAA;
+    margin: 0 5px;
+    padding: 0 10px;
+    border-bottom: 0; 
+    background: -moz-linear-gradient(top, white, #c7c7cc);
+    background: -webkit-gradient(linear, center top, center bottom, from(#fff), to(#c7c7cc));
+    background-image: -o-linear-gradient(rgb(255,255,255),rgb(199,199,204));
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#c7c7cc');
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+
+
+}
+
+ul.tabrow li a{
+    text-decoration:none;
+}
+
+ul.tabrow:after{
+    position:absolute;
+    content: "";
+    width:100%;
+    bottom:0;
+    left:0;
+    border-bottom: 1px solid #AAA;
+    z-index: 1;
+}
+
+
+ul.tabrow li.selected{
+    background-color:#ffffff;
+    background:#ffffff;
+    color:#000000;
+    z-index:2;
+    border-bottom-color:#ffffff;
+}
+.content{
+    display:block;
+}
+#tab_content_2,#tab_content_3,#tab_content_4{
+    display:none;
+}
+
+ul.tabrow li:before,
+ul.tabrow li:after {
+    position: absolute;
+    bottom: 0px;
+    width: 6px;
+    height: 6px;
+    content: " ";
+}
+
+ul.tabrow li:after, .tabrow li:before {
+    border: 1px solid #AAA;
+}
+ul.tabrow li:before {
+    left: -7px;
+    border-bottom-right-radius: 6px;
+    border-width: 0 1px 1px 0;
+    box-shadow: 1px 1px 0 #ECECEC;
+
+}
+ul.tabrow li:after {
+    right: -7px;
+    border-bottom-left-radius: 6px;
+    border-width: 0 0 1px 1px;
+    box-shadow: -1px 1px 0 #ECECEC;
+
+}
+
+.tabrow li.selected:before {
+    box-shadow: 1px 1px 0 #FFF;
+}
+.tabrow li.selected:after {
+    box-shadow: -1px 1px 0 #FFF;
+}
+
+
+
+
+/*
+
+div.tabrow a { 
+    height:20px;
+    margin-left: 10px; 
+    position: inline; 
     left: 1px; 
     text-decoration: none; 
     color: black; 
@@ -64,30 +164,10 @@ div.tabs div a {
     border-bottom: 1px solid white; 
 }
 
-div.tabs div:not(target) a 
-{ 
-  border-bottom: 0; 
-  background: -moz-linear-gradient(top, white, #c7c7cc);
-  background: -webkit-gradient(linear, center top, center bottom, from(#fff), to(#c7c7cc));
-  background-image: -o-linear-gradient(rgb(255,255,255),rgb(199,199,204));
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#c7c7cc');
-  
-}
-
-div.tabs div:target a{
-  background:white;
-  background-color:rgb(255,255,255);
-}
 
 
-div.tabs div div{
-    position:absolute;
-    display:none;
-}
 
-div.tabs div:target div, #tab1 div{
-    display:block;
-}
+*/
 
 
 
@@ -115,7 +195,7 @@ DIV.section {
     text-align:right;
 }
 #section_text{
-    padding: 10px;
+    /*padding: 10px;*/
     text-align:left;
 }
 #banner_1{
@@ -233,7 +313,6 @@ DIV.graphdiv {
 
 
 DIV.outergraphdiv {
-    top:50px;
     width:901px;
     height: 453px;
     margin-left:auto;

@@ -56,39 +56,37 @@
 
         
 
-<!--
-<div class="progresscontainer">
-    <div class="progressbar" id="progress" indeterminate="true" title="loading" ></div>
-</div>
-<br /><br /><br />
--->
+<div class ="display">
+    <ul class ="tabrow">
+        <li class="selected" id="tab_1"><a href="javascript:changeTab(1,4,'tab_','tab_content_')">Download</a></li>
+        <li id="tab_2"><a href="javascript:changeTab(2,4,'tab_','tab_content_')">Upload</a></li>
+        <li id="tab_3"><a href="javascript:changeTab(3,4,'tab_','tab_content_')">Round-Trip</a></li>
+        <li id="tab_4"><a href="javascript:changeTab(4,4,'tab_','tab_content_')">Last Mile</a></li>
+    </ul>
 
-    <div class ="tabs">
-    <div id="tab1">
-        <a href="#tab1">Download</a>
+
+    <div class="tab" id="tab_content_1">  
         <div class ="outergraphdiv" id="graph_div_outer_1">
             <div class ="graphdiv" id="graph_div_1"></div>
         </div>
     </div>
-    <div id="tab2">
-        <a href="#tab2">Upload</a>
+    <div class="tab" id="tab_content_2"> 
         <div class ="outergraphdiv" id="graph_div_outer_2">
             <div class ="graphdiv" id="graph_div_2"></div>
         </div>
     </div>
-    <div id="tab3">
-        <a href="#tab3">Round-Trip</a>
+    <div class="tab" id="tab_content_3">  
         <div class ="outergraphdiv" id="graph_div_outer_3">
             <div class ="graphdiv" id="graph_div_3"></div>
         </div>
     </div>
-    <div id="tab4">
-        <a href="#tab4">Last Mile</a>
+    <div class="tab" id="tab_content_4">  
         <div class ="outergraphdiv" id="graph_div_outer_4">
             <div class ="graphdiv" id="graph_div_4"></div>
         </div>
     </div>
-    </div>
+    
+</div>
 
 <script type="text/javascript">
         var filter = "none";
@@ -108,6 +106,17 @@
             window.open(href, windowname, 'width=500,height=200,scrollbars=yes,location=0,status=0');
             return false;
         }
+        
+        function changeTab(active, total, tab, content) {  
+      
+            for (var i=1; i < total+1; i++) {  
+              document.getElementById(content+i).style.display = 'none';  
+              document.getElementById(tab+i).className = '';  
+            }  
+            document.getElementById(content+active).style.display = 'block';  
+            document.getElementById(tab+active).className = 'selected';      
+      
+        }  
         
         function createParameters(i){
             var url = "/line_bitrate/";
