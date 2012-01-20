@@ -244,9 +244,7 @@ def linegraph_bytes_hour(request):
     node = database_helper.deviceid_to_nodeid(device)
 
     all_device_details= BytesPerHour_mem.objects.all().order_by('eventstamp')
-    print node
     device_details = all_device_details.filter(node_id=node)
-    print len(device_details)
     other_device_details = []
     filtered_deviceids = []	
 
@@ -285,9 +283,7 @@ def linegraph_bytes_port_hour(request):
     node = database_helper.deviceid_to_nodeid(device)
 
     all_device_details= BytesPerPortPerHour_mem.objects.all().order_by('eventstamp')
-    print node
     device_details = all_device_details.filter(node_id=node)
-    print len(device_details)
     other_device_details = []
     filtered_deviceids = []	
 
