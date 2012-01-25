@@ -1,90 +1,83 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class ="section" id="section_1">
-    <div class ="banner" id ="banner_1"></div>
-    <div id="section_text">
-    <h1>BISMark Device           <a href ="/editDevicePage/{{detail.hashkey}}"> Edit </a></h1>
+<div class="container" id="c2">
 
-    <table>
-        <!--
-        <tr><td>MAC Address</td><td>{{ detail.macid }}</td></tr>
-        <tr><td>Type</td><td>{{ detail.type }}</td></tr>
-        <tr><td>Operating System</td><td>{{ detail.os }}</td></tr> -->
-        <tr><td><b>Name</b></td><td><b>{{ detail.name }}</b></td></tr>
-        <tr><td>ISP</td><td>{{ detail.isp }}</td></tr>
-        <tr><td>Location</td><td><div id="location{{ deviceid }}"></div><script type="text/javascript">
+    <div class="page-header">
+        <div class="header-text">
+          <h1>BISMark Device <a href ="/editDevicePage/{{detail.hashkey}}"> Edit </a></h1>
+        </div>
+    </div>
+    <div class="content">
+        <div class="row">
+            <div class="span10">
+                <div class ="section" id="section_1">
+                    <div id="section_text">
 
-		$.ajax({
-                type: "GET",
-                url: escape("/getLocation/{{ deviceid }}/"),
-                success: OnSuccess2
-            });
-		
-		function OnSuccess2(data)
-		{
-		document.getElementById('location{{ deviceid }}').innerHTML = data;
-		}
+                        <table class="info">
+                            <tr><td><b>Name</b></td><td><b>{{ detail.name }}</b></td></tr>
+                            <tr><td>ISP</td><td>{{ detail.isp }}</td></tr>
+                            <tr><td>Location</td><td><div id="location{{ deviceid }}"></div>
+                                <script type="text/javascript">
 
-		</script></td>
-        </tr>     
-        <tr><td>Service Plan</td><td>{{ detail.serviceplan }}</td></tr>
-        <tr><td>Download Rate</td><td>{{ detail.downloadrate}} kbps</td></tr>
-        <tr><td>Upload Rate</td><td>{{ detail.uploadrate}} kbps</td></tr>
-    
- 
-  
-        
-	
+                                    $.ajax({
+                                    type: "GET",
+                                    url: escape("/getLocation/{{ deviceid }}/"),
+                                    success: OnSuccess2
+                                });
 
-<tr><td>First Measurement</td><td>{{ firstUpdate }}</td></tr>
-<tr><td>Last Measurement</td><td>{{ lastUpdate }}</td></tr>
+                                    function OnSuccess2(data)
+                                    {
+                                    document.getElementById('location{{ deviceid }}').innerHTML = data;
+                                    }
 
- 
-<tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
-
-<tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}" ></td></tr>
-<tr><td><a href ="/feedback.html/?hashkey={{detail.hashkey}}" onClick ="return feedback(this, 'feedback')"><b>Feedback</b></a></td></tr>
-    
-</table>
+                                </script></td>
+                            </tr>     
+                            <tr><td>Service Plan</td><td>{{ detail.serviceplan }}</td></tr>
+                            <tr><td>Download Rate</td><td>{{ detail.downloadrate}} kbps</td></tr>
+                            <tr><td>Upload Rate</td><td>{{ detail.uploadrate}} kbps</td></tr>
+                            <tr><td>First Measurement</td><td>{{ firstUpdate }}</td></tr>
+                            <tr><td>Last Measurement</td><td>{{ lastUpdate }}</td></tr>
+                            <tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
+                            <tr><td><a href ="/feedback.html/?hashkey={{detail.hashkey}}" onClick ="return feedback(this, 'feedback')"><b>Feedback</b></a></td></tr>
+                        </table>
+                        URL for this device page: <input id="url" type="text" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}" />
+                    </div>
+                </div>
+            </div>
+            <div class="span4">
+                <div class ="display">
+                    <ul class ="tabrow">
+                        <li class="selected" id="tab_1"><a href="javascript:changeTab(1,4,'tab_','tab_content_')">Download</a></li>
+                        <li id="tab_2"><a href="javascript:changeTab(2,4,'tab_','tab_content_')">Upload</a></li>
+                        <li id="tab_3"><a href="javascript:changeTab(3,4,'tab_','tab_content_')">Round-Trip</a></li>
+                        <li id="tab_4"><a href="javascript:changeTab(4,4,'tab_','tab_content_')">Last Mile</a></li>
+                    </ul>
+                    <div class="tab" id="tab_content_1">  
+                        <div class ="outergraphdiv" id="graph_div_outer_1">
+                            <div class ="graphdiv" id="graph_div_1"></div>
+                        </div>
+                    </div>
+                    <div class="tab" id="tab_content_2"> 
+                        <div class ="outergraphdiv" id="graph_div_outer_2">
+                            <div class ="graphdiv" id="graph_div_2"></div>
+                        </div>
+                    </div>
+                    <div class="tab" id="tab_content_3">  
+                        <div class ="outergraphdiv" id="graph_div_outer_3">
+                            <div class ="graphdiv" id="graph_div_3"></div>
+                        </div>
+                    </div>
+                    <div class="tab" id="tab_content_4">  
+                        <div class ="outergraphdiv" id="graph_div_outer_4">
+                            <div class ="graphdiv" id="graph_div_4"></div>
+                        </div>
+                    </div>    
+                </div>  
+            </div>
+        </div>
+    </div>
 </div>
-</div>
-
-
-        
-
-<div class ="display">
-    <ul class ="tabrow">
-        <li class="selected" id="tab_1"><a href="javascript:changeTab(1,4,'tab_','tab_content_')">Download</a></li>
-        <li id="tab_2"><a href="javascript:changeTab(2,4,'tab_','tab_content_')">Upload</a></li>
-        <li id="tab_3"><a href="javascript:changeTab(3,4,'tab_','tab_content_')">Round-Trip</a></li>
-        <li id="tab_4"><a href="javascript:changeTab(4,4,'tab_','tab_content_')">Last Mile</a></li>
-    </ul>
-
-
-    <div class="tab" id="tab_content_1">  
-        <div class ="outergraphdiv" id="graph_div_outer_1">
-            <div class ="graphdiv" id="graph_div_1"></div>
-        </div>
-    </div>
-    <div class="tab" id="tab_content_2"> 
-        <div class ="outergraphdiv" id="graph_div_outer_2">
-            <div class ="graphdiv" id="graph_div_2"></div>
-        </div>
-    </div>
-    <div class="tab" id="tab_content_3">  
-        <div class ="outergraphdiv" id="graph_div_outer_3">
-            <div class ="graphdiv" id="graph_div_3"></div>
-        </div>
-    </div>
-    <div class="tab" id="tab_content_4">  
-        <div class ="outergraphdiv" id="graph_div_outer_4">
-            <div class ="graphdiv" id="graph_div_4"></div>
-        </div>
-    </div>
-    
-</div>
-
 <script type="text/javascript">
     renderGraphs("{{deviceid}}");
 </script>
