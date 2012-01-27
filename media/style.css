@@ -58,6 +58,10 @@ table td{
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
+#header1{
+    height:230px;
+}
+
 .content{
     position:relative;
     padding:0;
