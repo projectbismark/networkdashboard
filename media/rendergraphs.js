@@ -1,6 +1,7 @@
 var filter = "none"; 
 
 function createParameters(i){
+    var graphid = 1;
     var url = "/line_bitrate/";
     var graphno = 1;
     var divid = "graph_div_1";
@@ -60,11 +61,14 @@ function createParameters(i){
             formatter = function(){
                     return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y)+'</b> KBps';
                 };
+            graphid = 0;
             break;
+            
         case 1:
             divid = "graph_div_2";
             graphno = 2;
             titlename = "Upload Throughput";
+            graphid = 1;
             break;
         case 2:
             units = "msec";
@@ -74,6 +78,7 @@ function createParameters(i){
             formatter = function(){
                 return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />' + Highcharts.dateFormat('%A, %e. %b %Y, %l:%M %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y) +'</b> msec';
             }
+            graphid = 2;
             break;
         case 3:
             units = "msec";
@@ -83,6 +88,7 @@ function createParameters(i){
             formatter = function(){
                 return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A, %e. %b %Y, %l:%M %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y) +'</b> msec';
             }
+            graphid = 3;
             break;
 
         case 4:
@@ -160,7 +166,8 @@ function createParameters(i){
             plotoptions: plotoptions,
             units: units,
             url: url,
-            graphno: graphno
+            graphno: graphno,
+            graphid: graphid
         }
 
         return ret;
@@ -168,6 +175,7 @@ function createParameters(i){
 
 
 function OnSuccessGraph(graphParams){
+    
     return function(data){
         if(data.length>200){
         window.chart = new Highcharts.StockChart({
@@ -211,6 +219,7 @@ function OnSuccessGraph(graphParams){
             var div = document.getElementById(graphParams.divid);
             div.innerHTML="<div id = 'error'><b>Insufficient Data</b></div>";
         }
+        hideBar(graphParams.graphid);
     }
 }
 

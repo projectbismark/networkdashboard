@@ -22,7 +22,11 @@ function changeTab(active, total, tab, content) {
     document.getElementById(content+active).style.display = 'block';  
     document.getElementById(tab+active).className = 'selected';      
 
-}  
+}
+
+function hideBar(id){
+    document.getElementById("load_bar_" + id).style.display='none'
+}
 
 function OnError(data)
 {
