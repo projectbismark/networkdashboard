@@ -5,11 +5,15 @@ body, html {
   margin-right:auto;
 }
 
+html{
+    overflow:scroll;
+}
+
 
 body {
-    font-family: arial, sans-serif ;
+    width:95%;
+    font-family: arial, sans-serif;
     background: rgb(234,234,240);
-    width: 95%;
     font-size: 9pt;
 }
 
@@ -50,7 +54,9 @@ table td{
 }
 
 #c2{
-    width:100%;
+    margin-left:auto;
+    margin-right:auto;
+    width:1200px;
     height:600px;
     border-bottom: 1px solid #ddd;
     -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
@@ -80,8 +86,9 @@ table td{
 
 .page-header{
     position:relative;
-    padding-left: 15px;
-    padding-right: 15px;
+    margin-left:auto;
+    margin-right:auto;
+    padding-left:15px;
     height:120px;
     -moz-box-shadow: 0 0 2px 2px rgba(255, 255, 255, 0.5);
     -webkit-box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0.5);
@@ -142,7 +149,7 @@ ul.tabrow li{
     text-align:center;
     list-style:none;
     border: 1px solid;
-    border-color: rgb(38,0,117);
+    border-color: #000;
     margin: 0 7px;
     padding: 0 10px;
     border-bottom: none;
@@ -222,10 +229,10 @@ ul.tabrow li:after {
 }
 
 .tabrow li.selected:before {
-    box-shadow: 1px 1px 0 #f9f9ff;
+    box-shadow: 1px 1px 0 #fff;
 }
 .tabrow li.selected:after {
-    box-shadow: -1px 1px 0 #f9f9ff;
+    box-shadow: -1px 1px 0 #fff;
 }
 
 /*.topbar {
@@ -403,7 +410,7 @@ DIV.outergraphdiv {
     /*border-left:3px solid rgb(44,44,88);*/
     /*border-radius:10px;
     -moz-border-radius:10px;*/
-    border-color: rgb(38,0,117);
+    border-color: #000;
     position:relative;
     z-index:1;
     -moz-box-shadow:2px 2px 2px #333333;
