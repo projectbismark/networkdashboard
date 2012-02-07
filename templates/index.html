@@ -2,84 +2,95 @@
 
 {% block content %}
 
-    <div class="page-header" id ="header1">
-        <div class="header-text">
-            <p><b>What is network dashboard?  </b>The <em>network dashboard</em> is
-            a portal designed to help home users visualize properties of their
-            home Internet connections.  To use the network dashboard, users
-            install a BISMark-enabled gateway device in their home network.  The
-            gateway device periodically uploads measurements of the user's
-            Internet Service Provider to a centralized database, which the user
-            can access via this portal.</p><br/>
-    
-            <form method = "POST" name="device_form" action ="/device/">
-            <b>Enter Device MAC Address:</b><br /> 
-                <input type = "text" name = "device" value ="c43dc7a376d3"/>
-                <input type = "submit" value = "Search"/>
-            </form>
-        </div>
-    </div>
+<div class="page-header" id ="header1">
+	<div class="header-text">
+		<p><b>What is network dashboard?  </b>The <em>network dashboard</em> is
+			a portal designed to help home users visualize properties of their
+			home Internet connections.  To use the network dashboard, users
+			install a BISMark-enabled gateway device in their home network.  The
+			gateway device periodically uploads measurements of the user's
+			Internet Service Provider to a centralized database, which the user
+			can access via this portal.</p><br/>
 
-<script src="/static/jquery-latest.js"></script>
-<script language="Javascript" src="http://gd.geobytes.com/gd?after=-1&variables=GeobytesCountry,GeobytesCity,GeobytesRegion,GeobytesLatitude,GeobytesLongitude">
-</script>
-<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
-<body onload="load()" onunload="GUnload()">
-<div class ="label">
-    <b>Device Map</b>
-</div>
-<div id="map" class="map"></div>
+			<form method = "POST" name="device_form" action ="/device/">
+				<b>Enter Device MAC Address:</b><br /> 
+				<input type = "text" name = "device" value ="c43dc7a376d3"/>
+				<input type = "submit" value = "Search"/>
+			</form>
+		</div>
+	</div>
 
-<script type="text/javascript">
+	<script src="/static/jquery-latest.js"></script>
+	<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+	<body onload="load()" onunload="GUnload()">
+		<div class ="label">
+			<b>Device Map</b>
+		</div>
+		<div id="map" class="map"></div>
 
-   function load()
-    {
-     var mid = new google.maps.LatLng(0,0);
-     var options = {
-     zoom: 1,
-     center: mid,
-     mapTypeId: google.maps.MapTypeId.ROADMAP
-     };
+		<script type="text/javascript">
 
-     map = new google.maps.Map(document.getElementById("map"),options);
-  
-         
-      
-      $.ajax({
-                type: "GET",
-                url: "/getCoordinates/",
-                success: OnSuccess
-            });            
-   }
-   
-   function OnSuccess(data){
-        coordstring = data.split("\n");
-        for (var i=0; i<coordstring.length-1; i++){
-            var coords = coordstring[i].split(",");
-            var point = new google.maps.LatLng(parseFloat(coords[0]),parseFloat(coords[1]));
-            var marker = new google.maps.Marker({
-            position: point
-            })
-            if (coords[2]=="server"){
-                marker.setIcon("http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/blank.png");
-            }
-            else{
-                marker.setIcon("http://gmaps-samples.googlecode.com/svn/trunk/markers/red/blank.png");
-            }
-        
-            marker.setMap(map);
+		function load()
+		{
+			var mid = new google.maps.LatLng(0,0);
+			var options = {
+				zoom: 1,
+				center: mid,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			};
 
-        }
-   }
-
-   function GUnload(){
-      if (window.GUnloadApi)
-      {
-         GUnloadApi();
-      }
-   }
-</script>
-</body>
+			map = new google.maps.Map(document.getElementById("map"),options);
+			geocoder = new google.maps.Geocoder();
 
 
-{% endblock %}
+			$.ajax({
+				type: "GET",
+				url: "/getCoordinates/",
+				success: OnSuccess
+			});            
+		}
+
+		function OnSuccess(data){
+			coordstring = data.split("\n");
+			for (var i=0; i<coordstring.length-1; i++){
+				var coords = coordstring[i].split(":");
+				if(coords[1]=='coord'){
+					var point = new google.maps.LatLng(parseFloat(coords[2]),parseFloat(coords[3]));
+					var marker = new google.maps.Marker({
+						position: point
+					})
+					if (coords[0]=="server"){
+						marker.setIcon("http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/blank.png");
+					}
+					else{
+						marker.setIcon("http://gmaps-samples.googlecode.com/svn/trunk/markers/red/blank.png");
+					}
+
+					marker.setMap(map);
+				}
+				else{
+					geocoder.geocode( { 'address': coords[2]}, function(results, status) {
+						if (status == google.maps.GeocoderStatus.OK) {
+
+							var marker = new google.maps.Marker({
+								map: map,
+								position: results[0].geometry.location
+							});
+						}
+					});
+
+				}
+			}
+		}
+
+		function GUnload(){
+			if (window.GUnloadApi)
+			{
+				GUnloadApi();
+			}
+		}
+		</script>
+	</body>
+
+
+	{% endblock %}
