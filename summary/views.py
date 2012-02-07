@@ -11,6 +11,7 @@ from time import time,mktime,strftime
 #from mx.DateTime.ISO import ParseDateTimeUTC
 import hashlib
 import cvs_helper,datetime_helper,database_helper,views_helper,email_helper
+from graph_filter import *
 
 def index(request):
     return render_to_response('index.html')
@@ -79,69 +80,68 @@ def getLocation(request, device):
     return HttpResponse(database_helper.get_location(device))
 
 def throughputGraph(request):
-    device = request.GET.get('deviceid')
-    graphno = int(request.GET.get('graphno'))
-    filter_by = request.GET.get('filter_by')
-    chosen_limit = 100000000
-    data = "["
-    all_device_details = MBitrate.objects.filter(average__lte = chosen_limit).order_by('eventstamp')
-    if(graphno==1):
-        all_device_details = all_device_details.filter(srcip = '143.215.131.173')
-    else:
-        all_device_details = all_device_details.filter(dstip = '143.215.131.173')
-    for entry in all_device_details:
-        if(data!='['):
-            data+= ','
-        data += '[' + datetime_helper.datetime_to_JSON(entry.eventstamp)+ ',' + str(entry.average) +"]"
+	g_filter = Graph_Filter(request)
+	print "me"
+	print g_filter
+	device = request.GET.get('deviceid')
+	graphno = int(request.GET.get('graphno'))
+	filter_by = request.GET.get('filter_by')
+	chosen_limit = 100000000
+	data = "["
+	all_device_details = MBitrate.objects.filter(average__lte = chosen_limit).order_by('eventstamp')
+	if(graphno==1):
+		all_device_details = all_device_details.filter(srcip = '143.215.131.173')
+	else:
+		all_device_details = all_device_details.filter(dstip = '143.215.131.173')
+	for entry in all_device_details:
+		if(data!='['):
+			data+= ','
+		data += '[' + datetime_helper.datetime_to_JSON(entry.eventstamp)+ ',' + str(entry.average) +"]"
 
-    data += "]"
-    return HttpResponse(data)
+	data += "]"
+	return HttpResponse(data)
         
 def linegraph_bitrate(request):
-    device = request.GET.get('deviceid')
-    graphno = int(request.GET.get('graphno'))
-    filter_by = request.GET.get('filter_by')
+    g_filter = Graph_Filter(request)
     chosen_limit = 100000000
 
-    details = Devicedetails.objects.filter(deviceid=device)[0]
+    details = Devicedetails.objects.filter(deviceid=g_filter.device)[0]
 		
     all_device_details= MBitrate.objects.filter(average__lte=chosen_limit).order_by('eventstamp')
-    
 
     other_device_details_netperf_3 = []
     other_device_details_other = []
     filtered_deviceids = []
-	
 
-    if (filter_by == 'location'):
-	filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
+    if (g_filter.filter_by == 'location'):
+		filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=g_filter.device)
 
-    if (filter_by == 'provider'):
-	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
-
+    if (g_filter.filter_by == 'provider'):
+		filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=g_filter.device)
 
     for row in filtered_deviceids:
-	other_device_details_other.extend(all_device_details.filter(deviceid=row.deviceid).exclude(toolid='NETPERF_3'))
-	other_device_details_netperf_3.extend(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))	
-	
-    if (graphno==1):
-	all_device_details = all_device_details.filter(srcip='143.215.131.173')		
-    elif (graphno==2): 
+		other_device_details_other.extend(all_device_details.filter(deviceid=row.deviceid).exclude(toolid='NETPERF_3'))
+		other_device_details_netperf_3.extend(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))	
+
+    if (g_filter.graphno==1):
+		all_device_details = all_device_details.filter(srcip='143.215.131.173')		
+    elif (g_filter.graphno==2): 
         all_device_details = all_device_details.filter(dstip='143.215.131.173')
 
-    my_device_details = all_device_details.filter(deviceid=device)
-    
+    my_device_details = all_device_details.filter(deviceid=g_filter.device)
+
     my_device_details_netperf_3 = my_device_details.filter(toolid='NETPERF_3')
     my_device_details_other = my_device_details.exclude(toolid='NETPERF_3')
+
     result=[]
     result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"multi-threaded tcp"))
     result.append(cvs_helper.linegraph_normal(my_device_details_other,"single-threaded tcp"))
-	
-    if (filter_by != 'none'):
-	bucket_width = 24*3600
-	result.append(cvs_helper.linegraph_bucket(other_device_details_netperf_3,bucket_width,"multi-median"))
-	result.append(cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"single-median"))
     
+    if (g_filter.filter_by != 'none'):
+		bucket_width = 24*3600
+		result.append(cvs_helper.linegraph_bucket(other_device_details_netperf_3,bucket_width,"multi-median"))
+		result.append(cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"single-median"))
+	
     answer = str(result).replace("'D","D")
     answer = answer.replace(")'",")")
 
@@ -161,19 +161,19 @@ def linegraph_lmrtt(request):
     filtered_deviceids = []	
 
     if (filter_by == 'location'):
-	filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
+		filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
 
     if (filter_by == 'provider'):
-	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
+		filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
 
     for row in filtered_deviceids:
-	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
+		other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
     result=[]
     result.append(cvs_helper.linegraph_normal(device_details,'last-mile Rtt'))
 
     if (filter_by != 'none'):
-	bucket_width = 2*3600
-	result.append(cvs_helper.linegraph_bucket(other_device_details,bucket_width,'median'))
+		bucket_width = 2*3600
+		result.append(cvs_helper.linegraph_bucket(other_device_details,bucket_width,'median'))
     answer = str(result).replace("['","[")
     answer = answer.replace(")'",")")
 
@@ -244,7 +244,9 @@ def linegraph_bytes_hour(request):
     node = database_helper.deviceid_to_nodeid(device)
 
     all_device_details= BytesPerHour_mem.objects.all().order_by('eventstamp')
+
     device_details = all_device_details.filter(node_id=node)
+
     other_device_details = []
     filtered_deviceids = []	
 
@@ -283,7 +285,9 @@ def linegraph_bytes_port_hour(request):
     node = database_helper.deviceid_to_nodeid(device)
 
     all_device_details= BytesPerPortPerHour_mem.objects.all().order_by('eventstamp')
+
     device_details = all_device_details.filter(node_id=node)
+
     other_device_details = []
     filtered_deviceids = []	
 
