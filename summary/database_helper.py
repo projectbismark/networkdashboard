@@ -74,22 +74,37 @@ def get_last_measurement(device):
     	return last[0].eventstamp.strftime("%B %d, %Y")
 
 def get_coordinates_for_googlemaps():
- 	coordstring = ""
+	coordstring = ""
 
-    	distinct_ips = IpResolver.objects.all()
-
-    	for row_ip in distinct_ips:
+	distinct_ips = IpResolver.objects.all()
+	data_type="coord"
+	for row_ip in distinct_ips:
 
 		lat = str(row_ip.latitude)
 		lon = str(row_ip.longitude)
 		devtype = str(row_ip.type)
-        	coordstring += lat
-        	coordstring += ","
-        	coordstring += lon
-        	coordstring += ","
-        	coordstring += devtype
-        	coordstring += "\n"
-    	return HttpResponse(coordstring)
+		coordstring += devtype
+		coordstring += ":"
+		coordstring += data_type
+		coordstring += ":"
+		coordstring += lat
+		coordstring += ":"
+		coordstring += lon
+		coordstring += "\n"
+	
+	distinct_devices= Devicedetails.objects.all()
+	data_type="address"
+	for row in distinct_devices:
+
+		address = str(row.city) + ',' + str(row.state) + ',' + str(row.country)
+		coordstring += "device"
+		coordstring += ":"
+		coordstring += data_type
+		coordstring += ":"
+		coordstring += address
+		coordstring += "\n"
+	
+	return HttpResponse(coordstring)
 
 def get_location(device):
     device = device.replace(':','')
