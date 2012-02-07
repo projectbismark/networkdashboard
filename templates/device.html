@@ -41,7 +41,7 @@
                             <tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
                             <tr><td><a href ="/feedback.html/?hashkey={{detail.hashkey}}" onClick ="return feedback(this, 'feedback')"><b>Feedback</b></a></td></tr>
                         </table>
-                        URL for this device page: <input id="url" type="text" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}" />
+                        URL for this device page: <input id="url" type="text" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}"/>
                     </div>
                 </div>
             </div>
@@ -92,5 +92,11 @@
 </div>
 <script type="text/javascript">
     renderGraphs("{{deviceid}}");
+	hashid="{{ detail.hashkey }}";
+	setHashid(hashid);
+	tabid=getParameterByName('tab');
+	if(tabid!='') changeTab(tabid,4,'tab_','tab_content_');
+	else changeTab(1,4,'tab_','tab_content_');
+	
 </script>
 {% endblock %}
