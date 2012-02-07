@@ -1,351 +1,96 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class ="section" id="section_1">
-    <div class ="banner" id ="banner_1"></div>
-    <div id="section_text">
-    <h1>BISMark Device           <a href ="/editDevicePage/{{detail.hashkey}}"> Edit </a></h1>
-    <script src="/static/jquery-latest.js"></script>
-    <script src="/static/highcharts.js"></script>
-    <script src="/static/js/modules/exporting.js"></script>
+<div class="container" id="c2">
 
-    <table>
-        <!--
-        <tr><td>MAC Address</td><td>{{ detail.macid }}</td></tr>
-        <tr><td>Type</td><td>{{ detail.type }}</td></tr>
-        <tr><td>Operating System</td><td>{{ detail.os }}</td></tr> -->
-        <tr><td><b>Name</b></td><td><b>{{ detail.name }}</b></td></tr>
-        <tr><td>ISP</td><td>{{ detail.isp }}</td></tr>
-        <tr><td>Location</td><td><div id="location{{ deviceid }}"></div><script type="text/javascript">
+    <div class="page-header">
+        <div class="header-text">
+          <h1> {{detail.name}} - <a href ="/editDevicePage/{{detail.hashkey}}"> Edit </a></h1>
+        </div>
+    </div>
+    <div class="content">
+        <div class="row">
+            <div class="span10">
+                <div class ="section" id="section_1">
+                    <div id="section_text">
 
-		$.ajax({
-                type: "GET",
-                url: escape("/getLocation/{{ deviceid }}/"),
-                success: OnSuccess
-            });
-		
-		function OnSuccess(data)
-		{
-		document.getElementById('location{{ deviceid }}').innerHTML = data;
-		}
+                        <table class="info">
+                            <tr><td><b>Name</b></td><td><b>{{ detail.name }}</b></td></tr>
+                            <tr><td>ISP</td><td>{{ detail.isp }}</td></tr>
+                            <tr><td>Location</td><td><div id="location{{ deviceid }}"></div>
+                                <script type="text/javascript">
 
-		</script></td>
-        </tr>     
-        <tr><td>Service Plan</td><td>{{ detail.serviceplan }}</td></tr>
-        <tr><td>Download Rate</td><td>{{ detail.downloadrate}} kbps</td></tr>
-        <tr><td>Upload Rate</td><td>{{ detail.uploadrate}} kbps</td></tr>
-    
- 
-  
-        
-	
+                                    $.ajax({
+                                    type: "GET",
+                                    url: escape("/getLocation/{{ deviceid }}/"),
+                                    success: OnSuccess2
+                                });
 
-<tr><td>First Measurement</td><td>{{ firstUpdate }}</td></tr>
-<tr><td>Last Measurement</td><td>{{ lastUpdate }}</td></tr>
+                                    function OnSuccess2(data)
+                                    {
+                                    document.getElementById('location{{ deviceid }}').innerHTML = data;
+                                    }
 
- 
-<tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
-
-<tr><td>URL for this device page</td><td><input id="url" type="text" style="width:320px;" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}" ></td></tr>
-<tr><td><a href ="/feedback.html/?hashkey={{detail.hashkey}}" onClick ="return feedback(this, 'feedback')"><b>Feedback</b></a></td></tr>
-    
-</table>
+                                </script></td>
+                            </tr>     
+                            <tr><td>Service Plan</td><td>{{ detail.serviceplan }}</td></tr>
+                            <tr><td>Download Rate</td><td>{{ detail.downloadrate}} kbps</td></tr>
+                            <tr><td>Upload Rate</td><td>{{ detail.uploadrate}} kbps</td></tr>
+                            <tr><td>First Measurement</td><td>{{ firstUpdate }}</td></tr>
+                            <tr><td>Last Measurement</td><td>{{ lastUpdate }}</td></tr>
+                            <tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
+                            <tr><td><a href ="/feedback.html/?hashkey={{detail.hashkey}}" onClick ="return feedback(this, 'feedback')"><b>Feedback</b></a></td></tr>
+                        </table>
+                        URL for this device page: <input id="url" type="text" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}" />
+                    </div>
+                </div>
+            </div>
+            <div class="span4">
+                <div class ="display">
+                    <ul class ="tabrow">
+                        <li class="selected" id="tab_1"><a href="javascript:changeTab(1,4,'tab_','tab_content_')">Download</a></li>
+                        <li id="tab_2"><a href="javascript:changeTab(2,4,'tab_','tab_content_')">Upload</a></li>
+                        <li id="tab_3"><a href="javascript:changeTab(3,4,'tab_','tab_content_')">Round-Trip</a></li>
+                        <li id="tab_4"><a href="javascript:changeTab(4,4,'tab_','tab_content_')">Last Mile</a></li>
+                    </ul>
+                    <div class="tab" id="tab_content_1">  
+                        <div class ="outergraphdiv" id="graph_div_outer_1">
+                            <div class ="graphdiv" id="graph_div_1"></div>
+                        </div>
+                        <div class ="loadbar" id="load_bar_0">
+                            <img src="/static/images/ajax-loader.gif" alt="Loading Data"/>
+                        </div>
+                    </div>
+                    <div class="tab" id="tab_content_2"> 
+                        <div class ="outergraphdiv" id="graph_div_outer_2">
+                            <div class ="graphdiv" id="graph_div_2"></div>
+                        </div>
+                        <div class ="loadbar" id="load_bar_1">
+                            <img src="/static/images/ajax-loader.gif" alt="Loading Data"/>
+                        </div>
+                    </div>
+                    <div class="tab" id="tab_content_3">  
+                        <div class ="outergraphdiv" id="graph_div_outer_3">
+                            <div class ="graphdiv" id="graph_div_3"></div>
+                        </div>
+                        <div class ="loadbar" id="load_bar_2">
+                            <img src="/static/images/ajax-loader.gif" alt="Loading Data"/>
+                        </div>
+                    </div>
+                    <div class="tab" id="tab_content_4">  
+                        <div class ="outergraphdiv" id="graph_div_outer_4">
+                            <div class ="graphdiv" id="graph_div_4"></div>
+                        </div>
+                        <div class="loadbar" id="load_bar_3">
+                            <img src="/static/images/ajax-loader.gif" alt="Loading Data"/>
+                        </div>
+                    </div>    
+                </div>  
+            </div>
+        </div>
+    </div>
 </div>
-</div>
-
-
-        
-
-<!--
-<div class="progresscontainer">
-    <div class="progressbar" id="progress" indeterminate="true" title="loading" ></div>
-</div>
-<br /><br /><br />
--->
-
-    <div class ="tabs">
-    <div id="tab1">
-        <a href="#tab1">Download</a>
-        <div class ="outergraphdiv" id="graph_div_outer_1">
-            <div class ="graphdiv" id="graph_div_1"></div>
-        </div>
-    </div>
-    <div id="tab2">
-        <a href="#tab2">Upload</a>
-        <div class ="outergraphdiv" id="graph_div_outer_2">
-            <div class ="graphdiv" id="graph_div_2"></div>
-        </div>
-    </div>
-    <div id="tab3">
-        <a href="#tab3">Round-Trip</a>
-        <div class ="outergraphdiv" id="graph_div_outer_3">
-            <div class ="graphdiv" id="graph_div_3"></div>
-        </div>
-    </div>
-    <div id="tab4">
-        <a href="#tab4">Last Mile</a>
-        <div class ="outergraphdiv" id="graph_div_outer_4">
-            <div class ="graphdiv" id="graph_div_4"></div>
-        </div>
-    </div>
-    </div>
-
 <script type="text/javascript">
-        var filter = "none";
-
-       	render();
-        function feedback(link,windowname){
-            if (! window.focus){
-                return true;
-            }
-            var href;
-            if (typeof(mylink) == 'string'){
-               href=link;
-            }
-            else{
-               href=link.href;
-            }
-            window.open(href, windowname, 'width=500,height=200,scrollbars=yes,location=0,status=0');
-            return false;
-        }
-        
-        function createParameters(i){
-            var url = "/line_bitrate/";
-            var graphno = 1;
-            var divid = "graph_div_1";
-            var titlename ="Download Throughput";
-            var formatter = function(){};
-            var legend = {
-                enabled: true,
-                align: 'right',
-                backgroundColor: '#FCFFC5',
-                borderColor: 'black',
-                borderWidth: 2,
-                layout: 'vertical',
-                verticalAlign: 'top',
-                y: 100,
-                shadow: true
-            };
-            var rangeselector={
-                buttons: [{
-                        type: 'day',
-                        count: 1,
-                        text: '1d'
-                }, {
-                        type: 'week',
-                        count: 1,
-                        text: '1w'
-                }, {
-                        type: 'month',
-                        count: 1,
-                        text: '1m'
-                }, {
-                        type: 'month',
-                        count: 3,
-                        text: '3m'
-                }, {
-                        type: 'month',
-                        count: 6,
-                        text: '6m'
-                }, {
-                        type: 'ytd',
-                        text: 'YTD'
-                }, {
-                        type: 'year',
-                        count: 1,
-                        text: '1y'
-                }, {
-                        type: 'all',
-                        text: 'All'
-                }],
-                selected: 1
-            };
-            var plotoptions = {};
-            var units = "KBps";
-            
-   
-            switch (i){
-                case 0:
-                    formatter = function(){
-                            return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y)+'</b> KBps';
-                        };
-                    break;
-                case 1:
-                    divid = "graph_div_2";
-                    graphno = 2;
-                    titlename = "Upload Throughput";
-                    break;
-                case 2:
-                    units = "msec";
-                    titlename = "Round-Trip Time";
-                    divid = "graph_div_3";
-                    url = "/line_rtt/";
-                    formatter = function(){
-                        return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />' + Highcharts.dateFormat('%A, %e. %b %Y, %l:%M %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y) +'</b> msec';
-                    }
-                    break;
-                case 3:
-                    units = "msec";
-                    titlename = "Last Mile Latency";
-                    divid = "graph_div_4";
-                    url = "/line_lmrtt/";
-                    formatter = function(){
-                        return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A, %e. %b %Y, %l:%M %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y) +'</b> msec';
-                    }
-                    break;
-                    
-                case 4:
-                    titlename = "Passive Data";
-                    divid = "graph_div_5";
-                    units = "MB";
-                    url = "/line_passive/";
-                    formatter = function(){
-                        return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y/1000/1000) +'</b> MB';
-                    };
-                    plotoptions ={
-                        series:{
-                           dataGrouping:{
-                               groupPixelWidth: 50,
-                               units: [[
-                                        'hour',
-                                        [1]
-                                ], [
-                                        'day',
-                                        [1]
-                                ], [
-                                        'week',
-                                        [1]
-                                ], [
-                                        'month',
-                                        [1, 3, 6]
-                                ]]
-                           } 
-                        }
-                    };
-                    break;
-                case 5:
-                    paramselect = "PASSIVE_PORT";
-                    titlename = "Passive Data By Port";
-                    divid = "graph_div_6";
-                    units = "MB";
-                    url = "/line_passive_port/";
-                    formatter = function(){
-                        return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y/1000/1000) +'</b> MB';
-                    };
-                    plotoptions ={
-                        column: {
-                          borderWidth: 0,
-                          stacking: "normal"
-                        },
-                        series:{
-                           dataGrouping:{
-                               groupPixelWidth: 50,
-                               units: [[
-                                        'hour',
-                                        [1]
-                                ], [
-                                        'day',
-                                        [1]
-                                ], [
-                                        'week',
-                                        [1]
-                                ], [
-                                        'month',
-                                        [1, 3, 6]
-                                ]]
-                           } 
-                        }
-
-                    };
-                    break;
-                }
-                
-                var ret = {
-                    legend: legend,
-                    divid: divid,
-                    titlename: titlename,
-                    formatter: formatter,
-                    rangeselector: rangeselector,
-                    plotoptions: plotoptions,
-                    units: units,
-                    url: url,
-                    graphno: graphno
-                }
-                
-                return ret;
-        }
-        
-        
-        function OnSuccess(graphParams){
-            return function(data){
-                if(data.length>200){
-                window.chart = new Highcharts.StockChart({
-                chart: {
-                    renderTo: graphParams.divid,
-                    backgroundColor: "rgb(249,249,255)"
-                },
-                legend: graphParams.legend,
-
-                rangeSelector: graphParams.rangeselector,
-
-                title: {
-                    text: graphParams.titlename
-                },
-
-                plotOptions: graphParams.plotoptions,
-
-                xAxis: {
-                    maxZoom: 1 * 24 * 3600000 // fourteen days
-                },
-                yAxis: {
-                    min: 0,
-                    maxZoom: 10000,
-                    title: {
-                        text: graphParams.units,
-                        style:{
-                            fontSize: 15
-                        }
-                    }
-
-                },
-
-                tooltip: {
-                                           formatter: graphParams.formatter
-                },
-
-                series: eval(data)
-            });
-                }
-                else{
-                    var div = document.getElementById(graphParams.divid);
-                    div.innerHTML="<div id = 'error'><b>Insufficient Data</b></div>";
-                }
-            }
-        }
-        function OnError(data)
-        {
-	  alert("data loading failed");
-        }
-        
-        function createGraphs(){
-            for (var i =0; i<4; i++){
-                var params = createParameters(i);
-                $.ajax({
-                        type: "GET",
-                        url: params.url,
-                        data: {'graphno' : params.graphno, 'deviceid': "{{deviceid}}", 'filter_by': filter},
-                        success: OnSuccess(params)
-                    });   
-            }
-        }
-
-	function render()
-	{
-        createGraphs();
-        }
-
+    renderGraphs("{{deviceid}}");
 </script>
-</body>
-
-
 {% endblock %}

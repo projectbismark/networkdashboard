@@ -2,32 +2,27 @@
 
 {% block content %}
 
-<div class="about">
-    <div class ="banner" id ="banner_1"></div>
-    <div id ="section_text">
-<h3>Network Dashboard</h3>
-<p><b>What is network dashboard?  </b>The <em>network dashboard</em> is
-  a portal designed to help home users visualize properties of their
-  home Internet connections.  To use the network dashboard, users
-  install a BISMark-enabled gateway device in their home network.  The
-  gateway device periodically uploads measurements of the user's
-  Internet Service Provider to a centralized database, which the user
-  can access via this portal.</p><br/><br/>
+    <div class="page-header" id ="header1">
+        <div class="header-text">
+            <p><b>What is network dashboard?  </b>The <em>network dashboard</em> is
+            a portal designed to help home users visualize properties of their
+            home Internet connections.  To use the network dashboard, users
+            install a BISMark-enabled gateway device in their home network.  The
+            gateway device periodically uploads measurements of the user's
+            Internet Service Provider to a centralized database, which the user
+            can access via this portal.</p><br/>
     
-
-
-
-   <form method = "POST" name="device_form" action ="/device/">
-       <b>Enter Device MAC Address:</b><br /> <input type = "text" name = "device" value ="c43dc7a376d3"/>
-   <input type = "submit" value = "Search">
-   </form>
-
-</div>
+            <form method = "POST" name="device_form" action ="/device/">
+            <b>Enter Device MAC Address:</b><br /> 
+                <input type = "text" name = "device" value ="c43dc7a376d3"/>
+                <input type = "submit" value = "Search"/>
+            </form>
+        </div>
     </div>
 
 <script src="/static/jquery-latest.js"></script>
 <script language="Javascript" src="http://gd.geobytes.com/gd?after=-1&variables=GeobytesCountry,GeobytesCity,GeobytesRegion,GeobytesLatitude,GeobytesLongitude">
-    </script>
+</script>
 <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 <body onload="load()" onunload="GUnload()">
 <div class ="label">

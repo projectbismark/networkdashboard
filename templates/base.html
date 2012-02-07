@@ -3,23 +3,47 @@
 <html xml:lang="en" lang="en"> 
 
 <head> 
-  <title>Network Dashboard</title> 
-  <link rel="stylesheet" type="text/css" href="/static/style.css" /> 
+  <title>Network Dashboard</title>
+  <link rel="stylesheet" type="text/css" href="/static/bootstrap/bootstrap.css" />
+  <link rel="stylesheet" type="text/css" href="/static/style.css" />
+  <script src="/static/jquery-latest.js"></script>
+  <script src="/static/highcharts.js"></script>
+  <script src="/static/js/modules/exporting.js"></script>
+  <script src="/static/device.js"></script>
+  <script src="/static/rendergraphs.js"></script>
+  <script language="Javascript" src="http://gd.geobytes.com/gd?after=-1&variables=GeobytesCountry,GeobytesCity,GeobytesRegion,GeobytesLatitude,GeobytesLongitude"></script>
+  <script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+  
   <meta name="Author" content="Nick Feamster" /> 
 </head>
 
 
 <body>
+<div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="/">Network Dashboard</a>
+
+          <ul class="nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="http://projectbismark.net">BISMark</a></li>
+            <li><a href="http://gtnoise.net">GTNoise</a></li>
+          </ul>
+        </div>
+      </div>
+</div>
 
 {% block content %} {% endblock %}
 
 {% block footer %} 
 <hr />
+<!--
 <p class="footnote"> 
   <a href="/">Home</a> | 
   <a href="http://projectbismark.net/">BISMark</a> |
   <a href="http://gtnoise.net/">GTNoise</a> |
-</p> 
+</p>
+-->
 {% endblock %}
 
 </body>
