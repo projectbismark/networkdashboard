@@ -53,7 +53,13 @@ def list_isps():
 	return ret
 
 def list_countries():
-	ret = ['USA','Italia','France','UK']
+	ret=[]
+	out = Devicedetails.objects.values('country').distinct()
+	for one in out:
+		print ast.literal_eval(str(one))
+		value = ast.literal_eval(str(one))
+		ret.append(value['country'])
+		
 	ret.sort()
 	return ret
 
