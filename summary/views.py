@@ -180,60 +180,62 @@ def linegraph_lmrtt(request):
     return HttpResponse("(" + answer + ")")
 
 def linegraph_rtt(request):
-    device = request.GET.get('deviceid')
-    filter_by = request.GET.get('filter_by')
+	device = request.GET.get('deviceid')
+	filter_by = request.GET.get('filter_by')
+
+	details = Devicedetails.objects.filter(deviceid=device)[0]
+
+	all_device_details= MRtt.objects.filter(average__lte=3000).order_by('eventstamp')
+
+	other_device_details = []
+	filtered_deviceids = []	
+
+	if (filter_by == 'location'):
+		filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
+
+	if (filter_by == 'provider'):
+		filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
+
+	for row in filtered_deviceids:
+		other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
+
   
-    details = Devicedetails.objects.filter(deviceid=device)[0]
-
-    all_device_details= MRtt.objects.filter(average__lte=3000).order_by('eventstamp')
-
-    other_device_details = []
-    filtered_deviceids = []	
-
-    if (filter_by == 'location'):
-	filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
-
-    if (filter_by == 'provider'):
-	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
-
-    for row in filtered_deviceids:
-	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
-
-  
-    divides = {}
+	divides = {}
     
-    for row in other_device_details:
-	ee = str(row.dstip)
+	for row in other_device_details:
+		ee = str(row.dstip)
 	
-	if not divides.has_key(ee):
-		divides[ee]=[]
+		if not divides.has_key(ee):
+			divides[ee]=[]
 
-	divides[ee].append(row)		
+		divides[ee].append(row)		
     
-
-    distinct_ips = MRtt.objects.values('dstip').distinct()
+	distinct_ips = MRtt.objects.values('dstip').distinct()
  
-    result=[]
+	result=[]
 
-    count = 1
-    for row_ip in distinct_ips:
-	try:
-		ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0].location
-	except:
-		continue
-        
-    	device_details = MRtt.objects.filter(deviceid=device,average__lte=3000, dstip = row_ip["dstip"]).order_by('eventstamp')
-	result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup)))
+	count = 1
+	
+	for row_ip in distinct_ips:
+		try:
+			ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0].location
+			
+		except:
+			continue
+       
+		device_details = MRtt.objects.filter(deviceid=device,average__lte=3000, dstip = row_ip["dstip"]).order_by('eventstamp')
+		if(len(device_details)<=0) continue
+		result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup)))
 
-    	if (filter_by != 'none'):
-		result.append(cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,"median"+str(count)))
+		if (filter_by != 'none'):
+			result.append(cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,"median"+str(count)))
 
-	count+=1
+		count+=1
 
-    answer = str(result).replace("['","[")
-    answer = answer.replace(")'",")")
+	answer = str(result).replace("['","[")
+	answer = answer.replace(")'",")")
 
-    return HttpResponse("(" + answer + ")")
+	return HttpResponse("(" + answer + ")")
 
 def linegraph_bytes_hour(request):
     device = request.GET.get('deviceid')
