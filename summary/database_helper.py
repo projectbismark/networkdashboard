@@ -5,8 +5,9 @@ from networkdashboard.summary.models import *
 import random
 from datetime import datetime, timedelta
 from time import time,mktime,strftime
-import hashlib
+import hashlib,httplib,urllib2
 import cvs_helper,datetime_helper,views_helper
+import ast
 
 def fetch_deviceid_soft(device):
 	device_search = Devicedetails.objects.filter(deviceid=device)
@@ -95,13 +96,38 @@ def get_coordinates_for_googlemaps():
 	distinct_devices= Devicedetails.objects.all()
 	data_type="address"
 	for row in distinct_devices:
-
-		address = str(row.city) + ',' + str(row.state) + ',' + str(row.country)
+		if row.latitude == None:
+			address = str(row.city) + ',' + str(row.state) + ',' + str(row.country)
+			try:
+				params = urllib.urlencode({'key': 'AIzaSyBHEmkA7XyusAjA9Zf-UnLSR9ydvCExY6k', 'output': 'json', 'q': str(address)})
+				f = urllib2.urlopen("http://maps.google.com/maps/geo?"+str(params))
+				result = ast.literal_eval(f.read())
+				if result['Status']['code'] == 200:
+					coord=result['Placemark'][0]['Point']['coordinates']
+					row.latitude = coord[1]
+					row.longitude=coord[0]
+					row.save()
+				else:
+					row.latitude =33.748
+					row.longitude=-84.387
+					row.save()
+			except:
+				row.latitude = 0
+				row.longitude=0
+				row.save()
+		
+			#print str(result)
+			#print str(result["Point"])
+			
+		if row.latitude == None:
+			continue
 		coordstring += "device"
 		coordstring += ":"
-		coordstring += data_type
+		coordstring += "coord"
 		coordstring += ":"
-		coordstring += address
+		coordstring += str(row.latitude)
+		coordstring += ":"
+		coordstring += str(row.longitude)
 		coordstring += "\n"
 	
 	return HttpResponse(coordstring)
@@ -126,19 +152,36 @@ def get_location(device):
     return ('unavailable')
 		
 def save_device_details_from_request(request,device):
-    hashing = views_helper.get_hash(device)
-    dname = request.POST.get('name')
-    disp = request.POST.get('isp')
-    dlocation = request.POST.get('location')
-    dsp = request.POST.get('sp')
-    durate = int(request.POST.get('urate'))
-    ddrate = int(request.POST.get('drate'))
-    dcity = request.POST.get('city')
-    dstate = request.POST.get('state')
-    dcountry = request.POST.get('country')	    
-       
-    details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now(),hashkey=hashing)
-    details.save()
+	hashing = views_helper.get_hash(device)
+	dname = request.POST.get('name')
+	disp = request.POST.get('isp')
+	dlocation = request.POST.get('location')
+	dsp = request.POST.get('sp')
+	durate = int(request.POST.get('urate'))
+	ddrate = int(request.POST.get('drate'))
+	dcity = request.POST.get('city')
+	dstate = request.POST.get('state')
+	dcountry = request.POST.get('country')	    
+	details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now(),hashkey=hashing)
+
+	try:
+		address = dcity+","+dstate+","+dcountry
+		params = urllib.urlencode({'key': 'AIzaSyBHEmkA7XyusAjA9Zf-UnLSR9ydvCExY6k', 'output': 'json', 'q': str(address)})
+		f = urllib2.urlopen("http://maps.google.com/maps/geo?"+str(params))
+		result = ast.literal_eval(f.read())
+		if result['Status']['code'] == 200:
+			
+			coord=result['Placemark'][0]['Point']['coordinates']
+			details.latitude = coord[1]
+			details.longitude=coord[0]
+			details.country=result['Placemark'][0]['AddressDetails']['Country']['CountryName']
+			details.state=result['Placemark'][0]['AddressDetails']['Country']['AdministrativeArea']['AdministrativeAreaName']
+			details.city=result['Placemark'][0]['AddressDetails']['Country']['AdministrativeArea']['Locality']['LocalityName']
+	except Exception as inst:
+		print type(inst)
+		print inst
+		
+	details.save()
 
 def save_device_details_from_default(device):
     hashing = views_helper.get_hash(device)

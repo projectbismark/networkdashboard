@@ -30,6 +30,8 @@ class Devicedetails(models.Model):
     country = models.CharField(max_length=30)
     eventstamp = models.DateTimeField()
     hashkey = models.TextField()
+    latitude = models.FloatField()
+    longitude = models.FloatField()
     class Meta:
         db_table = u'devicedetails'
 
