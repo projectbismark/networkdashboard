@@ -53,7 +53,7 @@ def list_isps():
 	return ret
 
 def list_countries():
-	ret = ['United States','South Africa','France']
+	ret = ['USA','Italia','France','UK']
 	ret.sort()
 	return ret
 
