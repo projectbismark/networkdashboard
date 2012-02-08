@@ -105,9 +105,7 @@ def get_coordinates_for_googlemaps():
 		if row.latitude == None:
 			address = str(row.city) + ',' + str(row.state) + ',' + str(row.country)
 			try:
-				params = urllib.urlencode({'key': 'AIzaSyBHEmkA7XyusAjA9Zf-UnLSR9ydvCExY6k', 'output': 'json', 'q': str(address)})
-				f = urllib2.urlopen("http://maps.google.com/maps/geo?"+str(params))
-				result = ast.literal_eval(f.read())
+				result = get_google_maps_result_from_request(str(address))
 				if result['Status']['code'] == 200:
 					coord=result['Placemark'][0]['Point']['coordinates']
 					row.latitude = coord[1]
@@ -121,9 +119,6 @@ def get_coordinates_for_googlemaps():
 				row.latitude = 0
 				row.longitude=0
 				row.save()
-		
-			#print str(result)
-			#print str(result["Point"])
 			
 		if row.latitude == None:
 			continue
@@ -156,7 +151,13 @@ def get_location(device):
         return (res)  
     
     return ('unavailable')
-		
+
+def get_google_maps_result_from_request(address):
+	params = urllib.urlencode({'key': 'AIzaSyBHEmkA7XyusAjA9Zf-UnLSR9ydvCExY6k', 'output': 'json', 'q': str(address)})
+	f = urllib2.urlopen("http://maps.google.com/maps/geo?"+str(params))
+	result = ast.literal_eval(f.read())
+	return result
+
 def save_device_details_from_request(request,device):
 	hashing = views_helper.get_hash(device)
 	dname = request.POST.get('name')
@@ -172,9 +173,7 @@ def save_device_details_from_request(request,device):
 
 	try:
 		address = dcity+","+dstate+","+dcountry
-		params = urllib.urlencode({'key': 'AIzaSyBHEmkA7XyusAjA9Zf-UnLSR9ydvCExY6k', 'output': 'json', 'q': str(address)})
-		f = urllib2.urlopen("http://maps.google.com/maps/geo?"+str(params))
-		result = ast.literal_eval(f.read())
+		result = get_google_maps_result_from_request(str(address))
 		if result['Status']['code'] == 200:
 			
 			coord=result['Placemark'][0]['Point']['coordinates']
