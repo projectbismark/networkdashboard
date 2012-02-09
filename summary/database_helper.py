@@ -52,13 +52,34 @@ def list_isps():
 	ret.sort()
 	return ret
 
+def device_count_and_country_data():
+	distinct_countries = list_countries()
+	
+	response = []
+	
+	for country in distinct_countries:
+		count = device_count_for_country(country)
+		value={}
+		value['count']=count
+		if country!='':
+			value['country']=country
+		else:
+			value['country']="Unknown"
+		response.append(value)
+	
+	return response
+
+def device_count_for_country(cntry):
+	return len(Devicedetails.objects.filter(country=cntry))
+	
+
 def list_countries():
 	ret=[]
 	out = Devicedetails.objects.values('country').distinct()
 	for one in out:
-		print ast.literal_eval(str(one))
 		value = ast.literal_eval(str(one))
-		ret.append(value['country'])
+		v = value['country']
+		ret.append(v)
 		
 	ret.sort()
 	return ret

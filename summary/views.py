@@ -14,7 +14,10 @@ import cvs_helper,datetime_helper,database_helper,views_helper,email_helper
 from graph_filter import *
 
 def index(request):
-    return render_to_response('index.html')
+	
+	response = database_helper.device_count_and_country_data()
+	
+	return render_to_response('index.html', {'country-data' : response})
 
 def editDevicePage(request, devicehash):
     device_details = Devicedetails.objects.filter(hashkey=devicehash)
