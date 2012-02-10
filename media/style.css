@@ -15,6 +15,7 @@ body {
     font-family: arial, sans-serif;
     background: rgb(234,234,240);
     font-size: 9pt;
+    border-bottom: 0px;
 }
 
 
@@ -55,6 +56,7 @@ table td{
 
 #c2{
     margin-left:auto;
+    padding-bottom:10px;
     margin-right:auto;
     width:1200px;
     height:600px;
@@ -70,6 +72,8 @@ table td{
 
 .content{
     position:relative;
+    display: inline-block;
+    width:1200px;
     padding:0;
     top:15px;
 }
@@ -102,31 +106,15 @@ table td{
     top:70px;
 }
 
-div.span10{
-    position:relative;
-    width:300px;
-    height: 400px;
-    margin: auto;
-    padding:0;
-    
-}
-
-div.span4{
-    position:relative;
-    margin-left:75px;
-    width:850px;
-    height:400px;
-    padding:0;
-    left:25px;
-}
-
 
 
 div.display{
     width:750px;
     height:424px;
+    margin-left:30px;
     top:-24px;
     margin: 0;
+    float:left;
 }
 
 ul.tabrow{
@@ -258,8 +246,6 @@ DIV.section {
 /*    background-image: -o-linear-gradient(left,rgba(249,249,255),rgba(180,198,220));
     background: -webkit-gradient(linear, left top, right bottom, from(rgb(249,249,255)), to(rgb(180,198,220)));
     background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(180,198,220));*/
-    margin-left:auto;
-    margin-right:auto;
     background-color:rgb(249,249,255);
     height:400px;
     /*width:900px;*/
@@ -267,6 +253,14 @@ DIV.section {
     -moz-box-shadow:2px 2px 2px #333333;
     box-shadow:2px 2px 2px #333333;
 /*    background-image: -o-linear-gradient(left,rgb(249,249,255),rgb(230,234,240));*/
+}
+
+#section_1{
+    position:relative;
+    float: left;
+    margin-right:45px;
+    width:300px;
+    height:400px;
 }
 
 
