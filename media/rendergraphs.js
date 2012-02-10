@@ -53,13 +53,13 @@ function createParameters(i){
         selected: 1
     };
     var plotoptions = {};
-    var units = "KBps";
+    var units = "bps";
 
 
     switch (i){
         case 0:
             formatter = function(){
-                    return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y)+'</b> KBps';
+                    return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y)+'</b> bps';
                 };
             graphid = 0;
             break;
