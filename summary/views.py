@@ -172,7 +172,7 @@ def linegraph_lmrtt(request):
     for row in filtered_deviceids:
 		other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
     result=[]
-    result.append(cvs_helper.linegraph_normal(device_details,'last-mile Rtt'),1)
+    result.append(cvs_helper.linegraph_normal(device_details,'last-mile Rtt',1))
 
     if (filter_by != 'none'):
 		bucket_width = 2*3600
@@ -231,7 +231,7 @@ def linegraph_rtt(request):
 		if len(device_details)<=0 :
 			continue
 		
-		result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup)),1)
+		result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup),1))
 
 		if (filter_by != 'none'):
 			result.append(cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,"median"+str(count)))
