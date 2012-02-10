@@ -137,8 +137,8 @@ def linegraph_bitrate(request):
     my_device_details_other = my_device_details.exclude(toolid='NETPERF_3')
 
     result=[]
-    result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"multi-threaded tcp",1000))
-    result.append(cvs_helper.linegraph_normal(my_device_details_other,"single-threaded tcp",1000))
+    result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"multi-threaded tcp",1000),1)
+    result.append(cvs_helper.linegraph_normal(my_device_details_other,"single-threaded tcp",1000),1)
     
     if (g_filter.filter_by != 'none'):
 		bucket_width = 24*3600
@@ -172,7 +172,7 @@ def linegraph_lmrtt(request):
     for row in filtered_deviceids:
 		other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
     result=[]
-    result.append(cvs_helper.linegraph_normal(device_details,'last-mile Rtt'))
+    result.append(cvs_helper.linegraph_normal(device_details,'last-mile Rtt'),1)
 
     if (filter_by != 'none'):
 		bucket_width = 2*3600
@@ -231,7 +231,7 @@ def linegraph_rtt(request):
 		if len(device_details)<=0 :
 			continue
 		
-		result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup)))
+		result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup)),1)
 
 		if (filter_by != 'none'):
 			result.append(cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,"median"+str(count)))
@@ -268,7 +268,7 @@ def linegraph_bytes_hour(request):
 	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
     
     result=[]
-    result.append(cvs_helper.linegraph_normal_passive(device_details,'bytes per hour'))
+    result.append(cvs_helper.linegraph_normal_passive(device_details,'bytes per hour'),1)
 
     '''
     if (filter_by != 'none'):
@@ -310,7 +310,7 @@ def linegraph_bytes_port_hour(request):
     
     result=[]
     for i in range(0,len(port_names)):
-    	result.append(cvs_helper.linegraph_normal_passive(device_details.filter(port=port_high[i]),port_names[i]))
+    	result.append(cvs_helper.linegraph_normal_passive(device_details.filter(port=port_high[i]),port_names[i]),1)
 
     '''
     if (filter_by != 'none'):
