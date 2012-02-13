@@ -116,6 +116,14 @@ div.display{
     margin: 0;
     float:left;
 }
+div.linkbox{
+    position:relative;
+    width:95%;
+    margin-left:auto;
+    margin-right:auto;
+    top:80px;
+    height:50px;
+}
 
 ul.tabrow{
     line-height:24px;
@@ -254,7 +262,10 @@ DIV.section {
     box-shadow:2px 2px 2px #333333;
 /*    background-image: -o-linear-gradient(left,rgb(249,249,255),rgb(230,234,240));*/
 }
-
+#submit_1{
+    position:relative;
+    left:5px;
+}
 #section_1{
     position:relative;
     float: left;

@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 
+
 <div class="container" id="c2">
 
+    
     <div class="page-header">
         <div class="header-text">
-          <h1> {{detail.name}} - <a href ="/editDevicePage/{{detail.hashkey}}"> Edit </a></h1>
+          <h1> {{detail.name}} </h1>
         </div>
     </div>
     <div class="content">
@@ -35,10 +37,13 @@
                             <tr><td>Upload Rate</td><td>{{ detail.uploadrate}} kbps</td></tr>
                             <tr><td>First Measurement</td><td>{{ firstUpdate }}</td></tr>
                             <tr><td>Last Measurement</td><td>{{ lastUpdate }}</td></tr>
-                            <tr><td>Raw Data</td></td><td><a href="http://projectbismark.net/data/{{ deviceid }}">Download XML</a></td></tr>
-                            <tr><td><a href ="/feedback.html/?hashkey={{detail.hashkey}}" onClick ="return feedback(this, 'feedback')"><b>Feedback</b></a></td></tr>
                         </table>
                         URL for this device page: <input id="url" type="text" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}"/>
+                        <div class ="linkbox">
+                            <a class="btn btn-primary btn-large" href="/editDevicePage/{{detail.hashkey}}"> <b>Edit</b></a></h1>
+                            <a class="btn btn-primary btn-large" href ="/feedback.html/?hashkey={{detail.hashkey}}" onClick ="return feedback(this, 'feedback')"><b>Feedback</b></a>
+                            <a class="btn btn-primary btn-large" href="http://projectbismark.net/data/{{ deviceid }}"><b>Download</b></a>
+                        </div>
                     </div>
                 </div>
                 <div class ="display">
