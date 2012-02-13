@@ -69,6 +69,9 @@ function createParameters(i){
             graphno = 2;
             titlename = "Upload Throughput";
             graphid = 1;
+            formatter = function(){
+                    return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y)+'</b> bps';
+                };
             break;
         case 2:
             units = "msec";
