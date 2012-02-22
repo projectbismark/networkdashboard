@@ -222,11 +222,12 @@ DIV.outerContainer {
     box-shadow:2px 2px 2px #333333;*/
 }
 
-#outer_container_1,outer_container_2,outer_container_3, outer_container_4{
+#outer_container_1,#outer_container_2,#outer_container_3, #outer_container_4{
     top:2px;
     left:-2px;
     width:850px;
     height:400px;
+    
 }
 #outer_container_5{
     top:0px;
@@ -243,7 +244,7 @@ DIV.outerContainer {
     border-radius:10px;*/
 }
 
-#graph_div_1,graph_div2,graph_div3,graph_div{
+#graph_div_1,#graph_div_2,#graph_div_3,#graph_div_4{
     width:849px;
     height:399px;
 }
