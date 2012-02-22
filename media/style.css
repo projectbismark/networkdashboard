@@ -6,7 +6,6 @@ body, html {
 }
 
 html{
-    overflow:scroll;
 }
 
 
@@ -66,6 +65,18 @@ table td{
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
+#c3{
+    margin-left:auto;
+    padding-bottom:10px;
+    margin-right:auto;
+    width:1200px;
+    height:700px;
+    border-bottom: 1px solid #ddd;
+    -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    -moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
 #header1{
     height:230px;
 }
@@ -73,7 +84,8 @@ table td{
 .content{
     position:relative;
     display: inline-block;
-    width:1200px;
+    width:inherit;
+    height:400px;
     padding:0;
     top:15px;
 }
@@ -93,7 +105,6 @@ table td{
     margin-left:auto;
     margin-right:auto;
     padding-left:15px;
-    height:120px;
     -moz-box-shadow: 0 0 2px 2px rgba(255, 255, 255, 0.5);
     -webkit-box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0.5);
     box-shadow: 0 0 1px 1px rgba(255, 255, 255, 0.5);
@@ -101,20 +112,145 @@ table td{
     border-right: 1px solid #ddd;
     border-left: 1px solid #ddd;
 }
+#page_header_1{
+    height:170px;
+}
+
+#page_header_2{
+    height:100px;
+}
 .header-text{
     position:relative;
+}
+#header_text_1{
+    top:50px;
+    padding-left:30px;
+    padding-right:30px;
+}
+#header_text_2{
     top:70px;
+}
+
+.map-area{
+    position:relative;
+    width:600px;
+    height:400px;
+    float:right;
+    left:-10px;
+    margin-right:100px;
+}
+
+.stats-area{
+    position:relative;
+    width:300px;
+    float:left;
+    margin-left:100px;
+}
+
+.content-inner{
+    position:relative;
+    height:inherit;
+    width: 851px;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.section {
+    position:relative;
+    border-left:1px solid #000;
+    border-top:1px solid #000;
+    background-color:rgb(249,249,255);
+    height:inherit;
+    width:300px;
+    -moz-box-shadow:2px 2px 2px #333333;
+    box-shadow:2px 2px 2px #333333;
+    position:relative;
+    float: left;
+    margin:0;
+}
+
+#section_1{
+    margin-left:auto;
+    width:290px;
+}
+
+#section_2{
+    
 }
 
 
 
-div.display{
-    width:750px;
-    height:424px;
-    margin-left:30px;
-    top:-24px;
+.display{
+    position:relative;
+    height:inherit;  
     margin: 0;
+}
+
+#display_1{
+    width:560px;
+    height: 700px;
+    top:0px;
+    margin-left:0;
     float:left;
+}
+
+#display_2{
+    top:-24px;
+    margin-left:0px;
+    width:850px;
+    height: 424px;
+    float:right;
+}
+
+DIV.outerContainer {
+    margin-left:auto;
+    margin-right: auto;
+    border: 0px;
+    border-top: 1px solid #000;
+    border-left: 1px solid #000;
+    background-color:#f9f9ff;
+    background:#f9f9ff;
+    /*border-left:3px solid rgb(44,44,88);*/
+    /*border-radius:10px;
+    -moz-border-radius:10px;*/
+    border-color: #000;
+    position:relative;
+    z-index:1;
+    -moz-box-shadow:2px 2px 2px #333333;
+    box-shadow:2px 2px 2px #333333;
+/*    -moz-box-shadow:2px 2px 2px #333333;
+    box-shadow:2px 2px 2px #333333;*/
+}
+
+#outer_container_1,outer_container_2,outer_container_3, outer_container_4{
+    top:2px;
+    left:-2px;
+    width:850px;
+    height:400px;
+}
+#outer_container_5{
+    top:0px;
+    width:560px;
+    height:400px; 
+}
+
+.graphdiv {
+    position:absolute;
+    left:1px;
+    top:1px;
+    /*
+    -moz-border-radius:10px;
+    border-radius:10px;*/
+}
+
+#graph_div_1,graph_div2,graph_div3,graph_div{
+    width:849px;
+    height:399px;
+}
+
+#map{
+    width:560px;
+    height:400px;
 }
 div.linkbox{
     position:relative;
@@ -170,9 +306,6 @@ ul.tabrow li.selected{
     z-index:3;
 }
 
-.display{
-    position:relative;
-}
 .tab{
     position:absolute;
     margin-left:auto;
@@ -245,42 +378,36 @@ ul.tabrow li:after {
 
 
 
-DIV.section {
-    border-left:1px solid #000;
-    border-top:1px solid #000;
-/*    border-style: solid;
-    border-color: white;
-    border-width: 2px;*/
-/*    background-image: -o-linear-gradient(left,rgba(249,249,255),rgba(180,198,220));
-    background: -webkit-gradient(linear, left top, right bottom, from(rgb(249,249,255)), to(rgb(180,198,220)));
-    background: -moz-linear-gradient(-45deg, rgb(249,249,255),rgb(180,198,220));*/
-    background-color:rgb(249,249,255);
-    height:400px;
-    /*width:900px;*/
-/*    -moz-box-shadow:inset 0 0 5px rgb(17,0,54);*/
-    -moz-box-shadow:2px 2px 2px #333333;
-    box-shadow:2px 2px 2px #333333;
-/*    background-image: -o-linear-gradient(left,rgb(249,249,255),rgb(230,234,240));*/
-}
+
+
+
 #submit_1{
     position:relative;
     left:5px;
 }
-#section_1{
-    position:relative;
-    float: left;
-    margin-right:45px;
-    width:300px;
-    height:400px;
+
+
+#index_content{
+    top:-50px;
+    padding:0;
 }
 
 
 #feedback_link{
     text-align:right;
 }
-#section_text{
+#section_text_1{
     padding: 10px;
     text-align:left;
+}
+#section_text_1 h1{
+    margin-bottom:10px;
+}
+
+#section_text_2{
+    padding: 10px;
+    text-align: left;
+    margin-bottom: 20px;
 }
 #banner_1{
     position: relative;
@@ -288,10 +415,6 @@ DIV.section {
     height: 30px;
 }
 
-#section_2{
-    position:relative;
-    top:30px;
-}
 DIV.about {
 /*    color:rgb(38,0,117);*/
 /*    border-radius:10px;
@@ -333,8 +456,8 @@ DIV.progresscontainer {
 
 DIV.map {
     position: relative;
-    width: 500px;
-    height: 300px;
+    width: 600px;
+    height: 400px;
     text-align: center;
     margin-left:auto;
     margin-right:auto;
@@ -389,40 +512,7 @@ DIV.progressbar {
 }
 
 
-DIV.graphdiv {
-    width: 849px;
-    height: 400px;
-    position:absolute;
-    left:1px;
-    /*
-    -moz-border-radius:10px;
-    border-radius:10px;*/
-    
-}
 
-
-DIV.outergraphdiv {
-    top:2px;
-    width:850px;
-    height: 400px;
-    margin-left:auto;
-    margin-right: auto;
-    border: 0px;
-    border-top: 1px solid #000;
-    border-left: 1px solid #000;
-    background-color:#f9f9ff;
-    background:#f9f9ff;
-    /*border-left:3px solid rgb(44,44,88);*/
-    /*border-radius:10px;
-    -moz-border-radius:10px;*/
-    border-color: #000;
-    position:relative;
-    z-index:1;
-    -moz-box-shadow:2px 2px 2px #333333;
-    box-shadow:2px 2px 2px #333333;
-/*    -moz-box-shadow:2px 2px 2px #333333;
-    box-shadow:2px 2px 2px #333333;*/
-}
 
 /*#graph_div_outer_1 {
     margin-left:auto;
@@ -435,19 +525,6 @@ DIV.outergraphdiv {
     position: relative;
     top:40px;
 }*/
-
-#label_1 {
-    position:absolute;
-    top:-20px;
-    left:230px;
-    
-}
-
-#label_2 {
-    position:absolute;
-    top:-45px;
-    left:230px;
-}
 DIV.projects ul {
 	list-style-type: circle;
 	padding-left: 2.5em;
@@ -469,6 +546,8 @@ DIV.traps a {
 
 a:visited { 
 }
+
+
 
 
 p.lastupdated { 

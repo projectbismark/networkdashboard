@@ -17,7 +17,7 @@ def index(request):
 	
 	response = database_helper.device_count_and_country_data()
 	
-	return render_to_response('index.html', {'country-data' : response})
+	return render_to_response('index.html', {'country_data' : response})
 
 def editDevicePage(request, devicehash):
     device_details = Devicedetails.objects.filter(hashkey=devicehash)
