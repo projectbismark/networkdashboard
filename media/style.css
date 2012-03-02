@@ -252,6 +252,8 @@ DIV.outerContainer {
 #map{
     width:560px;
     height:400px;
+    top:0px;
+    left:0px;
 }
 div.linkbox{
     position:relative;

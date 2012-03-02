@@ -3,7 +3,7 @@
 {% block content %}
 
 <script src="/static/jquery-latest.js"></script>
-<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBHEmkA7XyusAjA9Zf-UnLSR9ydvCExY6k&sensor=false"></script>
+<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
 <body onload="load()" onunload="GUnload()">
 
 <div class="container" id="c3">
@@ -46,12 +46,15 @@
 </div>
             
 <script type="text/javascript">
+    
+    var locs = new Array();
+    var delay = 5000;
 
     function load()
     {
         var mid = new google.maps.LatLng(0,0);
         var options = {
-                zoom: 1,
+                zoom: 3,
                 center: mid,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
         };
@@ -64,7 +67,27 @@
                 type: "GET",
                 url: "/getCoordinates/",
                 success: OnSuccess
-        });            
+        });
+        locs[0]= new google.maps.LatLng(40,-97);
+        locs[1]= new google.maps.LatLng(-20,-58);
+        locs[2]= new google.maps.LatLng(0,17);
+        locs[3]= new google.maps.LatLng(49,30);
+        locs[4]= new google.maps.LatLng(50,120);
+        locs[5]= new google.maps.LatLng(-5,130);
+        CycleMap(0);
+    }
+    
+    function CycleMap(i){
+        var mi = i;
+        if(mi<locs.length){
+            map.panTo(locs[mi]);
+            mi++;
+        }
+        else{
+            map.panTo(locs[0]);
+            mi=1;
+        }
+        setTimeout(function(){CycleMap(mi)}, delay);
     }
 
     function OnSuccess(data){
