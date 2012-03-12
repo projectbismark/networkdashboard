@@ -232,7 +232,26 @@ DIV.outerContainer {
 #outer_container_5{
     top:0px;
     width:560px;
-    height:400px; 
+    height:400px;
+    text-align:left;
+}
+
+.controls{
+    position:relative;
+    width:inherit;
+    height:60px;
+}
+
+#map_control_1{
+    position:relative;
+    margin-left:auto;
+    margin-right:auto;
+}
+#map_control_2{
+    float:left;   
+}
+#map_control_3{
+    float:right;   
 }
 
 .graphdiv {
