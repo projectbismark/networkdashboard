@@ -2,8 +2,6 @@
 
 {% block content %}
 
-<script src="/static/jquery-latest.js"></script>
-<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyBHEmkA7XyusAjA9Zf-UnLSR9ydvCExY6k&sensor=false"></script>
 <body onload="load()" onunload="GUnload()">
 
 <div class="container" id="c3">
@@ -40,12 +38,60 @@
                 <div class ="outerContainer" id="outer_container_5">
                     <div class ="graphdiv" id="map"></div>
                 </div>
+                <div class ="controls">
+                    <!--<a class="btn btn-primary btn-large" href="" id="map_control_1"> <b>Edit</b></a>
+                    <a class="btn btn-primary btn-large" href="" id="map_control_2"> <b>Edit</b></a>
+                    <a class="btn btn-primary btn-large" href="" id="map_control_3"> <b>Edit</b></a>-->
+                </div>
            </div>
         </div>
     </div>
 </div>
             
 <script type="text/javascript">
+    
+    //delay after panning to new location
+    var delay = 5000;
+    //delay between zoomout-pan-zoomin
+    var animationDelay = 700;
+    //delay between zoom levels (currently bugs with googles continuous zoom methods, so this must be handled manually)
+    var innerAnimationDelay = 30;
+    var points = new Array();
+    //threshold for panning map. Map will pam to the closest, unvisited node that is at least this far away (in kilometers)
+    var thresh = 1000;
+    var minZoom = 1;
+    var maxZoom = 5;
+    
+    function MapPoint(latLng){
+        this.visited = false;
+        this.latLng = latLng;
+    }
+    
+    function resetPoints(){
+        for(var i=0;i<points.length;i++){
+            points[i].visited = false;
+        }
+    }
+    
+    function zoomIn(){
+        var z = map.getZoom();
+        if(z<maxZoom){
+            map.setZoom(z+1);
+            setTimeout(function(){zoomIn()}, innerAnimationDelay);
+        }
+    }
+    
+    function zoomOut(){
+        var z = map.getZoom();
+        if(z>minZoom){
+            map.setZoom(z-1);
+            setTimeout(function(){zoomOut()}, innerAnimationDelay);
+        }
+    }
+    
+    function panMap(coords){
+        map.panTo(coords);
+    }
 
     function load()
     {
@@ -64,15 +110,48 @@
                 type: "GET",
                 url: "/getCoordinates/",
                 success: OnSuccess
-        });            
+        });
+        /*
+        setTimeout(function(){cycleMap()}, delay);
+		*/
+    }
+    
+    function cycleMap(){
+        var mid = map.getBounds().getCenter();
+        var next = mid;
+        //in kilometers
+        var shortestDist = 0;
+        for(var i =0;i<points.length;i++){
+            if(!points[i].visited){
+                var d = (google.maps.geometry.spherical.computeDistanceBetween(mid,points[i].latLng))/1000;
+                if(d<thresh){
+                    points[i].visited=true;
+                }
+                else if((d<shortestDist)||(shortestDist==0)){
+                    next = points[i];
+                    shortestDist=d;
+                }
+            }
+        }
+        if (shortestDist==0){
+            resetPoints();
+            cycleMap();    
+        }
+        else{
+            zoomOut();
+            setTimeout(function(){panMap(next.latLng)}, animationDelay);
+            setTimeout(function(){zoomIn()}, animationDelay*2);
+            setTimeout(function(){cycleMap()}, delay+animationDelay*2);
+        }
     }
 
     function OnSuccess(data){
-        coordstring = data.split("\n");
+        var coordstring = data.split("\n");
         for (var i=0; i<coordstring.length-1; i++){
             var coords = coordstring[i].split(":");
             if(coords[1]=='coord'){
                 var point = new google.maps.LatLng(parseFloat(coords[2]),parseFloat(coords[3]));
+                points.push(new MapPoint(point));
                 var marker = new google.maps.Marker({
                         position: point
                 })
