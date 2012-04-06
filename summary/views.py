@@ -185,7 +185,7 @@ def linegraph_lmrtt(request):
 def linegraph_rtt(request):
 	device = request.GET.get('deviceid')
 	filter_by = request.GET.get('filter_by')
-]
+
     #all_device_details= MRtt.objects.filter(average__lte=3000).order_by('eventstamp')
 
     #other_device_details = []
