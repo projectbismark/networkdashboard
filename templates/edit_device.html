@@ -74,7 +74,10 @@
             <td>Country</td>
             <td>
 		<select name = "country">
-
+			<option selected> {{detail.country}} </option>
+			{% include "countries.html" %}
+			
+			<!--
 	   		{% for country in country_options %}
 				{% if country == detail.country %}
  					<option selected>{{country}}</option>
@@ -83,7 +86,7 @@
  					<option>{{country}}</option>
 				{% endif %}
 				
-	   		{% endfor %}
+	   		{% endfor %}-->
 		</select>
 
             </td>

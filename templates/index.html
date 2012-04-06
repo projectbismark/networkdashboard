@@ -95,9 +95,9 @@
 
     function load()
     {
-        var mid = new google.maps.LatLng(40,-97);
+        var mid = new google.maps.LatLng(0,0);
         var options = {
-                zoom: maxZoom,
+                zoom: 1,
                 center: mid,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
         };
@@ -111,8 +111,9 @@
                 url: "/getCoordinates/",
                 success: OnSuccess
         });
-        
+        /*
         setTimeout(function(){cycleMap()}, delay);
+		*/
     }
     
     function cycleMap(){
