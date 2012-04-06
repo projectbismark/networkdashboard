@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+<em>{% extends "base.html" %}
 {% block content %}
 
 <h1> Edit Device {{detail.name}} </h1> <br />
@@ -14,20 +14,8 @@
         </tr>
   	<tr>
             <td>ISP</td>
-            <td>
-		<select name = "isp">
-
-	   		{% for isp in isp_options %}
-				{% if isp == detail.isp %}
- 					<option selected>{{isp}}</option>
-				{% endif %}
-				{% if isp != detail.isp %}
- 					<option>{{isp}}</option>
-				{% endif %}
-				
-	   		{% endfor %}
-		</select>
-
+			<td>
+                <input type ="isp" name ="isp" value = "{{detail.isp}}" size ="20"/>
             </td>
         </tr>
         <tr>
@@ -37,6 +25,10 @@
                     <option>DSL </option>
                     <option selected>Fiber</option>
                     <option>Cable</option>
+                    <option>Wireless - Cellular</option>
+                    <option>Wireless - WiMAX</option>
+                    <option>Wireless - 802.11</option>
+                    <option>Other</option>
                 </select>
             </td>
         </tr>
@@ -101,3 +93,4 @@
 
 
 {% endblock %}
+</em>
