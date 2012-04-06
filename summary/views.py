@@ -237,10 +237,7 @@ def linegraph_rtt(request):
 
 		count+=1
 
-	answer = str(result).replace("['","[")
-	answer = answer.replace(")'",")")
-
-	return HttpResponse("(" + answer + ")")
+	return HttpResponse("(" + str(replace) + ")")
 
 def linegraph_bytes_hour(request):
     device = request.GET.get('deviceid')
