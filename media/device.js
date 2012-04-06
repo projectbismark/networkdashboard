@@ -1,3 +1,22 @@
+hashid="";
+tabid=1;
+
+function setHashid(data){
+	hashid=data;
+}
+
+function setTabid(data){
+	tabid=data;
+}
+
+function getHashid(data){
+	hashid=data;
+}
+
+function getTabid(data){
+	tabid=data;
+}
+
 function feedback(link,windowname){
     if (!window.focus){
         return true;
@@ -20,8 +39,13 @@ function changeTab(active, total, tab, content) {
       document.getElementById(tab+i).className = '';  
     }  
     document.getElementById(content+active).style.display = 'block';  
-    document.getElementById(tab+active).className = 'selected';      
+    document.getElementById(tab+active).className = 'selected';
+    setTabid(active);
+	updateShareLink();
+}
 
+function updateShareLink(){
+	document.getElementById('url').value =  window.location.hostname + "/displayDevice/" + hashid + "?tab=" + tabid;
 }
 
 function hideBar(id){
@@ -31,4 +55,16 @@ function hideBar(id){
 function OnError(data)
 {
   alert("data loading failed");
+}
+
+function getParameterByName(name)
+{
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regexS = "[\\?&]" + name + "=([^&#]*)";
+  var regex = new RegExp(regexS);
+  var results = regex.exec(window.location.search);
+  if(results == null)
+    return "";
+  else
+    return decodeURIComponent(results[1].replace(/\+/g, " "));
 }

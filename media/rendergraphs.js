@@ -53,13 +53,15 @@ function createParameters(i){
         selected: 1
     };
     var plotoptions = {};
-    var units = "KBps";
+    var units = "bps";
 
 
     switch (i){
         case 0:
             formatter = function(){
-                    return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y)+'</b> KBps';
+                    var si = determineSI(this.points[0].y,0);
+                    var d = parseFloat(recDivide(this.points[0].y,this.points[0].y,0));
+                    return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ d+'</b>' + si;
                 };
             graphid = 0;
             break;
@@ -69,6 +71,11 @@ function createParameters(i){
             graphno = 2;
             titlename = "Upload Throughput";
             graphid = 1;
+            formatter = function(){
+                    var si = determineSI(this.points[0].y,0);
+                    var d = parseFloat(recDivide(this.points[0].y,this.points[0].y,0));
+                    return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>' + d + '</b>' + si;
+                };
             break;
         case 2:
             units = "msec";
@@ -234,3 +241,46 @@ function renderGraphs(deviceid){
             });   
     }
 }
+
+function determineSI(n,i){
+    var d = n/1000;
+    var ret = "";
+    if(d<1){
+        switch(i){
+            case 0:
+                ret = "bps";
+                break;
+            case 1:
+                ret = "Kbps";
+                break;
+            case 2:
+                ret = "Mbps"
+                break;
+            case 3:
+                ret = "Gbps"
+                break;
+            default:
+                ret = "bps"
+                break;
+        }
+        return ret;
+    }
+    else{
+        return determineSI(d,i+1);
+    }
+}
+
+function recDivide(bits, n, i){
+    var d = n/1000;
+    if(i>3){
+        return bits;
+    }
+    else if(d<1){
+        return n;
+    }
+    else{
+        return recDivide(bits,d,i+1);
+    }
+}
+    
+

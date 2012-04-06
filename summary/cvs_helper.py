@@ -55,6 +55,9 @@ def linegraph_bucket(data,bucket_size,title):
 	return result
 
 def linegraph_normal(data,title):
+	return linegraph_normal(data,title,1)
+
+def linegraph_normal(data,title,factor):
     result={}
     result['name'] = title
     result['type'] = "line"
@@ -67,7 +70,7 @@ def linegraph_normal(data,title):
 	temp=[]
 
 	temp.append(datetime_helper.datetime_to_JSON(measure.eventstamp))
-	temp.append(int(measure.average))
+	temp.append(int(measure.average)*factor)
 	output.append(temp)
 
     result['data'] = output

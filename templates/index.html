@@ -2,84 +2,195 @@
 
 {% block content %}
 
-    <div class="page-header" id ="header1">
-        <div class="header-text">
+<body onload="load()" onunload="GUnload()">
+
+<div class="container" id="c3">
+    <div class="page-header" id="page_header_1">
+        <div class="header-text" id="header_text_1">
             <p><b>What is network dashboard?  </b>The <em>network dashboard</em> is
             a portal designed to help home users visualize properties of their
             home Internet connections.  To use the network dashboard, users
             install a BISMark-enabled gateway device in their home network.  The
             gateway device periodically uploads measurements of the user's
             Internet Service Provider to a centralized database, which the user
-            can access via this portal.</p><br/>
-    
+            can access via this portal.</p>
+
             <form method = "POST" name="device_form" action ="/device/">
-            <b>Enter Device MAC Address:</b><br /> 
-                <input type = "text" name = "device" value ="c43dc7a376d3"/>
-                <input type = "submit" value = "Search"/>
+                    <b>Enter Device MAC Address:</b><br /> 
+                    <input type = "text" name = "device" value ="c43dc7a376d3"/>
+                    <input class="btn btn-primary btn-large" id="submit_1" type = "submit" value = "Search"/>
             </form>
         </div>
     </div>
-
-<script src="/static/jquery-latest.js"></script>
-<script language="Javascript" src="http://gd.geobytes.com/gd?after=-1&variables=GeobytesCountry,GeobytesCity,GeobytesRegion,GeobytesLatitude,GeobytesLongitude">
-</script>
-<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
-<body onload="load()" onunload="GUnload()">
-<div class ="label">
-    <b>Device Map</b>
+    <div class="content">
+        <div class="content-inner">
+            <div class ="section" id="section_1">
+                <div id="section_text_1">
+                    <h1> Active Devices </h1>
+                    <table class="info"> 
+                        {% for country in country_data %}
+                            <tr><td>{{country.count}} Device(s) found in {{country.country}}</td></tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            <div class ="display" id="display_1"> 
+                <div class ="outerContainer" id="outer_container_5">
+                    <div class ="graphdiv" id="map"></div>
+                </div>
+                <div class ="controls">
+                    <!--<a class="btn btn-primary btn-large" href="" id="map_control_1"> <b>Edit</b></a>
+                    <a class="btn btn-primary btn-large" href="" id="map_control_2"> <b>Edit</b></a>
+                    <a class="btn btn-primary btn-large" href="" id="map_control_3"> <b>Edit</b></a>-->
+                </div>
+           </div>
+        </div>
+    </div>
 </div>
-<div id="map" class="map"></div>
-
+            
 <script type="text/javascript">
+    
+    //delay after panning to new location
+    var delay = 5000;
+    //delay between zoomout-pan-zoomin
+    var animationDelay = 700;
+    //delay between zoom levels (currently bugs with googles continuous zoom methods, so this must be handled manually)
+    var innerAnimationDelay = 30;
+    var points = new Array();
+    //threshold for panning map. Map will pam to the closest, unvisited node that is at least this far away (in kilometers)
+    var thresh = 1000;
+    var minZoom = 1;
+    var maxZoom = 5;
+    
+    function MapPoint(latLng){
+        this.visited = false;
+        this.latLng = latLng;
+    }
+    
+    function resetPoints(){
+        for(var i=0;i<points.length;i++){
+            points[i].visited = false;
+        }
+    }
+    
+    function zoomIn(){
+        var z = map.getZoom();
+        if(z<maxZoom){
+            map.setZoom(z+1);
+            setTimeout(function(){zoomIn()}, innerAnimationDelay);
+        }
+    }
+    
+    function zoomOut(){
+        var z = map.getZoom();
+        if(z>minZoom){
+            map.setZoom(z-1);
+            setTimeout(function(){zoomOut()}, innerAnimationDelay);
+        }
+    }
+    
+    function panMap(coords){
+        map.panTo(coords);
+    }
 
-   function load()
+    function load()
     {
-     var mid = new google.maps.LatLng(0,0);
-     var options = {
-     zoom: 1,
-     center: mid,
-     mapTypeId: google.maps.MapTypeId.ROADMAP
-     };
+        var mid = new google.maps.LatLng(0,0);
+        var options = {
+                zoom: 1,
+                center: mid,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
 
-     map = new google.maps.Map(document.getElementById("map"),options);
-  
-         
-      
-      $.ajax({
+        map = new google.maps.Map(document.getElementById("map"),options);
+        geocoder = new google.maps.Geocoder();
+
+
+        $.ajax({
                 type: "GET",
                 url: "/getCoordinates/",
                 success: OnSuccess
-            });            
-   }
-   
-   function OnSuccess(data){
-        coordstring = data.split("\n");
+        });
+        /*
+        setTimeout(function(){cycleMap()}, delay);
+		*/
+    }
+    
+    function cycleMap(){
+        var mid = map.getBounds().getCenter();
+        var next = mid;
+        //in kilometers
+        var shortestDist = 0;
+        for(var i =0;i<points.length;i++){
+            if(!points[i].visited){
+                var d = (google.maps.geometry.spherical.computeDistanceBetween(mid,points[i].latLng))/1000;
+                if(d<thresh){
+                    points[i].visited=true;
+                }
+                else if((d<shortestDist)||(shortestDist==0)){
+                    next = points[i];
+                    shortestDist=d;
+                }
+            }
+        }
+        if (shortestDist==0){
+            resetPoints();
+            cycleMap();    
+        }
+        else{
+            zoomOut();
+            setTimeout(function(){panMap(next.latLng)}, animationDelay);
+            setTimeout(function(){zoomIn()}, animationDelay*2);
+            setTimeout(function(){cycleMap()}, delay+animationDelay*2);
+        }
+    }
+
+    function OnSuccess(data){
+        var coordstring = data.split("\n");
         for (var i=0; i<coordstring.length-1; i++){
-            var coords = coordstring[i].split(",");
-            var point = new google.maps.LatLng(parseFloat(coords[0]),parseFloat(coords[1]));
-            var marker = new google.maps.Marker({
-            position: point
-            })
-            if (coords[2]=="server"){
-                marker.setIcon("http://gmaps-samples.googlecode.com/svn/trunk/markers/blue/blank.png");
+            var coords = coordstring[i].split(":");
+            if(coords[1]=='coord'){
+                var point = new google.maps.LatLng(parseFloat(coords[2]),parseFloat(coords[3]));
+                points.push(new MapPoint(point));
+                var marker = new google.maps.Marker({
+                        position: point
+                })
+                if (coords[0]=="server"){
+                        marker.setIcon("/static/images/icon-blue.png")
+                }
+                else{
+                        marker.setIcon("/static/images/icon-red.png");
+                }
+
+                marker.setMap(map);
             }
             else{
-                marker.setIcon("http://gmaps-samples.googlecode.com/svn/trunk/markers/red/blank.png");
+                geocoder.geocode( { 'address': coords[2]}, function(results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {
+
+                                var marker = new google.maps.Marker({
+                                        map: map,
+                                        position: results[0].geometry.location
+                                });
+                        }
+                });
             }
-        
-            marker.setMap(map);
-
         }
-   }
+    }
 
-   function GUnload(){
-      if (window.GUnloadApi)
-      {
-         GUnloadApi();
-      }
-   }
+    function GUnload(){
+            if (window.GUnloadApi)
+            {
+                    GUnloadApi();
+            }
+    }
 </script>
 </body>
 
 
-{% endblock %}
+	{% endblock %}
+
+
+
+	
+            
