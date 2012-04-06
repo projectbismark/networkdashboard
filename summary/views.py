@@ -137,8 +137,8 @@ def linegraph_bitrate(request):
     my_device_details_other = my_device_details.exclude(toolid='NETPERF_3')
 
     result=[]
-    result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"multi-threaded tcp",1000))
-    result.append(cvs_helper.linegraph_normal(my_device_details_other,"single-threaded tcp",1000))
+    result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"Multi-threaded TCP",1000))
+    result.append(cvs_helper.linegraph_normal(my_device_details_other,"Single-threaded TCP",1000))
     
     if (g_filter.filter_by != 'none'):
 		bucket_width = 24*3600
@@ -172,7 +172,7 @@ def linegraph_lmrtt(request):
     for row in filtered_deviceids:
 		other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
     result=[]
-    result.append(cvs_helper.linegraph_normal(device_details,'last-mile Rtt',1))
+    result.append(cvs_helper.linegraph_normal(device_details,'Last mile latency',1))
 
     if (filter_by != 'none'):
 		bucket_width = 2*3600

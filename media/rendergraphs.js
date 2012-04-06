@@ -5,7 +5,7 @@ function createParameters(i){
     var url = "/line_bitrate/";
     var graphno = 1;
     var divid = "graph_div_1";
-    var titlename ="Download Throughput";
+    var titlename ="";
     var formatter = function(){};
     var legend = {
         enabled: true,
@@ -53,7 +53,7 @@ function createParameters(i){
         selected: 1
     };
     var plotoptions = {};
-    var units = "bps";
+    var units = "Bytes per second";
 
 
     switch (i){
@@ -69,7 +69,7 @@ function createParameters(i){
         case 1:
             divid = "graph_div_2";
             graphno = 2;
-            titlename = "Upload Throughput";
+            titlename = "";
             graphid = 1;
             formatter = function(){
                     var si = determineSI(this.points[0].y,0);
@@ -78,8 +78,8 @@ function createParameters(i){
                 };
             break;
         case 2:
-            units = "msec";
-            titlename = "Round-Trip Time";
+            units = "Milliseconds";
+            titlename = "";
             divid = "graph_div_3";
             url = "/line_rtt/";
             formatter = function(){
@@ -88,8 +88,8 @@ function createParameters(i){
             graphid = 2;
             break;
         case 3:
-            units = "msec";
-            titlename = "Last Mile Latency";
+            units = "Milliseconds";
+            titlename = "";
             divid = "graph_div_4";
             url = "/line_lmrtt/";
             formatter = function(){
