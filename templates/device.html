@@ -32,11 +32,11 @@
 
                         </script></td>
                     </tr>     
-                    <tr><td>Service plan</td><td>{{ detail.serviceplan }}</td></tr>
-                    <tr><td>Download rate</td><td>{{ detail.downloadrate}} kbps</td></tr>
-                    <tr><td>Upload rate</td><td>{{ detail.uploadrate}} kbps</td></tr>
-                    <tr><td>First measurement</td><td>{{ firstUpdate }}</td></tr>
-                    <tr><td>Last measurement</td><td>{{ lastUpdate }}</td></tr>
+                    <tr><td>Service Plan</td><td>{{ detail.serviceplan }}</td></tr>
+                    <tr><td>Download Rate</td><td>{{ detail.downloadrate}} kbps</td></tr>
+                    <tr><td>Upload Rate</td><td>{{ detail.uploadrate}} kbps</td></tr>
+                    <tr><td>First Measurement</td><td>{{ firstUpdate }}</td></tr>
+                    <tr><td>Last Measurement</td><td>{{ lastUpdate }}</td></tr>
                 </table>
                 URL for this device page: <input id="url" type="text" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}"/>
                 <div class ="linkbox">
@@ -48,10 +48,10 @@
         </div>
         <div class ="display" id="display_2">
             <ul class ="tabrow">
-                <li class="selected" id="tab_1"><a href="javascript:changeTab(1,4,'tab_','tab_content_')">Download throughput</a></li>
-                <li id="tab_2"><a href="javascript:changeTab(2,4,'tab_','tab_content_')">Upload throughput</a></li>
-                <li id="tab_3"><a href="javascript:changeTab(3,4,'tab_','tab_content_')">Round trip latency</a></li>
-                <li id="tab_4"><a href="javascript:changeTab(4,4,'tab_','tab_content_')">Last mile latency</a></li>
+                <li class="selected" id="tab_1"><a href="javascript:changeTab(1,4,'tab_','tab_content_')">Download Throughput</a></li>
+                <li id="tab_2"><a href="javascript:changeTab(2,4,'tab_','tab_content_')">Upload Throughput</a></li>
+                <li id="tab_3"><a href="javascript:changeTab(3,4,'tab_','tab_content_')">Round Trip Latency</a></li>
+                <li id="tab_4"><a href="javascript:changeTab(4,4,'tab_','tab_content_')">Last Mile Latency</a></li>
             </ul>
             <div class="tab" id="tab_content_1">  
                 <div class ="outerContainer" id="outer_container_1">

@@ -53,7 +53,7 @@ function createParameters(i){
         selected: 1
     };
     var plotoptions = {};
-    var units = "Bytes per second";
+    var units = "Bytes Per Second";
 
 
     switch (i){
