@@ -186,32 +186,31 @@ def linegraph_rtt(request):
 	device = request.GET.get('deviceid')
 	filter_by = request.GET.get('filter_by')
 
-	details = Devicedetails.objects.filter(deviceid=device)[0]
+    #all_device_details= MRtt.objects.filter(average__lte=3000).order_by('eventstamp')
 
-	all_device_details= MRtt.objects.filter(average__lte=3000).order_by('eventstamp')
+    #other_device_details = []
+    #filtered_deviceids = []	
 
-	other_device_details = []
-	filtered_deviceids = []	
+    #if (filter_by == 'location'):
+	#filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
 
-	if (filter_by == 'location'):
-		filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
+    #if (filter_by == 'provider'):
+	#filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
 
-	if (filter_by == 'provider'):
-		filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
-
-	for row in filtered_deviceids:
-		other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
+    #for row in filtered_deviceids:
+	#other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
 
   
-	divides = {}
+    #divides = {}
     
-	for row in other_device_details:
-		ee = str(row.dstip)
+    #for row in other_device_details:
+	#ee = str(row.dstip)
 	
-		if not divides.has_key(ee):
-			divides[ee]=[]
+	#if not divides.has_key(ee):
+	#	divides[ee]=[]
 
-		divides[ee].append(row)		
+	#divides[ee].append(row)		
+
     
 	distinct_ips = MRtt.objects.values('dstip').distinct()
  
@@ -238,10 +237,7 @@ def linegraph_rtt(request):
 
 		count+=1
 
-	answer = str(result).replace("['","[")
-	answer = answer.replace(")'",")")
-
-	return HttpResponse("(" + answer + ")")
+	return HttpResponse("(" + str(result) + ")")
 
 def linegraph_bytes_hour(request):
     device = request.GET.get('deviceid')
