@@ -14,9 +14,9 @@
         <div class ="section" id="section_2">
             <div id="section_text_2">
                 <table class="info">
-                    <tr><td><b>Name</b></td><td><b>{{ detail.name }}</b></td></tr>
-                    <tr><td>ISP</td><td>{{ detail.isp }}</td></tr>
-                    <tr><td>Location</td><td><div id="location{{ deviceid }}"></div>
+                    <tr><td id="col1"><b>Name</b></td><td id="col2"><b>{{ detail.name }}</b></td></tr>
+                    <tr><td id="col1">ISP</td><td id="col2">{{ detail.isp }}</td></tr>
+                    <tr><td id="col1">Location</td><td id="col2"><div id="location{{ deviceid }}"></div>
                         <script type="text/javascript">
 
                             $.ajax({
@@ -32,11 +32,11 @@
 
                         </script></td>
                     </tr>     
-                    <tr><td>Service Plan</td><td>{{ detail.serviceplan }}</td></tr>
-                    <tr><td>Download Rate</td><td>{{ detail.downloadrate}} kbps</td></tr>
-                    <tr><td>Upload Rate</td><td>{{ detail.uploadrate}} kbps</td></tr>
-                    <tr><td>First Measurement</td><td>{{ firstUpdate }}</td></tr>
-                    <tr><td>Last Measurement</td><td>{{ lastUpdate }}</td></tr>
+                    <tr><td id="col1">Service Plan</td><td id="col2">{{ detail.serviceplan }}</td></tr>
+                    <tr><td id="col1">Download Rate</td><td id="col2">{{ detail.downloadrate}} kbps</td></tr>
+                    <tr><td id="col1">Upload Rate</td><td id="col2">{{ detail.uploadrate}} kbps</td></tr>
+                    <tr><td id="col1">First Measurement</td><td id="col2">{{ firstUpdate }}</td></tr>
+                    <tr><td id="col1">Last Measurement</td><td id="col2">{{ lastUpdate }}</td></tr>
                 </table>
                 URL for this device page: <input id="url" type="text" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}"/>
                 <div class ="linkbox">

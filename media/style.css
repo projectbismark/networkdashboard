@@ -53,6 +53,14 @@ table td{
     border:none;
 }
 
+table td.col1{
+	float:left;
+}
+
+table td.col2{
+	float:right;
+}
+
 #c2{
     margin-left:auto;
     padding-bottom:10px;
@@ -69,7 +77,9 @@ table td{
     margin-left:auto;
     padding-bottom:10px;
     margin-right:auto;
-    width:1200px;
+	/*
+    width:1200px;*/
+	width:850px;
     height:700px;
     border-bottom: 1px solid #ddd;
     -webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
@@ -94,10 +104,15 @@ table td{
     position:relative;
     padding:0;
     height: 100%;
+	width: 100%;
 }
-.info td{
-    padding: 0px;
-    padding-bottom:4px;
+
+#col1{
+	float:left;
+}
+
+#col2{
+	float:right;
 }
 
 .page-header{
@@ -113,7 +128,9 @@ table td{
     border-left: 1px solid #ddd;
 }
 #page_header_1{
-    height:170px;
+	/*
+    height:170px;*/
+	height:220px;
 }
 
 #page_header_2{
@@ -123,7 +140,7 @@ table td{
     position:relative;
 }
 #header_text_1{
-    top:50px;
+    top:40px;
     padding-left:30px;
     padding-right:30px;
 }
@@ -150,7 +167,9 @@ table td{
 .content-inner{
     position:relative;
     height:inherit;
-    width: 851px;
+	/*
+    width: 851px;*/
+	width:650px;
     margin-left:auto;
     margin-right:auto;
 }
@@ -187,7 +206,8 @@ table td{
 }
 
 #display_1{
-    width:560px;
+	width:100%;
+    /*width:560px;*/
     height: 700px;
     top:0px;
     margin-left:0;
@@ -231,7 +251,10 @@ DIV.outerContainer {
 }
 #outer_container_5{
     top:0px;
+	/*
     width:560px;
+	*/
+	width:100%;
     height:400px;
     text-align:left;
 }
@@ -269,17 +292,19 @@ DIV.outerContainer {
 }
 
 #map{
-    width:560px;
+	/*
+    width:560px;*/
+	width:100%;
     height:400px;
     top:0px;
     left:0px;
 }
 div.linkbox{
-    position:relative;
+    position:absolute;
     width:95%;
     margin-left:auto;
     margin-right:auto;
-    top:80px;
+    bottom:10px;
     height:50px;
 }
 
