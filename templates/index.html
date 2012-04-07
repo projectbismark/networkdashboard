@@ -21,21 +21,21 @@
                     <input id="view_button" class="btn btn-primary" type="submit" value="View My Data" onclick="return expandAdvanced()"/>
                 </form>
             </div>
-
             <div style="float: left; padding: 4px">
                 <form method="post" action="/device/" style="display: inline">
                     <input type="hidden" name="device" value="C43DC7A376D3"/>
                     <input class="btn" type="submit" value="View Example Data"/>
                 </form>
             </div>
-
-            <div style="clear: left; padding: 4px">
-                <a href="#" onclick="return expandAdvanced()">Enter Device MAC Address (advanced)</a>
-                <form id="advanced" method="post" action="/device/" style="display: none">
-                    <input type="text" name="device" placeholder="MAC address..." id="advanced_mac" value=""/>
-                    <input class="btn" id="submit_1" type="submit" value="Search"/>
+            <div style="clear: both"></div>
+            <div id="detection_error" class="alert" style="width: 500px; display: none">
+                <p>Please enter the MAC address of your BISmark router.</p>
+                <form method="post" action="/device/" style="display: inline">
+                    <input id="error_mac" type="text" name="device" placeholder="MAC address..."/>
+                    <input class="btn btn-primary" type="submit" value="Search"/>
                 </form>
             </div>
+            <p><a id="advanced" href="#" onclick="return expandAdvanced()">Manually enter device MAC Address (advanced)</a></p>
         </div>
     </div>
     <div class="content">
@@ -145,8 +145,11 @@
     }
     
     function expandAdvanced() {
-        $('#advanced').toggle('fast');
-        $('#advanced_mac').focus();
+        $('#view_button').addClass('disabled');
+        $('#view_button').removeClass('btn-primary');
+        $('#advanced').hide();
+        $('#detection_error').show();
+        $('#error_mac').focus();
         return false;
     }
 
