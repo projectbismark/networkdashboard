@@ -18,7 +18,7 @@
             <div style="float: left; padding: 4px">
                 <form method="post" style="display: inline" action="/device/">
                     <input id="node_id" type="hidden" name="device" value=""/>
-                    <input id="view_button" class="btn btn-primary" type="button" value="View My Data" onclick="expandAdvanced()"/>
+                    <input id="view_button" class="btn btn-primary" type="submit" value="View My Data" onclick="return expandAdvanced()"/>
                 </form>
             </div>
 
@@ -30,7 +30,7 @@
             </div>
 
             <div style="clear: left; padding: 4px">
-                <a href="#" onclick="expandAdvanced()">Enter Device MAC Address (advanced)</a>
+                <a href="#" onclick="return expandAdvanced()">Enter Device MAC Address (advanced)</a>
                 <form id="advanced" method="post" action="/device/" style="display: none">
                     <input type="text" name="device" placeholder="MAC address..." id="advanced_mac" value=""/>
                     <input class="btn" id="submit_1" type="submit" value="Search"/>
@@ -137,18 +137,17 @@
                 success: function(data, textStatus, jqXHR) {
                     var node_id = $.trim(data);
                     if (node_id.length == 12) {
-                        $("#node_id")[0].setAttribute("value", node_id);
-                        var button = $("#view_button")[0];
-                        button.setAttribute("type", "submit");
-                        button.setAttribute("onclick", "");
+                        $("#node_id").val(node_id);
+                        $("#view_button").removeAttr("onclick");
                     }
                 }
         });
     }
     
     function expandAdvanced() {
-        $('#advanced')[0].setAttribute('style', 'display: block');
-        $('#advanced_mac')[0].focus();
+        $('#advanced').toggle('fast');
+        $('#advanced_mac').focus();
+        return false;
     }
 
     function cycleMap(){
