@@ -15,11 +15,27 @@
             Internet Service Provider to a centralized database, which the user
             can access via this portal.</p>
 
-            <form method = "POST" name="device_form" action ="/device/">
-                    <b>Enter Device MAC Address:</b><br /> 
-                    <input type = "text" name = "device" value ="c43dc7a376d3"/>
-                    <input class="btn btn-primary btn-large" id="submit_1" type = "submit" value = "Search"/>
-            </form>
+            <div style="float: left; padding: 4px">
+                <form method="post" style="display: inline" action="/device/">
+                    <input id="node_id" type="hidden" name="device" value=""/>
+                    <input id="view_button" class="btn btn-primary" type="button" value="View My Data" onclick="expandAdvanced()"/>
+                </form>
+            </div>
+
+            <div style="float: left; padding: 4px">
+                <form method="post" action="/device/" style="display: inline">
+                    <input type="hidden" name="device" value="C43DC7A376D3"/>
+                    <input class="btn" type="submit" value="View Example Data"/>
+                </form>
+            </div>
+
+            <div style="clear: left; padding: 4px">
+                <a href="#" onclick="expandAdvanced()">Enter Device MAC Address (advanced)</a>
+                <form id="advanced" method="post" action="/device/" style="display: none">
+                    <input type="text" name="device" placeholder="MAC address..." id="advanced_mac" value=""/>
+                    <input class="btn" id="submit_1" type="submit" value="Search"/>
+                </form>
+            </div>
         </div>
     </div>
     <div class="content">
@@ -47,7 +63,7 @@
         </div>
     </div>
 </div>
-            
+
 <script type="text/javascript">
     
     //delay after panning to new location
@@ -114,8 +130,27 @@
         /*
         setTimeout(function(){cycleMap()}, delay);
 		*/
+
+        $.ajax({
+                type: "GET",
+                url: "http://myrouter.projectbismark.net/cgi-bin/id",
+                success: function(data, textStatus, jqXHR) {
+                    var node_id = $.trim(data);
+                    if (node_id.length == 12) {
+                        $("#node_id")[0].setAttribute("value", node_id);
+                        var button = $("#view_button")[0];
+                        button.setAttribute("type", "submit");
+                        button.setAttribute("onclick", "");
+                    }
+                }
+        });
     }
     
+    function expandAdvanced() {
+        $('#advanced')[0].setAttribute('style', 'display: block');
+        $('#advanced_mac')[0].focus();
+    }
+
     function cycleMap(){
         var mid = map.getBounds().getCenter();
         var next = mid;
