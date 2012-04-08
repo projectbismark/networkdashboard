@@ -9,13 +9,11 @@ function createParameters(i){
     var formatter = function(){};
     var legend = {
         enabled: true,
-        align: 'right',
+        align: 'center',
+	    verticalAlign: 'top',
         backgroundColor: '#FCFFC5',
         borderColor: 'black',
         borderWidth: 2,
-        layout: 'vertical',
-        verticalAlign: 'top',
-        y: 100,
         shadow: true
     };
     var rangeselector={
