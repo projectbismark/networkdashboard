@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+<em>{% extends "base.html" %}
 {% block content %}
 
 
@@ -41,15 +41,15 @@
                 URL for this device page: <input id="url" type="text" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}"/>
                 <div class ="linkbox">
                     <a class="btn btn-primary btn-large" href="/editDevicePage/{{detail.hashkey}}"> <b>Edit</b></a></h1>
-                    <!--<a class="btn btn-primary btn-large" href ="/feedback.html/?hashkey={{detail.hashkey}}" onClick ="return feedback(this, 'feedback')"><b>Feedback</b></a>-->
+
                     <a class="btn btn-primary btn-large" href="http://projectbismark.net/data/{{ deviceid }}"><b>Download</b></a>
                 </div>
             </div>
         </div>
         <div class ="display" id="display_2">
             <ul class ="tabrow">
-                <li class="selected" id="tab_1"><a href="javascript:changeTab(1,4,'tab_','tab_content_')">Download Throughput</a></li>
-                <li id="tab_2"><a href="javascript:changeTab(2,4,'tab_','tab_content_')">Upload Throughput</a></li>
+                <li id="tab_1"><a href="javascript:changeTab(1,4,'tab_','tab_content_')">Download Throughput</a></li>
+                <li class="selected" id="tab_2"><a href="javascript:changeTab(2,4,'tab_','tab_content_')">Upload Throughput</a></li>
                 <li id="tab_3"><a href="javascript:changeTab(3,4,'tab_','tab_content_')">Round Trip Latency</a></li>
                 <li id="tab_4"><a href="javascript:changeTab(4,4,'tab_','tab_content_')">Last Mile Latency</a></li>
             </ul>
@@ -93,8 +93,14 @@
 	hashid="{{ detail.hashkey }}";
 	setHashid(hashid);
 	tabid=getParameterByName('tab');
-	if(tabid!='') changeTab(tabid,4,'tab_','tab_content_');
-	else changeTab(1,4,'tab_','tab_content_');
+	if(tabid!='') {
+		changeTab(tabid,4,'tab_','tab_content_');
+	}
+	
+	else{
+		changeTab(1,4,'tab_','tab_content_');
+	}
 	
 </script>
 {% endblock %}
+</em>
