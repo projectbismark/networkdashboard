@@ -101,7 +101,8 @@
         var options = {
                 zoom: 1,
                 center: mid,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+				streetViewControl: false
         };
 
         map = new google.maps.Map(document.getElementById("map"),options);
