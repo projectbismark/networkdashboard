@@ -15,11 +15,27 @@
             Internet Service Provider to a centralized database, which the user
             can access via this portal.<br/><br/></p>
 
-            <form method = "POST" name="device_form" action ="/device/">
-                    <b>Enter Device MAC Address:</b><br /> 
-                    <input type = "text" name = "device" value ="c43dc7a376d3"/>
-                    <input class="btn btn-primary btn-large" id="submit_1" type = "submit" value = "Search"/>
-            </form>
+            <div style="float: left; padding: 4px">
+                <form method="post" style="display: inline" action="/device/">
+                    <input id="node_id" type="hidden" name="device" value=""/>
+                    <input id="view_button" class="btn btn-primary" type="submit" value="View My Data" onclick="return expandAdvanced()"/>
+                </form>
+            </div>
+            <div style="float: left; padding: 4px">
+                <form method="post" action="/device/" style="display: inline">
+                    <input type="hidden" name="device" value="C43DC7A376D3"/>
+                    <input class="btn" type="submit" value="View Example Data"/>
+                </form>
+            </div>
+            <div style="clear: both"></div>
+            <div id="detection_error" class="alert" style="width: 500px; display: none">
+                <p>Please enter the MAC address of your BISmark router.</p>
+                <form method="post" action="/device/" style="display: inline">
+                    <input id="error_mac" type="text" name="device" placeholder="MAC address..."/>
+                    <input class="btn btn-primary" type="submit" value="Search"/>
+                </form>
+            </div>
+            <p><a id="advanced" href="#" onclick="return expandAdvanced()">Manually enter device MAC Address (advanced)</a></p>
         </div>
     </div>
     <div class="content">
@@ -49,7 +65,7 @@
         </div>
     </div>
 </div>
-            
+
 <script type="text/javascript">
     
     //delay after panning to new location
@@ -117,8 +133,29 @@
         /*
         setTimeout(function(){cycleMap()}, delay);
 		*/
+
+        $.ajax({
+                type: "GET",
+                url: "http://myrouter.projectbismark.net/cgi-bin/id",
+                success: function(data, textStatus, jqXHR) {
+                    var node_id = $.trim(data);
+                    if (node_id.length == 12) {
+                        $("#node_id").val(node_id);
+                        $("#view_button").removeAttr("onclick");
+                    }
+                }
+        });
     }
     
+    function expandAdvanced() {
+        $('#view_button').addClass('disabled');
+        $('#view_button').removeClass('btn-primary');
+        $('#advanced').hide();
+        $('#detection_error').show();
+        $('#error_mac').focus();
+        return false;
+    }
+
     function cycleMap(){
         var mid = map.getBounds().getCenter();
         var next = mid;

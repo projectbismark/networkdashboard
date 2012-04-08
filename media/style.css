@@ -132,9 +132,8 @@ img { max-width: none; }
     border-left: 1px solid #ddd;
 }
 #page_header_1{
-	/*
-    height:170px;*/
 	height:220px;
+
 }
 
 #page_header_2{
@@ -144,9 +143,10 @@ img { max-width: none; }
     position:relative;
 }
 #header_text_1{
-    top:40px;
-    padding-left:30px;
-    padding-right:30px;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-top: 30px;
+
 }
 #header_text_2{
     top:70px;
