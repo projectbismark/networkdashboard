@@ -5,7 +5,7 @@
 <body onload="load()" onunload="GUnload()">
 
 <div class="container" id="c3">
-    <div class="page-header" id="page_header_1">
+    <div class="page-header">
         <div class="header-text" id="header_text_1">
             <p><b>What is network dashboard?  </b>The <em>network dashboard</em> is
             a portal designed to help home users visualize properties of their
@@ -18,7 +18,7 @@
             <div style="float: left; padding: 4px">
                 <form method="post" style="display: inline" action="/device/">
                     <input id="node_id" type="hidden" name="device" value=""/>
-                    <input id="view_button" class="btn btn-primary" type="submit" value="View My Data" onclick="return expandAdvanced()"/>
+                    <input id="view_button" class="btn btn-primary" type="submit" value="View My Data" onclick="return expandEntry()"/>
                 </form>
             </div>
             <div style="float: left; padding: 4px">
@@ -28,6 +28,7 @@
                 </form>
             </div>
             <div style="clear: both"></div>
+            <p><a id="advanced" href="#" onclick="return expandAdvanced()">Manually enter device MAC Address (advanced)</a></p>
             <div id="detection_error" class="alert" style="width: 500px; display: none">
                 <p>Please enter the MAC address of your BISmark router.</p>
                 <form method="post" action="/device/" style="display: inline">
@@ -35,7 +36,6 @@
                     <input class="btn btn-primary" type="submit" value="Search"/>
                 </form>
             </div>
-            <p><a id="advanced" href="#" onclick="return expandAdvanced()">Manually enter device MAC Address (advanced)</a></p>
         </div>
     </div>
     <div class="content">
@@ -135,24 +135,28 @@
 		*/
 
         $.ajax({
-                type: "GET",
-                url: "http://myrouter.projectbismark.net/cgi-bin/id",
-                success: function(data, textStatus, jqXHR) {
-                    var node_id = $.trim(data);
-                    if (node_id.length == 12) {
-                        $("#node_id").val(node_id);
-                        $("#view_button").removeAttr("onclick");
-                    }
+            type: "GET",
+            url: "http://myrouter.projectbismark.net/cgi-bin/dashboard-verify",
+            success: function(data, textStatus, jqXHR) {
+                var node_id = $.trim(data);
+                if (node_id.length == 12) {
+                    $("#node_id").val(node_id);
+                    $("#view_button").removeAttr("onclick");
                 }
+            }
         });
     }
-    
-    function expandAdvanced() {
+
+    function expandEntry() {
         $('#view_button').addClass('disabled');
         $('#view_button').removeClass('btn-primary');
-        $('#advanced').hide();
+        return expandAdvanced();
+    }
+
+    function expandAdvanced() {
         $('#detection_error').show();
         $('#error_mac').focus();
+        $('#advanced').hide();
         return false;
     }
 
