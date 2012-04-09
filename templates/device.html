@@ -13,6 +13,15 @@
     <div class="content">
         <div class ="section" id="section_2">
             <div id="section_text_2">
+                {% if detail.is_default % }
+                <div class="alert alert-block">
+                    <a class="close" data-dismiss="alert">×</a>
+                    <h4 class="alert-heading">Welcome, new Dashboard user!</h4>
+                    We don't have any information about your router or ISP.
+                    Please click the Edit button below to fill in your details.
+                </div>
+                {% endif %}
+
                 <table class="info">
                     <tr><td id="col1"><b>Name</b></td><td id="col2"><b>{{ detail.name }}</b></td></tr>
                     <tr><td id="col1">ISP</td><td id="col2">{{ detail.isp }}</td></tr>
