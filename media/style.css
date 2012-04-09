@@ -1,8 +1,8 @@
 body { 
     background-color: #ddd;
-    color: #333;
+/*    color: #333;
     font-family: arial, sans-serif;
-    font-size: 12pt;
+    font-size: 12pt;*/
     margin: 0px;
     padding: 0px;
     text-align: center;
@@ -14,16 +14,8 @@ h2 {
     font-weight: bold;
 }
 
-h3 {
-    font-size: 145% ;
-    font-weight: bold ;
-    color: #4A4A3C ;
-    color-grey: #bbbbbb
-}
-
 a {
     color: #0091C9;
-    text-decoration: underline;
 }
 
 a:visited {
@@ -33,6 +25,7 @@ a:visited {
 h1 {
     color: #0091C9;
     font-size: 2.5em;
+    line-height: 2em;
 }
 
 p {
@@ -41,7 +34,7 @@ p {
     line-height: 1.3em;
 }
 
-#container {
+div.content {
     background-color: #fff;
     margin: 0px auto;
     padding: 3em;
@@ -98,18 +91,6 @@ ul {
 	padding-left: 2.5em;
 }
 
-table td{
-    border:none;
-}
-
-table td.col1{
-	float:left;
-}
-
-table td.col2{
-	float:right;
-}
-
 #c2{
     margin-left:auto;
     padding-bottom:10px;
@@ -142,22 +123,6 @@ img { max-width: none; }
 
 #header1{
     height:230px;
-}
-
-#device-url{
-	position:relative;
-	float:left;
-	margin-top:10px;
-}
-
-#device-url input{
-	height:22px;
-}
-
-.info{
-    position:relative;
-    padding:0;
-	width: 100%;
 }
 
 #col1{
@@ -269,19 +234,14 @@ img { max-width: none; }
 DIV.outerContainer {
     margin-left:auto;
     margin-right: auto;
-    border: 0px;
-    border-top: 1px solid #000;
-    border-left: 1px solid #000;
+    border: 1px solid #ddd;
     background-color:#f9f9ff;
     background:#f9f9ff;
     /*border-left:3px solid rgb(44,44,88);*/
     /*border-radius:10px;
     -moz-border-radius:10px;*/
-    border-color: #000;
-    position:relative;
+    /*position:relative;*/
     z-index:1;
-    -moz-box-shadow:2px 2px 2px #333333;
-    box-shadow:2px 2px 2px #333333;
 /*    -moz-box-shadow:2px 2px 2px #333333;
     box-shadow:2px 2px 2px #333333;*/
 }
@@ -303,11 +263,11 @@ DIV.outerContainer {
     text-align:left;
 }
 
-.controls{
+/*.controls{
     position:relative;
     width:inherit;
     height:60px;
-}
+}*/
 
 #map_control_1{
     position:relative;
@@ -321,18 +281,19 @@ DIV.outerContainer {
     float:right;   
 }
 
-.graphdiv {
-    position:absolute;
-    left:1px;
-    top:1px;
-    /*
-    -moz-border-radius:10px;
-    border-radius:10px;*/
-}
-
-#graph_div_1,#graph_div_2,#graph_div_3,#graph_div_4{
+div.graphdiv {
     width:849px;
     height:399px;
+}
+
+div.progress_wrapper {
+    padding-left, padding-right: 200px;
+    padding-top: 150px;
+}
+
+div.graphdiv div.progress {
+    margin-left: 25%;
+    margin-right: 25%;
 }
 
 #map{
@@ -343,15 +304,6 @@ DIV.outerContainer {
     top:0px;
     left:0px;
 }
-div.linkbox{
-    position:absolute;
-    width:95%;
-    margin-left:auto;
-    margin-right:auto;
-    bottom:10px;
-    height:50px;
-}
-
 ul.tabrow{
     line-height:24px;
     width: 100%;
