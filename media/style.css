@@ -95,6 +95,16 @@ img { max-width: none; }
     height:230px;
 }
 
+#device-url{
+	position:relative;
+	float:left;
+	margin-top:10px;
+}
+
+#device-url input{
+	height:22px;
+}
+
 .content{
     position:relative;
     display: inline-block;
@@ -107,7 +117,6 @@ img { max-width: none; }
 .info{
     position:relative;
     padding:0;
-    height: 100%;
 	width: 100%;
 }
 

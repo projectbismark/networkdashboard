@@ -38,8 +38,10 @@
                     <tr><td id="col1">First Measurement</td><td id="col2">{{ firstUpdate }}</td></tr>
                     <tr><td id="col1">Last Measurement</td><td id="col2">{{ lastUpdate }}</td></tr>
                 </table>
+				<div id ="device-url">
                 URL for this device page: <input id="url" type="text" value="http://networkdashboard.org/displayDevice/{{ detail.hashkey }}"/>
-                <div class ="linkbox">
+                </div>
+				<div class ="linkbox">
                     <a class="btn btn-primary btn-large" href="/editDevicePage/{{detail.hashkey}}"> <b>Edit</b></a></h1>
 
                     <a class="btn btn-primary btn-large" href="http://projectbismark.net/data/{{ deviceid }}"><b>Download</b></a>
