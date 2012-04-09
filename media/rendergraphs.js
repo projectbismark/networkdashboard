@@ -9,16 +9,14 @@ function createParameters(i){
     var formatter = function(){};
     var legend = {
         enabled: true,
-        align: 'right',
-        backgroundColor: '#FCFFC5',
-        borderColor: 'black',
-        borderWidth: 2,
-        layout: 'vertical',
-        verticalAlign: 'top',
-        y: 100,
-        shadow: true
+        align: 'center',
+	    verticalAlign: 'top',
+        borderColor: '#ddd',
+        borderWidth: 1,
+        shadow: false
     };
     var rangeselector={
+
         buttons: [{
                 type: 'day',
                 count: 1,
@@ -40,13 +38,6 @@ function createParameters(i){
                 count: 6,
                 text: '6m'
         }, {
-                type: 'ytd',
-                text: 'YTD'
-        }, {
-                type: 'year',
-                count: 1,
-                text: '1y'
-        }, {
                 type: 'all',
                 text: 'All'
         }],
@@ -59,9 +50,13 @@ function createParameters(i){
     switch (i){
         case 0:
             formatter = function(){
-                    var si = determineSI(this.points[0].y,0);
-                    var d = parseFloat(recDivide(this.points[0].y,this.points[0].y,0));
-                    return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ d+'</b>' + si;
+                  	var ret =Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) + "<br/>";
+					for(var i=0;i<this.points.length;i++){
+						var si = determineSI(this.points[i].y,0);
+						var d = parseFloat(recDivide(this.points[i].y,this.points[i].y,0));
+						ret += ''+ '<p style="color:' + this.points[i].series.color +  ';">' + this.points[i].series.name+ '</p> <b>'+ d +'</b> '+ si +' <br/>';
+					}
+					return ret;
                 };
             graphid = 0;
             break;
@@ -72,10 +67,16 @@ function createParameters(i){
             titlename = "";
             graphid = 1;
             formatter = function(){
-                    var si = determineSI(this.points[0].y,0);
-                    var d = parseFloat(recDivide(this.points[0].y,this.points[0].y,0));
-                    return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>' + d + '</b>' + si;
-                };
+                   
+			var ret =Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) + "<br/>";
+			for(var i=0;i<this.points.length;i++){
+				var si = determineSI(this.points[i].y,0);
+				var d = parseFloat(recDivide(this.points[i].y,this.points[i].y,0));
+				ret += ''+ '<p style="color:' + this.points[i].series.color +  ';">' + this.points[i].series.name+ '</p> <b>'+ d +'</b> '+ si +' <br/>';
+			}
+			return ret;
+			
+		};
             break;
         case 2:
             units = "Milliseconds";
@@ -83,7 +84,10 @@ function createParameters(i){
             divid = "graph_div_3";
             url = "/line_rtt/";
             formatter = function(){
-                return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />' + Highcharts.dateFormat('%A, %e. %b %Y, %l:%M %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y) +'</b> msec';
+			   var ret =Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) + "<br/>";
+			   for(var i=0;i<this.points.length;i++)
+			   		ret += ''+ '<p style="color:' + this.points[i].series.color +  ';">' + this.points[i].series.name+ '</p> <b>'+ parseInt(this.points[i].y) +'</b> msec <br/>';
+			   return ret;
             }
             graphid = 2;
             break;
@@ -93,7 +97,8 @@ function createParameters(i){
             divid = "graph_div_4";
             url = "/line_lmrtt/";
             formatter = function(){
-                return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A, %e. %b %Y, %l:%M %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y) +'</b> msec';
+				var ret =Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) + "<br/>";
+                return ret+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p> <b>'+ parseInt(this.points[0].y) +'</b> msec';
             }
             graphid = 3;
             break;
@@ -188,7 +193,6 @@ function OnSuccessGraph(graphParams){
         window.chart = new Highcharts.StockChart({
         chart: {
             renderTo: graphParams.divid,
-            backgroundColor: "rgb(249,249,255)"
         },
         legend: graphParams.legend,
 
@@ -214,6 +218,8 @@ function OnSuccessGraph(graphParams){
             }
 
         },
+
+
 
         tooltip: {
                                    formatter: graphParams.formatter

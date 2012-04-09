@@ -49,7 +49,7 @@ function updateShareLink(){
 }
 
 function hideBar(id){
-    document.getElementById("load_bar_" + id).style.display='none'
+    /*document.getElementById("load_bar_" + id).style.display='none'*/
 }
 
 function OnError(data)
@@ -64,7 +64,7 @@ function getParameterByName(name)
   var regex = new RegExp(regexS);
   var results = regex.exec(window.location.search);
   if(results == null)
-    return "";
+    return '';
   else
     return decodeURIComponent(results[1].replace(/\+/g, " "));
 }

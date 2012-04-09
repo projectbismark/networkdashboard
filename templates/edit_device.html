@@ -1,96 +1,91 @@
-<em>{% extends "base.html" %}
+{% extends "base.html" %}
 {% block content %}
-
-<h1> Edit Device {{detail.name}} </h1> <br />
-
-
-<form name ="edit" action="/device/" method="POST">
-    <table border="0">
-        <tr>
-            <td>Name</td>
-            <td>
-                <input type ="text" name ="name" value = "{{detail.name}}" size ="20"/>
-            </td>
-        </tr>
-  	<tr>
-            <td>ISP</td>
-			<td>
-                <input type ="isp" name ="isp" value = "{{detail.isp}}" size ="20"/>
-            </td>
-        </tr>
-        <tr>
-            <td>Service Type</td>
-            <td>
-                <select name = "servicetype">
-                    <option>DSL </option>
-                    <option selected>Fiber</option>
-                    <option>Cable</option>
-                    <option>Wireless - Cellular</option>
-                    <option>Wireless - WiMAX</option>
-                    <option>Wireless - 802.11</option>
-                    <option>Other</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td>Service Plan</td>
-            <td>
-                <input type ="text" name ="sp" value = "{{detail.serviceplan}}" size ="20"/>
-            </td>
-        </tr>
-        <tr>
-            <td>Upload Rate (kbps)</td>
-            <td>
-                <input type = "text" name ="urate" value = "{{detail.uploadrate}}" size ="20" />
-            </td>
-        </tr>
-        <tr>
-            <td>Download Rate (kbps)</td>
-            <td>
-                <input type ="text" name ="drate" value = "{{detail.downloadrate}}" size ="20" />
-            </td>
-        </tr>
-        <tr>
-            <td>City</td>
-            <td>
-                <input type ="text" name ="city" value = "{{detail.city}}" size="20"/>
-            </td>
-        </tr>
-        <tr>
-            <td>State</td>
-            <td>
-                <input type ="text" name ="state" value = "{{detail.state}}" size="20"/>
-            </td>
-        </tr>
-        <tr>
-            <td>Country</td>
-            <td>
-		<select name = "country">
-			<option selected> {{detail.country}} </option>
-			{% include "countries.html" %}
-			
-			<!--
-	   		{% for country in country_options %}
-				{% if country == detail.country %}
- 					<option selected>{{country}}</option>
-				{% endif %}
-				{% if country != detail.country %}
- 					<option>{{country}}</option>
-				{% endif %}
-				
-	   		{% endfor %}-->
-		</select>
-
-            </td>
-        </tr>
-        
-    </table>
-    <input type ="hidden" name ="device" value = "{{deviceid}}"/>
-    <input type ="hidden" name ="edit" value ="edit"/>
-    <input type ="submit" value ="Submit Changes"/><br />
-    
-</form>
-
-
+<div class="content">
+    <h1>Edit <em>{{detail.name}}</em></h1>
+    <form name="edit" action="/device/" method="post" class="well form-horizontal">
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label" for="input_name">Name</label>
+                <div class="controls">
+                    <input id="input_name" type="text" name="name" value="{{detail.name}}" size="20"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="input_isp">Internet Service Provider</label>
+                <div class="controls">
+                    <input id="input_isp" type="isp" name="isp" value= "{{detail.isp}}" size="20"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="input_type">Service Type</label>
+                <div class="controls">
+                    <select id="input_type" name="servicetype">
+                        <option>DSL </option>
+                        <option>Fiber</option>
+                        <option>Cable</option>
+                        <option>Wireless - Cellular</option>
+                        <option>Wireless - WiMAX</option>
+                        <option>Wireless - 802.11</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="input_plan">Service Plan</label>
+                <div class="controls">
+                    <input id="input_plan" type="text" name="sp" value="{{detail.serviceplan}}" size ="20"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="input_upload">Upload Rate (Kbps)</label>
+                <div class="controls">
+                    <input id="input_upload" type="text" name="urate" value="{{detail.uploadrate}}" size ="20" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="input_download">Download Rate (Kbps)</label>
+                <div class="controls">
+                    <input id="input_download" type="text" name="drate" value="{{detail.downloadrate}}" size ="20" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="input_city">City</label>
+                <div class="controls">
+                    <input id="input_city" type="text" name="city" value="{{detail.city}}" size="20"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="input_state">State</label>
+                <div class="controls">
+                    <input id="input_state" type="text" name="state" value="{{detail.state}}" size="20"/>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="input_country">Country</label>
+                <div class="controls">
+                    <select id="input_country" name="country">
+                        <option selected>{{detail.country}}</option>
+                        {% include "countries.html" %}
+                        
+                        <!--
+                        {% for country in country_options %}
+                            {% if country == detail.country %}
+                                <option selected>{{country}}</option>
+                            {% endif %}
+                            {% if country != detail.country %}
+                                <option>{{country}}</option>
+                            {% endif %}
+                            
+                        {% endfor %}-->
+                    </select>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="hidden" name="device" value="{{deviceid}}"/>
+                <input type="hidden" name="edit" value="edit"/>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+        </fieldset>
+    </form>
+</div>
 {% endblock %}
-</em>

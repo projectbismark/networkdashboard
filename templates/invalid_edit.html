@@ -1,12 +1,11 @@
-
 {% extends "base.html" %}
 
 {% block content %}
-<h3>Unsuccessful Edit</h3>
-<br/>
-<div> One or more fields were invalid. </div>
-<a href = "/editDevicePage/{{deviceid}}/" > Return </a>
-  
+<div class="content">
+<h1>Unsuccessful Edit</h1>
+<div class="alert alert-error">One or more fields were invalid.</div>
+<a class="btn" href="/editDevicePage/{{deviceid}}/">Try again</a>
+</div>
 
 {% endblock %}
 
