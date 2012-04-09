@@ -180,36 +180,38 @@ def get_google_maps_result_from_request(address):
     return result
 
 def save_device_details_from_request(request,device):
-    hashing = views_helper.get_hash(device)
-    dname = request.POST.get('name')
-    disp = request.POST.get('isp')
-    dlocation = request.POST.get('location')
-    dsp = request.POST.get('sp')
-    dservicetype = request.POST.get('servicetype')
-    durate = int(request.POST.get('urate'))
-    ddrate = int(request.POST.get('drate'))
-    dcity = request.POST.get('city')
-    dstate = request.POST.get('state')
-    dcountry = request.POST.get('country')        
-    details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, servicetype=dservicetype,city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now(),hashkey=hashing)
+	
+	
+	hashing = views_helper.get_hash(device)
+	dname = request.POST.get('name')
+	disp = request.POST.get('isp')
+	dlocation = request.POST.get('location')
+	dsp = request.POST.get('sp')
+	dservicetype = request.POST.get('servicetype')
+	durate = int(request.POST.get('urate'))
+	ddrate = int(request.POST.get('drate'))
+	dcity = request.POST.get('city')
+	dstate = request.POST.get('state')
+	dcountry = request.POST.get('country')        
+	details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, servicetype=dservicetype,city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now(),hashkey=hashing)
 
-    try:
-        address = dcity+","+dstate+","+dcountry
-        result = get_google_maps_result_from_request(str(address))
-        if result['Status']['code'] == 200:
-            
-            coord=result['Placemark'][0]['Point']['coordinates']
-            details.latitude = coord[1]
-            details.longitude=coord[0]
-            details.country=result['Placemark'][0]['AddressDetails']['Country']['CountryName']
-            details.state=result['Placemark'][0]['AddressDetails']['Country']['AdministrativeArea']['AdministrativeAreaName']
-            details.city=result['Placemark'][0]['AddressDetails']['Country']['AdministrativeArea']['Locality']['LocalityName']
-    except Exception as inst:
-        print type(inst)
-        print inst
-        
-    details.is_default=False
-    details.save()
+	try:
+		address = dcity+","+dstate+","+dcountry
+		result = get_google_maps_result_from_request(str(address))
+		if result['Status']['code'] == 200:
+   
+		    coord=result['Placemark'][0]['Point']['coordinates']
+		    details.latitude = coord[1]
+		    details.longitude=coord[0]
+		    details.country=result['Placemark'][0]['AddressDetails']['Country']['CountryName']
+		    details.state=result['Placemark'][0]['AddressDetails']['Country']['AdministrativeArea']['AdministrativeAreaName']
+		    details.city=result['Placemark'][0]['AddressDetails']['Country']['AdministrativeArea']['Locality']['LocalityName']
+	except Exception as inst:
+		print type(inst)
+		print inst
+       
+	details.is_default=False
+	details.save()
 
 def save_device_details_from_default(device):
     hashing = views_helper.get_hash(device)
