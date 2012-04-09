@@ -1,52 +1,101 @@
-body, html { 
-  color: #000000;
-  background: rgb(234,234,240);
-  margin-left:auto;
-  margin-right:auto;
-}
-
-html{
-}
-
-
-body {
-    width:95%;
+body { 
+    background-color: #ddd;
+    color: #333;
     font-family: arial, sans-serif;
-    background: rgb(234,234,240);
-    font-size: 9pt;
-    border-bottom: 0px;
+    font-size: 12pt;
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
 }
 
-
-img {  
-  border-style: none;
+h2 {
+    color: #333;
+    font-size: 1.5em;
+    font-weight: bold;
 }
 
 h3 {
-        font-size: 145% ;
-        font-weight: bold ;
-        color: #4A4A3C ;
-        color-grey: #bbbbbb
+    font-size: 145% ;
+    font-weight: bold ;
+    color: #4A4A3C ;
+    color-grey: #bbbbbb
 }
-
 
 a {
-        text-decoration: none ;
-        color: #991133 ;
+    color: #0091C9;
+    text-decoration: underline;
 }
 
-a:hover {
-        text-decoration: underline
+a:visited {
+    color: #00609C;
 }
 
+h1 {
+    color: #0091C9;
+    font-size: 2.5em;
+}
+
+p {
+    color: #333;
+    font: 12pt arial;
+    line-height: 1.3em;
+}
+
+#container {
+    background-color: #fff;
+    margin: 0px auto;
+    padding: 3em;
+    padding-top: 2em;
+    text-align: left;
+    width: 680px;
+}
+
+#header {
+    vertical-align: middle;
+    margin-bottom: 2em;
+}
+
+#header div {
+    display: table;
+    height: 140px;
+}
+    
+#header h1 {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+#logo {
+    margin-bottom: 1em;
+    margin-right: 2em;
+    float: left;
+}
+
+div.view_form {
+    float: left;
+    padding: 4px;
+}
+
+div.view_form form {
+    display: inline;
+}
+
+#advanced {
+    margin-bottom: 1.5em;
+    font-size: small;
+}
+
+#detection_error {
+    display: none;
+}
+
+#detection_error form {
+    display: inline;
+}
 
 ul {
 	list-style-type: none;
 	padding-left: 2.5em;
-}
-
-li {
-	/*padding-bottom: 20px*/
 }
 
 table td{
@@ -103,15 +152,6 @@ img { max-width: none; }
 
 #device-url input{
 	height:22px;
-}
-
-.content{
-    position:relative;
-    display: inline-block;
-    width:inherit;
-    height:400px;
-    padding:0;
-    top:15px;
 }
 
 .info{
@@ -208,23 +248,6 @@ img { max-width: none; }
 
 #section_2{
     
-}
-
-
-
-.display{
-    position:relative;
-    height:inherit;  
-    margin: 0;
-}
-
-#display_1{
-	width:100%;
-    /*width:560px;*/
-    height: 700px;
-    top:0px;
-    margin-left:0;
-    float:left;
 }
 
 #display_2{
