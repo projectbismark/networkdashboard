@@ -10,149 +10,149 @@ import cvs_helper,datetime_helper,views_helper
 import ast
 
 def fetch_deviceid_soft(device):
-	device_search = Devicedetails.objects.filter(deviceid=device)
-	try:
-		if len(device_search)>0:
-			return True
-	except:
-		pass
+    device_search = Devicedetails.objects.filter(deviceid=device)
+    try:
+        if len(device_search)>0:
+            return True
+    except:
+        pass
 
-	return False
-	
+    return False
+    
 
 def fetch_deviceid_hard(device):
-	
-	device_search = MBitrate.objects.filter(deviceid=device)
-	print device
+    
+    device_search = MBitrate.objects.filter(deviceid=device)
+    print device
 
-	try:
-		if (len(device_search)>0):
-			return True
-	except:
+    try:
+        if (len(device_search)>0):
+            return True
+    except:
 
-		device_search = MRtt.objects.filter(deviceid=device)
+        device_search = MRtt.objects.filter(deviceid=device)
 
-	try:
-		if (len(device_search)>0):
-			return True
-	except:
-		device_search = MLmrtt.objects.filter(deviceid=device)
+    try:
+        if (len(device_search)>0):
+            return True
+    except:
+        device_search = MLmrtt.objects.filter(deviceid=device)
 
 
-	try:
-		if (len(device_search)>0):
-			return True
-	except:
-		pass
-	
-	return False
+    try:
+        if (len(device_search)>0):
+            return True
+    except:
+        pass
+    
+    return False
 
 def list_isps():
-	ret = ["Comcast","Time Warner Cable","At&t","Cox Optimum","Charter","Verizon","CenturyLink","SuddenLink","EarthLink","Windstream","Cable One","Frontier","NetZero Juno","Basic ISP","ISP.com","PeoplePC","AOL MSN","Fairpoint","Qwest","CableVision","MEdiaCom"]
-	ret.sort()
-	return ret
+    ret = ["Comcast","Time Warner Cable","At&t","Cox Optimum","Charter","Verizon","CenturyLink","SuddenLink","EarthLink","Windstream","Cable One","Frontier","NetZero Juno","Basic ISP","ISP.com","PeoplePC","AOL MSN","Fairpoint","Qwest","CableVision","MEdiaCom"]
+    ret.sort()
+    return ret
 
 def device_count_and_country_data():
-	distinct_countries = list_countries()
-	
-	response = []
-	
-	for country in distinct_countries:
-		count = device_count_for_country(country)
-		value={}
-		value['count']=count
-		if country!='':
-			value['country']=country
-		else:
-			value['country']="Unknown"
-		response.append(value)
-	
-	return response
+    distinct_countries = list_countries()
+    
+    response = []
+    
+    for country in distinct_countries:
+        count = device_count_for_country(country)
+        value={}
+        value['count']=count
+        if country!='':
+            value['country']=country
+        else:
+            value['country']="Unknown"
+        response.append(value)
+    
+    return response
 
 def device_count_for_country(cntry):
-	return len(Devicedetails.objects.filter(country=cntry))
-	
+    return len(Devicedetails.objects.filter(country=cntry))
+    
 
 def list_countries():
-	ret=[]
-	out = Devicedetails.objects.values('country').distinct()
-	for one in out:
-		value = ast.literal_eval(str(one))
-		v = value['country']
-		ret.append(v)
-		
-	ret.sort()
-	return ret
+    ret=[]
+    out = Devicedetails.objects.values('country').distinct()
+    for one in out:
+        value = ast.literal_eval(str(one))
+        v = value['country']
+        ret.append(v)
+        
+    ret.sort()
+    return ret
 
 def get_num_common_locations(device_details):
-	return len(Devicedetails.objects.filter(city=device_details.city))-1
+    return len(Devicedetails.objects.filter(city=device_details.city))-1
 
 def get_num_common_providers(device_details):
-	return len(Devicedetails.objects.filter(isp=device_details.isp))-1
+    return len(Devicedetails.objects.filter(isp=device_details.isp))-1
 
 def get_num_devices(device_details):
-	return len(Devicedetails.objects.exclude(deviceid=device_details.deviceid))-1
+    return len(Devicedetails.objects.exclude(deviceid=device_details.deviceid))-1
 
 def get_first_measurement(device):
-	first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]	
-    	return first[0].eventstamp.strftime("%B %d, %Y")
+    first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]    
+    return first[0].eventstamp.strftime("%B %d, %Y")
 
 def get_last_measurement(device):
-	last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-    	return last[0].eventstamp.strftime("%B %d, %Y")
+    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
+    return last[0].eventstamp.strftime("%B %d, %Y")
 
 def get_coordinates_for_googlemaps():
-	coordstring = ""
+    coordstring = ""
 
-	distinct_ips = IpResolver.objects.all()
-	data_type="coord"
-	for row_ip in distinct_ips:
+    distinct_ips = IpResolver.objects.all()
+    data_type="coord"
+    for row_ip in distinct_ips:
 
-		lat = str(row_ip.latitude)
-		lon = str(row_ip.longitude)
-		devtype = str(row_ip.type)
-		coordstring += devtype
-		coordstring += ":"
-		coordstring += data_type
-		coordstring += ":"
-		coordstring += lat
-		coordstring += ":"
-		coordstring += lon
-		coordstring += "\n"
-	
-	distinct_devices= Devicedetails.objects.all()
-	data_type="address"
-	for row in distinct_devices:
-		if row.latitude == None:
-			address = str(row.city) + ',' + str(row.state) + ',' + str(row.country)
-			try:
-				result = get_google_maps_result_from_request(str(address))
-				if result['Status']['code'] == 200:
-					coord=result['Placemark'][0]['Point']['coordinates']
-					row.latitude = coord[1]
-					row.longitude=coord[0]
-					row.save()
-				else:
-					row.latitude =33.748
-					row.longitude=-84.387
-					row.save()
-			except:
-				row.latitude = 0
-				row.longitude=0
-				row.save()
-			
-		if row.latitude == None:
-			continue
-		coordstring += "device"
-		coordstring += ":"
-		coordstring += "coord"
-		coordstring += ":"
-		coordstring += str(row.latitude)
-		coordstring += ":"
-		coordstring += str(row.longitude)
-		coordstring += "\n"
-	
-	return HttpResponse(coordstring)
+        lat = str(row_ip.latitude)
+        lon = str(row_ip.longitude)
+        devtype = str(row_ip.type)
+        coordstring += devtype
+        coordstring += ":"
+        coordstring += data_type
+        coordstring += ":"
+        coordstring += lat
+        coordstring += ":"
+        coordstring += lon
+        coordstring += "\n"
+    
+    distinct_devices= Devicedetails.objects.all()
+    data_type="address"
+    for row in distinct_devices:
+        if row.latitude == None:
+            address = str(row.city) + ',' + str(row.state) + ',' + str(row.country)
+            try:
+                result = get_google_maps_result_from_request(str(address))
+                if result['Status']['code'] == 200:
+                    coord=result['Placemark'][0]['Point']['coordinates']
+                    row.latitude = coord[1]
+                    row.longitude=coord[0]
+                    row.save()
+                else:
+                    row.latitude =33.748
+                    row.longitude=-84.387
+                    row.save()
+            except:
+                row.latitude = 0
+                row.longitude=0
+                row.save()
+            
+        if row.latitude == None:
+            continue
+        coordstring += "device"
+        coordstring += ":"
+        coordstring += "coord"
+        coordstring += ":"
+        coordstring += str(row.latitude)
+        coordstring += ":"
+        coordstring += str(row.longitude)
+        coordstring += "\n"
+    
+    return HttpResponse(coordstring)
 
 def get_location(device):
     device = device.replace(':','')
@@ -174,44 +174,47 @@ def get_location(device):
     return ('unavailable')
 
 def get_google_maps_result_from_request(address):
-	params = urllib.urlencode({'key': 'AIzaSyBHEmkA7XyusAjA9Zf-UnLSR9ydvCExY6k', 'output': 'json', 'q': str(address)})
-	f = urllib2.urlopen("http://maps.google.com/maps/geo?"+str(params))
-	result = ast.literal_eval(f.read())
-	return result
+    params = urllib.urlencode({'key': 'AIzaSyBHEmkA7XyusAjA9Zf-UnLSR9ydvCExY6k', 'output': 'json', 'q': str(address)})
+    f = urllib2.urlopen("http://maps.google.com/maps/geo?"+str(params))
+    result = ast.literal_eval(f.read())
+    return result
 
 def save_device_details_from_request(request,device):
-	hashing = views_helper.get_hash(device)
-	dname = request.POST.get('name')
-	disp = request.POST.get('isp')
-	dlocation = request.POST.get('location')
-	dsp = request.POST.get('sp')
-	durate = int(request.POST.get('urate'))
-	ddrate = int(request.POST.get('drate'))
-	dcity = request.POST.get('city')
-	dstate = request.POST.get('state')
-	dcountry = request.POST.get('country')	    
-	details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now(),hashkey=hashing)
+    hashing = views_helper.get_hash(device)
+    dname = request.POST.get('name')
+    disp = request.POST.get('isp')
+    dlocation = request.POST.get('location')
+    dsp = request.POST.get('sp')
+    durate = int(request.POST.get('urate'))
+    ddrate = int(request.POST.get('drate'))
+    dcity = request.POST.get('city')
+    dstate = request.POST.get('state')
+    dcountry = request.POST.get('country')        
+    details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now(),hashkey=hashing)
 
-	try:
-		address = dcity+","+dstate+","+dcountry
-		result = get_google_maps_result_from_request(str(address))
-		if result['Status']['code'] == 200:
-			
-			coord=result['Placemark'][0]['Point']['coordinates']
-			details.latitude = coord[1]
-			details.longitude=coord[0]
-			details.country=result['Placemark'][0]['AddressDetails']['Country']['CountryName']
-			details.state=result['Placemark'][0]['AddressDetails']['Country']['AdministrativeArea']['AdministrativeAreaName']
-			details.city=result['Placemark'][0]['AddressDetails']['Country']['AdministrativeArea']['Locality']['LocalityName']
-	except Exception as inst:
-		print type(inst)
-		print inst
-		
-	details.save()
+    try:
+        address = dcity+","+dstate+","+dcountry
+        result = get_google_maps_result_from_request(str(address))
+        if result['Status']['code'] == 200:
+            
+            coord=result['Placemark'][0]['Point']['coordinates']
+            details.latitude = coord[1]
+            details.longitude=coord[0]
+            details.country=result['Placemark'][0]['AddressDetails']['Country']['CountryName']
+            details.state=result['Placemark'][0]['AddressDetails']['Country']['AdministrativeArea']['AdministrativeAreaName']
+            details.city=result['Placemark'][0]['AddressDetails']['Country']['AdministrativeArea']['Locality']['LocalityName']
+    except Exception as inst:
+        print type(inst)
+        print inst
+        
+    details.is_default=False
+    details.save()
 
 def save_device_details_from_default(device):
     hashing = views_helper.get_hash(device)
-    device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now(),name="default name",hashkey=hashing)
+    device_entry = Devicedetails(
+            deviceid=device, eventstamp=datetime.now(), name="default name",
+            hashkey=hashing, is_default=True)
     device_entry.save()
 
 def deviceid_to_nodeid(device):

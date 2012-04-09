@@ -11,10 +11,9 @@ function createParameters(i){
         enabled: true,
         align: 'center',
 	    verticalAlign: 'top',
-        backgroundColor: '#FCFFC5',
-        borderColor: 'black',
-        borderWidth: 2,
-        shadow: true
+        borderColor: '#ddd',
+        borderWidth: 1,
+        shadow: false
     };
     var rangeselector={
 
@@ -194,7 +193,6 @@ function OnSuccessGraph(graphParams){
         window.chart = new Highcharts.StockChart({
         chart: {
             renderTo: graphParams.divid,
-            backgroundColor: "rgb(249,249,255)"
         },
         legend: graphParams.legend,
 

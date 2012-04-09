@@ -2,14 +2,14 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h3>BISMark Devices</h3>
-<br/>
-<div> Device not found.</div>
-<a href = "/" > Search for Devices </a>
 
-
- 
-
-  
-
+<div class="content">
+<div id="header">
+    <img id="logo" src="/static/images/bismark.gif" alt="BISmark logo"/>
+    <div>
+        <h1>Network Dashboard</h1>
+    </div>
+</div>
+<div class="alert alert-error"><big>Device not found</big></div>
+<a class="btn" href="/"><i class="icon-arrow-left"></i> Try again</a>
 {% endblock %}

@@ -49,7 +49,7 @@ function updateShareLink(){
 }
 
 function hideBar(id){
-    document.getElementById("load_bar_" + id).style.display='none'
+    /*document.getElementById("load_bar_" + id).style.display='none'*/
 }
 
 function OnError(data)

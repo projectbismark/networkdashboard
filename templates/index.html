@@ -4,233 +4,206 @@
 
 <body onload="load()" onunload="GUnload()">
 
-<div class="container" id="c3">
-    <div class="page-header" id="page_header_1">
-        <div class="header-text" id="header_text_1">
-            <p><b>What is network dashboard?  </b>The <em>network dashboard</em> is
-            a portal designed to help home users visualize properties of their
-            home Internet connections.  To use the network dashboard, users
-            install a BISMark-enabled gateway device in their home network.  The
-            gateway device periodically uploads measurements of the user's
-            Internet Service Provider to a centralized database, which the user
-            can access via this portal.<br/><br/></p>
-
-            <div style="float: left; padding: 4px">
-                <form method="post" style="display: inline" action="/device/">
-                    <input id="node_id" type="hidden" name="device" value=""/>
-                    <input id="view_button" class="btn btn-primary" type="submit" value="View My Data" onclick="return expandAdvanced()"/>
-                </form>
-            </div>
-            <div style="float: left; padding: 4px">
-                <form method="post" action="/device/" style="display: inline">
-                    <input type="hidden" name="device" value="C43DC7A376D3"/>
-                    <input class="btn" type="submit" value="View Example Data"/>
-                </form>
-            </div>
-            <div style="clear: both"></div>
-            <div id="detection_error" class="alert" style="width: 500px; display: none">
-                <p>Please enter the MAC address of your BISmark router.</p>
-                <form method="post" action="/device/" style="display: inline">
-                    <input id="error_mac" type="text" name="device" placeholder="MAC address..."/>
-                    <input class="btn btn-primary" type="submit" value="Search"/>
-                </form>
-            </div>
-            <p><a id="advanced" href="#" onclick="return expandAdvanced()">Manually enter device MAC Address (advanced)</a></p>
+<div class="content">
+    <div id="header">
+        <img id="logo" src="/static/images/bismark.gif" alt="BISmark logo"/>
+        <div>
+            <h1>Network Dashboard</h1>
         </div>
     </div>
-    <div class="content">
-        <div class="content-inner">
-			<!--
-            <div class ="section" id="section_1">
-                <div id="section_text_1">
-                    <h1> Active Devices </h1>
-                    <table class="info"> 
-                        {% for country in country_data %}
-                            <tr><td>{{country.count}} Device(s) found in {{country.country}}</td></tr>
-                        {% endfor %}
-                    </table>
-                </div>
-            </div>
-			-->
-            <div class ="display" id="display_1"> 
-                <div class ="outerContainer" id="outer_container_5">
-                    <div class ="graphdiv" id="map"></div>
-                </div>
-                <div class ="controls">
-                    <!--<a class="btn btn-primary btn-large" href="" id="map_control_1"> <b>Edit</b></a>
-                    <a class="btn btn-primary btn-large" href="" id="map_control_2"> <b>Edit</b></a>
-                    <a class="btn btn-primary btn-large" href="" id="map_control_3"> <b>Edit</b></a>-->
-                </div>
-           </div>
-        </div>
+
+    <p>The <em>network dashboard</em> is a portal designed to help home users
+    visualize properties of their home Internet connections. To use the network
+    dashboard, users install a BISMark-enabled gateway device in their home
+    network. The gateway device periodically uploads measurements of the user's
+    Internet Service Provider to a centralized database, which the user can
+    access via this portal.</p>
+
+    <div class="view_form">
+        <form method="post" action="/device/">
+            <input id="node_id" type="hidden" name="device" value=""/>
+            <input id="view_button" class="btn btn-primary" type="submit"
+            value="Show me data from my router" onclick="return expandEntry()"/>
+        </form>
+    </div>
+    <div class="view_form">
+        <form method="post" action="/device/">
+            <input type="hidden" name="device" value="C43DC7B0B13F"/>
+            <input class="btn" type="submit" value="Show me an example router"/>
+        </form>
+    </div>
+    <div style="clear: both">
+        <p id="advanced"><a href="#" onclick="return expandAdvanced()">Provide a BISmark router MAC address (advanced)</a></p>
+    </div>
+    <div id="detection_error" class="alert">
+        <p>Please provide the MAC address of your BISmark router.</p>
+        <form method="post" action="/device/">
+            <input id="error_mac" type="text" name="device" placeholder="MAC address..."/>
+            <input class="btn btn-primary" type="submit" value="Search"/>
+        </form>
+    </div>
+
+    <h2>Map of Active BISmark Routers</h2>
+    <div class ="outerContainer" id="outer_container_5">
+        <div class ="graphdiv" id="map"></div>
     </div>
 </div>
 
 <script type="text/javascript">
-    
-    //delay after panning to new location
-    var delay = 5000;
-    //delay between zoomout-pan-zoomin
-    var animationDelay = 700;
-    //delay between zoom levels (currently bugs with googles continuous zoom methods, so this must be handled manually)
-    var innerAnimationDelay = 30;
-    var points = new Array();
-    //threshold for panning map. Map will pam to the closest, unvisited node that is at least this far away (in kilometers)
-    var thresh = 1000;
-    var minZoom = 1;
-    var maxZoom = 5;
-    
-    function MapPoint(latLng){
-        this.visited = false;
-        this.latLng = latLng;
-    }
-    
-    function resetPoints(){
-        for(var i=0;i<points.length;i++){
-            points[i].visited = false;
-        }
-    }
-    
-    function zoomIn(){
-        var z = map.getZoom();
-        if(z<maxZoom){
-            map.setZoom(z+1);
-            setTimeout(function(){zoomIn()}, innerAnimationDelay);
-        }
-    }
-    
-    function zoomOut(){
-        var z = map.getZoom();
-        if(z>minZoom){
-            map.setZoom(z-1);
-            setTimeout(function(){zoomOut()}, innerAnimationDelay);
-        }
-    }
-    
-    function panMap(coords){
-        map.panTo(coords);
-    }
+//delay after panning to new location
+var delay = 5000;
+//delay between zoomout-pan-zoomin
+var animationDelay = 700;
+//delay between zoom levels (currently bugs with googles continuous zoom methods, so this must be handled manually)
+var innerAnimationDelay = 30;
+var points = new Array();
+//threshold for panning map. Map will pam to the closest, unvisited node that is at least this far away (in kilometers)
+var thresh = 1000;
+var minZoom = 1;
+var maxZoom = 5;
 
-    function load()
-    {
-        var mid = new google.maps.LatLng(0,0);
-        var options = {
-                zoom: 1,
-                center: mid,
-                mapTypeId: google.maps.MapTypeId.ROADMAP,
-				streetViewControl: false
-        };
+function MapPoint(latLng) {
+    this.visited = false;
+    this.latLng = latLng;
+}
 
-        map = new google.maps.Map(document.getElementById("map"),options);
-        geocoder = new google.maps.Geocoder();
-
-
-        $.ajax({
-                type: "GET",
-                url: "/getCoordinates/",
-                success: OnSuccess
-        });
-        /*
-        setTimeout(function(){cycleMap()}, delay);
-		*/
-
-        $.ajax({
-                type: "GET",
-                url: "http://myrouter.projectbismark.net/cgi-bin/id",
-                success: function(data, textStatus, jqXHR) {
-                    var node_id = $.trim(data);
-                    if (node_id.length == 12) {
-                        $("#node_id").val(node_id);
-                        $("#view_button").removeAttr("onclick");
-                    }
-                }
-        });
+function resetPoints() {
+    for (var i = 0;i < points.length; ++i) {
+        points[i].visited = false;
     }
-    
-    function expandAdvanced() {
-        $('#view_button').addClass('disabled');
-        $('#view_button').removeClass('btn-primary');
-        $('#advanced').hide();
-        $('#detection_error').show();
-        $('#error_mac').focus();
-        return false;
-    }
+}
 
-    function cycleMap(){
-        var mid = map.getBounds().getCenter();
-        var next = mid;
-        //in kilometers
-        var shortestDist = 0;
-        for(var i =0;i<points.length;i++){
-            if(!points[i].visited){
-                var d = (google.maps.geometry.spherical.computeDistanceBetween(mid,points[i].latLng))/1000;
-                if(d<thresh){
-                    points[i].visited=true;
-                }
-                else if((d<shortestDist)||(shortestDist==0)){
-                    next = points[i];
-                    shortestDist=d;
-                }
+function zoomIn() {
+    var z = map.getZoom();
+    if (z < maxZoom) {
+        map.setZoom(z + 1);
+        setTimeout(function(){zoomIn()}, innerAnimationDelay);
+    }
+}
+
+function zoomOut() {
+    var z = map.getZoom();
+    if (z > minZoom) {
+        map.setZoom(z - 1);
+        setTimeout(function(){zoomOut()}, innerAnimationDelay);
+    }
+}
+
+function panMap(coords) {
+    map.panTo(coords);
+}
+
+function load() {
+    var mid = new google.maps.LatLng(0, 0);
+    var options = {
+        zoom: 1,
+        center: mid,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        streetViewControl: false
+    };
+
+    map = new google.maps.Map(document.getElementById("map"),options);
+    geocoder = new google.maps.Geocoder();
+
+    $.ajax({
+        type: "GET",
+        url: "/getCoordinates/",
+        success: OnSuccess
+    });
+    /*
+    setTimeout(function(){cycleMap()}, delay);
+    */
+
+    $.ajax({
+        type: "GET",
+        url: "http://myrouter.projectbismark.net/cgi-bin/dashboard-verify",
+        success: function(data, textStatus, jqXHR) {
+            var node_id = $.trim(data);
+            if (node_id.length == 12) {
+                $("#node_id").val(node_id);
+                $("#view_button").removeAttr("onclick");
             }
         }
-        if (shortestDist==0){
-            resetPoints();
-            cycleMap();    
-        }
-        else{
-            zoomOut();
-            setTimeout(function(){panMap(next.latLng)}, animationDelay);
-            setTimeout(function(){zoomIn()}, animationDelay*2);
-            setTimeout(function(){cycleMap()}, delay+animationDelay*2);
-        }
-    }
+    });
+}
 
-    function OnSuccess(data){
-        var coordstring = data.split("\n");
-        for (var i=0; i<coordstring.length-1; i++){
-            var coords = coordstring[i].split(":");
-            if(coords[1]=='coord'){
-                var point = new google.maps.LatLng(parseFloat(coords[2]),parseFloat(coords[3]));
-                points.push(new MapPoint(point));
-                var marker = new google.maps.Marker({
-                        position: point
-                })
-                if (coords[0]=="server"){
-                        marker.setIcon("/static/images/icon-blue.png")
-                }
-                else{
-                        marker.setIcon("/static/images/icon-red.png");
-                }
+function expandEntry() {
+    $('#view_button').addClass('disabled');
+    $('#view_button').removeClass('btn-primary');
+    return expandAdvanced();
+}
 
-                marker.setMap(map);
+function expandAdvanced() {
+    $('#detection_error').show();
+    $('#error_mac').focus();
+    $('#advanced').hide();
+    return false;
+}
+
+function cycleMap(){
+    var mid = map.getBounds().getCenter();
+    var next = mid;
+    //in kilometers
+    var shortestDist = 0;
+    for(var i = 0; i < points.length; ++i) {
+        if (!points[i].visited) {
+            var d = google.maps.geometry.spherical.computeDistanceBetween(mid,points[i].latLng)/1000;
+            if (d < thresh) {
+                points[i].visited=true;
             }
-            else{
-                geocoder.geocode( { 'address': coords[2]}, function(results, status) {
-                        if (status == google.maps.GeocoderStatus.OK) {
-
-                                var marker = new google.maps.Marker({
-                                        map: map,
-                                        position: results[0].geometry.location
-                                });
-                        }
-                });
+            else if (d < shortestDist || shortestDist == 0) {
+                next = points[i];
+                shortestDist = d;
             }
         }
     }
-
-    function GUnload(){
-            if (window.GUnloadApi)
-            {
-                    GUnloadApi();
-            }
+    if (shortestDist==0){
+        resetPoints();
+        cycleMap();    
     }
+    else{
+        zoomOut();
+        setTimeout(function() { panMap(next.latLng) }, animationDelay);
+        setTimeout(function() { zoomIn() }, animationDelay * 2);
+        setTimeout(function() { cycleMap() }, delay + animationDelay * 2);
+    }
+}
+
+function OnSuccess(data) {
+    var coordstring = data.split("\n");
+    for (var i = 0; i < coordstring.length - 1; ++i){
+        var coords = coordstring[i].split(":");
+        if (coords[1] == 'coord') {
+            var point = new google.maps.LatLng(parseFloat(coords[2]), parseFloat(coords[3]));
+            points.push(new MapPoint(point));
+            var marker = new google.maps.Marker({
+                    position: point
+            });
+            if (coords[0] == "server") {
+                marker.setIcon("/static/images/icon-blue.png")
+            } else {
+                marker.setIcon("/static/images/icon-red.png");
+            }
+
+            marker.setMap(map);
+        } else {
+            geocoder.geocode({ 'address': coords[2]}, function(results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: results[0].geometry.location
+                    });
+                }
+            });
+        }
+    }
+}
+
+function GUnload(){
+    if (window.GUnloadApi) {
+        GUnloadApi();
+    }
+}
 </script>
-</body>
 
-
-	{% endblock %}
-
-
-
-	
-            
+{% endblock %}
