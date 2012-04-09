@@ -114,17 +114,20 @@ function load() {
     setTimeout(function(){cycleMap()}, delay);
     */
 
-    $.ajax({
-        type: "GET",
-        url: "http://myrouter.projectbismark.net/cgi-bin/dashboard-verify",
-        success: function(data, textStatus, jqXHR) {
-            var node_id = $.trim(data);
-            if (node_id.length == 12) {
-                $("#node_id").val(node_id);
-                $("#view_button").removeAttr("onclick");
+    var hosts = ['myrouter.projectbismark.net', 'myrouter.local', '192.168.142.1'];
+    for (var idx in hosts) {
+        $.ajax({
+            type: "GET",
+            url: "http://" + hosts[idx] + "/cgi-bin/dashboard-verify",
+            success: function(data, textStatus, jqXHR) {
+                var node_id = $.trim(data);
+                if (node_id.length == 12) {
+                    $("#node_id").val(node_id);
+                    $("#view_button").removeAttr("onclick");
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 function expandEntry() {
