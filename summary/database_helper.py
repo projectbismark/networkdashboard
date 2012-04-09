@@ -185,12 +185,13 @@ def save_device_details_from_request(request,device):
     disp = request.POST.get('isp')
     dlocation = request.POST.get('location')
     dsp = request.POST.get('sp')
+    dservicetype = request.POST.get('servicetype')
     durate = int(request.POST.get('urate'))
     ddrate = int(request.POST.get('drate'))
     dcity = request.POST.get('city')
     dstate = request.POST.get('state')
     dcountry = request.POST.get('country')        
-    details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now(),hashkey=hashing)
+    details = Devicedetails(deviceid = device, name = dname, isp = disp, serviceplan = dsp, servicetype=dservicetype,city = dcity, state = dstate, country = dcountry, uploadrate = durate, downloadrate = ddrate, eventstamp = datetime.now(),hashkey=hashing)
 
     try:
         address = dcity+","+dstate+","+dcountry

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+<em>{% extends "base.html" %}
 {% block content %}
 <div class="content">
     <h1>Edit <em>{{detail.name}}</em></h1>
@@ -20,6 +20,7 @@
                 <label class="control-label" for="input_type">Service Type</label>
                 <div class="controls">
                     <select id="input_type" name="servicetype">
+						<option selected>{{detail.servicetype}}</option>
                         <option>DSL </option>
                         <option>Fiber</option>
                         <option>Cable</option>
@@ -89,3 +90,4 @@
     </form>
 </div>
 {% endblock %}
+</em>
