@@ -210,6 +210,14 @@ img { max-width: none; }
     margin-right:100px;
 }
 
+#edit-device{
+	border:0;
+}
+
+#edit-device tr input{
+	height:100%;
+}
+
 .stats-area{
     position:relative;
     width:300px;

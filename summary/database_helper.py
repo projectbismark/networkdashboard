@@ -207,11 +207,14 @@ def save_device_details_from_request(request,device):
 		print type(inst)
 		print inst
 		
+    details.is_default=False
 	details.save()
 
 def save_device_details_from_default(device):
     hashing = views_helper.get_hash(device)
-    device_entry = Devicedetails(deviceid = device,  eventstamp = datetime.now(),name="default name",hashkey=hashing)
+    device_entry = Devicedetails(
+            deviceid=device, eventstamp=datetime.now(), name="default name",
+            hashkey=hashing, is_default=True)
     device_entry.save()
 
 def deviceid_to_nodeid(device):
