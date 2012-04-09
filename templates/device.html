@@ -2,12 +2,13 @@
 {% block content %}
 
 <div class="content" style="width: 750px">
+    {% if not detail.is_default %}
     <h1>{{detail.name}}</h1>
+    {% endif %}
 
         <div id="section_text_2">
             {% if detail.is_default %}
             <div class="alert alert-block">
-                <a class="close" data-dismiss="alert">×</a>
                 <h4 class="alert-heading">Welcome, new Dashboard user!</h4>
                 We don't have any information about your router or ISP.
                 Please click the Edit button below to fill in your details.
