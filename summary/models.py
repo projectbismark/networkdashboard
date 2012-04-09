@@ -32,7 +32,7 @@ class Devicedetails(models.Model):
     hashkey = models.TextField()
     latitude = models.FloatField()
     longitude = models.FloatField()
-    is_default = models.BooleanField(default=True)
+    is_default = models.BooleanField(default=True,blank=True)
     class Meta:
         db_table = u'devicedetails'
 
