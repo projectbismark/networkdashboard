@@ -370,6 +370,10 @@ ul.tabrow li.selected{
     display:none;
 }
 
+.nav-tabs li{
+	font-size: 10px;
+}
+
 ul.tabrow li:before,
 ul.tabrow li:after {
     position: absolute;

@@ -9,8 +9,8 @@ def datetime_to_JSON(time,roundit):
     #x = datetime.fromtimestamp(mktime(time.timetuple()))
 	unixtime = mktime(time.timetuple())+1e-6*time.microsecond
 
-	unixtime = (int)(round(unixtime/roundit)*roundit)
-	return unixtime*1000
+	unixtime = (round(unixtime/roundit)*roundit)
+	return (unixtime*1000)
     #return "Date.UTC(" + str(x.year) + "," +str(x.month-1) + "," +str(x.day) + "," +str(x.hour) + "," +str(x.minute) + "," +str(x.second) + "," +str(x.microsecond/1000)+")"
 
 def datetime_format_to_unixtime(time):
