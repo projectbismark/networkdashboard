@@ -184,7 +184,7 @@ def linegraph_shaperate(request):
 
 	details = Devicedetails.objects.filter(deviceid=device)[0]
 
-	all_device_details= MShaperate.objects.filter(average__lte=3000).order_by('eventstamp')
+	all_device_details= MShaperate.objects.all().order_by('eventstamp')
 	device_details = all_device_details.filter(deviceid=device)
 
     #other_device_details = []
