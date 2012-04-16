@@ -44,7 +44,7 @@ function createParameters(i){
 			selected: 1
 		};
 		var plotoptions = {};
-		var units = "Bytes Per Second";
+		var units = "Bits Per Second";
 
 
 		switch (i){
@@ -104,14 +104,17 @@ function createParameters(i){
 			break;
 
 			case 4:
-			units = "Milliseconds";
+			units = "Bits Per Second";
 			titlename = "";
 			divid = "graph_div_5";
 			url = "/line_shaperate/";
 			formatter = function(){
 				var ret =Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) + "<br/>";
-				return ret+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p> <b>'+ parseInt(this.points[0].y) +'</b> msec';
-			}
+				var si = determineSI(this.points[0].y,0);
+				var d = parseFloat(recDivide(this.points[0].y,this.points[0].y,0));
+				ret += ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p> <b>'+ d +'</b> '+ si +' <br/>';
+				return ret;
+			};
 			graphid = 3;
 			break;
 			case 5:
