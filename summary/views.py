@@ -1,5 +1,6 @@
 # Create your views here.
 
+import json
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils import simplejson
 import urllib2, urllib, json
@@ -145,7 +146,7 @@ def linegraph_bitrate(request):
 		result.append(cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"single-median"))
 
 
-	return HttpResponse("(" + str(result) + ")")
+	return HttpResponse(json.dumps(result))
 
 def linegraph_lmrtt(request):
     device = request.GET.get('deviceid')
@@ -173,10 +174,8 @@ def linegraph_lmrtt(request):
     if (filter_by != 'none'):
 		bucket_width = 2*3600
 		result.append(cvs_helper.linegraph_bucket(other_device_details,bucket_width,'median'))
-    answer = str(result).replace("['","[")
-    answer = answer.replace(")'",")")
 
-    return HttpResponse("(" + answer + ")")
+    return HttpResponse(json.dumps(result))
 
 def linegraph_shaperate(request):
 	device = request.GET.get('deviceid')
@@ -201,7 +200,7 @@ def linegraph_shaperate(request):
 		
 	result=[]
 	result.append(cvs_helper.linegraph_normal(device_details,'Shape rate',1,1))
-	return HttpResponse("(" + str(result) + ")")
+	return HttpResponse(json.dumps(result))
 
 def linegraph_rtt(request):
 	
@@ -233,7 +232,7 @@ def linegraph_rtt(request):
 			#result.append(cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,"median"+str(count)))
 		count+=1
 
-	return HttpResponse("(" + str(result) + ")")
+	return HttpResponse(json.dumps(result))
 
 def linegraph_bytes_hour(request):
     device = request.GET.get('deviceid')
