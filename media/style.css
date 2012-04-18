@@ -166,6 +166,10 @@ img { max-width: none; }
     top:70px;
 }
 
+.latest-measurement{
+	text-align: center;
+}
+
 .map-area{
     position:relative;
     width:600px;
