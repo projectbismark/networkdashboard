@@ -117,41 +117,6 @@ function createParameters(i){
 			};
 			graphid = 3;
 			break;
-			case 5:
-			paramselect = "PASSIVE_PORT";
-			titlename = "Passive Data By Port";
-			divid = "graph_div_6";
-			units = "MB";
-			url = "/line_passive_port/";
-			formatter = function(){
-				return ''+ '<p style="color:' + this.points[0].series.color +  ';">' + this.points[0].series.name+ '</p><br />'+ Highcharts.dateFormat('%A,%e. %b %Y, %l %p', this.x) +' <br/><b>'+ parseInt(this.points[0].y/1000/1000) +'</b> MB';
-			};
-			plotoptions ={
-				column: {
-					borderWidth: 0,
-					stacking: "normal"
-				},
-				series:{
-					dataGrouping:{
-						groupPixelWidth: 50,
-						units: [[
-						'hour',
-						[1]
-						], [
-						'day',
-						[1]
-						], [
-						'week',
-						[1]
-						], [
-						'month',
-						[1, 3, 6]
-						]]
-					} 
-				}
-
-			};
-			break;
 		}
 
 		var ret = {
