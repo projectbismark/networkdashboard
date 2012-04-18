@@ -222,7 +222,7 @@ function createParameters(i){
 	}
 
 	function renderGraphs(deviceid){
-		for (var i =0; i<5; i++){
+		for (var i =0; i<4; i++){
 			var params = createParameters(i);
 			$.ajax({
 				type: "GET",
