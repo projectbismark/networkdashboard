@@ -100,6 +100,43 @@ def get_first_measurement(device):
 def get_last_measurement(device):
     last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
     return last[0].eventstamp.strftime("%B %d, %Y")
+	
+def get_latest_download(device):
+	latest = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')
+	latest = latest.filter(dstip = '143.215.131.173')
+	ret = {}
+	ret['average']= latest[0].average
+	ret['eventstamp']= latest[0].eventstamp.strftime("%B %d, %Y, %I:%M %p")
+	return ret
+
+def get_latest_upload(device):
+	latest = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')
+	latest = latest.filter(srcip = '143.215.131.173')
+	ret = {}
+	ret['average']= latest[0].average
+	ret['eventstamp']= latest[0].eventstamp.strftime("%B %d, %Y, %I:%M %p")
+	return ret
+
+def get_latest_lastmile(device):
+	latest = MLmrtt.objects.filter(deviceid=device,average__lte=3000).order_by('-eventstamp')
+	ret = {}
+	ret['average']= latest[0].average
+	ret['eventstamp']= latest[0].eventstamp.strftime("%B %d, %Y, %I:%M %p")
+	return ret
+
+def get_latest_roundtrip(device):
+	latest = MRtt.objects.filter(deviceid=device,average__lte=3000).order_by('-eventstamp')	
+	ret = {}
+	ret['average']= latest[0].average
+	ret['eventstamp']= latest[0].eventstamp.strftime("%B %d, %Y, %I:%M %p")
+	return ret
+	
+def get_latest_shaperate(device):
+	latest = MShaperate.objects.filter(deviceid=device,average__lte=300).order_by('-eventstamp')
+	ret = {}
+	ret['average']= latest[0].average
+	ret['eventstamp']= latest[0].eventstamp.strftime("%B %d, %Y, %I:%M %p")
+	return ret
 
 def get_coordinates_for_googlemaps():
     coordstring = ""
