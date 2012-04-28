@@ -2,7 +2,7 @@
 import sys
 import os
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -86,7 +86,7 @@ INSTALLED_APPS = (
 )
 
 
-try:			
-   	from settings_dev import *
-except ImportError, e:
-	pass
+#try:			
+#   	from settings_dev import *
+#except ImportError, e:
+#	pass
