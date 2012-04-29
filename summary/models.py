@@ -199,21 +199,22 @@ class MAggl3Bitrate(models.Model):
         db_table = u'm_aggl3bitrate'
 
 class MBitrate(models.Model):
-    deviceid = models.TextField() # This field type is a guess.
-    srcip = models.IPAddressField()
-    dstip = models.IPAddressField()
-    eventstamp = models.DateTimeField()
-    average = models.FloatField()
-    std = models.FloatField()
-    minimum = models.FloatField()
-    maximum = models.FloatField()
-    median = models.FloatField()
-    iqr = models.FloatField()
-    exitstatus = models.IntegerField()
-    
-    toolid = models.TextField() # This field type is a guess.
-    class Meta:
-        db_table = u'm_bitrate'
+	deviceid = models.TextField() # This field type is a guess.
+	srcip = models.IPAddressField()
+	dstip = models.IPAddressField()
+	eventstamp = models.DateTimeField()
+	average = models.FloatField()
+	std = models.FloatField()
+	minimum = models.FloatField()
+	maximum = models.FloatField()
+	median = models.FloatField()
+	iqr = models.FloatField()
+	exitstatus = models.IntegerField()
+
+	toolid = models.TextField() # This field type is a guess.
+	direction = models.CharField(max_length=20)
+	class Meta:
+		db_table = u'm_bitrate'
 
 class MDnsdelay(models.Model):
     deviceid = models.TextField() # This field type is a guess.
