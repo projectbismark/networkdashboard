@@ -83,28 +83,6 @@ def devicesummary(request):
 def getLocation(request, device):   
     return HttpResponse(database_helper.get_location(device))
 
-def throughputGraph(request):
-	g_filter = Graph_Filter(request)
-	print "me"
-	print g_filter
-	device = request.GET.get('deviceid')
-	graphno = int(request.GET.get('graphno'))
-	filter_by = request.GET.get('filter_by')
-	chosen_limit = 100000000
-	data = "["
-	all_device_details = MBitrate.objects.filter(average__lte = chosen_limit).order_by('eventstamp')
-	if(graphno==1):
-		all_device_details = all_device_details.filter(srcip = '143.215.131.173')
-	else:
-		all_device_details = all_device_details.filter(dstip = '143.215.131.173')
-	for entry in all_device_details:
-		if(data!='['):
-			data+= ','
-		data += '[' + datetime_helper.datetime_to_JSON(entry.eventstamp)+ ',' + str(entry.average) +"]"
-
-	data += "]"
-	return HttpResponse(data)
-        
 def linegraph_bitrate(request):
 	g_filter = Graph_Filter(request)
 	chosen_limit = 100000000
@@ -127,9 +105,9 @@ def linegraph_bitrate(request):
 		other_device_details_netperf_3.extend(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))	
 
 	if (g_filter.graphno==1):
-		all_device_details = all_device_details.filter(srcip='143.215.131.173')		
+		all_device_details = all_device_details.filter(direction='up')		
 	elif (g_filter.graphno==2): 
-		all_device_details = all_device_details.filter(dstip='143.215.131.173')
+		all_device_details = all_device_details.filter(direction='dw')
 
 	my_device_details = all_device_details.filter(deviceid=g_filter.device)
 
