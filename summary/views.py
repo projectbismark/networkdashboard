@@ -105,9 +105,9 @@ def linegraph_bitrate(request):
 		other_device_details_netperf_3.extend(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))	
 
 	if (g_filter.graphno==1):
-		all_device_details = all_device_details.filter(direction='up')		
+		all_device_details = all_device_details.filter(direction='dw')		
 	elif (g_filter.graphno==2): 
-		all_device_details = all_device_details.filter(direction='dw')
+		all_device_details = all_device_details.filter(direction='up')
 
 	my_device_details = all_device_details.filter(deviceid=g_filter.device)
 
