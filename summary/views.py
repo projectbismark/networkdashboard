@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from time import time,mktime,strftime
 #from mx.DateTime.ISO import ParseDateTimeUTC
 import hashlib
-import cvs_helper,datetime_helper,database_helper,views_helper,email_helper
+import cvs_helper,datetime_helper,database_helper,views_helper,email_helper,geoip_helper
 from graph_filter import *
 
 def index(request):
@@ -37,7 +37,7 @@ def invalidEdit(request, device):
     return render_to_response('invalid_edit.html', {'deviceid' : device})
     
 def getCoordinates(request):
-    return HttpResponse(database_helper.get_coordinates_for_googlemaps())
+    return HttpResponse(geoip_helper.get_coordinates_for_googlemaps())
         
 def sharedDeviceSummary(request,devicehash):
 
@@ -82,6 +82,11 @@ def devicesummary(request):
 
 def getLocation(request, device):   
     return HttpResponse(database_helper.get_location(device))
+
+def iptest(iptest):
+	dat = geoip_helper.getLocation("117.192.232.202")
+	return HttpResponse(str(dat))
+	
 
 def linegraph_bitrate(request):
 	g_filter = Graph_Filter(request)
