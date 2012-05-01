@@ -1,0 +1,8 @@
+*.kpf
+*env
+*.pyc
+*.egg-info
+*.dat
+.tox
+build
+dist
