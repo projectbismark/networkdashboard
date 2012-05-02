@@ -5,13 +5,13 @@ from networkdashboard.summary.models import *
 import cvs_helper,datetime_helper,views_helper
 import pygeoip
 import psycopg2
-from django.conf import settings
+import geoip_values
 from django.core.cache import cache
 import random
 
 def get_coordinates_for_googlemaps():
 	coordstring = ""
-	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	gi = pygeoip.GeoIP(geoip_values.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	distinct = getIPList()
 	data_type="coord"
 	devtype = 'address'
@@ -64,7 +64,7 @@ def getLocation(ip,gi):
 	return gi_rec
 
 def getIPList():
-	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
+	conn_string = "host='localhost' dbname='" + geoip_values.MGMT_DB + "' user='"+ geoip_values.MGMT_USERNAME  +"' password='" +  geoip_values.MGMT_PASS + "'"
 	conn = psycopg2.connect(conn_string)
 	cursor = conn.cursor()
 	cursor.execute("select ip from devices")
