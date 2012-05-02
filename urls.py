@@ -50,6 +50,7 @@ urlpatterns = patterns('',
      (r'^newuser.html', 'networkdashboard.summary.views.newuser'),
      (r'^feedback.html', 'networkdashboard.summary.views.feedback'),
      (r'^send_feedback/', 'networkdashboard.summary.views.send_feedback'),
+     (r'^ip_test/', 'networkdashboard.summary.views.iptest'),
      (r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root':settings.MEDIA_ROOT})
 
 )
