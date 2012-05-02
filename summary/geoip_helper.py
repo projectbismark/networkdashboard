@@ -59,7 +59,7 @@ def getLocation(ip,gi):
 	
 	gi_rec = gi.record_by_addr(ip)
 	
-	cache.set(ip,gi_rec,random.randint(50000, 100000))
+	cache.set(ip,gi_rec,random.randint(1000, 10000))
 	
 	return gi_rec
 
