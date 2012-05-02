@@ -6,7 +6,7 @@ import random
 from datetime import datetime, timedelta
 from time import time,mktime,strftime
 import hashlib,httplib,urllib2
-import cvs_helper,datetime_helper,views_helper
+import cvs_helper,datetime_helper,views_helper,geoip_helper
 import ast
 
 def fetch_deviceid_soft(device):
@@ -138,58 +138,6 @@ def get_latest_shaperate(device):
 	ret['eventstamp']= latest[0].eventstamp.strftime("%B %d, %Y, %I:%M %p")
 	return ret
 
-def get_coordinates_for_googlemaps():
-    coordstring = ""
-
-    distinct_ips = IpResolver.objects.all()
-    data_type="coord"
-    for row_ip in distinct_ips:
-
-        lat = str(row_ip.latitude)
-        lon = str(row_ip.longitude)
-        devtype = str(row_ip.type)
-        coordstring += devtype
-        coordstring += ":"
-        coordstring += data_type
-        coordstring += ":"
-        coordstring += lat
-        coordstring += ":"
-        coordstring += lon
-        coordstring += "\n"
-    
-    distinct_devices= Devicedetails.objects.all()
-    data_type="address"
-    for row in distinct_devices:
-        if row.latitude == None:
-            address = str(row.city) + ',' + str(row.state) + ',' + str(row.country)
-            try:
-                result = get_google_maps_result_from_request(str(address))
-                if result['Status']['code'] == 200:
-                    coord=result['Placemark'][0]['Point']['coordinates']
-                    row.latitude = coord[1]
-                    row.longitude=coord[0]
-                    row.save()
-                else:
-                    row.latitude =33.748
-                    row.longitude=-84.387
-                    row.save()
-            except:
-                row.latitude = 0
-                row.longitude=0
-                row.save()
-            
-        if row.latitude == None:
-            continue
-        coordstring += "device"
-        coordstring += ":"
-        coordstring += "coord"
-        coordstring += ":"
-        coordstring += str(row.latitude)
-        coordstring += ":"
-        coordstring += str(row.longitude)
-        coordstring += "\n"
-    
-    return HttpResponse(coordstring)
 
 def get_location(device):
     device = device.replace(':','')
