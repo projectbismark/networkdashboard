@@ -171,18 +171,6 @@ def linegraph_shaperate(request):
 	device_details = all_device_details.filter(deviceid=device)
 	device_details_capacity = all_device_details_capacity.filter(deviceid=device)
 
-        #other_device_details = []
-        #filtered_deviceids = []	
-
-        #if (filter_by == 'location'):
-        #        filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
-
-        #if (filter_by == 'provider'):
-	#	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
-
-        #for row in filtered_deviceids:
-	#	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
-
         device_details_up = device_details.filter(direction='up')
         device_details_dw = device_details.filter(direction='dw')
         device_details_capacity_up = device_details_capacity.filter(direction='up')
