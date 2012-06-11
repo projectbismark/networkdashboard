@@ -6,7 +6,7 @@ import random
 from datetime import datetime, timedelta
 from time import time,mktime,strftime
 import hashlib,httplib,urllib2
-import cvs_helper,datetime_helper,views_helper,geoip_helper
+import cvs_helper,datetime_helper,views_helper
 import ast
 
 def fetch_deviceid_soft(device):

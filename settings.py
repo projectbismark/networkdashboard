@@ -2,7 +2,7 @@
 import sys
 import os
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -13,8 +13,8 @@ MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = 'bismark_openwrt_live_v0_1'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'postgres'             # Not used with sqlite3.
-DATABASE_PASSWORD = '3030spot'         # Not used with sqlite3.
+DATABASE_USER = 'abhishek'             # Not used with sqlite3.
+DATABASE_PASSWORD = 'dashboard'         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
@@ -38,7 +38,7 @@ USE_I18N = True
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 # CHANGE to something that is local to you for testing
-MEDIA_ROOT = 'C:/Users/Alfred/Desktop/new/networkdashboard/templates'
+MEDIA_ROOT = '/data/users/dashboard/networkdashboard/media'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -59,13 +59,12 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.load_template_source',
 #     'django.template.loaders.eggs.load_template_source',
 )
-
 MIDDLEWARE_CLASSES = (
-    #'django.middleware.cache.UpdateCacheMiddleware',
+    
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    #'django.middleware.cache.FetchFromCacheMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware'
+
 )
 
 ROOT_URLCONF = 'networkdashboard.urls'
@@ -74,7 +73,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    'C:/Users/Alfred/Desktop/new/networkdashboard/templates',
+    '/data/users/dashboard/networkdashboard/templates',
 )
 
 INSTALLED_APPS = (
@@ -87,7 +86,7 @@ INSTALLED_APPS = (
 )
 
 
-try:			
-   	from settings_dev import *
-except ImportError, e:
-	pass
+#try:			
+#   	from settings_dev import *
+#except ImportError, e:
+#	pass
