@@ -312,6 +312,7 @@ class TracerouteHops(models.Model):
 
 class MCapacity(models.Model):
     deviceid = models.TextField() # This field type is a guess.
+    direction = models.TextField()
     srcip = models.IPAddressField()
     dstip = models.IPAddressField()
     eventstamp = models.DateTimeField()
@@ -380,6 +381,7 @@ class MPktloss(models.Model):
 
 class MShaperate(models.Model):
     deviceid = models.TextField() # This field type is a guess.
+    direction = models.TextField()
     srcip = models.IPAddressField()
     dstip = models.IPAddressField()
     eventstamp = models.DateTimeField()

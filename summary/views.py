@@ -167,22 +167,32 @@ def linegraph_shaperate(request):
 	details = Devicedetails.objects.filter(deviceid=device)[0]
 
 	all_device_details= MShaperate.objects.all().order_by('eventstamp')
+	all_device_details_capacity= MCapacity.objects.all().order_by('eventstamp')
 	device_details = all_device_details.filter(deviceid=device)
+	device_details_capacity = all_device_details_capacity.filter(deviceid=device)
 
-    #other_device_details = []
-    #filtered_deviceids = []	
+        #other_device_details = []
+        #filtered_deviceids = []	
 
-    #if (filter_by == 'location'):
-		#filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
+        #if (filter_by == 'location'):
+        #        filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
 
-    #if (filter_by == 'provider'):
-		#filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
+        #if (filter_by == 'provider'):
+	#	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
 
-    #for row in filtered_deviceids:
-		#other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
+        #for row in filtered_deviceids:
+	#	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
+
+        device_details_up = device_details.filter(direction='up')
+        device_details_dw = device_details.filter(direction='dw')
+        device_details_capacity_up = device_details_capacity.filter(direction='up')
+        device_details_capacity_dw = device_details_capacity.filter(direction='dw')        
 		
 	result=[]
-	result.append(cvs_helper.linegraph_normal(device_details,'Shape rate',1,1))
+	result.append(cvs_helper.linegraph_normal(device_details_up,'Shape rate Up',1,1))
+	result.append(cvs_helper.linegraph_normal(device_details_dw,'Shape rate Down',1,1))
+	result.append(cvs_helper.linegraph_normal(device_details_capacity_up,'Capacity Up',1,1))
+	result.append(cvs_helper.linegraph_normal(device_details_capacity_dw,'Capacity Down',1,1))
 	return HttpResponse(json.dumps(result))
 
 def linegraph_rtt(request):
@@ -211,8 +221,8 @@ def linegraph_rtt(request):
 		
 		result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup),1,1))
 
-		#if (filter_by != 'none'):
-			#result.append(cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,"median"+str(count)))
+		if (filter_by != 'none'):
+			result.append(cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,"median"+str(count)))
 		count+=1
 
 	return HttpResponse(json.dumps(result))
