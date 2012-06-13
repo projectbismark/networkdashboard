@@ -11,7 +11,12 @@ from datetime import datetime, timedelta
 from time import time,mktime,strftime
 #from mx.DateTime.ISO import ParseDateTimeUTC
 import hashlib
-import cvs_helper,datetime_helper,database_helper,views_helper,email_helper,geoip_helper
+import cvs_helper,datetime_helper,database_helper,views_helper,email_helper
+import site
+site.addsitedir("/home/abhishek/.local/lib/python2.6/site-packages/")
+import pygeoip
+import geoip_helper
+import psycopg2
 from graph_filter import *
 
 def index(request):
@@ -37,6 +42,7 @@ def invalidEdit(request, device):
     return render_to_response('invalid_edit.html', {'deviceid' : device})
     
 def getCoordinates(request):
+    #return HttpResponse("s")
     return HttpResponse(geoip_helper.get_coordinates_for_googlemaps())
         
 def sharedDeviceSummary(request,devicehash):
