@@ -50,13 +50,16 @@
 </div>
 
 <script type="text/javascript">
+var points = new Array();
+/*
 //delay after panning to new location
 var delay = 5000;
 //delay between zoomout-pan-zoomin
 var animationDelay = 700;
 //delay between zoom levels (currently bugs with googles continuous zoom methods, so this must be handled manually)
 var innerAnimationDelay = 30;
-var points = new Array();
+*/
+
 //threshold for panning map. Map will pam to the closest, unvisited node that is at least this far away (in kilometers)
 var thresh = 1000;
 var minZoom = 1;
@@ -66,6 +69,7 @@ function MapPoint(latLng) {
     this.visited = false;
     this.latLng = latLng;
 }
+/*
 
 function resetPoints() {
     for (var i = 0;i < points.length; ++i) {
@@ -92,6 +96,7 @@ function zoomOut() {
 function panMap(coords) {
     map.panTo(coords);
 }
+*/
 
 function load() {
     var mid = new google.maps.LatLng(0, 0);
@@ -129,7 +134,7 @@ function load() {
         });
     }
 }
-
+/*
 function expandEntry() {
     $('#view_button').addClass('disabled');
     $('#view_button').removeClass('btn-primary');
@@ -141,8 +146,9 @@ function expandAdvanced() {
     $('#error_mac').focus();
     $('#advanced').hide();
     return false;
-}
+}*/
 
+/*
 function cycleMap(){
     var mid = map.getBounds().getCenter();
     var next = mid;
@@ -171,7 +177,7 @@ function cycleMap(){
         setTimeout(function() { cycleMap() }, delay + animationDelay * 2);
     }
 }
-
+*/
 function OnSuccess(data) {
     var coordstring = data.split("\n");
     for (var i = 0; i < coordstring.length - 1; ++i){
