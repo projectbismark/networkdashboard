@@ -72,3 +72,61 @@ def getIPList():
 	#print records
 	return records
 	
+	
+def get_country_count():
+	gi = pygeoip.GeoIP(geoip_values.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	country_list = []
+	ip_list = getIPList()
+	for ip in ip_list:
+		new_country = True
+		name = gi.country_name_by_addr(ip[0])
+		for c in country_list:
+			if c['country']==name:
+				c['count']+=1
+				new_country = False
+		if new_country:
+			value = {}
+			value['country']=name
+			value['count']=1
+			country_list.append(value)
+	return country_list
+	
+def get_city_count():
+	gi = pygeoip.GeoIP(geoip_values.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	city_list = []
+	ip_list = getIPList()
+	for ip in ip_list:
+		new_city = True
+		rec = gi.record_by_addr(ip[0])
+		for c in city_list:
+			if ((c['city']==rec['city'])and(c['region']==rec['region_name'])):
+				c['count']+=1
+				new_city = False
+		if ((new_city) and (rec['city']!='')):
+			value = {}
+			value['city']=rec['city']
+			value['region']=rec['region_name']
+			value['country']=rec['country_name']
+			value['count']=1
+			city_list.append(value)
+			
+	return city_list
+	
+def get_isp_count():
+	gi = pygeoip.GeoIP(geoip_values.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	isp_list = []
+	ip_list = getIPList()
+	for ip in ip_list:
+		new_isp = True
+		name = gi.org_by_addr(ip[0])
+		for isp in isp_list:
+			if isp['isp']==name:
+				isp['count']+=1
+				new_isp = False
+		if ((new_isp) and (name!='')):
+			value = {}
+			value['isp']=name
+			value['count']=1
+			isp_list.append(value)
+			
+	return isp_list

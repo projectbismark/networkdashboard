@@ -2,13 +2,14 @@ from django.http import HttpResponse, HttpResponseRedirect
 import urllib2, urllib, json
 from django.shortcuts import render_to_response
 from networkdashboard.summary.models import *
+from operator import itemgetter
 
 import random
 from datetime import datetime, timedelta
 from time import time,mktime,strftime
 
 import hashlib
-import cvs_helper,datetime_helper,database_helper
+import cvs_helper,datetime_helper,database_helper,geoip_helper
 
 def get_response_for_devicehtml(device_details):
 
@@ -30,3 +31,18 @@ def get_hash(string):
     m = hashlib.md5()
     m.update(string)
     return m.hexdigest()
+	
+def get_sorted_country_data():
+	country_data = geoip_helper.get_country_count()
+	result = sorted(country_data, key=itemgetter('count'), reverse = True)
+	return result
+	
+def get_sorted_city_data():
+	city_data = geoip_helper.get_city_count()
+	result = sorted(city_data, key=itemgetter('city'))
+	return result
+	
+def get_sorted_isp_data():
+	isp_data = database_helper.get_isp_count()
+	result = sorted(isp_data, key=itemgetter('count'), reverse = True)
+	return result

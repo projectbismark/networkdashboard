@@ -46,6 +46,49 @@
     <h2>Map of Active BISmark Routers</h2>
     <div class ="outerContainer" id="outer_container_5">
         <div class ="graphdiv" id="map"></div>
+		<ul id="tab" class="nav nav-tabs" style="clear: both">
+			<li class="active"><a href="#country_list" data-toggle="tab">Country</a></li>
+			<li><a href="#city_list" data-toggle="tab">City</a></li>
+			<li><a href="#isp_list" data-toggle="tab">ISP</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane active in" id="country_list">
+				<div class ="statsdiv" id="stats1">
+					<table class="table table-striped table-condensed">
+						{% for country in country_data %}
+							<tr>
+								<td>{{country.country}}</td>
+								<td class = "tdright">{{country.count}}</td>
+							</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+			<div class="tab-pane" id="city_list">
+				<div class ="statsdiv" id="stats2">
+					<table class="table table-striped table-condensed">
+						{% for city in city_data %}
+							<tr>
+								<td>{{city.city}}, {{city.country}} ({{city.region}})</td>
+								<td class = "tdright">{{city.count}}</td>
+							</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+			<div class="tab-pane" id="isp_list">
+				<div class ="statsdiv" id="stats3">
+					<table class="table table-striped table-condensed">
+						{% for isp in isp_data %}
+							<tr>
+								<td>{{isp.isp}}</td>
+								<td class = "tdright">{{isp.count}}</td>
+							</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+		</div>
     </div>
 </div>
 

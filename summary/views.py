@@ -21,9 +21,10 @@ from graph_filter import *
 
 def index(request):
 	
-	response = database_helper.device_count_and_country_data()
-	
-	return render_to_response('index.html', {'country_data' : response})
+	countries = views_helper.get_sorted_country_data()
+	cities = views_helper.get_sorted_city_data()
+	isps = views_helper.get_sorted_isp_data()
+	return render_to_response('index.html', {'country_data' : countries, 'city_data': cities, 'isp_data': isps})
 
 def editDevicePage(request, devicehash):
     device_details = Devicedetails.objects.filter(hashkey=devicehash)
@@ -42,7 +43,6 @@ def invalidEdit(request, device):
     return render_to_response('invalid_edit.html', {'deviceid' : device})
     
 def getCoordinates(request):
-    #return HttpResponse("s")
     return HttpResponse(geoip_helper.get_coordinates_for_googlemaps())
         
 def sharedDeviceSummary(request,devicehash):

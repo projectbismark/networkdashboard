@@ -6,7 +6,7 @@ import random
 from datetime import datetime, timedelta
 from time import time,mktime,strftime
 import hashlib,httplib,urllib2
-import cvs_helper,datetime_helper,views_helper
+import cvs_helper,datetime_helper,views_helper,geoip_helper
 import ast
 
 def fetch_deviceid_soft(device):
@@ -53,24 +53,34 @@ def list_isps():
     return ret
 
 def device_count_and_country_data():
-    distinct_countries = list_countries()
-    
-    response = []
-    
-    for country in distinct_countries:
-        count = device_count_for_country(country)
-        value={}
-        value['count']=count
-        if country!='':
-            value['country']=country
-        else:
-            value['country']="Unknown"
-        response.append(value)
-    
-    return response
+	distinct_countries = list_countries()
+	response = []
+	for country in distinct_countries:
+		if country!='':
+			value={}
+			count = device_count_for_country(country)
+			value['country']=country
+			value['count']=count
+			response.append(value) 
+	return response
+	
+def get_isp_count():
+	distinct_isps = list_isps()
+	response = []
+	for isp in distinct_isps:
+		if isp!='':
+			value={}
+			count = device_count_for_isp(isp)
+			value['isp']=isp
+			value['count']=count
+			response.append(value) 
+	return response
 
 def device_count_for_country(cntry):
     return len(Devicedetails.objects.filter(country=cntry))
+	
+def device_count_for_isp(provider):
+    return len(Devicedetails.objects.filter(isp=provider))
     
 
 def list_countries():
@@ -80,7 +90,16 @@ def list_countries():
         value = ast.literal_eval(str(one))
         v = value['country']
         ret.append(v)
-        
+    ret.sort()
+    return ret
+	
+def list_isps():
+    ret=[]
+    out = Devicedetails.objects.values('isp').distinct()
+    for one in out:
+        value = ast.literal_eval(str(one))
+        v = value['isp']
+        ret.append(v)
     ret.sort()
     return ret
 
