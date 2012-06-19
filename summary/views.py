@@ -7,14 +7,13 @@ import urllib2, urllib, json
 from django.shortcuts import render_to_response
 from networkdashboard.summary.models import *
 import random
+import site
+site.addsitedir("/home/abhishek/.local/lib/python2.6/site-packages/")
 from datetime import datetime, timedelta
 from time import time,mktime,strftime
 #from mx.DateTime.ISO import ParseDateTimeUTC
 import hashlib
 import cvs_helper,datetime_helper,views_helper,email_helper
-import site
-site.addsitedir("/home/abhishek/.local/lib/python2.6/site-packages/")
-import pygeoip
 import geoip_helper
 import psycopg2
 from graph_filter import *
