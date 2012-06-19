@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 import urllib2, urllib, json
 from django.shortcuts import render_to_response
 from networkdashboard.summary.models import *
-import cvs_helper,datetime_helper,views_helper
+import cvs_helper,datetime_helper
 import pygeoip
 import psycopg2
 import geoip_values
