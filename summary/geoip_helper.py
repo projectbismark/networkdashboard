@@ -113,12 +113,12 @@ def get_city_count():
 	return city_list
 	
 def get_isp_count():
-	gi = pygeoip.GeoIP(geoip_values.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	gi = pygeoip.GeoIP(geoip_values.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
 	isp_list = []
 	ip_list = getIPList()
 	for ip in ip_list:
 		new_isp = True
-		name = gi.org_by_addr(ip[0])
+		name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
 		for isp in isp_list:
 			if isp['isp']==name:
 				isp['count']+=1
