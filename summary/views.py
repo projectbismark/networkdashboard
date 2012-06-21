@@ -182,10 +182,10 @@ def linegraph_shaperate(request):
         device_details_capacity_dw = device_details_capacity.filter(direction='dw')        
 		
 	result=[]
-	result.append(cvs_helper.linegraph_normal(device_details_up,'Shape rate Up',1,1))
-	result.append(cvs_helper.linegraph_normal(device_details_dw,'Shape rate Down',1,1))
-	result.append(cvs_helper.linegraph_normal(device_details_capacity_up,'Capacity Up',1,1))
-	result.append(cvs_helper.linegraph_normal(device_details_capacity_dw,'Capacity Down',1,1))
+	result.append(cvs_helper.linegraph_normal(device_details_up,'Shape rate Up',1000,1))
+	result.append(cvs_helper.linegraph_normal(device_details_dw,'Shape rate Down',1000,1))
+	result.append(cvs_helper.linegraph_normal(device_details_capacity_up,'Capacity Up',1000,1))
+	result.append(cvs_helper.linegraph_normal(device_details_capacity_dw,'Capacity Down',1000,1))
 	return HttpResponse(json.dumps(result))
 
 def linegraph_rtt(request):
