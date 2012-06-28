@@ -85,8 +85,13 @@ INSTALLED_APPS = (
     'networkdashboard.summary'
 )
 
+GEOIP_SERVER_LOCATION = ''
+GEOIP_ASN_LOCATION = ''
+MGMT_DB = ''
+MGMT_USERNAME = ''
+MGMT_PASS = ''
 
-#try:			
-#   	from settings_dev import *
-#except ImportError, e:
-#	pass
+try:
+    from settings_prod import *
+except ImportError, e:
+    pass
