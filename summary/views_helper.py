@@ -43,6 +43,6 @@ def get_sorted_city_data():
 	return result
 	
 def get_sorted_isp_data():
-	isp_data = database_helper.get_isp_count()
+	isp_data = geoip_helper.get_isp_count()
 	result = sorted(isp_data, key=itemgetter('count'), reverse = True)
 	return result

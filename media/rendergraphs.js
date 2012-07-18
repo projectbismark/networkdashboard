@@ -394,7 +394,7 @@ function createParameters(i) {
                 });
                 return ret;
             };
-            ret.units = 'Bytes Per Second';
+            ret.units = 'Bits Per Second';
             ret.url = "/line_shaperate/";
             break;
     }
