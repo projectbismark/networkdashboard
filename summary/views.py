@@ -44,6 +44,37 @@ def invalidEdit(request, device):
     
 def getCoordinates(request):
     return HttpResponse(geoip_helper.get_coordinates_for_googlemaps())
+
+def getLatestInfo(request):
+    devicehash = request.GET.get('devicehash')
+    try:
+        device_details = Devicedetails.objects.get(hashkey=devicehash)
+        latestInfo = ''
+
+        try:
+                latest_download = database_helper.get_latest_download(device_details.deviceid)
+                latestInfo += 'Latest Download: ' + str(latest_download['average']) + '<br>'
+        except KeyError:
+                latestInfo += 'Latest Download: N/A<br>'
+        try:
+                latest_upload = database_helper.get_latest_upload(device_details.deviceid)
+                latestInfo += 'Latest Upload: ' + str(latest_upload['average']) + '<br>'
+        except KeyError:
+                latestInfo += 'Latest Upload: N/A<br>'
+        try:
+                latest_lastmile = database_helper.get_latest_lastmile(device_details.deviceid)
+                latestInfo += 'Latest Lastmile: ' + str(latest_lastmile['average']) + '<br>'
+        except KeyError:
+                latestInfo += 'Latest Lastmile: N/A<br>'
+        try:
+                latest_roundtrip = database_helper.get_latest_roundtrip(device_details.deviceid)
+                latestInfo += 'Latest Roundtrip: ' + str(latest_roundtrip['average']) + '<br>'
+        except KeyError:
+                latestInfo += 'Latest Roundtrip: N/A<br>' 
+                
+        return HttpResponse(latestInfo)
+    except Devicedetails.DoesNotExist:
+        return HttpResponse('NOT AVAILABLE')
         
 def sharedDeviceSummary(request,devicehash):
 
