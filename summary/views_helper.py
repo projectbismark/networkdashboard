@@ -11,6 +11,20 @@ from time import time,mktime,strftime
 import hashlib
 import cvs_helper,datetime_helper,database_helper,geoip_helper
 
+def get_devices_for_compare(device):
+	print(device)
+	ip = geoip_helper.get_ip_by_device(device)
+	print(ip)
+	isp = geoip_helper.get_provider_by_ip(ip)
+	print(isp)
+	#all other ips with this provider
+	ips = geoip_helper.get_ips_by_provider(isp)
+	print(ips)
+	#all other devices with this provider
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
+	
+
 def get_response_for_devicehtml(device_details):
 
 	first = database_helper.get_first_measurement(device_details.deviceid)

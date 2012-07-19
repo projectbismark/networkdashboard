@@ -24,6 +24,27 @@ def index(request):
 	cities = views_helper.get_sorted_city_data()
 	isps = views_helper.get_sorted_isp_data()
 	return render_to_response('index.html', {'country_data' : countries, 'city_data': cities, 'isp_data': isps})
+	
+def compare(request):
+	device = request.POST.get("device").strip("/")
+	return render_to_response('compare.html', {'device' : device})
+	
+def compare_bitrate(request):
+	device = request.GET.get("device")
+	max_results = request.GET.get("max_results")
+	devices = views_helper.get_devices_for_compare(device)
+	result = []
+	result_count = 0
+	for dev in devices:
+		if(result_count == max_results):
+			break
+		if dev!= deviceid:
+			result_count+=1
+			data = MBitrate.objects.filter(deviceid = dev, direction = 'dw').order_by('eventstamp')
+			result.append(cvs_helper.linegraph_normal(data,"", 1000, 18000))
+	data = MBitrate.objects.filter(deviceid = deviceid, direction = 'dw').order_by('eventstamp')
+	result.append(cvs_helper.linegraph_normal(data, "Your Device", 1000, 18000))
+	return HttpResponse(json.dumps(result))
 
 def editDevicePage(request, devicehash):
     device_details = Devicedetails.objects.filter(hashkey=devicehash)
@@ -91,7 +112,7 @@ def getLocation(request, device):
 def iptest(iptest):
 	dat = geoip_helper.getLocation("117.192.232.202")
 	return HttpResponse(str(dat))
-	
+
 
 def linegraph_bitrate(request):
 	g_filter = Graph_Filter(request)

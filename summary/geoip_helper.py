@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response
 from django.conf import settings
 from networkdashboard.summary.models import *
 import cvs_helper,datetime_helper
+import isp_mappings
 import pygeoip
 import psycopg2
 from django.core.cache import cache
@@ -72,6 +73,52 @@ def getIPList():
 	#print records
 	return records
 	
+def get_ip_by_device(device):
+	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
+	conn = psycopg2.connect(conn_string)
+	cursor = conn.cursor()
+	cursor.execute("select ip from devices where SUBSTRING(id,3)='" + device.upper() +"'")
+	records = cursor.fetchall()[0]
+	return records
+	
+def get_provider_by_ip(ip):
+	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
+	mappings = isp_mappings.mappings
+	isp = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+	for m in mappings:
+		if(isp.lower().find(m[0].lower())!=-1):
+			isp = m[1]		
+	return isp
+	
+def get_ips_by_provider(isp):
+	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
+	mappings = isp_mappings.mappings
+	ret = []
+	ip_list = getIPList()
+	for ip in ip_list:
+		name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+		for m in mappings:
+			if(name.lower().find(m[0].lower())!=-1):
+				name = m[1]
+				break
+		if (name==isp):	
+			ret.append(ip[0])
+	return ret
+	
+def get_devices_by_ips(ips):
+	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
+	conn = psycopg2.connect(conn_string)
+	cursor = conn.cursor()
+	ret = []
+	for ip in ips:
+		cursor.execute("select SUBSTRING(id,3) from devices where ip='" + ip +"'")
+		record = cursor.fetchall()[0][0].lower()
+		ret.append(record)
+	return ret
+	
+	
+	
+
 	
 def get_country_count():
 	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
@@ -119,12 +166,17 @@ def get_city_count():
 	
 def get_isp_count():
 	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
+	mappings = isp_mappings.mappings
 	isp_list = []
 	ip_list = getIPList()
 	for ip in ip_list:
 		new_isp = True
 		try:
 			name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+			for m in mappings:
+				if(name.lower().find(m[0].lower())!=-1):
+					name = m[1]
+					break
 			for isp in isp_list:
 				if isp['isp']==name:
 					isp['count']+=1
