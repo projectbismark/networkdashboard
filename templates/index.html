@@ -3,7 +3,6 @@
 {% block content %}
 
 <body onload="load()" onunload="GUnload()">
-
 <div class="content">
     <div id="header">
         <img id="logo" src="/static/images/bismark.gif" alt="BISmark logo"/>
@@ -63,7 +62,7 @@
 						{% for country in country_data %}
 							<tr>
 								<td>{{country.country}}</td>
-								<td class = "tdright">{{country.count}}</td>
+								<td class = "tdright" id="countryCountStat">{{country.count}}</td>
 							</tr>
 						{% endfor %}
 					</table>
@@ -107,6 +106,15 @@
     </div>
 </div>
 
+<!--<script src="../media/infobubble.js" type="text/javascript"></script>-->
+<script type="text/javascript">
+	var script = '<script type="text/javascript" src="http://google-maps-' + 'utility-library-v3.googlecode.com/svn/trunk/infobubble/src/infobubble';
+	if (document.location.search.indexOf('compiled') !== -1) {
+		script += '-compiled';
+	}
+	script += '.js"><' + '/script>';
+	document.write(script);
+</script>
 <script type="text/javascript">
 var points = new Array();
 /*
@@ -122,6 +130,14 @@ var innerAnimationDelay = 30;
 var thresh = 1000;
 var minZoom = 1;
 var maxZoom = 5;
+var currentMarker;
+var infowindow = new InfoBubble({
+    	arrowSize: 7,
+    	disableAutoPan: false,
+    	hideCloseButton: true,
+});
+var boxText = document.createElement("p");
+boxText.style.cssText = "font-size:12px; margin-bottom:-3px";
 
 function MapPoint(latLng) {
     this.visited = false;
@@ -191,6 +207,12 @@ function load() {
             }
         });
     }
+    
+    google.maps.event.addListener(map, "click", function() { 
+		if (infowindow) { 
+			infowindow.close(); 
+		} 
+	}); 
 }
 
 function expandEntry() {
@@ -236,23 +258,68 @@ function cycleMap(){
     }
 }
 */
+
+function createMarker(c) {
+	var point = new google.maps.LatLng(parseFloat(c[2]), parseFloat(c[3]));
+    points.push(new MapPoint(point));
+	var marker = new google.maps.Marker({
+		position: point
+    });
+    marker.called = false;
+    marker.content = "Loading...";
+    marker.devicehash = c[4];
+    
+	google.maps.event.addListener(marker, "click", function() {
+		if(marker.called == false) {
+			$.ajax({
+				type: "GET",
+				url: "/getLatestInfo/",
+				data: {'devicehash': marker.devicehash},
+				success: function(data){OnSuccessMarker(data, marker);}
+			});
+			marker.called = true;
+		}
+		
+		if(marker.content == "Loading...")
+			boxText.innerHTML = marker.content;
+		else if(marker.content != "NOT AVAILABLE")
+			boxText.innerHTML = marker.content + 
+				"<a href=\"http://networkdashboard.org/displayDevice/" + marker.devicehash + 
+				"\">Show Router Details</a>";
+		else
+			boxText.innerHTML = "Information not available.";
+		
+		infowindow.setContent(boxText);
+		infowindow.open(map, marker);
+	});
+	
+	if (c[0] == "server") {
+		marker.setIcon("/static/images/icon-blue.png")
+	} else {
+		marker.setIcon("/static/images/icon-red-dot.png");
+	}
+	marker.setMap(map);
+}
+
+function OnSuccessMarker(data, marker) {
+	marker.content = data;
+	if(marker.content != "NOT AVAILABLE")
+		boxText.innerHTML = marker.content + 
+			"<a href=\"http://networkdashboard.org/displayDevice/" + marker.devicehash + 
+			"\">Show Router Details</a>";
+	else
+		boxText.innerHTML = "Information not available.";
+	infowindow.setContent(boxText);
+	infowindow.close();
+	infowindow.open(map, marker);
+}
+
 function OnSuccess(data) {
     var coordstring = data.split("\n");
     for (var i = 0; i < coordstring.length - 1; ++i){
         var coords = coordstring[i].split(":");
         if (coords[1] == 'coord') {
-            var point = new google.maps.LatLng(parseFloat(coords[2]), parseFloat(coords[3]));
-            points.push(new MapPoint(point));
-            var marker = new google.maps.Marker({
-                    position: point
-            });
-            if (coords[0] == "server") {
-                marker.setIcon("/static/images/icon-blue.png")
-            } else {
-                marker.setIcon("/static/images/icon-red-dot.png");
-            }
-
-            marker.setMap(map);
+            createMarker(coords);
         } else {
             geocoder.geocode({ 'address': coords[2]}, function(results, status) {
                 if (status == google.maps.GeocoderStatus.OK) {
