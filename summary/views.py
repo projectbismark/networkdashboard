@@ -30,13 +30,13 @@ def compare(request):
 	return render_to_response('compare.html', {'device' : device})
 	
 def compare_bitrate(request):
-	device = request.GET.get("device")
-	max_results = request.GET.get("max_results")
-	devices = views_helper.get_devices_for_compare(device)
+	deviceid = request.GET.get("device")
+	max_results = int(request.GET.get("max_results"))
+	devices = views_helper.get_devices_for_compare(deviceid)
 	result = []
 	result_count = 0
 	for dev in devices:
-		if(result_count == max_results):
+		if(result_count > max_results):
 			break
 		if dev!= deviceid:
 			result_count+=1
@@ -63,9 +63,7 @@ def invalidEdit(request, device):
     return render_to_response('invalid_edit.html', {'deviceid' : device})
     
 def getCoordinates(request):
-    print("1")
     return HttpResponse(geoip_helper.get_coordinates_for_googlemaps())
-    print("2")
 
 def getLatestInfo(request):
     devicehash = request.GET.get('devicehash')
@@ -116,10 +114,10 @@ def devicesummary(request):
     hashing = views_helper.get_hash(device)
     
     if(request.POST.get("edit")):
-        try:
-            database_helper.save_device_details_from_request(request,device)
-        except:
-            return render_to_response('invalid_edit.html', {'deviceid' : hashing})
+		try:
+			database_helper.save_device_details_from_request(request,device)
+		except:
+			return render_to_response('invalid_edit.html', {'deviceid' : hashing})
      
  
     if not database_helper.fetch_deviceid_soft(device):

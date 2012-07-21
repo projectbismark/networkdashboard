@@ -12,14 +12,10 @@ import hashlib
 import cvs_helper,datetime_helper,database_helper,geoip_helper
 
 def get_devices_for_compare(device):
-	print(device)
 	ip = geoip_helper.get_ip_by_device(device)
-	print(ip)
 	isp = geoip_helper.get_provider_by_ip(ip)
-	print(isp)
 	#all other ips with this provider
 	ips = geoip_helper.get_ips_by_provider(isp)
-	print(ips)
 	#all other devices with this provider
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
@@ -41,10 +37,10 @@ def get_response_for_devicehtml(device_details):
 	return render_to_response('device.html', {'detail': device_details,'firstUpdate': first, 'lastUpdate': last, 'deviceid': device_details.deviceid, 'num_location' : num_location, 'num_provider' : num_provider, 'num_all' : num_all, 'latestdownload' : latest_download, 'latestupload' : latest_upload, 'latestlastmile' : latest_lastmile, 'latestroundtrip' : latest_roundtrip, 'latestshaperate': latest_shaperate}) 
 
 def get_hash(string):
-        string = string.replace(':', '')  
-        m = hashlib.md5()
-        m.update(string)
-        return m.hexdigest()
+	string = string.replace(':', '')
+	m = hashlib.md5()
+	m.update(string)
+	return m.hexdigest()
 	
 def get_sorted_country_data():
 	country_data = geoip_helper.get_country_count()

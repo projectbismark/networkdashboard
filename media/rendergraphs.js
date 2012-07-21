@@ -431,7 +431,7 @@ function onSuccessGraph(graphParams) {
     }
 }
 
-function compareGraphs(devicelist){
+function compareGraphs(deviceid){
 	for (var i = 0; i<1; ++i){
 		var params = compareParameters(i);
 		$.ajax({

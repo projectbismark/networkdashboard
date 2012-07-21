@@ -6,7 +6,7 @@ import random
 from datetime import datetime, timedelta
 from time import time,mktime,strftime
 import hashlib,httplib,urllib2
-import cvs_helper,datetime_helper,geoip_helper
+import cvs_helper,datetime_helper,geoip_helper, views_helper
 import ast
 
 def fetch_deviceid_soft(device):
@@ -23,7 +23,6 @@ def fetch_deviceid_soft(device):
 def fetch_deviceid_hard(device):
     
     device_search = MBitrate.objects.filter(deviceid=device)
-    print device
 
     try:
         if (len(device_search)>0):
@@ -113,12 +112,18 @@ def get_num_devices(device_details):
     return len(Devicedetails.objects.exclude(deviceid=device_details.deviceid))-1
 
 def get_first_measurement(device):
-    first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]    
-    return first[0].eventstamp.strftime("%B %d, %Y")
+	try:
+		first = MBitrate.objects.filter(deviceid=device).order_by('eventstamp')[0:3]    
+		return first[0].eventstamp.strftime("%B %d, %Y")
+	except:
+		return None
 
 def get_last_measurement(device):
-    last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
-    return last[0].eventstamp.strftime("%B %d, %Y")
+	try:
+		last = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')[0:3]
+		return last[0].eventstamp.strftime("%B %d, %Y")
+	except:
+		return None
 	
 def get_latest_download(device):
 	latest = MBitrate.objects.filter(deviceid=device).order_by('-eventstamp')
@@ -176,7 +181,6 @@ def get_latest_shaperate(device):
 def get_location(device):
     device = device.replace(':','')
     details = Devicedetails.objects.filter(deviceid=device)
-    print details
     if len(details)>0:
         return (details[0].city + ", " + details[0].country)
 
@@ -199,8 +203,6 @@ def get_google_maps_result_from_request(address):
     return result
 
 def save_device_details_from_request(request,device):
-	
-	
 	hashing = views_helper.get_hash(device)
 	dname = request.POST.get('name')
 	disp = request.POST.get('isp')
