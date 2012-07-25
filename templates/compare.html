@@ -13,10 +13,15 @@
 				<select id="measurement_type">
 					<option value="down">Download Throughput</option>
 					<option value="up">Upload Throughput</option>
+					<option value="lm">Latency (Georgia Tech)</option>
+					<option value="lm">Latency (Berkeley, CA)</option>
+					<option value="lm">Latency (Napoli, Italy)</option>
 					<option value="lm">Latency (Last-Mile)</option>
+					<!--
 					{% for s in servers %}
 						<option value="rtt">Latency ({{s.location}})</option>
 					{% endfor %}
+					-->
 				</select>
 			</td>
         </tr>
@@ -24,8 +29,8 @@
             <td>Compare by:</td>
             <td class ="right">
 				<select id="compare_criteria">
-					<option value=1 selected = "selected">ISP</option>
-					<option value=2>City</option>
+					<option value=1 selected = "selected">My ISP</option>
+					<option value=2>My City</option>
 				</select>
 			</td>
         </tr>
