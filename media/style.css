@@ -320,6 +320,10 @@ div.graphdiv {
 	padding-top:0;
 }
 
+#edit_btn{
+	height: 35px;
+}
+
 div.graphdiv div.progress {
     margin-left: 25%;
     margin-right: 25%;
