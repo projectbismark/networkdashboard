@@ -24,6 +24,13 @@ a {
     color: #0091C9;
 }
 
+div.progress{
+}
+
+button#compare_button.btn{
+	margin-top:10px;
+}
+
 a:visited {
     color: #00609C;
 }
@@ -301,13 +308,24 @@ div.graphdiv {
 }
 
 div.progress_wrapper {
+	position:relative;
+	top: -200px;
     padding-left, padding-right: 200px;
-    padding-top: 150px;
+	text-align: center;
 }
 
 div.graphdiv div.progress {
     margin-left: 25%;
     margin-right: 25%;
+}
+
+div.progress{
+	margin-left:25%;
+	margin-right:25%;
+}
+
+input#compare_button{
+	padding: 5px 10px;
 }
 
 #map{
@@ -316,6 +334,10 @@ div.graphdiv div.progress {
     height:400px;
     top:0px;
     left:0px;
+}
+
+td.right{
+	text-align:right;
 }
 
 div.statsdiv{

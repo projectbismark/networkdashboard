@@ -11,12 +11,27 @@ from time import time,mktime,strftime
 import hashlib
 import cvs_helper,datetime_helper,database_helper,geoip_helper
 
-def get_devices_for_compare(device):
+def get_devices_for_compare(device,criteria):
+	if (criteria==1):
+		return get_devices_by_isp(device)
+	else:
+		return get_devices_by_city(device)
+	
+def get_devices_by_isp(device):
 	ip = geoip_helper.get_ip_by_device(device)
 	isp = geoip_helper.get_provider_by_ip(ip)
 	#all other ips with this provider
 	ips = geoip_helper.get_ips_by_provider(isp)
-	#all other devices with this provider
+	#devices for these ips
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
+	
+def get_devices_by_city(device):
+	ip = geoip_helper.get_ip_by_device(device)
+	city = geoip_helper.get_city_by_ip(ip)
+	#all other ips with this city
+	ips = geoip_helper.get_ips_by_city(city)
+	#devices for these ips
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
 	
@@ -42,6 +57,9 @@ def get_hash(string):
 	m.update(string)
 	return m.hexdigest()
 	
+def get_device_count():
+	return geoip_helper.get_device_count()
+	
 def get_sorted_country_data():
 	country_data = geoip_helper.get_country_count()
 	result = sorted(country_data, key=itemgetter('count'), reverse = True)
@@ -49,7 +67,7 @@ def get_sorted_country_data():
 	
 def get_sorted_city_data():
 	city_data = geoip_helper.get_city_count()
-	result = sorted(city_data, key=itemgetter('city'))
+	result = sorted(city_data, key=itemgetter('count'), reverse = True)
 	return result
 	
 def get_sorted_isp_data():

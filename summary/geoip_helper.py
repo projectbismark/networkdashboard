@@ -80,6 +80,17 @@ def getIPList():
 	records = cursor.fetchall()
 	#print records
 	return records
+	
+def get_device_count():
+	print "here"
+	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
+	conn = psycopg2.connect(conn_string)
+	cursor = conn.cursor()
+	cursor.execute("select COUNT(*) from devices")
+	count = cursor.fetchone()
+	#print records
+	print count[0]
+	return count[0]
 
 def getDeviceIDList():
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
@@ -113,13 +124,29 @@ def get_ips_by_provider(isp):
 	ret = []
 	ip_list = getIPList()
 	for ip in ip_list:
-		name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
-		for m in mappings:
-			if(name.lower().find(m[0].lower())!=-1):
-				name = m[1]
-				break
-		if (name==isp):	
-			ret.append(ip[0])
+		try:
+			name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+			for m in mappings:
+				if(name.lower().find(m[0].lower())!=-1):
+					name = m[1]
+					break
+			if (name==isp):	
+				ret.append(ip[0])
+		except:
+			continue
+	return ret
+	
+def get_ips_by_city(city):
+	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	ret = []
+	ip_list = getIPList()
+	for ip in ip_list:
+		try:
+			record = gi.record_by_addr(ip[0])
+			if (record==city):	
+				ret.append(ip[0])
+		except:
+			continue
 	return ret
 	
 def get_devices_by_ips(ips):
@@ -133,9 +160,13 @@ def get_devices_by_ips(ips):
 		ret.append(record)
 	return ret
 	
-	
-	
-
+def get_devices_by_ip(ip):
+	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
+	conn = psycopg2.connect(conn_string)
+	cursor = conn.cursor()
+	cursor.execute("select SUBSTRING(id,3) from devices where ip='" + ip +"'")
+	records = cursor.fetchall()[0]
+	return records
 	
 def get_country_count():
 	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
@@ -181,6 +212,19 @@ def get_city_count():
 			continue		
 	return city_list
 	
+def get_provider_by_ip(ip):
+	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
+	mappings = isp_mappings.mappings
+	isp = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+	for m in mappings:
+		if(isp.lower().find(m[0].lower())!=-1):
+			isp = m[1]		
+	return isp
+	
+def get_city_by_ip(ip):
+	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	return gi.record_by_addr(ip[0])
+	
 def get_isp_count():
 	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
 	mappings = isp_mappings.mappings
@@ -207,3 +251,35 @@ def get_isp_count():
 		except:
 			continue
 	return isp_list
+
+def group_isps():
+	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
+	mappings = isp_mappings.mappings
+	isp_list = {}
+	ip_list = getIPList()
+	for ip in ip_list:
+		new_isp = True
+		try:
+			devices = get_devices_by_ip(ip[0])
+			name = gi.org_by_addr(ip[0]).lstrip("AS0123456789 ")
+			for m in mappings:
+				if(name.lower().find(m[0].lower())!=-1):
+					name = m[1]
+					break
+			if isp_list.has_key(name):
+				for d in devices:
+					isp_list[name].append(d.lower())
+				new_isp=False
+			if ((new_isp) and (name!='')):
+				isp_list[name] = []
+				for d in devices:
+					isp_list[name].append(d.lower())
+		except:
+			continue
+	for isp in sorted(isp_list.iterkeys()):
+		print isp.upper() + ":"
+		print "-----------------"
+		print "\n"
+		for v in isp_list[isp]:
+			print v
+		print "\n"

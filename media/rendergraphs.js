@@ -1,5 +1,6 @@
 
-var filter = "none"; 
+var filter = "none";
+var ajax;
 
 function OnSuccessGraph(graphParams){
 	return function(data){
@@ -309,10 +310,11 @@ function compareParameters(i) {
         }
     };
     switch (i) {
-        case 0:
+        case "down":
             ret.divid = 'graph_div_6';
             ret.graphid = 0;
             ret.graphno = 1;
+			ret.direction = 'dw';
             ret.formatter = function() {
                 var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
@@ -326,58 +328,11 @@ function compareParameters(i) {
             ret.url = '/compare_bitrate/';
             break;
 
-        case 1:
-            ret.divid = 'graph_div_2';
-            ret.graphid = 1;
-            ret.graphno = 2;
-            ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
-                $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += formatBytes(point.y) + '<br/>';
-                });
-                return ret;
-            };
-            ret.units = "Bits Per Second";
-            ret.url = "/line_bitrate/";
-            break;
-
-        case 2:
-            ret.divid = "graph_div_3";
-            ret.graphid = 2;
-            ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
-                $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
-                });
-                return ret;
-            };
-            ret.units = "Milliseconds";
-            ret.url = "/line_rtt/";
-            break;
-
-        case 3:
-            ret.divid = "graph_div_4";
-            ret.graphid = 3;
-            ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
-                $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
-                });
-                return ret;
-            };
-            ret.units = "Milliseconds";
-            ret.url = "/line_lmrtt/";
-            break;
-
-        case 4:
-            ret.divid = "graph_div_5";
-            ret.graphid = 3;
+        case "up":
+            ret.divid = 'graph_div_6';
+            ret.graphid = 0;
+            ret.graphno = 1;
+			ret.direction = 'up';
             ret.formatter = function() {
                 var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
@@ -388,7 +343,37 @@ function compareParameters(i) {
                 return ret;
             };
             ret.units = 'Bits Per Second';
-            ret.url = "/line_shaperate/";
+            ret.url = '/compare_bitrate/';
+            break;
+		
+		case "lm":
+            ret.divid = "graph_div_6";
+            ret.formatter = function() {
+                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
+                    ret += '<p style="color:' + point.series.color +  ';">';
+                    ret += point.series.name + '</p> ';
+                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+                });
+                return ret;
+            };
+            ret.units = "Milliseconds";
+            ret.url = "/compare_lmrtt/";
+            break;
+			
+		case "rtt":
+            ret.divid = "graph_div_6";
+            ret.formatter = function() {
+                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
+                    ret += '<p style="color:' + point.series.color +  ';">';
+                    ret += point.series.name + '</p> ';
+                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+                });
+                return ret;
+            };
+            ret.units = "Milliseconds";
+            ret.url = "/compare_rtt/";
             break;
     }
     return ret;
@@ -428,19 +413,31 @@ function onSuccessGraph(graphParams) {
             var div = document.getElementById(graphParams.divid);
             div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
         }
+		$('#load_bar').hide();
     }
 }
 
 function compareGraphs(deviceid){
-	for (var i = 0; i<1; ++i){
-		var params = compareParameters(i);
-		$.ajax({
-			type: "GET",
-			url: params.url,
-			data: {'graphno' : params.graphno, 'device': deviceid, 'filter_by': filter, 'max_results': 4},
-			success: onSuccessGraph(params)
-		});
+	try{
+		ajax.abort();
 	}
+	catch(e){
+	}
+	$('#load_bar').show();
+	var sel1 = document.getElementById("max_devices");
+	var sel2 = document.getElementById("compare_criteria");
+	var sel3 = document.getElementById("measurement_type");
+	var max = sel1.options[sel1.selectedIndex].value;
+	var cri = sel2.options[sel2.selectedIndex].value;
+	var mtype = sel3.options[sel3.selectedIndex].value;
+	var serverloc = sel3.options[sel3.selectedIndex].text;
+	var params = compareParameters(mtype);
+	ajax = $.ajax({
+		type: "GET",
+		url: params.url,
+		data: {'server_loc': serverloc, 'direction' : params.direction, 'graphno' : params.graphno, 'device': deviceid, 'filter_by': filter, 'max_results': max, 'criteria': cri},
+		success: onSuccessGraph(params)
+	});
 }
 
 function renderGraphs(deviceid) {

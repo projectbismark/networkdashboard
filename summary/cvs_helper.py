@@ -65,6 +65,14 @@ def linegraph_normal(data,title,factor,roundit):
                     (datetime_helper.datetime_to_JSON(measure.eventstamp),
                      float(measure.average) * factor))
     return dict(name=title, type='line', data=output)
+	
+def linegraph_compare(data,title,factor,roundit,line_width):
+	output = []
+	for measure in data:
+		if measure.average > 0:
+			output.append((datetime_helper.datetime_to_JSON(measure.eventstamp),float(measure.average) * factor))
+	return dict(name=title, type='line', data=output, lineWidth=line_width)
+
 
 def linegraph_normal_passive(data,title):
     result={}

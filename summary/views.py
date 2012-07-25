@@ -23,27 +23,80 @@ def index(request):
 	countries = views_helper.get_sorted_country_data()
 	cities = views_helper.get_sorted_city_data()
 	isps = views_helper.get_sorted_isp_data()
-	return render_to_response('index.html', {'country_data' : countries, 'city_data': cities, 'isp_data': isps})
+	device_count = views_helper.get_device_count()
+	return render_to_response('index.html', {'country_data' : countries, 'city_data': cities, 'isp_data': isps, 'device_count':device_count})
 	
 def compare(request):
 	device = request.POST.get("device").strip("/")
-	return render_to_response('compare.html', {'device' : device})
+	servers = IpResolver.objects.all()	
+	return render_to_response('compare.html', {'device' : device, 'servers' : servers})
 	
-def compare_bitrate(request):
+def compare_rtt(request):
+	device = request.GET.get('device')
+	filter_by = request.GET.get('filter_by')
+	criteria = request.GET.get('criteria')
+	server_loc = request.GET.get('server_loc').lstrip('Latency( ').strip(')')
+	server_ip = IpResolver.objects.filter(location = server_loc)[0].ip
+	devices = views_helper.get_devices_for_compare(device,criteria)
+	max_results = int(request.GET.get('max_results'))
+	result=[]
+	result_count=0
+	for dev in devices:
+		if(result_count == max_results):
+			break
+		if dev!= device:
+			latest = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip).order_by('-eventstamp')[:1]
+			if len(latest)!=0:
+				if (datetime_helper.is_recent(latest[0].eventstamp,10)):
+					data = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip).order_by('eventstamp')
+					result.append(cvs_helper.linegraph_compare(data,"Other Device", 1,1,2))
+					result_count += 1
+	data = MRtt.objects.filter(deviceid=device,average__lte=3000,dstip = server_ip).order_by('eventstamp')
+	result.append(cvs_helper.linegraph_compare(data, "Your Device", 1,1,5))
+	return HttpResponse(json.dumps(result))
+	
+def compare_lmrtt(request):
 	deviceid = request.GET.get("device")
+	criteria = int(request.GET.get("criteria"))
 	max_results = int(request.GET.get("max_results"))
-	devices = views_helper.get_devices_for_compare(deviceid)
+	devices = views_helper.get_devices_for_compare(deviceid,criteria)
 	result = []
 	result_count = 0
 	for dev in devices:
-		if(result_count > max_results):
+		print dev
+		if(result_count == max_results):
 			break
 		if dev!= deviceid:
-			result_count+=1
-			data = MBitrate.objects.filter(deviceid = dev, direction = 'dw').order_by('eventstamp')
-			result.append(cvs_helper.linegraph_normal(data,"", 1000, 18000))
-	data = MBitrate.objects.filter(deviceid = deviceid, direction = 'dw').order_by('eventstamp')
-	result.append(cvs_helper.linegraph_normal(data, "Your Device", 1000, 18000))
+			data= MLmrtt.objects.filter(average__lte=3000, deviceid=dev).order_by('eventstamp')
+			if len(data)!=0:
+				last = len(data) - 1
+				if (datetime_helper.is_recent(data[last].eventstamp,10)):
+					result.append(cvs_helper.linegraph_compare(data,"Other Device", 1,1,2))
+					result_count += 1
+	data= MLmrtt.objects.filter(average__lte=3000, deviceid=deviceid).order_by('eventstamp')
+	result.append(cvs_helper.linegraph_compare(data, "Your Device", 1,1,5))
+	return HttpResponse(json.dumps(result))
+	
+def compare_bitrate(request):
+	deviceid = request.GET.get("device")
+	criteria = int(request.GET.get("criteria"))
+	max_results = int(request.GET.get("max_results"))
+	dir = request.GET.get("direction")
+	devices = views_helper.get_devices_for_compare(deviceid,criteria)
+	result = []
+	result_count = 0
+	data = MBitrate.objects.filter(deviceid = deviceid, direction = dir, toolid = 'NETPERF_3').order_by('eventstamp')
+	result.append(cvs_helper.linegraph_compare(data, "Your Device", 1000, 18000,5))
+	for dev in devices:
+		if(result_count == max_results):
+			break
+		if dev!= deviceid:
+			data = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3').order_by('eventstamp')
+			if len(data)!=0:
+				last = len(data) - 1
+				if (datetime_helper.is_recent(data[last].eventstamp,10)):
+					result.append(cvs_helper.linegraph_compare(data,"Other Device", 1000, 18000,2))
+					result_count += 1
 	return HttpResponse(json.dumps(result))
 
 def editDevicePage(request, devicehash):
