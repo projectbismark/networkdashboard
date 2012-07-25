@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="content">
+    <div style="float: right">
+        <a class="btn" href="/"><i class="icon-home"></i> Home</a>
+    </div>
+	<br /><br /><br />
+    <table class="table table-striped table-condensed" id="table_3">
+        <tr>
+            <td>Show My:</td>
+            <td class ="right">
+				<select id="measurement_type">
+					<option value="down">Download Throughput</option>
+					<option value="up">Upload Throughput</option>
+					<option value="lm">Latency (Last-Mile)</option>
+					{% for s in servers %}
+						<option value="rtt">Latency ({{s.location}})</option>
+					{% endfor %}
+				</select>
+			</td>
+        </tr>
+        <tr>
+            <td>Compare by:</td>
+            <td class ="right">
+				<select id="compare_criteria">
+					<option value=1 selected = "selected">ISP</option>
+					<option value=2>City</option>
+				</select>
+			</td>
+        </tr>
+		<tr>
+			<td>Number of devices to compare against: <br /> (Will increase load time)</td>
+			<td class="right">
+				<select id="max_devices">
+					<option value=1>1</option>
+					<option value=2>2</option>
+					<option value=3>3</option>
+					<option value=4 selected="selected">4</option>
+					<option value=5>5</option>
+					<option value=6>6</option>
+					<option value=7>7</option>
+					<option value=8>8</option>
+					<option value=9>9</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td class = "right">
+				<button class="btn" id="compare_button" onclick="compareGraphs('{{device}}')"> Update Data</button>
+			</td>
+		</tr>
+    </table>
+    <div class="graphdiv" id="graph_div_6"></div>
+	<div id="load_bar" class="progress_wrapper">
+		<div class="progress progress-info progress-striped active">
+			<div class="bar" style="width: 100%"></div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+    compareGraphs("{{device}}");
+</script>
+{% endblock %}
