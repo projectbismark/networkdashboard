@@ -64,10 +64,14 @@
     {% endif %}
     <div class="btn-group">
         {% if deviceid != 'c43dc7b0b13f' %}
-        <a id="edit_btn" class="btn" href="/editDevicePage/{{detail.hashkey}}"><i class="icon-pencil"></i> Edit device details</a></h1>
+		<!--
+		<form method="post" action="/editDevicePage/{{detail.hashkey}}">
+			<input class="btn" id="compare_btn_2" type="submit" value="Edit Device Details"/>
+		</form>-->
+		<button id="permalink_button" class="btn" onclick="location.href='/editDevicePage/{{detail.hashkey}}'">Edit Device Details</button>
         {% endif %}
         {% comment %}<a class="btn btn-primary bt n-large" href="http://projectbismark.net/data/{{ deviceid }}"><b>Download</b></a>{% endcomment %}
-        <button id="permalink_button" data-toggle="button" class="btn" onclick="$('#permalink').toggle()"><i class="icon-bookmark"></i> Link to this page</a></button>
+        <button id="permalink_button" data-toggle="button" class="btn" onclick="$('#permalink').toggle()"><i class="icon-bookmark"></i> Link to this page</button>
 		<form method="post" action="/compare/">
 			<input type="hidden" name="device" value="{{deviceid}}" />
 			<input class="btn" id="compare_btn" type="submit" value="Compare my Performance"/>

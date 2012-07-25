@@ -27,7 +27,7 @@ a {
 div.progress{
 }
 
-#compare_btn.btn{
+#compare_btn.btn, #compare_btn_2.btn{
 	height:35px;
 }
 
@@ -321,7 +321,7 @@ div.graphdiv {
 }
 
 #edit_btn{
-	height: 35px;
+	height: 
 }
 
 div.graphdiv div.progress {
