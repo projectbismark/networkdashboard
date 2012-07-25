@@ -311,11 +311,13 @@ div.graphdiv {
     height:400px;
 }
 
-div.progress_wrapper {
+#load_bar{
 	position:relative;
 	top: -200px;
-    padding-left, padding-right: 200px;
+    margin-left:25%;
+	margin-right:25%;
 	text-align: center;
+	padding-top:0;
 }
 
 div.graphdiv div.progress {
@@ -323,9 +325,9 @@ div.graphdiv div.progress {
     margin-right: 25%;
 }
 
-div.progress{
-	margin-left:25%;
-	margin-right:25%;
+div.progress_wrapper{
+	padding-left, padding-right: 200px;
+	padding-top:150px;
 }
 
 input#compare_button{
