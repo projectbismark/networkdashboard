@@ -418,11 +418,6 @@ function onSuccessGraph(graphParams) {
 }
 
 function compareGraphs(deviceid){
-	try{
-		ajax.abort();
-	}
-	catch(e){
-	}
 	$('#load_bar').show();
 	var sel1 = document.getElementById("max_devices");
 	var sel2 = document.getElementById("compare_criteria");
@@ -432,7 +427,7 @@ function compareGraphs(deviceid){
 	var mtype = sel3.options[sel3.selectedIndex].value;
 	var serverloc = sel3.options[sel3.selectedIndex].text;
 	var params = compareParameters(mtype);
-	ajax = $.ajax({
+	$.ajax({
 		type: "GET",
 		url: params.url,
 		data: {'server_loc': serverloc, 'direction' : params.direction, 'graphno' : params.graphno, 'device': deviceid, 'filter_by': filter, 'max_results': max, 'criteria': cri},

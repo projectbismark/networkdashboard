@@ -27,8 +27,12 @@ a {
 div.progress{
 }
 
-button#compare_button.btn{
-	margin-top:10px;
+#compare_btn.btn{
+	height:35px;
+}
+
+button#permalink_button.btn{
+	height:35px;
 }
 
 a:visited {
