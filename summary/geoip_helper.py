@@ -82,7 +82,6 @@ def getIPList():
 	return records
 	
 def get_device_count():
-	print "here"
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
 	conn = psycopg2.connect(conn_string)
 	cursor = conn.cursor()

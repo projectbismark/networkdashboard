@@ -15,11 +15,27 @@ from time import time,mktime,strftime
 import hashlib
 import cvs_helper,datetime_helper,views_helper,email_helper,database_helper
 import geoip_helper
+import threading
 import psycopg2
 from graph_filter import *
 
+class CompareThread(threading.Thread):
+	def __init__(self,res,data,title,lineweight):
+		threading.Thread.__init__(self)
+		self.data = data
+		self.title = title
+		self.result = res
+		self.lineweight = lineweight
+		
+	def run(self):
+		print "entering thread"
+		res = cvs_helper.linegraph_compare(self.data,self.title,1,1,self.lineweight)
+		self.result.append(res)
+		print "leaving thread"
+		
+		
+
 def index(request):
-	
 	countries = views_helper.get_sorted_country_data()
 	cities = views_helper.get_sorted_city_data()
 	isps = views_helper.get_sorted_isp_data()
@@ -30,6 +46,44 @@ def compare(request):
 	device = request.POST.get("device").strip("/")
 	servers = IpResolver.objects.all()	
 	return render_to_response('compare.html', {'device' : device, 'servers' : servers})
+	
+# def compare_rtt(request):
+	# device = request.GET.get('device')
+	# filter_by = request.GET.get('filter_by')
+	# criteria = request.GET.get('criteria')
+	# server_loc = request.GET.get('server_loc').lstrip('Latency( ').strip(')')
+	# server_ip = IpResolver.objects.filter(location = server_loc)[0].ip
+	# devices = views_helper.get_devices_for_compare(device,criteria)
+	# max_results = int(request.GET.get('max_results'))
+	# result=[]
+	# threads=[]
+	# result_count=0
+	# for dev in devices:
+		# if(result_count == max_results):
+			# break
+		# if dev!= device:
+			# print "getting latest"
+			# latest = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip).order_by('-eventstamp')[:1]
+			# print "latest found"
+			# if len(latest)!=0:
+				# if (datetime_helper.is_recent(latest[0].eventstamp,10)):
+					# result_count +=1
+					# print "query start"
+					# data = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip).order_by('eventstamp')
+					# print "query end"
+					# t = CompareThread(result,data,"Other Device",2)
+					# threads.append(t)
+					# t.start()
+	# print "query start"
+	# data = MRtt.objects.filter(deviceid=device,average__lte=3000,dstip = server_ip).order_by('eventstamp')
+	# print "query end"
+	# t = CompareThread(result,data,"Your Device",5)
+	# threads.append(t)
+	# t.start()
+	# for th in threads:
+		# th.join()
+		# print "thread terminated"
+	# return HttpResponse(json.dumps(result))
 	
 def compare_rtt(request):
 	device = request.GET.get('device')
@@ -49,11 +103,39 @@ def compare_rtt(request):
 			if len(latest)!=0:
 				if (datetime_helper.is_recent(latest[0].eventstamp,10)):
 					data = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip).order_by('eventstamp')
-					result.append(cvs_helper.linegraph_compare(data,"Other Device", 1,1,2))
-					result_count += 1
+					result.append(cvs_helper.linegraph_compare(data,"Other Device",1,1,2))
+					result_count +=1
 	data = MRtt.objects.filter(deviceid=device,average__lte=3000,dstip = server_ip).order_by('eventstamp')
 	result.append(cvs_helper.linegraph_compare(data, "Your Device", 1,1,5))
 	return HttpResponse(json.dumps(result))
+	
+# def compare_lmrtt(request):
+	# deviceid = request.GET.get("device")
+	# criteria = int(request.GET.get("criteria"))
+	# max_results = int(request.GET.get("max_results"))
+	# devices = views_helper.get_devices_for_compare(deviceid,criteria)
+	# result = []
+	# threads = []
+	# result_count = 0
+	# for dev in devices:
+		# if(result_count == max_results):
+			# break
+		# if dev!= deviceid:
+			# data= MLmrtt.objects.filter(average__lte=3000, deviceid=dev).order_by('eventstamp')
+			# if len(data)!=0:
+				# last = len(data) - 1
+				# if (datetime_helper.is_recent(data[last].eventstamp,10)):
+					# result_count += 1
+					# t = CompareThread(result,data,"Other Device",2)
+					# threads.append(t)
+					# t.start()
+	# data= MLmrtt.objects.filter(average__lte=3000, deviceid=deviceid).order_by('eventstamp')
+	# t = CompareThread(result,data,"Your Device",5)
+	# threads.append(t)
+	# t.start()
+	# for th in threads:
+		# th.join()
+	# return HttpResponse(json.dumps(result))
 	
 def compare_lmrtt(request):
 	deviceid = request.GET.get("device")
@@ -63,7 +145,6 @@ def compare_lmrtt(request):
 	result = []
 	result_count = 0
 	for dev in devices:
-		print dev
 		if(result_count == max_results):
 			break
 		if dev!= deviceid:
@@ -76,6 +157,36 @@ def compare_lmrtt(request):
 	data= MLmrtt.objects.filter(average__lte=3000, deviceid=deviceid).order_by('eventstamp')
 	result.append(cvs_helper.linegraph_compare(data, "Your Device", 1,1,5))
 	return HttpResponse(json.dumps(result))
+	
+# def compare_bitrate(request):
+	# deviceid = request.GET.get("device")
+	# criteria = int(request.GET.get("criteria"))
+	# max_results = int(request.GET.get("max_results"))
+	# dir = request.GET.get("direction")
+	# devices = views_helper.get_devices_for_compare(deviceid,criteria)
+	# result = []
+	# threads = []
+	# result_count = 0
+	# data = MBitrate.objects.filter(deviceid = deviceid, direction = dir, toolid = 'NETPERF_3').order_by('eventstamp')
+	# t = CompareThread(result,data,"Your Device",5)
+	# threads.append(t)
+	# t.start()
+	# for dev in devices:
+		# if(result_count == max_results):
+			# break
+		# if dev!= deviceid:
+			# data = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3').order_by('eventstamp')
+			# if len(data)!=0:
+				# last = len(data) - 1
+				# if (datetime_helper.is_recent(data[last].eventstamp,10)):
+					# result_count += 1
+					# t = CompareThread(result,data,"Other Device",2)
+					# threads.append(t)
+					# t.start()
+	
+	# for th in threads:
+		# th.join()
+	# return HttpResponse(json.dumps(result))
 	
 def compare_bitrate(request):
 	deviceid = request.GET.get("device")
