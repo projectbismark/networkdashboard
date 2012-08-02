@@ -81,9 +81,11 @@ def compare_rtt(request):
 	filter_by = request.GET.get('filter_by')
 	criteria = request.GET.get('criteria')
 	server_loc = request.GET.get('server_loc').lstrip('Latency( ').strip(')')
+	days = int(request.GET.get('days'))
 	server_ip = IpResolver.objects.filter(location = server_loc)[0].ip
 	devices = views_helper.get_devices_for_compare(device,criteria)
 	max_results = int(request.GET.get('max_results'))
+	earliest = datetime_helper.get_daterange_start(days)
 	result=[]
 	result_count=0
 	for dev in devices:
@@ -93,11 +95,11 @@ def compare_rtt(request):
 			latest = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip).order_by('-eventstamp')[:1]
 			if len(latest)!=0:
 				if (datetime_helper.is_recent(latest[0].eventstamp,10)):
-					data = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip).order_by('eventstamp')
+					data = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip, eventstamp__gte=earliest).order_by('eventstamp')
 					result.append(cvs_helper.linegraph_compare(data,"Other Device",1,1,2))
 					print datetime.now()
 					result_count +=1
-	data = MRtt.objects.filter(deviceid=device,average__lte=3000,dstip = server_ip).order_by('eventstamp')
+	data = MRtt.objects.filter(deviceid=device,average__lte=3000,dstip = server_ip, eventstamp__gte=earliest).order_by('eventstamp')
 	result.append(cvs_helper.linegraph_compare(data, "Your Device", 1,1,5))
 	print datetime.now()
 	return HttpResponse(json.dumps(result))
@@ -134,6 +136,8 @@ def compare_lmrtt(request):
 	deviceid = request.GET.get("device")
 	criteria = int(request.GET.get("criteria"))
 	max_results = int(request.GET.get("max_results"))
+	days = int(request.GET.get('days'))
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_for_compare(deviceid,criteria)
 	result = []
 	result_count = 0
@@ -141,13 +145,13 @@ def compare_lmrtt(request):
 		if(result_count == max_results):
 			break
 		if dev!= deviceid:
-			data= MLmrtt.objects.filter(average__lte=3000, deviceid=dev).order_by('eventstamp')
+			data= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
 			if len(data)!=0:
 				last = len(data) - 1
 				if (datetime_helper.is_recent(data[last].eventstamp,10)):
 					result.append(cvs_helper.linegraph_compare(data,"Other Device", 1,1,2))
 					result_count += 1
-	data= MLmrtt.objects.filter(average__lte=3000, deviceid=deviceid).order_by('eventstamp')
+	data= MLmrtt.objects.filter(average__lte=3000, deviceid=deviceid, eventstamp__gte=earliest).order_by('eventstamp')
 	result.append(cvs_helper.linegraph_compare(data, "Your Device", 1,1,5))
 	return HttpResponse(json.dumps(result))
 	
@@ -186,16 +190,18 @@ def compare_bitrate(request):
 	criteria = int(request.GET.get("criteria"))
 	max_results = int(request.GET.get("max_results"))
 	dir = request.GET.get("direction")
+	days = int(request.GET.get('days'))
 	devices = views_helper.get_devices_for_compare(deviceid,criteria)
+	earliest = datetime_helper.get_daterange_start(days)
 	result = []
 	result_count = 0
-	data = MBitrate.objects.filter(deviceid = deviceid, direction = dir, toolid = 'NETPERF_3').order_by('eventstamp')
+	data = MBitrate.objects.filter(deviceid = deviceid, direction = dir, toolid = 'NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
 	result.append(cvs_helper.linegraph_compare(data, "Your Device", 1000, 18000,5))
 	for dev in devices:
 		if(result_count == max_results):
 			break
 		if dev!= deviceid:
-			data = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3').order_by('eventstamp')
+			data = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
 			if len(data)!=0:
 				last = len(data) - 1
 				if (datetime_helper.is_recent(data[last].eventstamp,10)):

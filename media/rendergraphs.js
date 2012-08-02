@@ -289,17 +289,6 @@ function compareParameters(i) {
                 type: 'month',
                 count: 1,
                 text: '1m'
-            }, {
-                type: 'month',
-                count: 3,
-                text: '3m'
-            }, {
-                type: 'month',
-                count: 6,
-                text: '6m'
-            }, {
-                type: 'all',
-                text: 'All'
             }],
             selected: 1
         },
@@ -422,15 +411,17 @@ function compareGraphs(deviceid){
 	var sel1 = document.getElementById("max_devices");
 	var sel2 = document.getElementById("compare_criteria");
 	var sel3 = document.getElementById("measurement_type");
+	var sel4 = document.getElementById("days");
 	var max = sel1.options[sel1.selectedIndex].value;
 	var cri = sel2.options[sel2.selectedIndex].value;
 	var mtype = sel3.options[sel3.selectedIndex].value;
 	var serverloc = sel3.options[sel3.selectedIndex].text;
+	var days = sel4.options[sel4.selectedIndex].value;
 	var params = compareParameters(mtype);
 	$.ajax({
 		type: "GET",
 		url: params.url,
-		data: {'server_loc': serverloc, 'direction' : params.direction, 'graphno' : params.graphno, 'device': deviceid, 'filter_by': filter, 'max_results': max, 'criteria': cri},
+		data: {'days': days,'server_loc': serverloc, 'direction' : params.direction, 'graphno' : params.graphno, 'device': deviceid, 'filter_by': filter, 'max_results': max, 'criteria': cri},
 		success: onSuccessGraph(params)
 	});
 }
