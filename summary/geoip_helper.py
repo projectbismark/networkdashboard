@@ -3,7 +3,7 @@ import urllib2, urllib, json
 from django.shortcuts import render_to_response
 from django.conf import settings
 from networkdashboard.summary.models import *
-import cvs_helper,datetime_helper, views_helper, comcast_new
+import cvs_helper,datetime_helper, views_helper
 import isp_mappings
 import pygeoip
 import psycopg2
