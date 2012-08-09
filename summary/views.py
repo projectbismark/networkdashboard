@@ -86,8 +86,14 @@ def compare_rtt(request):
 	devices = views_helper.get_devices_for_compare(device,criteria)
 	max_results = int(request.GET.get('max_results'))
 	earliest = datetime_helper.get_daterange_start(days)
-	result=[]
+	result = []
+	result.append([])
+	result.append([])
 	result_count=0
+	data = MRtt.objects.filter(deviceid=device,average__lte=3000,dstip = server_ip, eventstamp__gte=earliest).order_by('eventstamp')
+	graph_data = cvs_helper.linegraph_compare(data,"Your Device",1,1,5)
+	result[0].append(graph_data[0])
+	result[1].append(graph_data[1])
 	for dev in devices:
 		if(result_count == max_results):
 			break
@@ -96,12 +102,10 @@ def compare_rtt(request):
 			if len(latest)!=0:
 				if (datetime_helper.is_recent(latest[0].eventstamp,10)):
 					data = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip, eventstamp__gte=earliest).order_by('eventstamp')
-					result.append(cvs_helper.linegraph_compare(data,"Other Device",1,1,2))
-					print datetime.now()
+					graph_data = cvs_helper.linegraph_compare(data,"Other Device",1,1,2)
+					result[0].append(graph_data[0])
+					result[1].append(graph_data[1])
 					result_count +=1
-	data = MRtt.objects.filter(deviceid=device,average__lte=3000,dstip = server_ip, eventstamp__gte=earliest).order_by('eventstamp')
-	result.append(cvs_helper.linegraph_compare(data, "Your Device", 1,1,5))
-	print datetime.now()
 	return HttpResponse(json.dumps(result))
 	
 # def compare_lmrtt(request):
@@ -140,7 +144,13 @@ def compare_lmrtt(request):
 	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_for_compare(deviceid,criteria)
 	result = []
+	result.append([])
+	result.append([])
 	result_count = 0
+	data= MLmrtt.objects.filter(average__lte=3000, deviceid=deviceid, eventstamp__gte=earliest).order_by('eventstamp')
+	graph_data = cvs_helper.linegraph_compare(data,"Your Device",1,1,5)
+	result[0].append(graph_data[0])
+	result[1].append(graph_data[1])
 	for dev in devices:
 		if(result_count == max_results):
 			break
@@ -149,10 +159,10 @@ def compare_lmrtt(request):
 			if len(data)!=0:
 				last = len(data) - 1
 				if (datetime_helper.is_recent(data[last].eventstamp,10)):
-					result.append(cvs_helper.linegraph_compare(data,"Other Device", 1,1,2))
+					graph_data = cvs_helper.linegraph_compare(data,"Other Device",1,1,2)
+					result[0].append(graph_data[0])
+					result[1].append(graph_data[1])
 					result_count += 1
-	data= MLmrtt.objects.filter(average__lte=3000, deviceid=deviceid, eventstamp__gte=earliest).order_by('eventstamp')
-	result.append(cvs_helper.linegraph_compare(data, "Your Device", 1,1,5))
 	return HttpResponse(json.dumps(result))
 	
 # def compare_bitrate(request):
@@ -194,9 +204,13 @@ def compare_bitrate(request):
 	devices = views_helper.get_devices_for_compare(deviceid,criteria)
 	earliest = datetime_helper.get_daterange_start(days)
 	result = []
+	result.append([])
+	result.append([])
 	result_count = 0
 	data = MBitrate.objects.filter(deviceid = deviceid, direction = dir, toolid = 'NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
-	result.append(cvs_helper.linegraph_compare(data, "Your Device", 1000, 18000,5))
+	graph_data = cvs_helper.linegraph_compare(data,"Your Device",1000,18000,5)
+	result[0].append(graph_data[0])
+	result[1].append(graph_data[1])
 	for dev in devices:
 		if(result_count == max_results):
 			break
@@ -204,8 +218,10 @@ def compare_bitrate(request):
 			data = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
 			if len(data)!=0:
 				last = len(data) - 1
-				if (datetime_helper.is_recent(data[last].eventstamp,10)):
-					result.append(cvs_helper.linegraph_compare(data,"Other Device", 1000, 18000,2))
+				if (datetime_helper.is_recent(data[last].eventstamp,20)):
+					graph_data = cvs_helper.linegraph_compare(data,"Other Device",1000,18000,2)
+					result[0].append(graph_data[0])
+					result[1].append(graph_data[1])
 					result_count += 1
 	return HttpResponse(json.dumps(result))
 
@@ -229,35 +245,36 @@ def getCoordinates(request):
     return HttpResponse(geoip_helper.get_coordinates_for_googlemaps())
 
 def getLatestInfo(request):
-    devicehash = request.GET.get('devicehash')
-    try:
-        device_details = Devicedetails.objects.get(hashkey=devicehash)
-        latestInfo = ''
+	devicehash = request.GET.get('devicehash')
+	latestInfo = ''
+    
+	try:
+		device_details = Devicedetails.objects.get(hashkey=devicehash)
+	except Devicedetails.DoesNotExist:
+		return HttpResponse('NOT AVAILABLE')
 
-        try:
-                latest_download = database_helper.get_latest_download(device_details.deviceid)
-                latestInfo += 'Latest Download: ' + str(latest_download['average']) + '<br>'
-        except KeyError:
-                latestInfo += 'Latest Download: N/A<br>'
-        try:
-                latest_upload = database_helper.get_latest_upload(device_details.deviceid)
-                latestInfo += 'Latest Upload: ' + str(latest_upload['average']) + '<br>'
-        except KeyError:
-                latestInfo += 'Latest Upload: N/A<br>'
-        try:
-                latest_lastmile = database_helper.get_latest_lastmile(device_details.deviceid)
-                latestInfo += 'Latest Lastmile: ' + str(latest_lastmile['average']) + '<br>'
-        except KeyError:
-                latestInfo += 'Latest Lastmile: N/A<br>'
-        try:
-                latest_roundtrip = database_helper.get_latest_roundtrip(device_details.deviceid)
-                latestInfo += 'Latest Roundtrip: ' + str(latest_roundtrip['average']) + '<br>'
-        except KeyError:
-                latestInfo += 'Latest Roundtrip: N/A<br>' 
-                
-        return HttpResponse(latestInfo)
-    except Devicedetails.DoesNotExist:
-        return HttpResponse('NOT AVAILABLE')
+	try:
+		latest_download = database_helper.get_latest_download(device_details.deviceid)
+		latestInfo += 'Latest Download: ' + str(latest_download['average']) + '<br>'
+	except KeyError:
+		latestInfo += 'Latest Download: N/A<br>'
+	try:
+		latest_upload = database_helper.get_latest_upload(device_details.deviceid)
+		latestInfo += 'Latest Upload: ' + str(latest_upload['average']) + '<br>'
+	except KeyError:
+		latestInfo += 'Latest Upload: N/A<br>'
+	try:
+		latest_lastmile = database_helper.get_latest_lastmile(device_details.deviceid)
+		latestInfo += 'Latest Lastmile: ' + str(latest_lastmile['average']) + '<br>'
+	except KeyError:
+		latestInfo += 'Latest Lastmile: N/A<br>'
+	try:
+		latest_roundtrip = database_helper.get_latest_roundtrip(device_details.deviceid)
+		latestInfo += 'Latest Roundtrip: ' + str(latest_roundtrip['average']) + '<br>'
+	except KeyError:
+		latestInfo += 'Latest Roundtrip: N/A<br>' 
+			
+	return HttpResponse(latestInfo)
         
 def sharedDeviceSummary(request,devicehash):
 

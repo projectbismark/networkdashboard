@@ -3,7 +3,7 @@ import urllib2, urllib, json
 from django.shortcuts import render_to_response
 from django.conf import settings
 from networkdashboard.summary.models import *
-import cvs_helper,datetime_helper, views_helper
+import cvs_helper,datetime_helper, views_helper, comcast_new
 import isp_mappings
 import pygeoip
 import psycopg2
@@ -17,7 +17,7 @@ def get_coordinates_for_googlemaps():
 	deviceIDList = getDeviceIDList()
 	deviceIDs = list()
 	for ID in deviceIDList:
-                deviceIDs.append(ID[0])
+		deviceIDs.append(ID[0])
 	data_type="coord"
 	devtype = 'address'
 	i = 0
@@ -27,7 +27,6 @@ def get_coordinates_for_googlemaps():
 		lon = str(loc['longitude'])
 		hashdevice = views_helper.get_hash(deviceIDs[i][2:])
 		i += 1
-
 		coordstring += devtype
 		coordstring += ":"
 		coordstring += data_type
@@ -38,10 +37,10 @@ def get_coordinates_for_googlemaps():
 		coordstring += ":"
 		coordstring += hashdevice
 		coordstring += "\n"
+
 	distinct_ips = IpResolver.objects.all()
 	data_type="coord"
 	for row_ip in distinct_ips:
-
 		lat = str(row_ip.latitude)
 		lon = str(row_ip.longitude)
 		devtype = str(row_ip.type)
@@ -58,6 +57,38 @@ def get_coordinates_for_googlemaps():
 		coordstring += "\n"
 
 	return HttpResponse(coordstring)
+	
+# def get_coordinates_for_googlemaps():
+	# coord_data = []
+	# gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	# device_ips = getIPList()
+	# servers = IpResolver.objects.all()
+	# dev_type = "device"
+	# for row in device_ips:
+		# value={}
+		# loc = getLocation(row[0],gi)
+		# lat = str(loc['latitude'])
+		# lon = str(loc['longitude'])
+		# device = get_devices_by_ip(row[0])
+		# hash = DeviceDetails.objects.filter(deviceid = device)[0]['hashkey']
+		# value['dev_type'] = dev_type
+		# value['lat'] = lat
+		# value['lon'] = lon
+		# value['hash'] = hash
+		# coord_data.append(value)
+	# dev_type = "server"
+	# for row_ip in servers:
+		# value = {}
+		# lat = str(row_ip.latitude)
+		# lon = str(row_ip.longitude)
+		# device = get_devices_by_ip(row_ip.ip)
+		# hash = DeviceDetails.objects.filter(deviceid = device)[0]['hashkey']
+		# value['dev_type'] = dev_type
+		# value['lat'] = lat
+		# value['lon'] = lon
+		# value['hash'] = hash
+		# coord_data.append(value)
+	# return HttpResponse(coordstring)
 
 def getLocation(ip,gi):
 	
@@ -250,35 +281,3 @@ def get_isp_count():
 		except:
 			continue
 	return isp_list
-
-def group_isps():
-	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
-	mappings = isp_mappings.mappings
-	isp_list = {}
-	ip_list = getIPList()
-	for ip in ip_list:
-		new_isp = True
-		try:
-			devices = get_devices_by_ip(ip[0])
-			name = gi.org_by_addr(ip[0]).lstrip("AS0123456789 ")
-			for m in mappings:
-				if(name.lower().find(m[0].lower())!=-1):
-					name = m[1]
-					break
-			if isp_list.has_key(name):
-				for d in devices:
-					isp_list[name].append(d.lower())
-				new_isp=False
-			if ((new_isp) and (name!='')):
-				isp_list[name] = []
-				for d in devices:
-					isp_list[name].append(d.lower())
-		except:
-			continue
-	for isp in sorted(isp_list.iterkeys()):
-		print isp.upper() + ":"
-		print "-----------------"
-		print "\n"
-		for v in isp_list[isp]:
-			print v
-		print "\n"

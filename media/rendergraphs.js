@@ -2,55 +2,6 @@
 var filter = "none";
 var ajax;
 
-function OnSuccessGraph(graphParams){
-	return function(data){
-		if(data.length>200){
-			window.chart = new Highcharts.StockChart({
-				chart: {
-					renderTo: graphParams.divid,
-				},
-				legend: graphParams.legend,
-
-				rangeSelector: graphParams.rangeselector,
-
-				title: {
-					text: graphParams.titlename
-				},
-
-				plotOptions: graphParams.plotoptions,
-
-				xAxis: {
-					maxZoom: 1 * 24 * 3600000 // fourteen days
-				},
-				yAxis: {
-					min: 0,
-					maxZoom: 10000,
-					title: {
-						text: graphParams.units,
-						style:{
-							fontSize: 15
-						}
-					}
-
-				},
-
-
-
-				tooltip: {
-					formatter: graphParams.formatter
-				},
-
-				series: eval(data)
-			});
-		}
-		else{
-			var div = document.getElementById(graphParams.divid);
-			div.innerHTML="<div id = 'error'><b>Insufficient Data</b></div>";
-		}
-		hideBar(graphParams.graphid);
-	}
-}
-
 function renderGraphs(deviceid){
 	for (var i =0; i<5; i++){
 		var params = createParameters(i);
@@ -298,6 +249,7 @@ function compareParameters(i) {
             }
         }
     };
+	ret.divid2 = 'graph_div_7';
     switch (i) {
         case "down":
             ret.divid = 'graph_div_6';
@@ -406,6 +358,95 @@ function onSuccessGraph(graphParams) {
     }
 }
 
+function onSuccessCompare(graphParams) {
+    return function(data) {
+        if (data.length > 200) {
+            window.chart = new Highcharts.StockChart({
+                chart: {
+                    renderTo: graphParams.divid,
+                },
+                legend: graphParams.legend,
+                rangeSelector: graphParams.rangeSelector,
+                plotOptions: graphParams.plotOptions,
+                xAxis: {
+                    maxZoom: 1 * 24 * 3600000, // fourteen days
+                    ordinal: false
+                },
+                yAxis: {
+                    min: 0,
+                    maxZoom: 10000,
+                    title: {
+                        text: graphParams.units,
+                        style:{
+                            fontSize: 15
+                        }
+                    }
+
+                },
+                tooltip: {
+                    formatter: graphParams.formatter
+                },
+                series: JSON.parse(data)[1]
+            });
+        } else {
+            var div = document.getElementById(graphParams.divid);
+            div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
+        }
+		if (data.length > 200) {
+			data = JSON.parse(data)[0];
+			var graphData = new Array();
+			var categories = new Array();
+			for(var i=0;i<data.length; i++){
+				graphData[i] = parseFloat(data[i]['data']);
+				categories[i] = data[i]['name'];
+			}
+            window.chart2 = new Highcharts.Chart({
+                chart: {
+					type: 'column',
+                    renderTo: graphParams.divid2,
+                },
+				title: {
+					text: 'Performance Averages'
+				},
+				yAxis:{
+					title:{
+						text: graphParams.units
+					}
+				},
+				xAxis:{
+					categories: categories
+				},
+				tooltip:{
+					formatter: function(){
+						var units;
+						var val;
+						if (graphParams.units == "Bits Per Second"){
+							units = "Mbps";
+							val = recDivide(this.y, this.y, 0);
+						}
+						else{
+							units = "ms";
+							val = this.y;
+						}
+						return val.toFixed(2) + units;
+					}
+				},
+				legend:{
+					enabled: false
+				},
+				series: [{
+					data: graphData,
+					name: categories
+				}]
+            });
+        } else {
+            var div = document.getElementById(graphParams.divid2);
+            div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
+        }
+		$('#load_bar').hide();
+    }
+}
+
 function compareGraphs(deviceid){
 	$('#load_bar').show();
 	var sel1 = document.getElementById("max_devices");
@@ -422,7 +463,7 @@ function compareGraphs(deviceid){
 		type: "GET",
 		url: params.url,
 		data: {'days': days,'server_loc': serverloc, 'direction' : params.direction, 'graphno' : params.graphno, 'device': deviceid, 'filter_by': filter, 'max_results': max, 'criteria': cri},
-		success: onSuccessGraph(params)
+		success: onSuccessCompare(params)
 	});
 }
 
