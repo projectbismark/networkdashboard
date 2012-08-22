@@ -400,7 +400,7 @@ function onSuccessCompare(graphParams) {
 				graphData[i] = parseFloat(data[i]['data']);
 				categories[i] = data[i]['name'];
 			}
-            window.chart2 = new Highcharts.Chart({
+            window.chart2 = new Highcharts.StockChart({
                 chart: {
 					type: 'column',
                     renderTo: graphParams.divid2,

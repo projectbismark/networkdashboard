@@ -69,8 +69,8 @@ def get_coordinates_for_googlemaps():
 		# loc = getLocation(row[0],gi)
 		# lat = str(loc['latitude'])
 		# lon = str(loc['longitude'])
-		# device = get_devices_by_ip(row[0])
-		# hash = DeviceDetails.objects.filter(deviceid = device)[0]['hashkey']
+		# device = get_devices_by_ip(row[0])[0]
+		# hash = Devicedetails.objects.filter(deviceid = device)[0]['hashkey']
 		# value['dev_type'] = dev_type
 		# value['lat'] = lat
 		# value['lon'] = lon
@@ -81,8 +81,8 @@ def get_coordinates_for_googlemaps():
 		# value = {}
 		# lat = str(row_ip.latitude)
 		# lon = str(row_ip.longitude)
-		# device = get_devices_by_ip(row_ip.ip)
-		# hash = DeviceDetails.objects.filter(deviceid = device)[0]['hashkey']
+		# device = get_devices_by_ip(row_ip.ip)[0]
+		# hash = Devicedetails.objects.filter(deviceid = device)[0]['hashkey']
 		# value['dev_type'] = dev_type
 		# value['lat'] = lat
 		# value['lon'] = lon
