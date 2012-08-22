@@ -336,7 +336,6 @@ function onSuccessGraph(graphParams) {
                 },
                 yAxis: {
                     min: 0,
-                    maxZoom: 10000,
                     title: {
                         text: graphParams.units,
                         style:{
@@ -374,7 +373,6 @@ function onSuccessCompare(graphParams) {
                 },
                 yAxis: {
                     min: 0,
-                    maxZoom: 10000,
                     title: {
                         text: graphParams.units,
                         style:{
