@@ -27,7 +27,7 @@ a {
 div.progress{
 }
 
-#compare_btn.btn, #compare_btn_2.btn{
+#compare_btn_1.btn{
 	height:35px;
 }
 
@@ -332,6 +332,10 @@ div.graphdiv div.progress {
 div.progress_wrapper{
 	padding-left, padding-right: 200px;
 	padding-top:150px;
+}
+
+form.form-compare{
+	float:left;
 }
 
 input#compare_button{

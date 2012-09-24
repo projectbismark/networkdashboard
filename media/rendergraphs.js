@@ -1,6 +1,7 @@
 
 var filter = "none";
 var ajax;
+var allSeries = new Array();
 
 function renderGraphs(deviceid){
 	for (var i =0; i<5; i++){
@@ -349,6 +350,11 @@ function onSuccessGraph(graphParams) {
                 },
                 series: JSON.parse(data)
             });
+			series = JSON.parse(data);
+			allSeries.push(series);
+			if(allSeries.length==5){
+				multiGraph();
+			}
         } else {
             var div = document.getElementById(graphParams.divid);
             div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
@@ -475,4 +481,150 @@ function renderGraphs(deviceid) {
             success: onSuccessGraph(params)
         });
     }
+}
+
+function multiGraph(){
+	var downloadString = "Download Throughput";
+	var uploadString = "Upload Throughput";
+	var RTTString = "RTT (Georgia Tech)";
+	var LMString = "Last Mile Latency";
+	var shaperateString = "Shape Rate (down)"
+	var multiSeries = new Array();
+	var i,j;
+	for(i=0; i<allSeries.length; i++){
+		for (j=0; j<allSeries[i].length; j++){
+			if (allSeries[i][j].priority==1){
+				switch(allSeries[i][j].id){
+					case 1:
+						allSeries[i][j].name = downloadString;
+						allSeries[i][j].yAxis = 0;
+						break;
+					case 2:
+						allSeries[i][j].name = uploadString;
+						allSeries[i][j].yAxis = 0;
+						break;
+					case 3:
+						allSeries[i][j].name = RTTString;
+						allSeries[i][j].yAxis = 1;
+						break;
+					case 4:
+						allSeries[i][j].name = LMString;
+						allSeries[i][j].yAxis = 1;
+						break;
+					case 5:
+						allSeries[i][j].name = shaperateString;
+						allSeries[i][j].yAxis = 0;
+						break;
+				}
+				multiSeries.push(allSeries[i][j]);
+			}
+		}
+	}
+	window.chart = new Highcharts.StockChart({
+		chart: {
+			renderTo: "graph_div_6"
+		},
+		legend: {
+            enabled: true,
+            align: 'center',
+            verticalAlign: 'top',
+            borderColor: '#ddd',
+            borderWidth: 1,
+            shadow: false
+        },
+		rangeSelector: {
+            buttons: [{
+                type: 'day',
+                count: 1,
+                text: '1d'
+            }, {
+                type: 'week',
+                count: 1,
+                text: '1w'
+            }, {
+                type: 'month',
+                count: 1,
+                text: '1m'
+            }, {
+                type: 'month',
+                count: 3,
+                text: '3m'
+            }, {
+                type: 'month',
+                count: 6,
+                text: '6m'
+            }, {
+                type: 'all',
+                text: 'All'
+            }],
+            selected: 1
+        },
+		xAxis: {
+			maxZoom: 1 * 24 * 3600000, // fourteen days
+			ordinal: false
+		},
+		yAxis: [{
+			min: 0,
+			title: {
+				text: "Bits Per Second",
+				style:{
+					fontSize: 15
+				}
+			}
+		},{
+			min: 0,
+			title: {
+				text: "Milliseconds",
+				style:{
+					fontSize: 15
+				}
+			},
+			opposite:true
+		}],
+		tooltip: {
+			shared: false,
+            formatter: function() {
+				var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                // $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
+                    // ret += '<p style="color:' + point.series.color +  ';">';
+                    // ret += point.series.name + '</p> ';
+					// switch(point.series.name){
+						// case uploadString:
+							// ret += formatBytes(point.y) + '<br/>';
+							// break;
+						// case downloadString:
+							// ret += formatBytes(point.y) + '<br/>';
+							// break;
+						// case RTTString:
+							// ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+							// break;
+						// case LMString:
+							// ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+							// break;
+					// }
+                // });
+				ret += '<p style="color:' + this.series.color +  ';">';
+                ret += this.series.name + '</p> ';
+				switch(this.series.name){
+					case uploadString:
+						ret += formatBytes(this.y) + '<br/>';
+						break;
+					case downloadString:
+						ret += formatBytes(this.y) + '<br/>';
+						break;
+					case RTTString:
+						ret += '<b>'+ parseInt(this.y) +'</b> milliseconds<br/>';
+						break;
+					case LMString:
+						ret += '<b>'+ parseInt(this.y) +'</b> milliseconds<br/>';
+						break;
+					case shaperateString:
+						ret += formatBytes(this.y) + '<br/>';
+						break;					
+				}
+                return ret;
+            }
+        },
+		series: multiSeries
+	});
 }

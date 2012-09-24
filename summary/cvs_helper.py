@@ -57,14 +57,16 @@ def linegraph_bucket(data,bucket_size,title):
 def linegraph_normal(data,title):
 	return linegraph_normal(data,title,1)
 	
-def linegraph_normal(data,title,factor,roundit):
+#priority - 1 or 0 and indicates if this series will be included in the multigraph
+#id - used by multigraph to determine which metric the series represents (upload,download,rtt...)
+def linegraph_normal(data,title,factor,roundit,priority,id):
     output = []
     for measure in data:
         if measure.average > 0:
             output.append(
                     (datetime_helper.datetime_to_JSON(measure.eventstamp),
                      float(measure.average) * factor))
-    return dict(name=title, type='line', data=output)
+    return dict(name=title, type='line', data=output, priority=priority, id=id)
 	
 def linegraph_compare(data,title,factor,roundit,line_width):
 	output = []

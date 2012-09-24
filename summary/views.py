@@ -30,8 +30,6 @@ class CompareThread(threading.Thread):
 	def run(self):
 		res = cvs_helper.linegraph_compare(self.data,self.title,1,1,self.lineweight)
 		self.result.append(res)
-		
-		
 
 def index(request):
 	countries = views_helper.get_sorted_country_data()
@@ -328,6 +326,7 @@ def iptest(iptest):
 def linegraph_bitrate(request):
 	g_filter = Graph_Filter(request)
 	chosen_limit = 100000000
+	series_id=0
 
 	details = Devicedetails.objects.filter(deviceid=g_filter.device)[0]
 	all_device_details= MBitrate.objects.filter(average__lte=chosen_limit).order_by('eventstamp')
@@ -347,9 +346,11 @@ def linegraph_bitrate(request):
 		other_device_details_netperf_3.extend(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))	
 
 	if (g_filter.graphno==1):
-		all_device_details = all_device_details.filter(direction='dw')		
+		all_device_details = all_device_details.filter(direction='dw')
+		series_id = 1;
 	elif (g_filter.graphno==2): 
 		all_device_details = all_device_details.filter(direction='up')
+		series_id = 2;
 
 	my_device_details = all_device_details.filter(deviceid=g_filter.device)
 
@@ -357,8 +358,8 @@ def linegraph_bitrate(request):
 	my_device_details_other = my_device_details.exclude(toolid='NETPERF_3')
 
 	result=[]
-	result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"Multi-threaded TCP",1000,18000))
-	result.append(cvs_helper.linegraph_normal(my_device_details_other,"Single-threaded TCP",1000,18000))
+	result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"Multi-threaded TCP",1000,18000,1,series_id))
+	result.append(cvs_helper.linegraph_normal(my_device_details_other,"Single-threaded TCP",1000,18000,0,series_id))
 	
 	if (g_filter.filter_by != 'none'):
 		bucket_width = 24*3600
@@ -369,35 +370,29 @@ def linegraph_bitrate(request):
 	return HttpResponse(json.dumps(result))
 
 def linegraph_lmrtt(request):
-    device = request.GET.get('deviceid')
-    filter_by = request.GET.get('filter_by')
-
-    details = Devicedetails.objects.filter(deviceid=device)[0]
-
-    all_device_details= MLmrtt.objects.filter(average__lte=3000).order_by('eventstamp')
-    device_details = all_device_details.filter(deviceid=device)
-   
-    other_device_details = []
-    filtered_deviceids = []	
-
-    if (filter_by == 'location'):
+	series_id=4
+	device = request.GET.get('deviceid')
+	filter_by = request.GET.get('filter_by')
+	details = Devicedetails.objects.filter(deviceid=device)[0]
+	all_device_details= MLmrtt.objects.filter(average__lte=3000).order_by('eventstamp')
+	device_details = all_device_details.filter(deviceid=device)
+	other_device_details = []
+	filtered_deviceids = []	
+	if (filter_by == 'location'):
 		filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
-
-    if (filter_by == 'provider'):
+	if (filter_by == 'provider'):
 		filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
-
-    for row in filtered_deviceids:
+	for row in filtered_deviceids:
 		other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
-    result=[]
-    result.append(cvs_helper.linegraph_normal(device_details,'Last mile latency',1,1))
-
-    if (filter_by != 'none'):
+	result=[]
+	result.append(cvs_helper.linegraph_normal(device_details,'Last mile latency',1,1,1,series_id))
+	if (filter_by != 'none'):
 		bucket_width = 2*3600
 		result.append(cvs_helper.linegraph_bucket(other_device_details,bucket_width,'median'))
-
-    return HttpResponse(json.dumps(result))
+	return HttpResponse(json.dumps(result))
 
 def linegraph_shaperate(request):
+	series_id=5
 	device = request.GET.get('deviceid')
 	filter_by = request.GET.get('filter_by')
 
@@ -414,42 +409,37 @@ def linegraph_shaperate(request):
         device_details_capacity_dw = device_details_capacity.filter(direction='dw')        
 		
 	result=[]
-	result.append(cvs_helper.linegraph_normal(device_details_up,'Shape rate Up',1000,1))
-	result.append(cvs_helper.linegraph_normal(device_details_dw,'Shape rate Down',1000,1))
-	result.append(cvs_helper.linegraph_normal(device_details_capacity_up,'Capacity Up',1000,1))
-	result.append(cvs_helper.linegraph_normal(device_details_capacity_dw,'Capacity Down',1000,1))
+	result.append(cvs_helper.linegraph_normal(device_details_up,'Shape rate Up',1000,1,0,series_id))
+	result.append(cvs_helper.linegraph_normal(device_details_dw,'Shape rate Down',1000,1,1,series_id))
+	result.append(cvs_helper.linegraph_normal(device_details_capacity_up,'Capacity Up',1000,1,0,series_id))
+	result.append(cvs_helper.linegraph_normal(device_details_capacity_dw,'Capacity Down',1000,1,0,series_id))
 	return HttpResponse(json.dumps(result))
 
 def linegraph_rtt(request):
-	
+	series_id=3
+	priority=0
 	device = request.GET.get('deviceid')
-	filter_by = request.GET.get('filter_by')
-    
+	filter_by = request.GET.get('filter_by')   
 	distinct_ips = MRtt.objects.values('dstip').distinct()
-	
  	full_details = MRtt.objects.filter(deviceid=device,average__lte=3000).order_by('eventstamp')
-
 	result=[]
-
 	count = 1
-	
 	for row_ip in distinct_ips:
 		try:
 			ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0].location	
 		except:
 			continue
-       
-		device_details = full_details.filter(dstip = row_ip["dstip"])
-		
+		device_details = full_details.filter(dstip = row_ip["dstip"])		
 		if len(device_details)<=0 :
 			continue
-		
-		result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup),1,1))
-
+		if(str(ip_lookup)=="Georgia Tech"):
+			priority=1
+		else:
+			priority=0
+		result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup),1,1,priority,series_id))
 		if (filter_by != 'none'):
 			result.append(cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,"median"+str(count)))
 		count+=1
-
 	return HttpResponse(json.dumps(result))
 
 def linegraph_bytes_hour(request):
