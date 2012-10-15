@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="content">
+    <div style="float: right">
+        <a class="btn" href="/"><i class="icon-home"></i> Home</a>
+    </div>
+    <h1>{{detail.name}}</h1>
+	{% if detail.is_default %}
+    {% else %}
+    <table class="table table-striped table-condensed">
+        <tr>
+            <td>ISP</td>
+            <td>{{detail.isp}}</td>
+        </tr>
+        <tr>
+            <td>Location</td>
+            <td id="location_column">
+                <script type="text/javascript">
+                $.ajax({
+                    type: "GET",
+                    url: escape("/getLocation/{{deviceid}}/"),
+                    success: function(data) {
+                        document.getElementById('location_column').innerHTML = data;
+                    }
+                });
+                </script>
+            </td>
+        </tr>     
+		 <tr>
+	            <td>Service Type</td>
+	            <td>{{detail.servicetype}}</td>
+	        </tr>
+        <tr>
+            <td>Service Plan</td>
+            <td>{{detail.serviceplan}}</td>
+        </tr>
+        <tr>
+            <td>Download Rate</td>
+            <td>{{detail.downloadrate}} kbps</td>
+        </tr>
+        <tr>
+            <td>Upload Rate</td>
+            <td>{{detail.uploadrate}} kbps</td>
+        </tr>
+        <tr>
+            <td>First Measurement</td>
+            <td>{{firstUpdate}}</td>
+        </tr>
+        <tr>
+            <td>Last Measurement</td>
+            <td>{{lastUpdate}}</td>
+        </tr>
+    </table>
+    {% endif %}
+    <div class="btn-group">
+      
+        {% comment %}<a class="btn btn-primary bt n-large" href="http://projectbismark.net/data/{{ deviceid }}"><b>Download</b></a>{% endcomment %}
+        <button id="permalink_button" data-toggle="button" class="btn" onclick="$('#permalink').toggle()"><i class="icon-bookmark"></i> Link to this page</button>
+		<form class="form-compare" method="post" action="/compare/">
+			<input type="hidden" name="device" value="{{deviceid}}" />
+			<input class="btn" id="compare_btn_1" type="submit" value="Compare my Performance"/>
+		</form>
+	</div>
+    <div id="permalink" class="alert alert-info" style="display: none">
+        <a href="http://networkdashboard.org/displayDevice/{{detail.hashkey}}">http://networkdashboard.org/displayDevice/{{detail.hashkey}}</a>
+    </div>
+    <br/>
+    <ul id="tab" class="nav nav-tabs" style="clear: both">
+        <li class="active"><a href="#download_throughput" data-toggle="tab">Download Throughput</a></li>
+        <li><a href="#upload_throughput" data-toggle="tab">Upload Throughput</a></li>
+        <li><a href="#round_trip_latency" data-toggle="tab">Round Trip Latency</a></li>
+        <li><a href="#last_mile_latency" data-toggle="tab">Last Mile Latency</a></li>
+		<li><a href="#shape_rate" data-toggle="tab">Shape Rate</a></li>
+		<li><a href="#all_metrics" data-toggle="tab">Show All</a></li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active in" id="download_throughput">
+            <div class="graphdiv" id="graph_div_1">
+                <div class="progress_wrapper">
+                    <div class="progress progress-info progress-striped active">
+                        <div class="bar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+		<!--
+		<div class="latest-measurement" id="latest-measurement-1">
+			Latest Measurement: <b>{{latestdownload.average}} Bits Per Second</b> on {{latestdownload.eventstamp}}.
+		</div>
+		-->
+        </div>
+        <div class="tab-pane" id="upload_throughput"> 
+            <div class="graphdiv" id="graph_div_2">
+                <div class="progress_wrapper">
+                    <div class="progress progress-info progress-striped active">
+                        <div class="bar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+			<!--
+			<div class="latest-measurement" id="latest-measurement-2">
+				Latest Measurement: <b>{{latestdownload.average}} Bits Per Second</b> on {{latestdownload.eventstamp}}.
+			</div>
+			-->
+        </div>
+        <div class="tab-pane" id="round_trip_latency">
+            <div class="graphdiv" id="graph_div_3">
+                <div class="progress_wrapper">
+                    <div class="progress progress-info progress-striped active">
+                        <div class="bar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+			<!--
+			<div class="latest-measurement" id="latest-measurement-3">
+				Latest Measurement: <b>{{latestdownload.average}} Milliseconds</b> on {{latestdownload.eventstamp}}.
+			</div>
+			-->
+        </div>
+        <div class="tab-pane" id="last_mile_latency">  
+            <div class="graphdiv" id="graph_div_4">
+                <div class="progress_wrapper">
+                    <div class="progress progress-info progress-striped active">
+                        <div class="bar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+			<!--
+			<div class="latest-measurement" id="latest-measurement-4">
+				Latest Measurement: <b>{{latestdownload.average}} Milliseconds</b> on {{latestdownload.eventstamp}}.
+			</div>
+			-->
+        </div>
+		<div class="tab-pane" id="shape_rate">  
+            <div class="graphdiv" id="graph_div_5">
+                <div class="progress_wrapper">
+                    <div class="progress progress-info progress-striped active">
+                        <div class="bar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+			<!--
+			<div class="latest-measurement" id="latest-measurement-4">
+				Latest Measurement: <b>{{latestdownload.average}} Bits Per Second</b> on {{latestdownload.eventstamp}}.
+			</div>
+			-->
+        </div>
+		<div class="tab-pane" id="all_metrics">  
+            <div class="graphdiv" id="graph_div_6">
+                <div class="progress_wrapper">
+                    <div class="progress progress-info progress-striped active">
+                        <div class="bar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+			<!--
+			<div class="latest-measurement" id="latest-measurement-5"></div>
+			-->
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $('download_throughput').tab('show');
+    $('#permalink_button').button()
+    renderGraphs("{{deviceid}}");
+	hashid="{{ detail.hashkey }}";
+	setHashid(hashid);
+	
+</script>
+{% endblock %}

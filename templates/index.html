@@ -49,6 +49,7 @@
 			<li class="active"><a href="#country_list" data-toggle="tab">Country</a></li>
 			<li><a href="#city_list" data-toggle="tab">City</a></li>
 			<li><a href="#isp_list" data-toggle="tab">ISP</a></li>
+			<li><a href="#active_count" data-toggle="tab">Recently Active</a></li>
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active in" id="country_list">
@@ -99,6 +100,21 @@
 								<td class = "tdright">{{isp.count}}</td>
 							</tr>
 						{% endfor %}
+					</table>
+				</div>
+			</div>
+			<div class="tab-pane" id="active_count">
+				<table class="tableheader">
+						<tr>
+							<td class = "tdright"><h3> Device Count ({{device_count}})</h3></td>
+						<td>
+				</table>
+				<div class ="statsdiv" id="stats4">
+					<table class="table table-striped table-condensed">
+							<tr>
+								<td>Recently Active Devices</td>
+								<td class = "tdright">{{active_count}}</td>
+							</tr>
 					</table>
 				</div>
 			</div>
@@ -265,9 +281,20 @@ function createMarker(c) {
 	var marker = new google.maps.Marker({
 		position: point
     });
-    marker.called = false;
-    marker.content = "Loading...";
     marker.devicehash = c[4];
+	google.maps.event.addListener(marker, "click", function() {
+		boxText.innerHTML = "<a href=\"http://networkdashboard.org/displayDevice/" + marker.devicehash + "\">Show Router Details</a>";
+		infowindow.setContent(boxText);
+		infowindow.open(map, marker);
+	});
+	if (c[0] == "server") {
+		marker.setIcon("/static/images/icon-blue.png");
+	} else {
+		marker.setIcon("/static/images/icon-red-dot.png");
+	}
+	marker.setMap(map);
+}
+	
 	/*
 	google.maps.event.addListener(marker, "click", function() {
 		if(marker.called == false) {
@@ -292,14 +319,6 @@ function createMarker(c) {
 		infowindow.setContent(boxText);
 		infowindow.open(map, marker);
 	});*/
-	
-	if (c[0] == "server") {
-		marker.setIcon("/static/images/icon-blue.png")
-	} else {
-		marker.setIcon("/static/images/icon-red-dot.png");
-	}
-	marker.setMap(map);
-}
 
 function OnSuccessMarker(data, marker) {
 	marker.content = data;

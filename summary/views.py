@@ -36,7 +36,9 @@ def index(request):
 	cities = views_helper.get_sorted_city_data()
 	isps = views_helper.get_sorted_isp_data()
 	device_count = views_helper.get_device_count()
-	return render_to_response('index.html', {'country_data' : countries, 'city_data': cities, 'isp_data': isps, 'device_count':device_count})
+	active_threshold = datetime_helper.get_daterange_start(7)
+	active_count = MBitrate.objects.filter(eventstamp__gte=active_threshold).values('deviceid').distinct().count()
+	return render_to_response('index.html', {'country_data' : countries, 'city_data': cities, 'isp_data': isps, 'device_count':device_count, 'active_count':active_count})
 	
 def compare(request):
 	device = request.POST.get("device").strip("/")
@@ -283,7 +285,7 @@ def sharedDeviceSummary(request,devicehash):
     else:
 	return render_to_response('device_not_found.html', {'deviceid': devicehash})
  
-    return views_helper.get_response_for_devicehtml(device_details[0])
+    return views_helper.get_response_for_shared_device(device_details[0])
 
 def devicesummary(request):
 
