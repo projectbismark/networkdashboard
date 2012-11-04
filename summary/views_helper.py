@@ -65,11 +65,41 @@ def get_response_for_shared_device(device_details):
 	device_details.deviceid = device_details.deviceid.replace(':', '').lower()
 	return render_to_response('shared_device.html', {'detail': device_details,'firstUpdate': first, 'lastUpdate': last, 'deviceid': device_details.deviceid, 'num_location' : num_location, 'num_provider' : num_provider, 'num_all' : num_all, 'latestdownload' : latest_download, 'latestupload' : latest_upload, 'latestlastmile' : latest_lastmile, 'latestroundtrip' : latest_roundtrip, 'latestshaperate': latest_shaperate}) 
 
-def get_hash(string):
-	string = string.replace(':', '')
-	m = hashlib.md5()
-	m.update(string)
-	return m.hexdigest()
+# def get_hash(string):
+	# string = string.replace(':', '')
+	# m = hashlib.md5()
+	# m.update(string)
+	# return m.hexdigest()
+	
+def get_hash(id):
+	devices = Devicedetails.objects.all()
+	if len(id)>1:
+		id = id[0]
+	elif len(id)==0:
+		return ""
+	for d in devices:
+		deviceid = str(d.deviceid).replace(':','')
+		if(id[0][0].lower()==deviceid):
+			print "found"
+			return d.hashkey
+	print "not found"
+	return ""
+	
+# def get_hash(id):
+	# if len(id)>1:
+		# id = id[0]
+	# elif len(id)==0:
+		# return ""
+	# id = str(id[0][0])
+	# id = ':'.join([id[i:i+2] for i in range(0, len(id)-1, 2)]).lower()
+	# if len(id)==17:
+		# device_details = Devicedetails.objects.filter(deviceid=id)
+		# if len(device_details)>0:
+			# return device_details[0].hashkey
+		# else:
+			# return ""
+	# else:
+		# return ""
 	
 def get_device_count():
 	return geoip_helper.get_device_count()

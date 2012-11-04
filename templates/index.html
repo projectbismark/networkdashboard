@@ -275,6 +275,7 @@ function cycleMap(){
 }
 */
 
+/*
 function createMarker(c) {
 	var point = new google.maps.LatLng(parseFloat(c[2]), parseFloat(c[3]));
     points.push(new MapPoint(point));
@@ -288,6 +289,28 @@ function createMarker(c) {
 		infowindow.open(map, marker);
 	});
 	if (c[0] == "server") {
+		marker.setIcon("/static/images/icon-blue.png");
+	} else {
+		marker.setIcon("/static/images/icon-red-dot.png");
+	}
+	marker.setMap(map);
+}*/
+
+function createMarker(d) {
+	var point = new google.maps.LatLng(parseFloat(d.lat), parseFloat(d.lon));
+    points.push(new MapPoint(point));
+	var marker = new google.maps.Marker({
+		position: point
+    });
+    marker.devicehash = d.hash;
+	if (marker.devicehash != ""){
+		google.maps.event.addListener(marker, "click", function() {
+			boxText.innerHTML = "<a href=\"http://networkdashboard.org/displayDevice/" + marker.devicehash + "\">Show Router Details</a>";
+			infowindow.setContent(boxText);
+			infowindow.open(map, marker);
+		});
+	}
+	if (d.dev_type == "server") {
 		marker.setIcon("/static/images/icon-blue.png");
 	} else {
 		marker.setIcon("/static/images/icon-red-dot.png");
@@ -333,7 +356,7 @@ function OnSuccessMarker(data, marker) {
 	infowindow.open(map, marker);
 }
 
-function OnSuccess(data) {
+/*function OnSuccess(data) {
     var coordstring = data.split("\n");
     for (var i = 0; i < coordstring.length - 1; ++i){
         var coords = coordstring[i].split(":");
@@ -350,6 +373,13 @@ function OnSuccess(data) {
             });
         }
     }
+}*/
+
+function OnSuccess(data) {
+	var dict = eval(data);
+	for (d in dict){
+		createMarker(dict[d]);
+	}
 }
 
 function GUnload(){

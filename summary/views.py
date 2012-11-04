@@ -36,7 +36,7 @@ def index(request):
 	cities = views_helper.get_sorted_city_data()
 	isps = views_helper.get_sorted_isp_data()
 	device_count = views_helper.get_device_count()
-	active_threshold = datetime_helper.get_daterange_start(7)
+	active_threshold = datetime_helper.get_daterange_start(200)
 	active_count = MBitrate.objects.filter(eventstamp__gte=active_threshold).values('deviceid').distinct().count()
 	return render_to_response('index.html', {'country_data' : countries, 'city_data': cities, 'isp_data': isps, 'device_count':device_count, 'active_count':active_count})
 	
@@ -242,7 +242,8 @@ def invalidEdit(request, device):
     return render_to_response('invalid_edit.html', {'deviceid' : device})
     
 def getCoordinates(request):
-    return HttpResponse(geoip_helper.get_coordinates_for_googlemaps())
+	result = geoip_helper.get_coordinates_for_googlemaps()
+	return HttpResponse(json.dumps(result))
 
 def getLatestInfo(request):
 	devicehash = request.GET.get('devicehash')
@@ -288,34 +289,27 @@ def sharedDeviceSummary(request,devicehash):
     return views_helper.get_response_for_shared_device(device_details[0])
 
 def devicesummary(request):
-
-    device = str(request.POST.get("device"))
-    device = device.replace(':', '')
-    hashing = views_helper.get_hash(device)
-    
-    if(request.POST.get("edit")):
+	device = str(request.POST.get("device"))
+	device = device.replace(':', '')
+	hashing = views_helper.get_hash(device)
+	if(request.POST.get("edit")):
 		try:
 			database_helper.save_device_details_from_request(request,device)
 		except:
 			return render_to_response('invalid_edit.html', {'deviceid' : hashing})
-     
- 
-    if not database_helper.fetch_deviceid_soft(device):
 	if not database_helper.fetch_deviceid_hard(device):
 		return render_to_response('device_not_found.html', {'deviceid': device})
-
-       
-    
-    device_details = Devicedetails.objects.filter(deviceid=device)
-    try: 
-        if len(device_details)<1:
-	    
-            database_helper.save_device_details_from_default(device)
-            device_details = Devicedetails.objects.filter(deviceid=device)
-    except:
-        return render_to_response('device_not_found.html', {'deviceid': device})
-
-    return views_helper.get_response_for_devicehtml(device_details[0])
+	device_details = Devicedetails.objects.filter(deviceid=device)
+	print "dev details"
+	print device_details
+	try: 
+		if len(device_details)<1:
+			database_helper.save_device_details_from_default(device)
+			device_details = Devicedetails.objects.filter(deviceid=device)
+	except:
+		return render_to_response('device_not_found.html', {'deviceid': device})
+		
+	return views_helper.get_response_for_devicehtml(device_details[0])
 
 def getLocation(request, device):   
     return HttpResponse(database_helper.get_location(device))

@@ -10,85 +10,85 @@ import psycopg2
 from django.core.cache import cache
 import random
 
-def get_coordinates_for_googlemaps():
-	coordstring = ""
-	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
-	distinct = getIPList()
-	deviceIDList = getDeviceIDList()
-	deviceIDs = list()
-	for ID in deviceIDList:
-		deviceIDs.append(ID[0])
-	data_type="coord"
-	devtype = 'address'
-	i = 0
-	for row in distinct:
-		loc = getLocation(row[0],gi)
-		lat = str(loc['latitude'])
-		lon = str(loc['longitude'])
-		hashdevice = views_helper.get_hash(deviceIDs[i][2:])
-		i += 1
-		coordstring += devtype
-		coordstring += ":"
-		coordstring += data_type
-		coordstring += ":"
-		coordstring += lat
-		coordstring += ":"
-		coordstring += lon
-		coordstring += ":"
-		coordstring += hashdevice
-		coordstring += "\n"
-
-	distinct_ips = IpResolver.objects.all()
-	data_type="coord"
-	for row_ip in distinct_ips:
-		lat = str(row_ip.latitude)
-		lon = str(row_ip.longitude)
-		devtype = str(row_ip.type)
-		hashdevice = views_helper.get_hash(deviceIDs[0]) # '0' is temp. replace '0'.
-		coordstring += devtype
-		coordstring += ":"
-		coordstring += data_type
-		coordstring += ":"
-		coordstring += lat
-		coordstring += ":"
-		coordstring += lon
-		coordstring += ":"
-		coordstring += hashdevice
-		coordstring += "\n"
-
-	return HttpResponse(coordstring)
-	
 # def get_coordinates_for_googlemaps():
-	# coord_data = []
+	# coordstring = ""
 	# gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
-	# device_ips = getIPList()
-	# servers = IpResolver.objects.all()
-	# dev_type = "device"
-	# for row in device_ips:
-		# value={}
+	# distinct = getIPList()
+	# deviceIDList = getDeviceIDList()
+	# deviceIDs = list()
+	# for ID in deviceIDList:
+		# deviceIDs.append(ID[0])
+	# data_type="coord"
+	# devtype = "address"
+	# i = 0
+	# for row in distinct:
 		# loc = getLocation(row[0],gi)
 		# lat = str(loc['latitude'])
 		# lon = str(loc['longitude'])
-		# device = get_devices_by_ip(row[0])[0]
-		# hash = Devicedetails.objects.filter(deviceid = device)[0]['hashkey']
-		# value['dev_type'] = dev_type
-		# value['lat'] = lat
-		# value['lon'] = lon
-		# value['hash'] = hash
-		# coord_data.append(value)
-	# dev_type = "server"
-	# for row_ip in servers:
-		# value = {}
+		# hashdevice = views_helper.get_hash(deviceIDs[i][2:])
+		# i += 1
+		# coordstring += devtype
+		# coordstring += ":"
+		# coordstring += data_type
+		# coordstring += ":"
+		# coordstring += lat
+		# coordstring += ":"
+		# coordstring += lon
+		# coordstring += ":"
+		# coordstring += hashdevice
+		# coordstring += "\n"
+	# distinct_ips = IpResolver.objects.all()
+	# data_type="coord"
+	# for row_ip in distinct_ips:
 		# lat = str(row_ip.latitude)
 		# lon = str(row_ip.longitude)
-		# device = get_devices_by_ip(row_ip.ip)[0]
-		# hash = Devicedetails.objects.filter(deviceid = device)[0]['hashkey']
-		# value['dev_type'] = dev_type
-		# value['lat'] = lat
-		# value['lon'] = lon
-		# value['hash'] = hash
-		# coord_data.append(value)
+		# devtype = str(row_ip.type)
+		# hashdevice = views_helper.get_hash(deviceIDs[0]) # '0' is temp. replace '0'.
+		# coordstring += devtype
+		# coordstring += ":"
+		# coordstring += data_type
+		# coordstring += ":"
+		# coordstring += lat
+		# coordstring += ":"
+		# coordstring += lon
+		# coordstring += ":"
+		# coordstring += hashdevice
+		# coordstring += "\n"
+
 	# return HttpResponse(coordstring)
+	
+def get_coordinates_for_googlemaps():
+	coord_data = []
+	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	device_ips = getIPList()
+	servers = IpResolver.objects.all()
+	dev_type = "device"
+	for row in device_ips:
+		value={}
+		loc = getLocation(row[0],gi)
+		lat = str(loc['latitude'])
+		lon = str(loc['longitude'])
+		device = get_devices_by_ip(row[0])
+		hash = views_helper.get_hash(device) 
+		value['dev_type'] = dev_type
+		value['lat'] = lat
+		value['lon'] = lon
+		value['hash'] = hash
+		coord_data.append(value)
+	dev_type = "server"
+	for row_ip in servers:
+		value = {}
+		loc = getLocation(row[0],gi)
+		lat = str(row_ip.latitude)
+		lon = str(row_ip.longitude)
+		device = get_devices_by_ip(row_ip.ip)
+		hash = views_helper.get_hash(device)
+		value['dev_type'] = dev_type
+		value['lat'] = lat
+		value['lon'] = lon
+		value['hash'] = hash
+		coord_data.append(value)
+	return coord_data
 
 def getLocation(ip,gi):
 	
@@ -111,6 +111,15 @@ def getIPList():
 	records = cursor.fetchall()
 	#print records
 	return records
+
+def getMACList():
+	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
+	conn = psycopg2.connect(conn_string)
+	cursor = conn.cursor()
+	cursor.execute("select id from devices")
+	records = cursor.fetchall()
+	#print records
+	return records
 	
 def get_device_count():
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
@@ -119,7 +128,6 @@ def get_device_count():
 	cursor.execute("select COUNT(*) from devices")
 	count = cursor.fetchone()
 	#print records
-	print count[0]
 	return count[0]
 
 def getDeviceIDList():
@@ -195,7 +203,7 @@ def get_devices_by_ip(ip):
 	conn = psycopg2.connect(conn_string)
 	cursor = conn.cursor()
 	cursor.execute("select SUBSTRING(id,3) from devices where ip='" + ip +"'")
-	records = cursor.fetchall()[0]
+	records = cursor.fetchall()
 	return records
 	
 def get_country_count():
