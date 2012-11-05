@@ -305,7 +305,7 @@ function createMarker(d) {
     marker.devicehash = d.hash;
 	if (marker.devicehash != ""){
 		google.maps.event.addListener(marker, "click", function() {
-			boxText.innerHTML = "<a href=\"http://networkdashboard.org/displayDevice/" + marker.devicehash + "\">Show Router Details</a>";
+			boxText.innerHTML = "<a href=/displayDevice/" + marker.devicehash + "\">Show Router Details</a>";
 			infowindow.setContent(boxText);
 			infowindow.open(map, marker);
 		});

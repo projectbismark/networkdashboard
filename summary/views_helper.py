@@ -80,9 +80,7 @@ def get_hash(id):
 	for d in devices:
 		deviceid = str(d.deviceid).replace(':','')
 		if(id[0][0].lower()==deviceid):
-			print "found"
 			return d.hashkey
-	print "not found"
 	return ""
 	
 # def get_hash(id):
