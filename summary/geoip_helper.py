@@ -70,13 +70,12 @@ def get_coordinates_for_googlemaps():
 		lon = str(loc['longitude'])
 		device = get_devices_by_ip(row[0])
 		hash = views_helper.get_hash(device)
+		isp = get_provider_by_ip(row)
+		value['isp'] = isp
 		if hash=="":
 			value['dev_type'] = "unregistered"
-			value['isp'] = ""
 		else:
 			value['dev_type'] = dev_type
-			isp = get_provider_by_ip(row)
-			value['isp'] = isp
 		value['lat'] = lat
 		value['lon'] = lon
 		value['hash'] = hash
