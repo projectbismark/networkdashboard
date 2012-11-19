@@ -97,6 +97,7 @@
 						{% for isp in isp_data %}
 							<tr>
 								<td>{{isp.isp}}</td>
+								<td> <input type="checkbox" onclick ="FilterProviders(this.checked, '{{isp.isp}}')"> </td>
 								<td class = "tdright">{{isp.count}}</td>
 							</tr>
 						{% endfor %}
@@ -133,6 +134,7 @@
 </script>
 <script type="text/javascript">
 var points = new Array();
+var markers = new Array();
 /*
 //delay after panning to new location
 var delay = 5000;
@@ -303,6 +305,7 @@ function createMarker(d) {
 		position: point
     });
     marker.devicehash = d.hash;
+	marker.isp = d.isp;
 	if (marker.devicehash != ""){
 		google.maps.event.addListener(marker, "click", function() {
 			boxText.innerHTML = "<a href=/displayDevice/" + marker.devicehash + "\">Show Router Details</a>";
@@ -312,10 +315,15 @@ function createMarker(d) {
 	}
 	if (d.dev_type == "server") {
 		marker.setIcon("/static/images/icon-blue.png");
-	} else {
+	}
+	else if (d.dev_type == "unregistered") {
+		marker.setIcon("/static/images/icon-gray-dot.png");
+	}
+	else {
 		marker.setIcon("/static/images/icon-red-dot.png");
 	}
 	marker.setMap(map);
+	markers.push(marker);
 }
 	
 	/*
@@ -354,6 +362,27 @@ function OnSuccessMarker(data, marker) {
 	infowindow.setContent(boxText);
 	infowindow.close();
 	infowindow.open(map, marker);
+}
+
+function FilterProviders(filter, isp) {
+	if (markers.length==0){
+		return
+	}
+	if (filter==true) {
+		for (var i=0; i<markers.length; i++){
+			if (markers[i].isp != isp){
+				markers[i].setVisible(false);
+			}
+			else {
+				markers[i].setVisible(true);
+			}
+		}
+	}
+	else{
+		for (var i=0; i<markers.length; i++){
+			markers[i].setVisible(true);
+		}
+	}
 }
 
 /*function OnSuccess(data) {

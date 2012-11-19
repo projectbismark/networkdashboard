@@ -69,8 +69,14 @@ def get_coordinates_for_googlemaps():
 		lat = str(loc['latitude'])
 		lon = str(loc['longitude'])
 		device = get_devices_by_ip(row[0])
-		hash = views_helper.get_hash(device) 
-		value['dev_type'] = dev_type
+		hash = views_helper.get_hash(device)
+		if hash=="":
+			value['dev_type'] = "unregistered"
+			value['isp'] = ""
+		else:
+			value['dev_type'] = dev_type
+			isp = get_provider_by_ip(row)
+			value['isp'] = isp
 		value['lat'] = lat
 		value['lon'] = lon
 		value['hash'] = hash
@@ -82,8 +88,9 @@ def get_coordinates_for_googlemaps():
 		lat = str(row_ip.latitude)
 		lon = str(row_ip.longitude)
 		device = get_devices_by_ip(row_ip.ip)
-		hash = views_helper.get_hash(device)
+		hash = ""
 		value['dev_type'] = dev_type
+		value['isp'] = ""
 		value['lat'] = lat
 		value['lon'] = lon
 		value['hash'] = hash
@@ -147,14 +154,6 @@ def get_ip_by_device(device):
 	records = cursor.fetchall()[0]
 	return records
 	
-def get_provider_by_ip(ip):
-	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
-	mappings = isp_mappings.mappings
-	isp = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
-	for m in mappings:
-		if(isp.lower().find(m[0].lower())!=-1):
-			isp = m[1]		
-	return isp
 	
 def get_ips_by_provider(isp):
 	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
@@ -253,7 +252,10 @@ def get_city_count():
 def get_provider_by_ip(ip):
 	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
 	mappings = isp_mappings.mappings
-	isp = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+	try:
+		isp = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+	except:
+		return "unknown"
 	for m in mappings:
 		if(isp.lower().find(m[0].lower())!=-1):
 			isp = m[1]		

@@ -3,7 +3,7 @@ import urllib2, urllib, json
 from django.shortcuts import render_to_response
 from networkdashboard.summary.models import *
 from operator import itemgetter
-
+from django.db import transaction
 import random
 from datetime import datetime, timedelta
 from time import time,mktime,strftime
@@ -71,33 +71,32 @@ def get_response_for_shared_device(device_details):
 	# m.update(string)
 	# return m.hexdigest()
 	
-def get_hash(id):
-	devices = Devicedetails.objects.all()
-	if len(id)>1:
-		id = id[0]
-	elif len(id)==0:
-		return ""
-	for d in devices:
-		deviceid = str(d.deviceid).replace(':','')
-		if(id[0][0].lower()==deviceid):
-			return d.hashkey
-	return ""
-	
 # def get_hash(id):
+	# devices = Devicedetails.objects.all()
 	# if len(id)>1:
 		# id = id[0]
 	# elif len(id)==0:
 		# return ""
-	# id = str(id[0][0])
-	# id = ':'.join([id[i:i+2] for i in range(0, len(id)-1, 2)]).lower()
-	# if len(id)==17:
-		# device_details = Devicedetails.objects.filter(deviceid=id)
-		# if len(device_details)>0:
-			# return device_details[0].hashkey
-		# else:
-			# return ""
-	# else:
-		# return ""
+	# for d in devices:
+		# deviceid = str(d.deviceid).replace(':','')
+		# if(id[0][0].lower()==deviceid):
+			# return d.hashkey
+	# return ""
+	
+def get_hash(id):
+	if len(id)>1:
+		id = id[0]
+	elif len(id)==0:
+		return ""
+	id = str(id[0][0])
+	if len(id)!=12:
+		return ""
+	id = ':'.join([id[i:i+2] for i in range(0, len(id)-1, 2)]).lower()
+	device_details = Devicedetails.objects.filter(deviceid=id)
+	if len(device_details)>0:
+		return device_details[0].hashkey
+	else:
+		return ""
 	
 def get_device_count():
 	return geoip_helper.get_device_count()
