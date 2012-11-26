@@ -84,11 +84,6 @@ def get_response_for_shared_device(device_details):
 	# return ""
 	
 def get_hash(id):
-	if len(id)>1:
-		id = id[0]
-	elif len(id)==0:
-		return ""
-	id = str(id[0][0])
 	if len(id)!=12:
 		return ""
 	id = ':'.join([id[i:i+2] for i in range(0, len(id)-1, 2)]).lower()

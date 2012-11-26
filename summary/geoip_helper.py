@@ -58,6 +58,9 @@ import random
 	# return HttpResponse(coordstring)
 	
 def get_coordinates_for_googlemaps():
+	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
+	conn = psycopg2.connect(conn_string)
+	cursor = conn.cursor()
 	coord_data = []
 	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	device_ips = getIPList()
@@ -68,8 +71,9 @@ def get_coordinates_for_googlemaps():
 		loc = getLocation(row[0],gi)
 		lat = str(loc['latitude'])
 		lon = str(loc['longitude'])
-		device = get_devices_by_ip(row[0])
-		hash = views_helper.get_hash(device)
+		cursor.execute("select SUBSTRING(id,3) from devices where ip='" + row[0] +"'")
+		device = cursor.fetchone()
+		hash = views_helper.get_hash(device[0])
 		isp = get_provider_by_ip(row)
 		value['isp'] = isp
 		if hash=="":
@@ -83,10 +87,9 @@ def get_coordinates_for_googlemaps():
 	dev_type = "server"
 	for row_ip in servers:
 		value = {}
-		loc = getLocation(row[0],gi)
+		loc = getLocation(row_ip.ip,gi)
 		lat = str(row_ip.latitude)
 		lon = str(row_ip.longitude)
-		device = get_devices_by_ip(row_ip.ip)
 		hash = ""
 		value['dev_type'] = dev_type
 		value['isp'] = ""
@@ -194,6 +197,7 @@ def get_devices_by_ips(ips):
 		cursor.execute("select SUBSTRING(id,3) from devices where ip='" + ip +"'")
 		record = cursor.fetchall()[0][0].lower()
 		ret.append(record)
+	conn.close()
 	return ret
 	
 def get_devices_by_ip(ip):
@@ -202,6 +206,7 @@ def get_devices_by_ip(ip):
 	cursor = conn.cursor()
 	cursor.execute("select SUBSTRING(id,3) from devices where ip='" + ip +"'")
 	records = cursor.fetchall()
+	conn.close()
 	return records
 	
 def get_country_count():
