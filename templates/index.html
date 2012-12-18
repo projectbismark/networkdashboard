@@ -50,13 +50,14 @@
 			<li><a href="#city_list" data-toggle="tab">City</a></li>
 			<li><a href="#isp_list" data-toggle="tab">ISP</a></li>
 			<li><a href="#active_count" data-toggle="tab">Recently Active</a></li>
+			<li><a href="#filter_markers" data-toggle="tab">Filter</a></li>
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active in" id="country_list">
 				<table class = "tableheader">
 						<tr>
 							<td class = "tdright"><h3>Device Count ({{device_count}})</h3></td>
-						<td>
+						</tr>
 				</table>
 				<div class ="statsdiv" id="stats1">
 					<table class="table table-striped table-condensed">
@@ -73,7 +74,7 @@
 				<table class="tableheader">
 						<tr>
 							<td class = "tdright"><h3> Device Count ({{device_count}})</h3></td>
-						<td>
+						</tr>
 				</table>
 				<div class ="statsdiv" id="stats2">
 					<table class="table table-striped table-condensed">
@@ -90,14 +91,13 @@
 				<table class="tableheader">
 						<tr>
 							<td class = "tdright"><h3> Device Count ({{device_count}})</h3></td>
-						<td>
+						</tr>
 				</table>
 				<div class ="statsdiv" id="stats3">
 					<table class="table table-striped table-condensed">
 						{% for isp in isp_data %}
 							<tr>
 								<td>{{isp.isp}}</td>
-								<td> <input type="checkbox" onclick ="FilterProviders(this.checked, '{{isp.isp}}')"> </td>
 								<td class = "tdright">{{isp.count}}</td>
 							</tr>
 						{% endfor %}
@@ -108,13 +108,39 @@
 				<table class="tableheader">
 						<tr>
 							<td class = "tdright"><h3> Device Count ({{device_count}})</h3></td>
-						<td>
+						</tr>
 				</table>
 				<div class ="statsdiv" id="stats4">
 					<table class="table table-striped table-condensed">
 							<tr>
 								<td>Recently Active Devices</td>
 								<td class = "tdright">{{active_count}}</td>
+							</tr>
+					</table>
+				</div>
+			</div>
+			<div class="tab-pane" id="filter_markers">
+				<table class="tableheader">
+						<tr>
+							<td class = "tdright"></td>
+						</tr>
+				</table>
+				<div class ="statsdiv" id="stats5">
+					<table class="table table-striped table-condensed">
+							<tr>
+								<td>Hide Unregistered Devices</td>
+								<td> <input type="checkbox" id="filter_unregistered" onclick ="HideUnregistered(this.checked)"> </td>
+							</tr>
+							<tr>
+								<td>Filter by Provider</td>
+								<td>
+									<select id="filter_isp" onChange = "FilterProviders(this)">
+										<option value="none" selected = "selected">None</option>
+										{% for isp in isp_data %}
+											<option value="{{isp.isp}}">{{isp.isp}}</option>
+										{% endfor %}
+									</select> 
+								</td>
 							</tr>
 					</table>
 				</div>
@@ -306,6 +332,7 @@ function createMarker(d) {
     });
     marker.devicehash = d.hash;
 	marker.isp = d.isp;
+	marker.dev_type = d.dev_type;
 	if (marker.devicehash != ""){
 		google.maps.event.addListener(marker, "click", function() {
 			boxText.innerHTML = "<a href=/displayDevice/" + marker.devicehash + "\">Show Router Details</a>";
@@ -364,24 +391,43 @@ function OnSuccessMarker(data, marker) {
 	infowindow.open(map, marker);
 }
 
-function FilterProviders(filter, isp) {
-	if (markers.length==0){
-		return
-	}
-	if (filter==true) {
+function FilterProviders(sel) {
+	var val = sel.options[sel.selectedIndex].value;
+	var hideUnregistered = document.getElementById("filter_unregistered").checked;
+	if (val=="none"){
 		for (var i=0; i<markers.length; i++){
-			if (markers[i].isp != isp){
-				markers[i].setVisible(false);
-			}
-			else {
+			if((markers[i].dev_type!="unregistered")||(hideUnregistered = false)){	
 				markers[i].setVisible(true);
 			}
 		}
 	}
 	else{
-		var self = this;
 		for (var i=0; i<markers.length; i++){
-			markers[i].setVisible(true);
+			if (markers[i].isp != val){
+				markers[i].setVisible(false);
+			}
+			else{
+				if ((markers[i].dev_type!="unregistered")||(hideUnregistered == false)){
+					markers[i].setVisible(true);
+				}
+			}
+		}
+	}
+}
+
+function HideUnregistered(hide) {
+	var sel = document.getElementById("filter_isp")
+	var isp = sel.options[sel.selectedIndex].value;
+	for (var i=0; i<markers.length; i++){
+		if (markers[i].dev_type == "unregistered"){
+			if(hide==true){
+				markers[i].setVisible(false);
+			}
+			else{
+				if((isp=="none")||(markers[i].isp==isp)){
+					markers[i].setVisible(true);
+				}
+			}
 		}
 	}
 }
