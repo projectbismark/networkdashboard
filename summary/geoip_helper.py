@@ -67,36 +67,42 @@ def get_coordinates_for_googlemaps():
 	servers = IpResolver.objects.all()
 	dev_type = "device"
 	for row in device_ips:
-		value={}
-		loc = getLocation(row[0],gi)
-		lat = str(loc['latitude'])
-		lon = str(loc['longitude'])
-		cursor.execute("select SUBSTRING(id,3) from devices where ip='" + row[0] +"'")
-		device = cursor.fetchone()
-		hash = views_helper.get_hash(device[0])
-		isp = get_provider_by_ip(row)
-		value['isp'] = isp
-		if hash=="":
-			value['dev_type'] = "unregistered"
-		else:
-			value['dev_type'] = dev_type
-		value['lat'] = lat
-		value['lon'] = lon
-		value['hash'] = hash
-		coord_data.append(value)
+		try:
+			value={}
+			loc = getLocation(row[0],gi)
+			lat = str(loc['latitude'])
+			lon = str(loc['longitude'])
+			cursor.execute("select SUBSTRING(id,3) from devices where ip='" + row[0] +"'")
+			device = cursor.fetchone()
+			hash = views_helper.get_hash(device[0])
+			isp = get_provider_by_ip(row)
+			value['isp'] = isp
+			if hash=="":
+				value['dev_type'] = "unregistered"
+			else:
+				value['dev_type'] = dev_type
+			value['lat'] = lat
+			value['lon'] = lon
+			value['hash'] = hash
+			coord_data.append(value)
+		except:
+			continue
 	dev_type = "server"
 	for row_ip in servers:
-		value = {}
-		loc = getLocation(row_ip.ip,gi)
-		lat = str(row_ip.latitude)
-		lon = str(row_ip.longitude)
-		hash = ""
-		value['dev_type'] = dev_type
-		value['isp'] = ""
-		value['lat'] = lat
-		value['lon'] = lon
-		value['hash'] = hash
-		coord_data.append(value)
+		try:
+			value = {}
+			loc = getLocation(row_ip.ip,gi)
+			lat = str(row_ip.latitude)
+			lon = str(row_ip.longitude)
+			hash = ""
+			value['dev_type'] = dev_type
+			value['isp'] = ""
+			value['lat'] = lat
+			value['lon'] = lon
+			value['hash'] = hash
+			coord_data.append(value)
+		except:
+			continue
 	return coord_data
 
 def getLocation(ip,gi):
