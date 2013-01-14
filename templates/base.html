@@ -6,13 +6,22 @@
     <link rel="stylesheet" type="text/css" href="/static/bootstrap/docs/assets/css/bootstrap.css" />
     <link rel="stylesheet" type="text/css" href="/static/style.css" />
     <script src="/static/js/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=geometry&sensor=false"></script>
+	<script type="text/javascript">
+		var script = '<script type="text/javascript" src="http://google-maps-' + 'utility-library-v3.googlecode.com/svn/trunk/infobubble/src/infobubble';
+		if (document.location.search.indexOf('compiled') !== -1) {
+			script += '-compiled';
+		}
+		script += '.js"><' + '/script>';
+		document.write(script);
+	</script>
     <script src="/static/js/bootstrap-tab.js"></script>
     <script src="/static/js/bootstrap-button.js"></script>
     <script src="/static/js/highstock/js/highstock.js"></script>
     <script src="/static/device.js"></script>
+	<script src="/static/index.js"></script>
     <script src="/static/rendergraphs.js"></script>
     <!--<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>-->
-    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?libraries=geometry&sensor=false"></script>
     <meta name="Author" content="Nick Feamster" /> 
     <script type="text/javascript">
         var _gaq = _gaq || [];

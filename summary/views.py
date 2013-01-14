@@ -1,35 +1,24 @@
-# Create your views here.
-
-import json
+import cvs_helper
+import database_helper
+import datetime_helper
+from datetime import datetime, timedelta
 from django.http import HttpResponse, HttpResponseRedirect
-from django.utils import simplejson
-import urllib2, urllib, json
 from django.shortcuts import render_to_response
+from django.utils import simplejson
+import email_helper
+import geoip_helper
+from graph_filter import *
+import hashlib
+import json
 from networkdashboard.summary.models import *
+import psycopg2
 import random
 import site
-site.addsitedir("/home/abhishek/.local/lib/python2.6/site-packages/")
-from datetime import datetime, timedelta
 from time import time,mktime,strftime
-#from mx.DateTime.ISO import ParseDateTimeUTC
-import hashlib
-import cvs_helper,datetime_helper,views_helper,email_helper,database_helper
-import geoip_helper
-import threading
-import psycopg2
-from graph_filter import *
-
-class CompareThread(threading.Thread):
-	def __init__(self,res,data,title,lineweight):
-		threading.Thread.__init__(self)
-		self.data = data
-		self.title = title
-		self.result = res
-		self.lineweight = lineweight
-		
-	def run(self):
-		res = cvs_helper.linegraph_compare(self.data,self.title,1,1,self.lineweight)
-		self.result.append(res)
+import urllib2
+import urllib
+import views_helper
+site.addsitedir("/home/abhishek/.local/lib/python2.6/site-packages/")
 
 def index(request):
 	countries = views_helper.get_sorted_country_data()
@@ -44,62 +33,38 @@ def compare(request):
 	device = request.POST.get("device").strip("/")
 	servers = IpResolver.objects.all()	
 	return render_to_response('compare.html', {'device' : device, 'servers' : servers})
-	
-# def compare_rtt(request):
-	# device = request.GET.get('device')
-	# filter_by = request.GET.get('filter_by')
-	# criteria = request.GET.get('criteria')
-	# server_loc = request.GET.get('server_loc').lstrip('Latency( ').strip(')')
-	# server_ip = IpResolver.objects.filter(location = server_loc)[0].ip
-	# devices = views_helper.get_devices_for_compare(device,criteria)
-	# max_results = int(request.GET.get('max_results'))
-	# result=[]
-	# threads=[]
-	# result_count=0
-	# for dev in devices:
-		# if(result_count == max_results):
-			# break
-		# if dev!= device:
-			# latest = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip).order_by('-eventstamp')[:1]
-			# if len(latest)!=0:
-				# if (datetime_helper.is_recent(latest[0].eventstamp,10)):
-					# result_count +=1
-					# data = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip).order_by('eventstamp')
-					# t = CompareThread(result,data,"Other Device",2)
-					# threads.append(t)
-					# t.start()
-	# data = MRtt.objects.filter(deviceid=device,average__lte=3000,dstip = server_ip).order_by('eventstamp')
-	# t = CompareThread(result,data,"Your Device",5)
-	# threads.append(t)
-	# t.start()
-	# for th in threads:
-		# th.join()
-	# return HttpResponse(json.dumps(result))
-	
+		
 def compare_rtt(request):
 	device = request.GET.get('device')
 	filter_by = request.GET.get('filter_by')
 	criteria = request.GET.get('criteria')
+	# The server loc is in this format in compare.html: Latency(server_loc). 
+	# Extra characters are removed:
 	server_loc = request.GET.get('server_loc').lstrip('Latency( ').strip(')')
 	days = int(request.GET.get('days'))
 	server_ip = IpResolver.objects.filter(location = server_loc)[0].ip
 	devices = views_helper.get_devices_for_compare(device,criteria)
 	max_results = int(request.GET.get('max_results'))
+	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
-	result = []
-	result.append([])
-	result.append([])
+	# Create list of lists. The first list contains data series for the linegraph.
+	# The second contains series for the bar graph (averages):
+	result = [[] for x in range(2)]
 	result_count=0
 	data = MRtt.objects.filter(deviceid=device,average__lte=3000,dstip = server_ip, eventstamp__gte=earliest).order_by('eventstamp')
+	# Graph data for user's own device:
 	graph_data = cvs_helper.linegraph_compare(data,"Your Device",1,1,5)
 	result[0].append(graph_data[0])
 	result[1].append(graph_data[1])
 	for dev in devices:
 		if(result_count == max_results):
 			break
+		# Ignore duplicate graph data for user's own device:
 		if dev!= device:
+			# Get the most recent RTT measurement for this device:
 			latest = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip).order_by('-eventstamp')[:1]
 			if len(latest)!=0:
+				# Ensure the most recent measurement for this device is no older than 10 days:
 				if (datetime_helper.is_recent(latest[0].eventstamp,10)):
 					data = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip, eventstamp__gte=earliest).order_by('eventstamp')
 					graph_data = cvs_helper.linegraph_compare(data,"Other Device",1,1,2)
@@ -107,118 +72,67 @@ def compare_rtt(request):
 					result[1].append(graph_data[1])
 					result_count +=1
 	return HttpResponse(json.dumps(result))
-	
-# def compare_lmrtt(request):
-	# deviceid = request.GET.get("device")
-	# criteria = int(request.GET.get("criteria"))
-	# max_results = int(request.GET.get("max_results"))
-	# devices = views_helper.get_devices_for_compare(deviceid,criteria)
-	# result = []
-	# threads = []
-	# result_count = 0
-	# for dev in devices:
-		# if(result_count == max_results):
-			# break
-		# if dev!= deviceid:
-			# data= MLmrtt.objects.filter(average__lte=3000, deviceid=dev).order_by('eventstamp')
-			# if len(data)!=0:
-				# last = len(data) - 1
-				# if (datetime_helper.is_recent(data[last].eventstamp,10)):
-					# result_count += 1
-					# t = CompareThread(result,data,"Other Device",2)
-					# threads.append(t)
-					# t.start()
-	# data= MLmrtt.objects.filter(average__lte=3000, deviceid=deviceid).order_by('eventstamp')
-	# t = CompareThread(result,data,"Your Device",5)
-	# threads.append(t)
-	# t.start()
-	# for th in threads:
-		# th.join()
-	# return HttpResponse(json.dumps(result))
-	
+		
 def compare_lmrtt(request):
 	deviceid = request.GET.get("device")
 	criteria = int(request.GET.get("criteria"))
 	max_results = int(request.GET.get("max_results"))
 	days = int(request.GET.get('days'))
+	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_for_compare(deviceid,criteria)
-	result = []
-	result.append([])
-	result.append([])
+	# Create list of lists. The first list contains data series for the linegraph.
+	# The second contains series for the bar graph (averages):
+	result = [[] for x in range(2)]
 	result_count = 0
 	data= MLmrtt.objects.filter(average__lte=3000, deviceid=deviceid, eventstamp__gte=earliest).order_by('eventstamp')
+	# Graph data for user's own device:
 	graph_data = cvs_helper.linegraph_compare(data,"Your Device",1,1,5)
 	result[0].append(graph_data[0])
 	result[1].append(graph_data[1])
 	for dev in devices:
 		if(result_count == max_results):
 			break
+		# Ignore duplicate graph data for user's own device:
 		if dev!= deviceid:
-			data= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
-			if len(data)!=0:
-				last = len(data) - 1
-				if (datetime_helper.is_recent(data[last].eventstamp,10)):
+			# Get the most recent RTT measurement for this device:
+			latest= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')[:1]
+			if len(latest)!=0:
+				# Ensure the most recent measurement for this device is no older than 10 days:
+				if (datetime_helper.is_recent(latest[0].eventstamp,10)):
 					graph_data = cvs_helper.linegraph_compare(data,"Other Device",1,1,2)
 					result[0].append(graph_data[0])
 					result[1].append(graph_data[1])
 					result_count += 1
 	return HttpResponse(json.dumps(result))
 	
-# def compare_bitrate(request):
-	# deviceid = request.GET.get("device")
-	# criteria = int(request.GET.get("criteria"))
-	# max_results = int(request.GET.get("max_results"))
-	# dir = request.GET.get("direction")
-	# devices = views_helper.get_devices_for_compare(deviceid,criteria)
-	# result = []
-	# threads = []
-	# result_count = 0
-	# data = MBitrate.objects.filter(deviceid = deviceid, direction = dir, toolid = 'NETPERF_3').order_by('eventstamp')
-	# t = CompareThread(result,data,"Your Device",5)
-	# threads.append(t)
-	# t.start()
-	# for dev in devices:
-		# if(result_count == max_results):
-			# break
-		# if dev!= deviceid:
-			# data = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3').order_by('eventstamp')
-			# if len(data)!=0:
-				# last = len(data) - 1
-				# if (datetime_helper.is_recent(data[last].eventstamp,10)):
-					# result_count += 1
-					# t = CompareThread(result,data,"Other Device",2)
-					# threads.append(t)
-					# t.start()
-	
-	# for th in threads:
-		# th.join()
-	# return HttpResponse(json.dumps(result))
-	
 def compare_bitrate(request):
 	deviceid = request.GET.get("device")
 	criteria = int(request.GET.get("criteria"))
 	max_results = int(request.GET.get("max_results"))
+	# upload or download:
 	dir = request.GET.get("direction")
 	days = int(request.GET.get('days'))
 	devices = views_helper.get_devices_for_compare(deviceid,criteria)
+	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
-	result = []
-	result.append([])
-	result.append([])
+	result = [[] for x in range(2)]
 	result_count = 0
 	data = MBitrate.objects.filter(deviceid = deviceid, direction = dir, toolid = 'NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
+	# Graph data for user's own device:
 	graph_data = cvs_helper.linegraph_compare(data,"Your Device",1000,18000,5)
 	result[0].append(graph_data[0])
 	result[1].append(graph_data[1])
 	for dev in devices:
 		if(result_count == max_results):
 			break
+		# Ignore duplicate graph data for user's own device:
 		if dev!= deviceid:
-			data = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
-			if len(data)!=0:
-				last = len(data) - 1
-				if (datetime_helper.is_recent(data[last].eventstamp,20)):
+			# Get the most recent RTT measurement for this device:
+			latest = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
+			if len(latest)!=0:
+				# Ensure the most recent measurement for this device is no older than 10 days:
+				if (datetime_helper.is_recent(latest[0].eventstamp,10)):
 					graph_data = cvs_helper.linegraph_compare(data,"Other Device",1000,18000,2)
 					result[0].append(graph_data[0])
 					result[1].append(graph_data[1])
@@ -227,15 +141,11 @@ def compare_bitrate(request):
 
 def editDevicePage(request, devicehash):
     device_details = Devicedetails.objects.filter(hashkey=devicehash)
-
     if len(device_details) < 1:
         return render_to_response('device_not_found.html', {'devicename' : devicehash})
-    
     device = str(device_details[0].deviceid)
-    
     isp_options = database_helper.list_isps()
     country_options = database_helper.list_countries()
-    
     return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device, 'isp_options': isp_options, 'country_options': country_options})
 
 def invalidEdit(request, device):
@@ -244,48 +154,13 @@ def invalidEdit(request, device):
 def getCoordinates(request):
 	result = geoip_helper.get_coordinates_for_googlemaps()
 	return HttpResponse(json.dumps(result))
-
-def getLatestInfo(request):
-	devicehash = request.GET.get('devicehash')
-	latestInfo = ''
-    
-	try:
-		device_details = Devicedetails.objects.get(hashkey=devicehash)
-	except Devicedetails.DoesNotExist:
-		return HttpResponse('NOT AVAILABLE')
-
-	try:
-		latest_download = database_helper.get_latest_download(device_details.deviceid)
-		latestInfo += 'Latest Download: ' + str(latest_download['average']) + '<br>'
-	except KeyError:
-		latestInfo += 'Latest Download: N/A<br>'
-	try:
-		latest_upload = database_helper.get_latest_upload(device_details.deviceid)
-		latestInfo += 'Latest Upload: ' + str(latest_upload['average']) + '<br>'
-	except KeyError:
-		latestInfo += 'Latest Upload: N/A<br>'
-	try:
-		latest_lastmile = database_helper.get_latest_lastmile(device_details.deviceid)
-		latestInfo += 'Latest Lastmile: ' + str(latest_lastmile['average']) + '<br>'
-	except KeyError:
-		latestInfo += 'Latest Lastmile: N/A<br>'
-	try:
-		latest_roundtrip = database_helper.get_latest_roundtrip(device_details.deviceid)
-		latestInfo += 'Latest Roundtrip: ' + str(latest_roundtrip['average']) + '<br>'
-	except KeyError:
-		latestInfo += 'Latest Roundtrip: N/A<br>' 
-			
-	return HttpResponse(latestInfo)
         
 def sharedDeviceSummary(request,devicehash):
-
     device_details = Devicedetails.objects.filter(hashkey=devicehash)
-	
     if len(device_details)>0:
-	device = device_details[0].deviceid		
+		device = device_details[0].deviceid		
     else:
-	return render_to_response('device_not_found.html', {'deviceid': devicehash})
- 
+		return render_to_response('device_not_found.html', {'deviceid': devicehash})
     return views_helper.get_response_for_shared_device(device_details[0])
 
 def devicesummary(request):

@@ -70,7 +70,8 @@ def get_coordinates_for_googlemaps():
 		try:
 			value={}
 			loc = getLocation(row[0],gi)
-			lat = str(loc['latitude'])
+			lat = loc['latitude']
+			lat = str(randomize_latitude(loc['latitude']))
 			lon = str(loc['longitude'])
 			cursor.execute("select SUBSTRING(id,3) from devices where ip='" + row[0] +"'")
 			device = cursor.fetchone()
@@ -301,3 +302,6 @@ def get_isp_count():
 		except:
 			continue
 	return isp_list
+
+def randomize_latitude(lat):
+	return (1-((1-(random.random()*2))*.0001))*lat
