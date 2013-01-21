@@ -243,3 +243,12 @@ def save_device_details_from_default(device):
 
 def deviceid_to_nodeid(device):
     return "OW" + device.upper()
+
+# def cache_bitrate(device, data):
+	# result = []
+	# data = JsonCache.filter(deviceid=device)...
+	# result.append(data)
+	# most_recent = data.last.eventstamp
+	# uncached = MBitrate.filter(deviceid=device,eventstamp__gt=most_recent)...
+	# result.append(cvs_helper.
+	

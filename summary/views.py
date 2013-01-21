@@ -192,206 +192,281 @@ def getLocation(request, device):
 def iptest(iptest):
 	dat = geoip_helper.getLocation("117.192.232.202")
 	return HttpResponse(str(dat))
-
+	
+def linegraph_rtt(request):
+	rtt_data=[]
+	series_id=3
+	priority=0
+	device = request.GET.get('deviceid')
+	cache = JsonCache.objects.filter(deviceid=device, datatype = "rtt")
+	# cache contains cached data:
+	if len(cache)!=0:
+		# this will hold the latest measurement for each series
+		latest_measurements = []
+		rtt_data = eval(cache[0].data)
+		for series in rtt_data:
+			latest_measurements.append(datetime.utcfromtimestamp(int(series['data'][-1][0])/1000))
+		# determine which measurement was most recently cached:
+		most_recent_measure = max(latest_measurements)
+		# retrieve all uncached measurements:
+		full_details = MRtt.objects.filter(deviceid=device,average__lte=3000,eventstamp__gt=most_recent_measure)
+		distinct_ips = full_details.values('dstip').distinct()
+		full_details = full_details.order_by('eventstamp')
+		# all measurements are already cached:
+		if len(full_details)==0:
+			return HttpResponse(json.dumps(rtt_data))
+		for ip in distinct_ips:
+			try:
+				ip_lookup = IpResolver.objects.filter(ip=ip['dstip'])[0]
+				dst_ip = ip_lookup.ip
+				# bandaid fix - the series derives its name from the location field of table ip_resolver
+				# and currently there are at least 2 records with the same location in this table:
+				if (dst_ip == '4.71.254.153'):
+					location = 'Atlanta, GA (2)'
+				else:
+					location = ip_lookup.location
+			except:
+				continue
+			device_details = full_details.filter(dstip = ip['dstip'])		
+			if len(device_details)==0:
+				continue
+			if(location=="Georgia Tech"):
+				priority=1
+			else:
+				priority=0
+			#find the correct series in the cache data to append to:
+			for index in range(len(rtt_data)):
+				if rtt_data[index]['name']==location:
+					rtt_data[index]['data'].extend(cvs_helper.linegraph_normal(device_details,ip_lookup,1,1,priority,series_id)['data'])
+					break
+				# new series:
+				if (index==(len(rtt_data)-1)):
+					rtt_data.append(cvs_helper.linegraph_normal(device_details,ip_lookup,1,1,priority,series_id))
+		cache.data = rtt_data
+		cache.save()
+		return HttpResponse(json.dumps(rtt_data))
+	# cache is empty:
+	else:
+		full_details = MRtt.objects.filter(deviceid=device,average__lte=3000)
+		distinct_ips = full_details.values('dstip').distinct()
+		# must wait until after distinct query before ordering original queryset:
+		full_details = full_details.order_by('eventstamp')
+		for ip in distinct_ips:
+			try:
+				ip_lookup = IpResolver.objects.filter(ip=ip['dstip'])[0]
+				dst_ip = ip_lookup.ip
+				# bandaid fix - the series derives its name from the location field of table ip_resolver
+				# and currently there are at least 2 records with the same location in this table:
+				if (dst_ip == '4.71.254.153'):
+					location = 'Atlanta, GA (2)'
+				else:
+					location = ip_lookup.location	
+			except:
+				continue
+			device_details = full_details.filter(dstip = ip['dstip'])		
+			if len(device_details)==0:
+				continue
+			if(location=="Georgia Tech"):
+				priority=1
+			else:
+				priority=0
+			rtt_data.append(cvs_helper.linegraph_normal(device_details,location,1,1,priority,series_id))
+		cache_new = JsonCache(deviceid = device, data = rtt_data, datatype = 'rtt')
+		cache_new.save()
+		
+		return HttpResponse(json.dumps(rtt_data))
 
 def linegraph_bitrate(request):
 	g_filter = Graph_Filter(request)
 	chosen_limit = 100000000
-	series_id=0
-
-	details = Devicedetails.objects.filter(deviceid=g_filter.device)[0]
-	all_device_details= MBitrate.objects.filter(average__lte=chosen_limit).order_by('eventstamp')
-
-	other_device_details_netperf_3 = []
-	other_device_details_other = []
-	filtered_deviceids = []
-
-	if (g_filter.filter_by == 'location'):
-		filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=g_filter.device)
-
-	if (g_filter.filter_by == 'provider'):
-		filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=g_filter.device)
-
-	for row in filtered_deviceids:
-		other_device_details_other.extend(all_device_details.filter(deviceid=row.deviceid).exclude(toolid='NETPERF_3'))
-		other_device_details_netperf_3.extend(all_device_details.filter(deviceid=row.deviceid).filter(toolid='NETPERF_3'))	
-
-	if (g_filter.graphno==1):
-		all_device_details = all_device_details.filter(direction='dw')
-		series_id = 1;
-	elif (g_filter.graphno==2): 
-		all_device_details = all_device_details.filter(direction='up')
-		series_id = 2;
-
-	my_device_details = all_device_details.filter(deviceid=g_filter.device)
-
-	my_device_details_netperf_3 = my_device_details.filter(toolid='NETPERF_3')
-	my_device_details_other = my_device_details.exclude(toolid='NETPERF_3')
-
-	result=[]
-	result.append(cvs_helper.linegraph_normal(my_device_details_netperf_3,"Multi-threaded TCP",1000,18000,1,series_id))
-	result.append(cvs_helper.linegraph_normal(my_device_details_other,"Single-threaded TCP",1000,18000,0,series_id))
-	
-	if (g_filter.filter_by != 'none'):
-		bucket_width = 24*3600
-		result.append(cvs_helper.linegraph_bucket(other_device_details_netperf_3,bucket_width,"multi-median"))
-		result.append(cvs_helper.linegraph_bucket(other_device_details_other,bucket_width,"single-median"))
-
-
-	return HttpResponse(json.dumps(result))
+	most_recent = []
+	# get all cached data:
+	cache_down = JsonCache.objects.filter(deviceid=g_filter.device, datatype = "bitrate_down")
+	cache_up = JsonCache.objects.filter(deviceid=g_filter.device, datatype = "bitrate_up")
+	# both caches already contain cached data:
+	if (len(cache_down)!=0 and len(cache_up)!=0):
+		download_data = eval(cache_down[0].data)
+		upload_data = eval(cache_up[0].data)
+		# split into the seperate series, multi-threaded and single-threaded:
+		download_multi = download_data[0]
+		download_single = download_data[1]
+		upload_multi = upload_data[0]
+		upload_single = upload_data[1]
+		# get timestamp of most recent measurement for each of the 4 series:
+		most_recent.append(datetime.utcfromtimestamp(int(download_multi['data'][-1][0])/1000))
+		most_recent.append(datetime.utcfromtimestamp(int(download_single['data'][-1][0])/1000))
+		most_recent.append(datetime.utcfromtimestamp(int(upload_multi['data'][-1][0])/1000))
+		most_recent.append(datetime.utcfromtimestamp(int(upload_single['data'][-1][0])/1000))
+		# determine which measurement was most recently cached:
+		most_recent_measure = max(most_recent)
+		# retrieve all uncached measurements:
+		all_device_details= MBitrate.objects.filter(average__lte=chosen_limit,deviceid=g_filter.device,eventstamp__gt=most_recent_measure).order_by('eventstamp')
+		# if there are no uncached measurements:
+		if len(all_device_details)==0:
+			if (g_filter.graphno==1):
+				data = download_data
+			else:
+				data = upload_data
+			return HttpResponse(json.dumps(data))
+		downloads = all_device_details.filter(direction='dw')
+		uploads = all_device_details.filter(direction='up')
+		downloads_netperf_3 = downloads.filter(toolid='NETPERF_3').order_by('eventstamp')
+		downloads_other = downloads.exclude(toolid='NETPERF_3').order_by('eventstamp')
+		uploads_netperf_3 = downloads.filter(toolid='NETPERF_3').order_by('eventstamp')
+		uploads_other = downloads.exclude(toolid='NETPERF_3').order_by('eventstamp')
+		download_data[0]['data'].extend(cvs_helper.linegraph_normal(downloads_netperf_3,"Multi-threaded TCP",1000,18000,1,1)['data'])
+		download_data[1]['data'].extend(cvs_helper.linegraph_normal(downloads_other,"Single-threaded TCP",1000,18000,0,1)['data'])
+		upload_data[0]['data'].extend(cvs_helper.linegraph_normal(uploads_netperf_3,"Multi-threaded TCP",1000,18000,1,2)['data'])
+		upload_data[1]['data'].extend(cvs_helper.linegraph_normal(uploads_other,"Single-threaded TCP",1000,18000,0,2)['data'])
+		cache_down[0].data=download_data
+		cache_up[0].data=upload_data
+		cache_down[0].save()
+		cache_up[0].save()
+		# even though both upload and download measurements are cached, only one set of measurements is expected by the graph:
+		if (g_filter.graphno==1):
+			data = download_data
+		else:
+			data = upload_data
+		return HttpResponse(json.dumps(data))
+	# 1 or both caches are empty:
+	else:
+		# check whether caches are empty or not. If only 1 cache is empty, trying to append to the data
+		# portion of the non-empty cache would corrupt the cache. These are booleans which evaluate to true
+		# in the event that the respective cache is indeed empty:
+		cache_check_down = len(JsonCache.objects.filter(deviceid=g_filter.device, datatype = "bitrate_down"))==0
+		cache_check_up = len(JsonCache.objects.filter(deviceid=g_filter.device, datatype = "bitrate_up"))==0
+		all_device_details= MBitrate.objects.filter(average__lte=chosen_limit,deviceid=g_filter.device).order_by('eventstamp')
+		# no measurements exist at all:
+		if len(all_device_details)==0:
+			return HttpResponse(json.dumps([]))
+		downloads = all_device_details.filter(direction='dw')
+		uploads = all_device_details.filter(direction='up')
+		downloads_netperf_3 = downloads.filter(toolid='NETPERF_3').order_by('eventstamp')
+		downloads_other = downloads.exclude(toolid='NETPERF_3').order_by('eventstamp')
+		uploads_netperf_3 = uploads.filter(toolid='NETPERF_3').order_by('eventstamp')
+		uploads_other = uploads.exclude(toolid='NETPERF_3').order_by('eventstamp')
+		download_data = []
+		upload_data = []
+		download_data.append(cvs_helper.linegraph_normal(downloads_netperf_3,"Multi-threaded TCP",1000,18000,1,1))
+		download_data.append(cvs_helper.linegraph_normal(downloads_other,"Single-threaded TCP",1000,18000,0,1))
+		upload_data.append(cvs_helper.linegraph_normal(uploads_netperf_3,"Multi-threaded TCP",1000,18000,1,2))
+		upload_data.append(cvs_helper.linegraph_normal(uploads_other,"Single-threaded TCP",1000,18000,0,2))
+		if (cache_check_down):
+			cache_down_new = JsonCache(deviceid = g_filter.device, data = download_data, datatype = 'bitrate_down')
+			cache_down_new.save()	
+		if (cache_check_up):
+			cache_up_new = JsonCache(deviceid = g_filter.device, data = upload_data, datatype = 'bitrate_up')
+			cache_up_new.save()
+		# even though both upload and download measurements are cached, only one set of measurements is expected by the graph:
+		if (g_filter.graphno==1):
+			data = download_data
+		else:
+			data = upload_data
+		return HttpResponse(json.dumps(data))
 
 def linegraph_lmrtt(request):
+	lmrtt_data=[]
 	series_id=4
 	device = request.GET.get('deviceid')
-	filter_by = request.GET.get('filter_by')
-	details = Devicedetails.objects.filter(deviceid=device)[0]
-	all_device_details= MLmrtt.objects.filter(average__lte=3000).order_by('eventstamp')
-	device_details = all_device_details.filter(deviceid=device)
-	other_device_details = []
-	filtered_deviceids = []	
-	if (filter_by == 'location'):
-		filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
-	if (filter_by == 'provider'):
-		filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
-	for row in filtered_deviceids:
-		other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
-	result=[]
-	result.append(cvs_helper.linegraph_normal(device_details,'Last mile latency',1,1,1,series_id))
-	if (filter_by != 'none'):
-		bucket_width = 2*3600
-		result.append(cvs_helper.linegraph_bucket(other_device_details,bucket_width,'median'))
-	return HttpResponse(json.dumps(result))
+	lmrtt_cache = JsonCache.objects.filter(deviceid=device, datatype='lmrtt')
+	if len(lmrtt_cache)!=0:
+		lmrtt_data = eval(lmrtt_cache[0].data)
+		latest_measurement = datetime.utcfromtimestamp(int(lmrtt_data[0]['data'][-1][0])/1000)
+		uncached_measurements = MLmrtt.objects.filter(deviceid=device,average__lte=3000,eventstamp__gt=latest_measurement).order_by('eventstamp')
+		# cache is up to date:
+		if (len(uncached_measurements)==0):
+			return HttpResponse(json.dumps(lmrtt_data))
+		lmrtt_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_measurements,'Last mile latency',1,1,1,series_id)['data'])
+		lmrtt_cache[0].data = lmrtt_data
+		lmrtt_cache[0].save()
+		return HttpResponse(json.dumps(lmrtt_data))
+	else:
+		all_measurements = MLmrtt.objects.filter(deviceid=device,average__lte=3000).order_by('eventstamp')
+		# no measurements for this device
+		if len(all_measurements)==0:
+			return HttpResponse(json.dumps(lmrtt_data))
+		lmrtt_data.append(cvs_helper.linegraph_normal(all_measurements,'Last mile latency',1,1,1,series_id))
+		new_cache = JsonCache(deviceid = device, data = lmrtt_data, datatype = 'lmrtt')
+		new_cache.save()
+		return HttpResponse(json.dumps(lmrtt_data))
 
 def linegraph_shaperate(request):
 	series_id=5
+	# series data for shaperate, in json format:
+	shaperate_data = []
+	# series data for capacity, in json format:
+	capacity_data = []
 	device = request.GET.get('deviceid')
-	filter_by = request.GET.get('filter_by')
-
-	details = Devicedetails.objects.filter(deviceid=device)[0]
-
-	all_device_details= MShaperate.objects.all().order_by('eventstamp')
-	all_device_details_capacity= MCapacity.objects.all().order_by('eventstamp')
-	device_details = all_device_details.filter(deviceid=device)
-	device_details_capacity = all_device_details_capacity.filter(deviceid=device)
-
-        device_details_up = device_details.filter(direction='up')
-        device_details_dw = device_details.filter(direction='dw')
-        device_details_capacity_up = device_details_capacity.filter(direction='up')
-        device_details_capacity_dw = device_details_capacity.filter(direction='dw')        
-		
-	result=[]
-	result.append(cvs_helper.linegraph_normal(device_details_up,'Shape rate Up',1000,1,0,series_id))
-	result.append(cvs_helper.linegraph_normal(device_details_dw,'Shape rate Down',1000,1,1,series_id))
-	result.append(cvs_helper.linegraph_normal(device_details_capacity_up,'Capacity Up',1000,1,0,series_id))
-	result.append(cvs_helper.linegraph_normal(device_details_capacity_dw,'Capacity Down',1000,1,0,series_id))
-	return HttpResponse(json.dumps(result))
-
-def linegraph_rtt(request):
-	series_id=3
-	priority=0
-	device = request.GET.get('deviceid')
-	filter_by = request.GET.get('filter_by')   
-	distinct_ips = MRtt.objects.values('dstip').distinct()
- 	full_details = MRtt.objects.filter(deviceid=device,average__lte=3000).order_by('eventstamp')
-	result=[]
-	count = 1
-	for row_ip in distinct_ips:
-		try:
-			ip_lookup = IpResolver.objects.filter(ip=row_ip['dstip'])[0].location	
-		except:
-			continue
-		device_details = full_details.filter(dstip = row_ip["dstip"])		
-		if len(device_details)<=0 :
-			continue
-		if(str(ip_lookup)=="Georgia Tech"):
-			priority=1
-		else:
-			priority=0
-		result.append(cvs_helper.linegraph_normal(device_details,str(ip_lookup),1,1,priority,series_id))
-		if (filter_by != 'none'):
-			result.append(cvs_helper.linegraph_bucket(divides[str(row_ip["dstip"])],2*3600,"median"+str(count)))
-		count+=1
-	return HttpResponse(json.dumps(result))
-
-def linegraph_bytes_hour(request):
-    device = request.GET.get('deviceid')
-    filter_by = request.GET.get('filter_by')
-
-    details = Devicedetails.objects.filter(deviceid=device)[0]
-	
-    node = database_helper.deviceid_to_nodeid(device)
-
-    all_device_details= BytesPerHour_mem.objects.all().order_by('eventstamp')
-
-    device_details = all_device_details.filter(node_id=node)
-
-    other_device_details = []
-    filtered_deviceids = []	
-
-    if (filter_by == 'location'):
-	filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
-
-    if (filter_by == 'provider'):
-	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
-
-    for row in filtered_deviceids:
-	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
-    
-    result=[]
-    result.append(cvs_helper.linegraph_normal_passive(device_details,'bytes per hour'))
-
-    '''
-    if (filter_by != 'none'):
-	bucket_width = 2*3600
-	result.append(cvs_helper.linegraph_bucket(other_device_details,bucket_width,'median'))
-    '''
-    answer = str(result).replace("['","[")
-    answer = answer.replace(")'",")")
-
-    return HttpResponse("(" + answer + ")")
-
-def linegraph_bytes_port_hour(request):
-    device = request.GET.get('deviceid')
-    filter_by = request.GET.get('filter_by')
-
-    port_names = ['Web','HTTPS','IMAPS','SMTPS','POP3S','JABBER','DNS','SMTP','SSH']
-    port_high = [80,443,993,587,995,5223,53,25,22] 
-    port_low = [80,443,993,587,995,5223,53,25,22] 
-
-    details = Devicedetails.objects.filter(deviceid=device)[0]
-	
-    node = database_helper.deviceid_to_nodeid(device)
-
-    all_device_details= BytesPerPortPerHour_mem.objects.all().order_by('eventstamp')
-
-    device_details = all_device_details.filter(node_id=node)
-
-    other_device_details = []
-    filtered_deviceids = []	
-
-    if (filter_by == 'location'):
-	filtered_deviceids = Devicedetails.objects.filter(city=details.city).exclude(deviceid=device)
-
-    if (filter_by == 'provider'):
-	filtered_deviceids = Devicedetails.objects.filter(isp=details.isp).exclude(deviceid=device)
-
-    for row in filtered_deviceids:
-	other_device_details.extend(all_device_details.filter(deviceid=row.deviceid))
-    
-    result=[]
-    for i in range(0,len(port_names)):
-    	result.append(cvs_helper.linegraph_normal_passive(device_details.filter(port=port_high[i]),port_names[i]))
-
-    '''
-    if (filter_by != 'none'):
-	bucket_width = 2*3600
-	result.append(cvs_helper.linegraph_bucket(other_device_details,bucket_width,'median'))
-    '''
-    answer = str(result).replace("['","[")
-    answer = answer.replace(")'",")")
-
-    return HttpResponse("(" + answer + ")")
-
+	# retrieve cached data:
+	shaperate_cache = JsonCache.objects.filter(deviceid=device,datatype='shaperate')
+	capacity_cache = JsonCache.objects.filter(deviceid=device,datatype='capacity')
+	# both caches already contain cached data:
+	if (len(shaperate_cache)!=0 and len(capacity_cache)!=0):
+		shaperate_data = eval(shaperate_cache[0].data)
+		capacity_data = eval(capacity_cache[0].data)
+		# split into 4 separate series, upload and download for shaperate and capacity:
+		shaperate_up = shaperate_data[0]
+		shaperate_down = shaperate_data[1]
+		capacity_up = capacity_data[0]
+		capacity_down = capacity_data[1]
+		# get timestamp of most recent measurement for each of the 4 series:
+		recent_shaperate_up = datetime.utcfromtimestamp(int(shaperate_up['data'][-1][0])/1000)
+		recent_shaperate_down = datetime.utcfromtimestamp(int(shaperate_down['data'][-1][0])/1000)
+		recent_capacity_up = datetime.utcfromtimestamp(int(capacity_up['data'][-1][0])/1000)
+		recent_capacity_down = datetime.utcfromtimestamp(int(capacity_down['data'][-1][0])/1000)
+		# determine which measurements were most recently cached:
+		most_recent_shaperate = max(recent_shaperate_up, recent_shaperate_down)
+		most_recent_capacity = max(recent_capacity_up, recent_capacity_down)
+		# retrieve all uncached measurements:
+		uncached_shaperate = MShaperate.objects.filter(deviceid=device,eventstamp__gt=most_recent_shaperate).order_by('eventstamp')
+		uncached_capacity = MCapacity.objects.filter(deviceid=device,eventstamp__gt=most_recent_capacity).order_by('eventstamp')
+		if len(uncached_shaperate)!=0:
+			# separate shaperate records into upload and download
+			shape_measure_up = uncached_shaperate.filter(direction='up').order_by('eventstamp')
+			shape_measure_down = uncached_shaperate.filter(direction='dw').order_by('eventstamp')
+			# convert records to series data and append to cached data:
+			shaperate_data[0]['data'].extend(cvs_helper.linegraph_normal(shape_measure_up,'Shape rate Up',1000,1,0,series_id)['data'])
+			shaperate_data[1]['data'].extend(cvs_helper.linegraph_normal(shape_measure_down,'Shape rate Down',1000,1,1,series_id)['data'])
+			shaperate_cache[0].data=shaperate_data
+			shaperate_cache[0].save()
+		if len(uncached_capacity)!=0:
+			cap_measure_up = uncached_capacity.filter(direction='up').order_by('eventstamp')
+			cap_measure_down = uncached_capacity.filter(direction='dw').order_by('eventstamp')
+			capacity_data[0]['data'].extend(cvs_helper.linegraph_normal(cap_measure_up,'Capacity Up',1000,1,0,series_id)['data'])
+			capacity_data[1]['data'].extend(cvs_helper.linegraph_normal(cap_measure_down,'Capacity Down',1000,1,0,series_id)['data'])
+			capacity_cache[0].data=capacity_data
+			capacity_cache[0].save()
+	# 1 or both caches are empty:
+	else:
+		# check whether caches are empty or not. If only 1 cache is empty, trying to append to the data
+		# portion of the non-empty cache would corrupt the cache. These are booleans which evaluate to true
+		# in the event that the respective cache is indeed empty:
+		cache_check_shape = len(JsonCache.objects.filter(deviceid=device, datatype = 'shaperate'))==0
+		cache_check_cap = len(JsonCache.objects.filter(deviceid=device, datatype = 'capacity'))==0
+		# retrieve all capacity and shaperate measurement records for this device:
+		all_shaperate= MShaperate.objects.filter(deviceid=device).order_by('eventstamp')
+		all_capacity= MCapacity.objects.filter(deviceid=device).order_by('eventstamp')
+		if len(all_shaperate)!=0:
+			# separate shaperate records into upload and download:
+			shape_measure_up = all_shaperate.filter(direction='up')
+			shape_measure_down = all_shaperate.filter(direction='dw')
+			# convert records into new series to be placed in cache:
+			shaperate_data.append(cvs_helper.linegraph_normal(shape_measure_up,'Shape rate Up',1000,1,0,series_id))
+			shaperate_data.append(cvs_helper.linegraph_normal(shape_measure_down,'Shape rate Down',1000,1,1,series_id))
+			# if cache is empty:
+			if (cache_check_shape):
+				cache_shaperate_new = JsonCache(deviceid = device, data = shaperate_data, datatype = 'shaperate')
+				cache_shaperate_new.save()
+		if len(all_capacity)!=0:
+			cap_measure_up = all_capacity.filter(direction='up')
+			cap_measure_down = all_capacity.filter(direction='dw')
+			capacity_data.append(cvs_helper.linegraph_normal(cap_measure_up,'Capacity Up',1000,1,0,series_id))
+			capacity_data.append(cvs_helper.linegraph_normal(cap_measure_down,'Capacity Down',1000,1,0,series_id))
+			if (cache_check_cap):
+				cache_capacity_new = JsonCache(deviceid = device, data =capacity_data, datatype = 'capacity')
+				cache_capacity_new.save()
+	shaperate_data.extend(capacity_data)
+	return HttpResponse(json.dumps(shaperate_data))
   
 def feedback(request):
 	return render_to_response('feedback.html', {'hashkey' : request.GET.get('hashkey')})

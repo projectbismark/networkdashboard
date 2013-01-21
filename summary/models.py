@@ -525,5 +525,19 @@ class BytesPerMinute(models.Model):
     bytes_transferred = models.TextField()
     class Meta:
 	db_table = u'"bismark_passive"."bytes_per_minute"'
+	
+class CacheTest(models.Model):
+	t = models.DateTimeField()
+	json = models.TextField()
+	class Meta:
+		db_table = u'cache_test'
+		
+class JsonCache(models.Model):
+	id = models.AutoField(primary_key=True)
+	deviceid = models.TextField()
+	data = models.TextField()
+	datatype = models.TextField()
+	class Meta:
+		db_table = u'json_cache'
 
 
