@@ -248,6 +248,8 @@ def linegraph_rtt(request):
 	# cache is empty:
 	else:
 		full_details = MRtt.objects.filter(deviceid=device,average__lte=3000)
+		if len(full_details)==0:
+			return HttpResponse(json.dumps([]))
 		distinct_ips = full_details.values('dstip').distinct()
 		# must wait until after distinct query before ordering original queryset:
 		full_details = full_details.order_by('eventstamp')
