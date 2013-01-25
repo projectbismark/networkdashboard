@@ -537,6 +537,7 @@ class JsonCache(models.Model):
 	deviceid = models.TextField()
 	data = models.TextField()
 	datatype = models.TextField()
+	eventstamp = models.DateTimeField()
 	class Meta:
 		db_table = u'json_cache'
 
