@@ -76,9 +76,9 @@ def compare_rtt(request):
 def update(request):
 	all_devices = Devicedetails.objects.all().values('deviceid')
 	for device in all_devices:
-		#database_helper.update_bitrate(device['deviceid'])
-		#database_helper.update_rtt(device['deviceid'])
-		#database_helper.update_lmrtt(device['deviceid'])
+		database_helper.update_bitrate(device['deviceid'])
+		database_helper.update_rtt(device['deviceid'])
+		database_helper.update_lmrtt(device['deviceid'])
 		database_helper.update_shaperate(device['deviceid'])
 		database_helper.update_capacity(device['deviceid'])
 	return HttpResponse('')
