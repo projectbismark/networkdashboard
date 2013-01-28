@@ -75,12 +75,15 @@ def compare_rtt(request):
 	
 def update(request):
 	all_devices = Devicedetails.objects.all().values('deviceid')
+	device_list = []
 	for device in all_devices:
-		database_helper.update_bitrate(device['deviceid'])
-		database_helper.update_rtt(device['deviceid'])
-		database_helper.update_lmrtt(device['deviceid'])
-		database_helper.update_shaperate(device['deviceid'])
-		database_helper.update_capacity(device['deviceid'])
+		device_list.append(device['deviceid'])
+	for device in device_list:
+		database_helper.update_bitrate(device)
+		database_helper.update_rtt(device)
+		database_helper.update_lmrtt(device)
+		database_helper.update_shaperate(device)
+		database_helper.update_capacity(device)
 	return HttpResponse('')
 		
 def compare_lmrtt(request):
@@ -212,7 +215,7 @@ def linegraph_rtt(request):
 
 def linegraph_bitrate(request):
 	device = request.GET.get('deviceid')
-	graphno = request.GET.get('graphno')
+	graphno = int(request.GET.get('graphno'))
 	data = []
 	if graphno==1:
 		cached_download = JsonCache.objects.filter(deviceid=device, datatype='bitrate_down')
