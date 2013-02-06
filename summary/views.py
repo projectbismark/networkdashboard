@@ -2,6 +2,7 @@ import cvs_helper
 import database_helper
 import datetime_helper
 from datetime import datetime, timedelta
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.utils import simplejson
@@ -72,6 +73,19 @@ def compare_rtt(request):
 					result[1].append(graph_data[1])
 					result_count +=1
 	return HttpResponse(json.dumps(result))
+	
+def create_devicepages(request):
+	all_bitrate_devices = MBitrate.objects.values('deviceid').distinct()
+	database_helper.add_new_devices(all_bitrate_devices)
+	all_rtt_devices = MRtt.objects.values('deviceid').distinct()
+	database_helper.add_new_devices(all_rtt_devices)
+	all_lmrtt_devices = MLmrtt.objects.values('deviceid').distinct()
+	database_helper.add_new_devices(all_lmrtt_devices)
+	all_shaperate_devices = MShaperate.objects.values('deviceid').distinct()
+	database_helper.add_new_devices(all_shaperate_devices)
+	all_capacity_devices = MCapacity.objects.values('deviceid').distinct()
+	database_helper.add_new_devices(all_capacity_devices)
+	return HttpResponse('')
 	
 def update(request):
 	all_devices = Devicedetails.objects.all().values('deviceid')
@@ -185,8 +199,8 @@ def devicesummary(request):
 			database_helper.save_device_details_from_request(request,device)
 		except:
 			return render_to_response('invalid_edit.html', {'deviceid' : hashing})
-	if not database_helper.fetch_deviceid_hard(device):
-		return render_to_response('device_not_found.html', {'deviceid': device})
+	#if not database_helper.fetch_deviceid_hard(device):
+		#return render_to_response('device_not_found.html', {'deviceid': device})
 	device_details = Devicedetails.objects.filter(deviceid=device)
 	try: 
 		if len(device_details)<1:
@@ -209,8 +223,8 @@ def linegraph_rtt(request):
 	device = request.GET.get('deviceid')
 	cached_rtt = JsonCache.objects.filter(deviceid=device, datatype='rtt')
 	if len(cached_rtt)!=0:
-		data = eval(cached_rtt[0].data)
-	return HttpResponse(json.dumps(data))
+		data = cached_rtt[0].data
+	return HttpResponse(data)
 	
 
 def linegraph_bitrate(request):
@@ -220,20 +234,20 @@ def linegraph_bitrate(request):
 	if graphno==1:
 		cached_download = JsonCache.objects.filter(deviceid=device, datatype='bitrate_down')
 		if len(cached_download)!=0:
-			data = eval(cached_download[0].data)
+			data = cached_download[0].data
 	else:
 		cached_upload = JsonCache.objects.filter(deviceid=device, datatype='bitrate_up')
 		if len(cached_upload)!=0:
-			data = eval(cached_upload[0].data)
-	return HttpResponse(json.dumps(data))
+			data = cached_upload[0].data
+	return HttpResponse(data)
 
 def linegraph_lmrtt(request):
 	data = []
 	device = request.GET.get('deviceid')
 	cached_lmrtt = JsonCache.objects.filter(deviceid=device, datatype='lmrtt')
 	if len(cached_lmrtt)!=0:
-		data = eval(cached_lmrtt[0].data)
-	return HttpResponse(json.dumps(data))
+		data = cached_lmrtt[0].data
+	return HttpResponse(data)
 
 def linegraph_shaperate(request):
 	data = []
@@ -241,12 +255,12 @@ def linegraph_shaperate(request):
 	cached_shaperate = JsonCache.objects.filter(deviceid=device, datatype='shaperate')
 	cached_capacity = JsonCache.objects.filter(deviceid=device, datatype='capacity')
 	if len(cached_shaperate)!=0:
-		shaperate_data = eval(cached_shaperate[0].data)
+		shaperate_data = json.loads(cached_shaperate[0].data)
 		# append both shaperate series
 		for series in shaperate_data:
 			data.append(series)
 		if len(cached_capacity)!=0:
-			capacity_data = eval(cached_capacity[0].data)
+			capacity_data = json.loads(cached_capacity[0].data)
 			# append both capacity series
 			for series in capacity_data:
 				data.append(series)

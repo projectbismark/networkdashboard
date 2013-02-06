@@ -9,6 +9,21 @@ import hashlib,httplib,urllib2
 import cvs_helper,datetime_helper,geoip_helper, views_helper
 import ast
 
+# searches the provided queryset for deviceids which are not already in devicedetails. If the deviceid
+# is missing, a new devicedetails record is created:
+def add_new_devices(devices):
+	all_details = Devicedetails.objects.all()
+	for d in devices:
+		# if no devicedetails record with this device id exists:
+		if len(all_details.filter(deviceid=d['deviceid']))==0:
+			# generate hashkey:
+			hash = hashlib.md5()
+			hash.update(d['deviceid'])
+			hash = hash.hexdigest()
+			# create new devicedetails record:
+			new_details = Devicedetails(deviceid = d['deviceid'], eventstamp = datetime.now(), hashkey = hash)
+			new_details.save()
+	return
 
 def update_bitrate(device):
 	chosen_limit = 100000000
@@ -27,8 +42,8 @@ def update_bitrate(device):
 		# cache is up to date
 		if most_recent_measure<=most_recent_cached:
 			return
-		download_data = eval(cache_down[0].data)
-		upload_data = eval(cache_up[0].data)
+		download_data = json.loads(cache_down[0].data)
+		upload_data = json.loads(cache_up[0].data)
 		# split into the seperate series, multi-threaded and single-threaded:
 		download_multi = download_data[0]
 		download_single = download_data[1]
@@ -49,9 +64,9 @@ def update_bitrate(device):
 		download_data[1]['data'].extend(cvs_helper.linegraph_normal(downloads_other,"Single-threaded TCP",1000,18000,0,1)['data'])
 		upload_data[0]['data'].extend(cvs_helper.linegraph_normal(uploads_netperf_3,"Multi-threaded TCP",1000,18000,1,2)['data'])
 		upload_data[1]['data'].extend(cvs_helper.linegraph_normal(uploads_other,"Single-threaded TCP",1000,18000,0,2)['data'])
-		cache_down[0].data=download_data
+		cache_down[0].data=json.dumps(download_data)
 		cache_down[0].eventstamp = most_recent_measure
-		cache_up[0].data=upload_data
+		cache_up[0].data= json.dumps(upload_data)
 		cache_up[0].eventstamp = most_recent_measure
 		cache_down[0].save()
 		cache_up[0].save()
@@ -81,10 +96,10 @@ def update_bitrate(device):
 		upload_data.append(cvs_helper.linegraph_normal(uploads_netperf_3,"Multi-threaded TCP",1000,18000,1,2))
 		upload_data.append(cvs_helper.linegraph_normal(uploads_other,"Single-threaded TCP",1000,18000,0,2))
 		if (cache_check_down):
-			cache_down_new = JsonCache(deviceid = device, data = download_data, datatype = 'bitrate_down', eventstamp = most_recent_measure)
+			cache_down_new = JsonCache(deviceid = device, data = json.dumps(download_data), datatype = 'bitrate_down', eventstamp = most_recent_measure)
 			cache_down_new.save()	
 		if (cache_check_up):
-			cache_up_new = JsonCache(deviceid = device, data = upload_data, datatype = 'bitrate_up', eventstamp = most_recent_measure)
+			cache_up_new = JsonCache(deviceid = device, data = json.dumps(upload_data), datatype = 'bitrate_up', eventstamp = most_recent_measure)
 			cache_up_new.save()
 		return
 
@@ -102,7 +117,7 @@ def update_rtt(device):
 		most_recent_uncached = full_details.latest('eventstamp').eventstamp
 		if (most_recent_uncached<=most_recent_cached):
 			return
-		rtt_data = eval(cache[0].data)
+		rtt_data = json.loads(cache[0].data)
 		# retrieve all uncached measurements:
 		distinct_ips = full_details.values('dstip').distinct()
 		full_details = full_details.filter(eventstamp__gt=most_recent_cached).order_by('eventstamp')
@@ -134,7 +149,7 @@ def update_rtt(device):
 				# new series:
 				if (index==(len(rtt_data)-1)):
 					rtt_data.append(cvs_helper.linegraph_normal(device_details,ip_lookup,1,1,priority,series_id))
-		cache.data = rtt_data
+		cache.data = json.dumps(rtt_data)
 		cache.save()
 		return
 	# cache is empty:
@@ -166,7 +181,7 @@ def update_rtt(device):
 			else:
 				priority=0
 			rtt_data.append(cvs_helper.linegraph_normal(device_details,location,1,1,priority,series_id))
-		cache_new = JsonCache(deviceid = device, data = rtt_data, datatype = 'rtt', eventstamp = most_recent)
+		cache_new = JsonCache(deviceid = device, data = json.dumps(rtt_data), datatype = 'rtt', eventstamp = most_recent)
 		cache_new.save()
 		return
 
@@ -184,9 +199,9 @@ def update_lmrtt(device):
 			return
 		uncached_measurements = all_records.filter(eventstamp__gt=lmrtt_cache[0].eventstamp).order_by('eventstamp')
 		# cache is up to date:
-		lmrtt_data = eval(lmrtt_cache[0].data)
+		lmrtt_data = json.loads(lmrtt_cache[0].data)
 		lmrtt_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_measurements,'Last mile latency',1,1,1,series_id)['data'])
-		lmrtt_cache[0].data = lmrtt_data
+		lmrtt_cache[0].data = json.dumps(lmrtt_data)
 		lmrtt_cache[0].save()
 		return
 	else:
@@ -197,7 +212,7 @@ def update_lmrtt(device):
 		latest_measurement = all_measurements.latest('eventstamp').eventstamp
 		all_measurements = all_measurements.order_by('eventstamp')
 		lmrtt_data.append(cvs_helper.linegraph_normal(all_measurements,'Last mile latency',1,1,1,series_id))
-		new_cache = JsonCache(deviceid = device, data = lmrtt_data, datatype = 'lmrtt', eventstamp = latest_measurement)
+		new_cache = JsonCache(deviceid = device, data = json.dumps(lmrtt_data), datatype = 'lmrtt', eventstamp = latest_measurement)
 		new_cache.save()
 		return
 		
@@ -218,7 +233,7 @@ def update_capacity(device):
 		if most_recent_uncached<=most_recent_cached:
 			# cache is up to date
 			return
-		capacity_data = eval(capacity_cache[0].data)
+		capacity_data = json.loads(capacity_cache[0].data)
 		capacity_up = capacity_data[0]
 		capacity_down = capacity_data[1]
 		# retrieve all uncached measurements:
@@ -229,7 +244,7 @@ def update_capacity(device):
 		cap_measure_down = uncached_capacity.filter(direction='dw').order_by('eventstamp')
 		capacity_data[0]['data'].extend(cvs_helper.linegraph_normal(cap_measure_up,'Capacity Up',1000,1,0,series_id)['data'])
 		capacity_data[1]['data'].extend(cvs_helper.linegraph_normal(cap_measure_down,'Capacity Down',1000,1,0,series_id)['data'])
-		capacity_cache[0].data=capacity_data
+		capacity_cache[0].data=json.dumps(capacity_data)
 		capacity_cache[0].eventstamp = most_recent_uncached
 		capacity_cache[0].save()
 	# cache is empty
@@ -243,7 +258,7 @@ def update_capacity(device):
 		cap_measure_down = all_capacity.filter(direction='dw').order_by('eventstamp')
 		capacity_data.append(cvs_helper.linegraph_normal(cap_measure_up,'Capacity Up',1000,1,0,series_id))
 		capacity_data.append(cvs_helper.linegraph_normal(cap_measure_down,'Capacity Down',1000,1,0,series_id))
-		cache_capacity_new = JsonCache(deviceid = device, data =capacity_data, datatype = 'capacity', eventstamp = latest_capacity)
+		cache_capacity_new = JsonCache(deviceid = device, data =json.dumps(capacity_data), datatype = 'capacity', eventstamp = latest_capacity)
 		cache_capacity_new.save()
 	return
 
@@ -263,7 +278,7 @@ def update_shaperate(device):
 		if most_recent_uncached<= most_recent_cached:
 			# up to date:
 			return
-		shaperate_data = eval(shaperate_cache[0].data)
+		shaperate_data = json.loads(shaperate_cache[0].data)
 		# split into 4 separate series, upload and download for shaperate and capacity:
 		shaperate_up = shaperate_data[0]
 		shaperate_down = shaperate_data[1]
@@ -277,7 +292,7 @@ def update_shaperate(device):
 		# convert records to series data and append to cached data:
 		shaperate_data[0]['data'].extend(cvs_helper.linegraph_normal(shape_measure_up,'Shape rate Up',1000,1,0,series_id)['data'])
 		shaperate_data[1]['data'].extend(cvs_helper.linegraph_normal(shape_measure_down,'Shape rate Down',1000,1,1,series_id)['data'])
-		shaperate_cache[0].data=shaperate_data
+		shaperate_cache[0].data=json.dumps(shaperate_data)
 		shaperate_cache[0].eventstamp = most_recent_cached
 		shaperate_cache[0].save()
 	# 1 or both caches are empty:
@@ -294,7 +309,7 @@ def update_shaperate(device):
 		# convert records into new series to be placed in cache:
 		shaperate_data.append(cvs_helper.linegraph_normal(shape_measure_up,'Shape rate Up',1000,1,0,series_id))
 		shaperate_data.append(cvs_helper.linegraph_normal(shape_measure_down,'Shape rate Down',1000,1,1,series_id))
-		cache_shaperate_new = JsonCache(deviceid = device, data = shaperate_data, datatype = 'shaperate', eventstamp = most_recent_cached)
+		cache_shaperate_new = JsonCache(deviceid = device, data = json.dumps(shaperate_data), datatype = 'shaperate', eventstamp = most_recent_cached)
 		cache_shaperate_new.save()
 	return
 

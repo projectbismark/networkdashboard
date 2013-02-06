@@ -348,9 +348,9 @@ function onSuccessGraph(graphParams) {
                 tooltip: {
                     formatter: graphParams.formatter
                 },
-                series: JSON.parse(data)
+                series: jQuery.parseJSON(data)
             });
-			series = JSON.parse(data);
+			series = jQuery.parseJSON(data);
 			allSeries.push(series);
 			if(allSeries.length==5){
 				multiGraph();
