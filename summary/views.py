@@ -65,40 +65,14 @@ def compare_rtt(request):
 			# Get the most recent RTT measurement for this device:
 			latest = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip).order_by('-eventstamp')[:1]
 			if len(latest)!=0:
-				# Ensure the most recent measurement for this device is no older than 10 days:
-				if (datetime_helper.is_recent(latest[0].eventstamp,10)):
+				# Ensure the most recent measurement for this device is not too old:
+				if (datetime_helper.is_recent(latest[0].eventstamp,days)):
 					data = MRtt.objects.filter(deviceid=dev,average__lte=3000,dstip = server_ip, eventstamp__gte=earliest).order_by('eventstamp')
 					graph_data = cvs_helper.linegraph_compare(data,"Other Device",1,1,2)
 					result[0].append(graph_data[0])
 					result[1].append(graph_data[1])
 					result_count +=1
 	return HttpResponse(json.dumps(result))
-	
-def create_devicepages(request):
-	all_bitrate_devices = MBitrate.objects.values('deviceid').distinct()
-	database_helper.add_new_devices(all_bitrate_devices)
-	all_rtt_devices = MRtt.objects.values('deviceid').distinct()
-	database_helper.add_new_devices(all_rtt_devices)
-	all_lmrtt_devices = MLmrtt.objects.values('deviceid').distinct()
-	database_helper.add_new_devices(all_lmrtt_devices)
-	all_shaperate_devices = MShaperate.objects.values('deviceid').distinct()
-	database_helper.add_new_devices(all_shaperate_devices)
-	all_capacity_devices = MCapacity.objects.values('deviceid').distinct()
-	database_helper.add_new_devices(all_capacity_devices)
-	return HttpResponse('')
-	
-def update(request):
-	all_devices = Devicedetails.objects.all().values('deviceid')
-	device_list = []
-	for device in all_devices:
-		device_list.append(device['deviceid'])
-	for device in device_list:
-		database_helper.update_bitrate(device)
-		database_helper.update_rtt(device)
-		database_helper.update_lmrtt(device)
-		database_helper.update_shaperate(device)
-		database_helper.update_capacity(device)
-	return HttpResponse('')
 		
 def compare_lmrtt(request):
 	deviceid = request.GET.get("device")
@@ -125,8 +99,9 @@ def compare_lmrtt(request):
 			# Get the most recent RTT measurement for this device:
 			latest= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')[:1]
 			if len(latest)!=0:
-				# Ensure the most recent measurement for this device is no older than 10 days:
-				if (datetime_helper.is_recent(latest[0].eventstamp,10)):
+				# Ensure the most recent measurement for this device is not too old:
+				if (datetime_helper.is_recent(latest[0].eventstamp,days)):
+					data= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
 					graph_data = cvs_helper.linegraph_compare(data,"Other Device",1,1,2)
 					result[0].append(graph_data[0])
 					result[1].append(graph_data[1])
@@ -158,8 +133,9 @@ def compare_bitrate(request):
 			# Get the most recent RTT measurement for this device:
 			latest = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
 			if len(latest)!=0:
-				# Ensure the most recent measurement for this device is no older than 10 days:
-				if (datetime_helper.is_recent(latest[0].eventstamp,10)):
+				# Ensure the most recent measurement for this device is not too old:
+				if (datetime_helper.is_recent(latest[0].eventstamp,days)):
+					data = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid = 'NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
 					graph_data = cvs_helper.linegraph_compare(data,"Other Device",1000,18000,2)
 					result[0].append(graph_data[0])
 					result[1].append(graph_data[1])
