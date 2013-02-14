@@ -18,4 +18,4 @@ def update():
 		database_helper.update_lmrtt(device)
 		database_helper.update_shaperate(device)
 		database_helper.update_capacity(device)
-	return HttpResponse('')
+	return

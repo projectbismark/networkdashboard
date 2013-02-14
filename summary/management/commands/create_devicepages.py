@@ -17,4 +17,4 @@ def create_devicepages():
 	database_helper.add_new_devices(all_shaperate_devices)
 	all_capacity_devices = MCapacity.objects.values('deviceid').distinct()
 	database_helper.add_new_devices(all_capacity_devices)
-	return HttpResponse('')
+	return
