@@ -149,8 +149,8 @@ def update_rtt(device):
 				# new series:
 				if (index==(len(rtt_data)-1)):
 					rtt_data.append(cvs_helper.linegraph_normal(device_details,ip_lookup,1,1,priority,series_id))
-		cache.data = json.dumps(rtt_data)
-		cache.save()
+		cache[0].data = json.dumps(rtt_data)
+		cache[0].save()
 		return
 	# cache is empty:
 	else:
