@@ -283,7 +283,7 @@ def update_shaperate(device):
 		shaperate_up = shaperate_data[0]
 		shaperate_down = shaperate_data[1]
 		# retrieve all uncached measurements:
-		uncached_shaperate = shaperate_data.filter(eventstamp__gt=most_recent_cached)
+		uncached_shaperate = all_measurements.filter(eventstamp__gt=most_recent_cached)
 		if len(uncached_shaperate)==0:
 			return
 		# separate shaperate records into upload and download
