@@ -150,6 +150,7 @@ def update_rtt(device):
 				if (index==(len(rtt_data)-1)):
 					rtt_data.append(cvs_helper.linegraph_normal(device_details,ip_lookup,1,1,priority,series_id))
 		cache[0].data = json.dumps(rtt_data)
+		cache[0].eventstamp = most_recent_uncached
 		cache[0].save()
 		return
 	# cache is empty:
@@ -198,10 +199,10 @@ def update_lmrtt(device):
 		if latest_record.eventstamp<=lmrtt_cache[0].eventstamp:
 			return
 		uncached_measurements = all_records.filter(eventstamp__gt=lmrtt_cache[0].eventstamp).order_by('eventstamp')
-		# cache is up to date:
 		lmrtt_data = json.loads(lmrtt_cache[0].data)
 		lmrtt_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_measurements,'Last mile latency',1,1,1,series_id)['data'])
 		lmrtt_cache[0].data = json.dumps(lmrtt_data)
+		lmrtt_cache[0].eventstamp = latest_record.eventstamp
 		lmrtt_cache[0].save()
 		return
 	else:
@@ -293,7 +294,7 @@ def update_shaperate(device):
 		shaperate_data[0]['data'].extend(cvs_helper.linegraph_normal(shape_measure_up,'Shape rate Up',1000,1,0,series_id)['data'])
 		shaperate_data[1]['data'].extend(cvs_helper.linegraph_normal(shape_measure_down,'Shape rate Down',1000,1,1,series_id)['data'])
 		shaperate_cache[0].data=json.dumps(shaperate_data)
-		shaperate_cache[0].eventstamp = most_recent_cached
+		shaperate_cache[0].eventstamp = most_recent_uncached
 		shaperate_cache[0].save()
 	# 1 or both caches are empty:
 	else:
