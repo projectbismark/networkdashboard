@@ -134,7 +134,7 @@ def update_rtt(device):
 					location = ip_lookup.location
 			except:
 				continue
-			device_details = full_details.filter(dstip = ip['dstip'])		
+			device_details = full_details.filter(dstip = ip['dstip'])
 			if len(device_details)==0:
 				continue
 			if(location=="Georgia Tech"):
@@ -144,11 +144,11 @@ def update_rtt(device):
 			#find the correct series in the cache data to append to:
 			for index in range(len(rtt_data)):
 				if rtt_data[index]['name']==location:
-					rtt_data[index]['data'].extend(cvs_helper.linegraph_normal(device_details,ip_lookup,1,1,priority,series_id)['data'])
+					rtt_data[index]['data'].extend(cvs_helper.linegraph_normal(device_details,location,1,1,priority,series_id)['data'])
 					break
 				# new series:
 				if (index==(len(rtt_data)-1)):
-					rtt_data.append(cvs_helper.linegraph_normal(device_details,ip_lookup,1,1,priority,series_id))
+					rtt_data.append(cvs_helper.linegraph_normal(device_details,location,1,1,priority,series_id))
 		cache[0].data = json.dumps(rtt_data)
 		cache[0].eventstamp = most_recent_uncached
 		cache[0].save()
