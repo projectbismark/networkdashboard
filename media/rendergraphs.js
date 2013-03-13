@@ -4,7 +4,7 @@ var ajax;
 var allSeries = new Array();
 
 function renderGraphs(deviceid){
-	for (var i =0; i<5; i++){
+	for (var i =0; i<6; i++){
 		var params = createParameters(i);
 		$.ajax({
 			type: "GET",
@@ -201,7 +201,7 @@ function createParameters(i) {
 
         case 4:
             ret.divid = "graph_div_5";
-            ret.graphid = 3;
+            ret.graphid = 4;
             ret.formatter = function() {
                 var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
@@ -213,6 +213,22 @@ function createParameters(i) {
             };
             ret.units = 'Bits Per Second';
             ret.url = "/line_shaperate/";
+            break;
+		
+		case 5:
+			ret.divid = "graph_div_6";
+            ret.graphid = 5;
+            ret.formatter = function() {
+                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
+                    ret += '<p style="color:' + point.series.color +  ';">';
+                    ret += point.series.name + '</p> ';
+                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+                });
+                return ret;
+            };
+            ret.units = "Milliseconds";
+            ret.url = "/line_unload/";
             break;
     }
     return ret;
@@ -472,7 +488,7 @@ function compareGraphs(deviceid){
 }
 
 function renderGraphs(deviceid) {
-    for (var i = 0; i < 5; ++i) {
+    for (var i = 0; i < 6; ++i) {
         var params = createParameters(i);
         $.ajax({
             type: "GET",
@@ -522,7 +538,7 @@ function multiGraph(){
 	}
 	window.chart = new Highcharts.StockChart({
 		chart: {
-			renderTo: "graph_div_6"
+			renderTo: "graph_div_7"
 		},
 		legend: {
             enabled: true,

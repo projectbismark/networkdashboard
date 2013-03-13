@@ -111,6 +111,7 @@ function expandAdvanced() {
     return false;
 }
 
+
 /*
 function cycleMap(){
     var mid = map.getBounds().getCenter();

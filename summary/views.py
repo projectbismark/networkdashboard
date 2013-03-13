@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
+from django.template import Template, Context
 from django.utils import simplejson
 import email_helper
 import geoip_helper
@@ -241,6 +242,14 @@ def linegraph_shaperate(request):
 			for series in capacity_data:
 				data.append(series)
 	return HttpResponse(json.dumps(data))
+
+def linegraph_unload(request):
+	data = []
+	device = request.GET.get('deviceid')
+	cached_unload = JsonCache.objects.filter(deviceid=device, datatype='unload')
+	if len(cached_unload)!=0:
+		data = cached_unload[0].data
+	return HttpResponse(data)
 	
   
 def feedback(request):

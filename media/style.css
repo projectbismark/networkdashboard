@@ -106,6 +106,22 @@ div.view_form form {
     display: none;
 }
 
+#download_desc_content {
+    display: none;
+}
+
+#upload_desc_content{
+    display: none;
+}
+
+#rtt_desc_content {
+    display: none;
+}
+
+#lmrtt_desc_content{
+    display: none;
+}
+
 #detection_error form {
     display: inline;
 }

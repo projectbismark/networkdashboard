@@ -5,6 +5,27 @@ function setHashid(data){
 	hashid=data;
 }
 
+function expandUploadDesc() {
+    $('#upload_desc_content').show();
+    $('#upload_desc').hide();
+    return false;
+}
+function expandRttDesc() {
+    $('#rtt_desc_content').show();
+    $('#rtt_desc').hide();
+    return false;
+}
+function expandLmrttDesc() {
+    $('#lmrtt_desc_content').show();
+    $('#lmrtt_desc').hide();
+    return false;
+}
+function expandDownloadDesc() {
+    $('#download_desc_content').show();
+    $('#download_desc').hide();
+    return false;
+}
+
 function setTabid(data){
 	tabid=data;
 }

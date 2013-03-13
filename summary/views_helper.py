@@ -16,6 +16,22 @@ def get_devices_for_compare(device,criteria):
 		return get_devices_by_isp(device)
 	else:
 		return get_devices_by_city(device)
+		
+def get_upload_description():
+	desc_string = ''
+	return desc_string
+
+def get_download_description():
+	desc_string=''
+	return desc_string
+
+def get_rtt_description():
+	desc_string=''
+	return desc_string
+
+def get_lmrtt_description():
+	desc_string=''
+	return desc_string
 	
 def get_devices_by_isp(device):
 	ip = geoip_helper.get_ip_by_device(device)
@@ -37,7 +53,6 @@ def get_devices_by_city(device):
 	
 
 def get_response_for_devicehtml(device_details):
-
 	first = database_helper.get_first_measurement(device_details.deviceid)
 	last = database_helper.get_last_measurement(device_details.deviceid)
 	num_location = database_helper.get_num_common_locations(device_details)
