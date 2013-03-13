@@ -109,7 +109,7 @@ def get_hash(id):
 		return ""
 	
 def get_device_count():
-	return Devicedetails.objects.all().count()
+	return geoip_helper.get_device_count()
 	
 def get_sorted_country_data():
 	country_data = geoip_helper.get_country_count()
