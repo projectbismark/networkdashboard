@@ -102,6 +102,19 @@ div.view_form form {
     font-size: small;
 }
 
+#upload_desc, #download_desc, #rtt_desc, #lmrtt_desc {
+	text-align: center;
+	font-size:12px;
+}
+
+#collapse_desc {
+	font-size:12px;
+}
+
+div.collapse_desc {
+	text-align:right;
+}
+
 #detection_error {
     display: none;
 }
