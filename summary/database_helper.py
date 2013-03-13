@@ -339,13 +339,13 @@ def update_unload(device):
 			uncached_up = all_upload.filter(eventstamp__gt=most_recent_cached)
 			if len(uncached_up)!=0:
 				uncached_up = uncached_up.order_by('eventstamp')
-				unload_data[1]['data'].extend(cvs_helper.linegraph_normal(uncached_up,'Unload Up',1,1,0,series_id)['data'])
+				unload_data[1]['data'].extend(cvs_helper.linegraph_normal(uncached_up,'Under Load Up',1,1,0,series_id)['data'])
 		if most_recent_uncached_down>most_recent_cached:
 			# retrieve all uncached measurements:
 			uncached_down = all_download.filter(eventstamp__gt=most_recent_cached)
 			if len(uncached_down)!=0:
 				uncached_down = uncached_down.order_by('eventstamp')
-				unload_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_down,'Unload Down',1,1,0,series_id)['data'])
+				unload_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_down,'Under Load Down',1,1,0,series_id)['data'])
 		unload_cache[0].data=json.dumps(unload_data)
 		unload_cache[0].eventstamp = most_recent_uncached
 		unload_cache[0].save()
@@ -364,8 +364,8 @@ def update_unload(device):
 			latest_eventstamp = latest_upload
 		all_upload = all_upload.order_by('eventstamp')
 		all_download = all_download.order_by('eventstamp')
-		unload_data.append(cvs_helper.linegraph_normal(all_download,'Unload Down',1,1,0,series_id))
-		unload_data.append(cvs_helper.linegraph_normal(all_upload,'Unload Up',1,1,0,series_id))
+		unload_data.append(cvs_helper.linegraph_normal(all_download,'Under Load Down',1,1,0,series_id))
+		unload_data.append(cvs_helper.linegraph_normal(all_upload,'Under Load Up',1,1,0,series_id))
 		cache_unload_new = JsonCache(deviceid = device, data =json.dumps(unload_data), datatype = 'unload', eventstamp = latest_eventstamp)
 		cache_unload_new.save()
 	return
