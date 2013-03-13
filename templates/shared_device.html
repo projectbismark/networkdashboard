@@ -72,10 +72,30 @@
         <li><a href="#round_trip_latency" data-toggle="tab">Round Trip Latency</a></li>
         <li><a href="#last_mile_latency" data-toggle="tab">Last Mile Latency</a></li>
 		<li><a href="#shape_rate" data-toggle="tab">Shape Rate</a></li>
+		<li><a href="#unload_rtt" data-toggle="tab">Under Load</a></li>
 		<li><a href="#all_metrics" data-toggle="tab">Show All</a></li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane active in" id="download_throughput">
+			<div style="clear: both">
+				<p id="download_desc"><a href="#" onclick="return expandDownloadDesc()">What is Download Throughput?</a></p>
+			</div>
+			<div id="download_desc_content" class="alert">
+				<b>Download Throughput</b> is the rate at which content is transferred from the Internet to your home, and is what most people mean when they talk about the "speed" of Internet access.
+				BISmark performs two slightly different measurements to measure download throughput: <br/><br/>
+				<ul>
+					<li>
+						<b>Single-threaded TCP</b> is the performance of a single data transfer, and approximates the performance you would normally observe from your Internet service (e.g. when downloading a single file).
+					</li>
+					<li>
+						<b>Multi-threaded TCP</b> is the performance of several simultaneous data transfers, and approaches the maximum performance you can hope to observe from your Internet service (e.g. aggregate speed when downloading multiple files simultaneously).
+					</li>
+				</ul>
+				A small difference is expected between the two numbers. If the difference is large, something may be wrong with your connection or our measurement server, or you may be very far away from our nearest measurement server. <br/>
+				<div class="collapse_desc">
+					<p id="collapse_desc"><a href="#" onclick="return collapseDownloadDesc()"> Hide </a></p>
+				</div>
+			</div>
             <div class="graphdiv" id="graph_div_1">
                 <div class="progress_wrapper">
                     <div class="progress progress-info progress-striped active">
@@ -89,7 +109,26 @@
 		</div>
 		-->
         </div>
-        <div class="tab-pane" id="upload_throughput"> 
+        <div class="tab-pane" id="upload_throughput">
+			<div style="clear: both">
+				<p id="upload_desc"><a href="#" onclick="return expandUploadDesc()">What is Upload Throughput?</a></p>
+			</div>
+			<div id="upload_desc_content" class="alert">
+				<b>Upload Throughput</b> is the rate at which content is transferred from your home to the Internet. While upload throughput is often less than download throughput for most types of residential Internet service, it is still important for users who frequently upload large photos, videos, or work documents.
+				BISmark performs two slightly different measurements to measure upload throughput:<br/><br/>
+				<ul>
+					<li>
+						<b>Single-threaded TCP</b> is the performance of a single data transfer, and approximates the performance you would normally observe from your Internet service (e.g. when uploading a single file).
+					</li>
+					<li>
+						<b>Multi-threaded TCP</b> is the performance of several simultaneous data transfers, and approaches the maximum performance you can hope to observe from your Internet service (e.g. aggregate speed when uploading multiple files simultaneously).
+					</li>
+				</ul>
+				A small difference is expected between the two numbers. If the difference is large, something may be wrong with your connection or our measurement server, or you may be very far away from our nearest measurement server.
+				<div class="collapse_desc">
+					<p id="collapse_desc"><a href="#" onclick="return collapseUploadDesc()"> Hide </a></p>
+				</div>
+			</div>
             <div class="graphdiv" id="graph_div_2">
                 <div class="progress_wrapper">
                     <div class="progress progress-info progress-striped active">
@@ -104,6 +143,16 @@
 			-->
         </div>
         <div class="tab-pane" id="round_trip_latency">
+			<div style="clear: both">
+				<p id="rtt_desc"><a href="#" onclick="return expandRttDesc()">What is Round Trip Latency?</a></p>
+			</div>
+			<div id="rtt_desc_content" class="alert">
+				<b>Round Trip Latency</b> is the amount of time it takes for a message from your home to reach a particular server on the Internet and then return to your home. In general, lower latency is better, and low latency is especially important for Internet telephone (VoIP) and video calls, gaming, and video streaming. High latency also affects the performance of most web traffic. <br/><br/>
+				Latency increases with geographical distance, which means that latencies between points across the United States or between Europe and the U.S. are expected to be high (more than 100 milliseconds). If no server in the plot below has a round trip latency of less than 50 milliseconds, it may mean that you are far away from the nearest measurement server, or that your Internet connection has high latency. To verify if it is your Internet connection, look at Last mile latency too.
+				<div class="collapse_desc">
+					<p id="collapse_desc"><a href="#" onclick="return collapseRttDesc()"> Hide </a></p>
+				</div>
+			</div>
             <div class="graphdiv" id="graph_div_3">
                 <div class="progress_wrapper">
                     <div class="progress progress-info progress-striped active">
@@ -118,6 +167,16 @@
 			-->
         </div>
         <div class="tab-pane" id="last_mile_latency">  
+			<div style="clear: both">
+				<p id="lmrtt_desc"><a href="#" onclick="return expandLmrttDesc()">What is Last Mile Latency?</a></p>
+			</div>
+			<div id="lmrtt_desc_content" class="alert">
+				<b>Last Mile Latency</b> is the amount of time it takes for a message from your home to reach your Internet service provider's (ISP's) network and then return to your home. As this delay is usually introduced by the length of cable and other equipment between your home and your ISP, it is often called the last mile latency. <br/><br/>
+				As with round trip latency, high last mile latency negatively affects the performance of many common Internet applications. Last mile latency is particularly important because all traffic that travels between your home and the Internet experiences at least this much delay.
+				<div class="collapse_desc">
+					<p id="collapse_desc"><a href="#" onclick="return collapseLmrttDesc()"> Hide </a></p>
+				</div>
+			</div>
             <div class="graphdiv" id="graph_div_4">
                 <div class="progress_wrapper">
                     <div class="progress progress-info progress-striped active">
@@ -145,8 +204,20 @@
 			</div>
 			-->
         </div>
-		<div class="tab-pane" id="all_metrics">  
+		<div class="tab-pane" id="unload_rtt">  
             <div class="graphdiv" id="graph_div_6">
+                <div class="progress_wrapper">
+                    <div class="progress progress-info progress-striped active">
+                        <div class="bar" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+			<!--
+			<div class="latest-measurement" id="latest-measurement-5"></div>
+			-->
+        </div>
+		<div class="tab-pane" id="all_metrics">  
+            <div class="graphdiv" id="graph_div_7">
                 <div class="progress_wrapper">
                     <div class="progress progress-info progress-striped active">
                         <div class="bar" style="width: 100%"></div>
