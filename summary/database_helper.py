@@ -319,7 +319,7 @@ def update_unload(device):
 	# series data in json format:
 	unload_data = []
 	# retrieve cached data:
-	unload_cache = JsonCache.objects.filter(deviceid=device,datatype='ul_up')
+	unload_cache = JsonCache.objects.filter(deviceid=device,datatype='unload')
 	# cache not empty:
 	if len(unload_cache)!=0:
 		all_upload = MUlrttup.objects.filter(deviceid=device)
