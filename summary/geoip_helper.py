@@ -132,7 +132,7 @@ def getIPList():
 	return ips
 	
 def getIPListActive():
-	active_thresh = datetime_helper.get_daterange_start(7)
+	active_thresh = datetime_helper.get_daterange_start(14)
 	devices = JsonCache.objects.filter(eventstamp__gte=active_thresh).values('deviceid').distinct()
 	ips=[]
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
