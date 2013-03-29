@@ -258,7 +258,7 @@ def get_country_count():
 			name = gi.country_name_by_addr(ip[0])
 			for c in country_list:
 				if c['country']==name:
-					c['active_count']+=1
+					c['count_active']+=1
 		except:
 			continue
 	return country_list
@@ -293,7 +293,7 @@ def get_city_count():
 			rec = gi.record_by_addr(ip[0])
 			for c in city_list:
 				if ((c['city']==rec['city'])and(c['region']==rec['region_name'])):
-					c['active_count']+=1
+					c['count_active']+=1
 		except:
 			continue
 	return city_list
