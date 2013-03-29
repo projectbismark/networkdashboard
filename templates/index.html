@@ -49,82 +49,71 @@
 			<li class="active"><a href="#country_list" data-toggle="tab">Country</a></li>
 			<li><a href="#city_list" data-toggle="tab">City</a></li>
 			<li><a href="#isp_list" data-toggle="tab">ISP</a></li>
-			<li><a href="#active_count" data-toggle="tab">Recently Active</a></li>
 			<li><a href="#filter_markers" data-toggle="tab">Filter</a></li>
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active in" id="country_list">
-				<table class = "tableheader">
+				<!--<table class = "tableheader">
 						<tr>
+							<td></td>
 							<td class = "tdright"><h3>Device Count ({{device_count}})</h3></td>
+							<td class= "tdright"><h3>Active</h3></td>
 						</tr>
-				</table>
+				</table>-->
 				<div class ="statsdiv" id="stats1">
 					<table class="table table-striped table-condensed">
+						<tr>
+							<td></td>
+							<td class = "tdright"><h3>Device Count ({{device_count}})</h3></td>
+							<td class= "tdright"><h3>Active</h3></td>
+						</tr>
 						{% for country in country_data %}
 							<tr>
 								<td>{{country.country}}</td>
 								<td class = "tdright" id="countryCountStat">{{country.count}}</td>
+								<td class= "tdright">{{country.count_active}}</td>
 							</tr>
 						{% endfor %}
 					</table>
 				</div>
 			</div>
 			<div class="tab-pane" id="city_list">
-				<table class="tableheader">
-						<tr>
-							<td class = "tdright"><h3> Device Count ({{device_count}})</h3></td>
-						</tr>
-				</table>
 				<div class ="statsdiv" id="stats2">
 					<table class="table table-striped table-condensed">
+						<tr>
+							<td></td>
+							<td class = "tdright"><h3>Device Count ({{device_count}})</h3></td>
+							<td class= "tdright"><h3>Active</h3></td>
+						</tr>
 						{% for city in city_data %}
 							<tr>
 								<td>{{city.city}}, {{city.country}} ({{city.region}})</td>
 								<td class = "tdright">{{city.count}}</td>
+								<td class = "tdright">{{city.count_active}}</td>
 							</tr>
 						{% endfor %}
 					</table>
 				</div>
 			</div>
 			<div class="tab-pane" id="isp_list">
-				<table class="tableheader">
-						<tr>
-							<td class = "tdright"><h3> Device Count ({{device_count}})</h3></td>
-						</tr>
-				</table>
 				<div class ="statsdiv" id="stats3">
 					<table class="table table-striped table-condensed">
+						<tr>
+							<td></td>
+							<td class = "tdright"><h3>Device Count ({{device_count}})</h3></td>
+							<td class= "tdright"><h3>Active</h3></td>
+						</tr>
 						{% for isp in isp_data %}
 							<tr>
 								<td>{{isp.isp}}</td>
 								<td class = "tdright">{{isp.count}}</td>
+								<td class = "tdright">{{isp.count_active}}</td>
 							</tr>
 						{% endfor %}
 					</table>
 				</div>
 			</div>
-			<div class="tab-pane" id="active_count">
-				<table class="tableheader">
-						<tr>
-							<td class = "tdright"><h3> Device Count ({{device_count}})</h3></td>
-						</tr>
-				</table>
-				<div class ="statsdiv" id="stats4">
-					<table class="table table-striped table-condensed">
-							<tr>
-								<td>Recently Active Devices</td>
-								<td class = "tdright">{{active_count}}</td>
-							</tr>
-					</table>
-				</div>
-			</div>
 			<div class="tab-pane" id="filter_markers">
-				<table class="tableheader">
-						<tr>
-							<td class = "tdright"></td>
-						</tr>
-				</table>
 				<div class ="statsdiv" id="stats5">
 					<table class="table table-striped table-condensed">
 							<tr>

@@ -120,13 +120,29 @@ def getLocation(ip,gi):
 	return gi_rec
 
 def getIPList():
+	devices = Devicedetails.objects.values('deviceid').distinct()
+	ips=[]
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
 	conn = psycopg2.connect(conn_string)
 	cursor = conn.cursor()
-	cursor.execute("select ip from devices")
-	records = cursor.fetchall()
-	#print records
-	return records
+	for d in devices:
+		id = "OW" + d['deviceid'].upper().replace(":","")
+		cursor.execute("select ip from devices where id='" + id + "'")
+		ips.append(cursor.fetchone())
+	return ips
+	
+def getIPListActive():
+	active_thresh = datetime_helper.get_daterange_start(7)
+	devices = JsonCache.objects.filter(eventstamp__gte=active_thresh).values('deviceid').distinct()
+	ips=[]
+	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
+	conn = psycopg2.connect(conn_string)
+	cursor = conn.cursor()
+	for d in devices:
+		id = "OW" + d['deviceid'].upper().replace(":","")
+		cursor.execute("select ip from devices where id='" + id + "'")
+		ips.append(cursor.fetchone())
+	return ips
 
 def getMACList():
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
@@ -220,6 +236,7 @@ def get_country_count():
 	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	country_list = []
 	ip_list = getIPList()
+	ip_list_active = getIPListActive()
 	for ip in ip_list:
 		new_country = True
 		try:
@@ -232,15 +249,27 @@ def get_country_count():
 				value = {}
 				value['country']=name
 				value['count']=1
+				value['count_active']=0
 				country_list.append(value)
 		except:
 			continue
+	for ip in ip_list_active:
+		try:
+			name = gi.country_name_by_addr(ip[0])
+			for c in country_list:
+				if c['country']==name:
+					c['active_count']+=1
+		except:
+			continue
 	return country_list
+	
+
 	
 def get_city_count():
 	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	city_list = []
 	ip_list = getIPList()
+	ip_list_active = getIPListActive()
 	for ip in ip_list:
 		new_city = True
 		try:
@@ -255,9 +284,18 @@ def get_city_count():
 				value['region']=rec['region_name']
 				value['country']=rec['country_name']
 				value['count']=1
+				value['count_active']=0
 				city_list.append(value)
 		except:
-			continue		
+			continue	
+	for ip in ip_list_active:
+		try:
+			rec = gi.record_by_addr(ip[0])
+			for c in city_list:
+				if ((c['city']==rec['city'])and(c['region']==rec['region_name'])):
+					c['active_count']+=1
+		except:
+			continue
 	return city_list
 	
 def get_provider_by_ip(ip):
@@ -281,6 +319,7 @@ def get_isp_count():
 	mappings = isp_mappings.mappings
 	isp_list = []
 	ip_list = getIPList()
+	ip_list_active = getIPListActive()
 	for ip in ip_list:
 		new_isp = True
 		
@@ -298,7 +337,20 @@ def get_isp_count():
 				value = {}
 				value['isp']=name
 				value['count']=1
+				value['count_active']=0
 				isp_list.append(value)
+		except:
+			continue
+	for ip in ip_list_active:
+		try:
+			name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+			for m in mappings:
+				if(name.lower().find(m[0].lower())!=-1):
+					name = m[1]
+					break
+			for isp in isp_list:
+				if isp['isp']==name:
+					isp['count_active']+=1
 		except:
 			continue
 	return isp_list
