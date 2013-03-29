@@ -111,6 +111,9 @@ def get_hash(id):
 def get_device_count():
 	return geoip_helper.get_device_count()
 	
+def get_active_count():
+	return geoip_helper.get_active_count()
+	
 def get_sorted_country_data():
 	country_data = geoip_helper.get_country_count()
 	result = sorted(country_data, key=itemgetter('count'), reverse = True)

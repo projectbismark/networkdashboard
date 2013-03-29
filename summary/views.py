@@ -27,7 +27,8 @@ def index(request):
 	cities = views_helper.get_sorted_city_data()
 	isps = views_helper.get_sorted_isp_data()
 	device_count = views_helper.get_device_count()
-	return render_to_response('index.html', {'country_data' : countries, 'city_data': cities, 'isp_data': isps, 'device_count':device_count})
+	active_count = views_helper.get_active_count()
+	return render_to_response('index.html', {'country_data' : countries, 'city_data': cities, 'isp_data': isps, 'device_count':device_count, 'active_count':active_count})
 	
 def compare(request):
 	device = request.POST.get("device").strip("/")

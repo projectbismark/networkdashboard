@@ -154,13 +154,25 @@ def getMACList():
 	return records
 	
 def get_device_count():
-	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
-	conn = psycopg2.connect(conn_string)
-	cursor = conn.cursor()
-	cursor.execute("select COUNT(*) from devices")
-	count = cursor.fetchone()
+	device_count = JsonCache.objects.values('deviceid').distinct().count()
+	# conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
+	# conn = psycopg2.connect(conn_string)
+	# cursor = conn.cursor()
+	# cursor.execute("select COUNT(*) from devices")
+	# count = cursor.fetchone()
 	#print records
-	return count[0]
+	return device_count
+
+def get_active_count():
+	active_thresh = datetime_helper.get_daterange_start(14) 
+	device_count = JsonCache.objects.filter(eventstamp__gte=active_thresh).values('deviceid').distinct().count()
+	# conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
+	# conn = psycopg2.connect(conn_string)
+	# cursor = conn.cursor()
+	# cursor.execute("select COUNT(*) from devices")
+	# count = cursor.fetchone()
+	#print records
+	return device_count
 
 def getDeviceIDList():
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
