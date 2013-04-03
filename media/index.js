@@ -186,6 +186,9 @@ function createMarker(d) {
 	else if (d.dev_type == "unregistered") {
 		marker.setIcon("/static/images/icon-gray-dot.png");
 	}
+	else if (d.dev_type == "active") {
+		marker.setIcon("/static/images/icon-green-dot.png");
+	}
 	else {
 		marker.setIcon("/static/images/icon-red-dot.png");
 	}

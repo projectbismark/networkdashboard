@@ -121,15 +121,15 @@ def update_rtt(device):
 		# retrieve all uncached measurements:
 		distinct_ips = full_details.values('dstip').distinct()
 		full_details = full_details.filter(eventstamp__gt=most_recent_cached).order_by('eventstamp')
-		# all measurements are already cached:
+		location = ''
+		dst_ip = ''
 		for ip in distinct_ips:
+			dst_ip = ip['dstip']
 			try:
-				ip_lookup = IpResolver.objects.filter(ip=ip['dstip'])[0]
-				dst_ip = ip_lookup.ip
-				# bandaid fix - the series derives its name from the location field of table ip_resolver
-				# and currently there are at least 2 records with the same location in this table:
-				if (dst_ip == '4.71.254.153'):
-					location = 'Atlanta, GA (2)'
+				ip_lookup = IpResolver.objects.filter(ip=dst_ip)
+				# not an active measurement server:
+				if len(ip_lookup)==0:
+					continue
 				else:
 					location = ip_lookup.location
 			except:
@@ -166,12 +166,7 @@ def update_rtt(device):
 			try:
 				ip_lookup = IpResolver.objects.filter(ip=ip['dstip'])[0]
 				dst_ip = ip_lookup.ip
-				# bandaid fix - the series derives its name from the location field of table ip_resolver
-				# and currently there are at least 2 records with the same location in this table:
-				if (dst_ip == '4.71.254.153'):
-					location = 'Atlanta, GA (2)'
-				else:
-					location = ip_lookup.location	
+				location = ip_lookup.location
 			except:
 				continue
 			device_details = full_details.filter(dstip = ip['dstip'])		

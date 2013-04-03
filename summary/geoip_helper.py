@@ -65,7 +65,6 @@ def get_coordinates_for_googlemaps():
 	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	device_ips = getIPList()
 	servers = IpResolver.objects.all()
-	dev_type = "device"
 	for row in device_ips:
 		try:
 			value={}
@@ -81,7 +80,13 @@ def get_coordinates_for_googlemaps():
 			if hash=="":
 				value['dev_type'] = "unregistered"
 			else:
-				value['dev_type'] = dev_type
+				dev = get_devices_by_ip(row[0])[0][0]
+				active_thresh = datetime_helper.get_daterange_start(7)
+				active_count = JsonCache.objects.filter(deviceid=dev,eventstamp__gte=active_thresh).count()
+				if active_count>0:
+					value['dev_type'] = "active"
+				else: 
+					value['dev_type'] = "inactive"
 			value['lat'] = lat
 			value['lon'] = lon
 			value['hash'] = hash
@@ -132,7 +137,7 @@ def getIPList():
 	return ips
 	
 def getIPListActive():
-	active_thresh = datetime_helper.get_daterange_start(14)
+	active_thresh = datetime_helper.get_daterange_start(7)
 	devices = JsonCache.objects.filter(eventstamp__gte=active_thresh).values('deviceid').distinct()
 	ips=[]
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
@@ -164,7 +169,7 @@ def get_device_count():
 	return device_count
 
 def get_active_count():
-	active_thresh = datetime_helper.get_daterange_start(14) 
+	active_thresh = datetime_helper.get_daterange_start(7) 
 	device_count = JsonCache.objects.filter(eventstamp__gte=active_thresh).values('deviceid').distinct().count()
 	# conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
 	# conn = psycopg2.connect(conn_string)
