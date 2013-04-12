@@ -65,6 +65,8 @@ def get_coordinates_for_googlemaps():
 	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	device_ips = getIPList()
 	servers = IpResolver.objects.all()
+	cached = JsonCache.objects.all()
+	active_thresh = datetime_helper.get_daterange_start(7)
 	for row in device_ips:
 		try:
 			value={}
@@ -80,9 +82,8 @@ def get_coordinates_for_googlemaps():
 			if hash=="":
 				value['dev_type'] = "unregistered"
 			else:
-				dev = get_devices_by_ip(row[0])[0][0]
-				active_thresh = datetime_helper.get_daterange_start(7)
-				active_count = JsonCache.objects.filter(deviceid=dev,eventstamp__gte=active_thresh).count()
+				d = format_mac_address(device[0])
+				active_count = cached.filter(deviceid=d,eventstamp__gte=active_thresh).count()
 				if active_count>0:
 					value['dev_type'] = "active"
 				else: 
@@ -112,16 +113,11 @@ def get_coordinates_for_googlemaps():
 	return coord_data
 
 def getLocation(ip,gi):
-	
 	ret = cache.get(ip)
-	
 	if(ret != None):
 		return ret
-	
 	gi_rec = gi.record_by_addr(ip)
-	
 	cache.set(ip,gi_rec,random.randint(1000, 10000))
-	
 	return gi_rec
 
 def getIPList():
@@ -148,6 +144,9 @@ def getIPListActive():
 		cursor.execute("select ip from devices where id='" + id + "'")
 		ips.append(cursor.fetchone())
 	return ips
+	
+def format_mac_address(ip):
+	return ':'.join(ip[i:i+2] for i in range(0, len(ip), 2)).lower()
 
 def getMACList():
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
