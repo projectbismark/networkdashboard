@@ -128,7 +128,7 @@ function createParameters(i) {
         },
         plotOptions: {
             line: {
-                gapSize: null
+                gapSize: 5
             }
         }
     };
