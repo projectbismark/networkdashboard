@@ -113,7 +113,7 @@ def update_rtt(device):
 		full_details = MRtt.objects.filter(deviceid=device,average__lte=3000)
 		if len(full_details)==0:
 			return
-		most_recent_cached = cache[0].eventstamp
+		most_recent_cached = cache.latest('eventstamp').eventstamp
 		most_recent_uncached = full_details.latest('eventstamp').eventstamp
 		if (most_recent_uncached<=most_recent_cached):
 			return
@@ -224,7 +224,7 @@ def update_capacity(device):
 		# no measurements:
 		if len(all_measurements)==0:
 			return
-		most_recent_cached = capacity_cache[0].eventstamp
+		most_recent_cached = capacity_cache.latest('eventstamp').eventstamp
 		most_recent_uncached = all_measurements.latest('eventstamp').eventstamp
 		if most_recent_uncached<=most_recent_cached:
 			# cache is up to date
