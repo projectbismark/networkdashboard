@@ -322,7 +322,7 @@ def update_unload(device):
 		# no measurements:
 		if len(all_upload)==0 and len(all_download)==0:
 			return
-		most_recent_cached = unload_cache[0].eventstamp
+		most_recent_cached = unload_cache.latest('eventstamp').eventstamp
 		most_recent_uncached_up = all_upload.latest('eventstamp').eventstamp
 		most_recent_uncached_down = all_download.latest('eventstamp').eventstamp
 		if most_recent_uncached_up<=most_recent_cached and most_recent_uncached_down<=most_recent_cached:
@@ -341,6 +341,10 @@ def update_unload(device):
 			if len(uncached_down)!=0:
 				uncached_down = uncached_down.order_by('eventstamp')
 				unload_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_down,'Under Load Down',1,1,0,series_id)['data'])
+		if most_recent_uncached_down>most_recent_uncached_up:
+			most_recent_uncached = most_recent_uncached_down
+		else:
+			most_recent_uncached = most_recent_uncached_up
 		unload_cache[0].data=json.dumps(unload_data)
 		unload_cache[0].eventstamp = most_recent_uncached
 		unload_cache[0].save()
