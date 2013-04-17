@@ -599,7 +599,7 @@ function multiGraph(){
 		}],
 		plotOptions: {
             line: {
-                gapSize: 5
+                gapSize: 10
             }
         },
 		tooltip: {
