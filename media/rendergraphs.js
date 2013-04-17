@@ -597,6 +597,11 @@ function multiGraph(){
 			},
 			opposite:true
 		}],
+		plotOptions: {
+            line: {
+                gapSize: 5
+            }
+        },
 		tooltip: {
 			shared: false,
             formatter: function() {
