@@ -192,8 +192,11 @@ def get_ip_by_device(device):
 	conn = psycopg2.connect(conn_string)
 	cursor = conn.cursor()
 	cursor.execute("select ip from devices where SUBSTRING(id,3)='" + device.upper() +"'")
-	records = cursor.fetchall()[0]
-	return records
+	records = cursor.fetchall()
+	if len(records)>0:
+		return records[0]
+	else:
+		return ""
 	
 	
 def get_ips_by_provider(isp):
@@ -326,9 +329,16 @@ def get_provider_by_ip(ip):
 			isp = m[1]		
 	return isp
 	
+def get_isp_by_device(dev):
+	ip = get_ip_by_device(dev)
+	return get_provider_by_ip(ip)
+	
 def get_city_by_ip(ip):
-	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
-	return gi.record_by_addr(ip[0])
+	if len(ip)>0:
+		gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+		return gi.record_by_addr(ip[0])
+	else:
+		return ""
 	
 def get_isp_count():
 	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)

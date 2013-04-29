@@ -42,6 +42,11 @@ def get_devices_by_isp(device):
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
 	
+def get_devices_by_city_name(city):
+	ips = geoio_helper.get_ips_by_city(city)
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
+	
 def get_devices_by_city(device):
 	ip = geoip_helper.get_ip_by_device(device)
 	city = geoip_helper.get_city_by_ip(ip)

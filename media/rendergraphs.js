@@ -337,6 +337,109 @@ function compareParameters(i) {
     return ret;
 }
 
+function compareByCityParameters(i) {
+    var ret = {
+        legend: {
+            enabled: true,
+            align: 'center',
+            verticalAlign: 'top',
+            borderColor: '#ddd',
+            borderWidth: 1,
+            shadow: false
+        },
+        rangeSelector: {
+            buttons: [{
+                type: 'day',
+                count: 1,
+                text: '1d'
+            }, {
+                type: 'week',
+                count: 1,
+                text: '1w'
+            }, {
+                type: 'month',
+                count: 1,
+                text: '1m'
+            }],
+            selected: 1
+        },
+        plotOptions: {
+            line: {
+                gapSize: null
+            }
+        }
+    };
+	ret.divid2 = 'graph_div_7';
+    switch (i) {
+        case "down":
+            ret.divid = 'graph_div_6';
+            ret.graphid = 0;
+            ret.graphno = 1;
+			ret.direction = 'dw';
+            ret.formatter = function() {
+                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
+                    ret += '<p style="color:' + point.series.color +  ';">';
+                    ret += point.series.name + '</p> ';
+                    ret += formatBytes(point.y) + '<br/>';
+                });
+                return ret;
+            };
+            ret.units = 'Bits Per Second';
+            ret.url = '/compare_bitrate_by_city/';
+            break;
+
+        case "up":
+            ret.divid = 'graph_div_6';
+            ret.graphid = 0;
+            ret.graphno = 1;
+			ret.direction = 'up';
+            ret.formatter = function() {
+                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
+                    ret += '<p style="color:' + point.series.color +  ';">';
+                    ret += point.series.name + '</p> ';
+                    ret += formatBytes(point.y) + '<br/>';
+                });
+                return ret;
+            };
+            ret.units = 'Bits Per Second';
+            ret.url = '/compare_bitrate_by_city/';
+            break;
+		
+		case "lm":
+            ret.divid = "graph_div_6";
+            ret.formatter = function() {
+                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
+                    ret += '<p style="color:' + point.series.color +  ';">';
+                    ret += point.series.name + '</p> ';
+                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+                });
+                return ret;
+            };
+            ret.units = "Milliseconds";
+            ret.url = "/compare_lmrtt_by_city/";
+            break;
+			
+		case "rtt":
+            ret.divid = "graph_div_6";
+            ret.formatter = function() {
+                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
+                    ret += '<p style="color:' + point.series.color +  ';">';
+                    ret += point.series.name + '</p> ';
+                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+                });
+                return ret;
+            };
+            ret.units = "Milliseconds";
+            ret.url = "/compare_rtt_by_city/";
+            break;
+    }
+    return ret;
+}
+
 function onSuccessGraph(graphParams) {
     return function(data) {
         if (data.length > 200) {
@@ -483,6 +586,23 @@ function compareGraphs(deviceid){
 		type: "GET",
 		url: params.url,
 		data: {'days': days,'server_loc': serverloc, 'direction' : params.direction, 'graphno' : params.graphno, 'device': deviceid, 'filter_by': filter, 'max_results': max, 'criteria': cri},
+		success: onSuccessCompare(params)
+	});
+}
+
+function compareByCity(city){
+	$('#load_bar').show();
+	var sel1 = document.getElementById("max_devices");
+	var sel2 = document.getElementById("measurement_type");
+	var sel3 = document.getElementById("days");
+	var max = sel1.options[sel1.selectedIndex].value;
+	var mtype = sel2.options[sel2.selectedIndex].value;
+	var days = sel3.options[sel3.selectedIndex].value;
+	var params = compareByCityParameters(mtype);
+	$.ajax({
+		type: "GET",
+		url: params.url,
+		data: {'days': days, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'city' : city},
 		success: onSuccessCompare(params)
 	});
 }

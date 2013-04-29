@@ -32,8 +32,25 @@ def index(request):
 	
 def compare(request):
 	device = request.POST.get("device").strip("/")
-	servers = IpResolver.objects.all()	
-	return render_to_response('compare.html', {'device' : device, 'servers' : servers})
+	return render_to_response('compare.html', {'device' : device})
+	
+def compare_by_city(request, city):
+	return render_to_response('compare_by_city.html', {'city' : city})
+	
+def compare_bitrate_by_city(request):
+	city = request.GET.get('city')
+	max_results = request.GET.get('max')
+	days = request.GET.get('days')
+	direction = request.GET.get('direction')
+	result = database_helper.compare_bitrate_by_city(city,max_results,days,direction)
+	return HttpResponse(json.dumps(result))
+
+def compare_lmrtt_by_city(request):
+	city = request.GET.get('city')
+	max_results = request.GET.get('max')
+	days = requset.GET.get('days')
+	result = database_helper.compare_lmrtt_by_city(city,max_results,days)
+	return HttpResponse(json.dumps(result))
 		
 def compare_rtt(request):
 	device = request.GET.get('device')

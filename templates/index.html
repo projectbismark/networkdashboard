@@ -87,7 +87,7 @@
 						</tr>
 						{% for city in city_data %}
 							<tr>
-								<td>{{city.city}}, {{city.country}} ({{city.region}})</td>
+								<td><a href="/compare_by_city/{{city.city}}">{{city.city}}, {{city.country}} ({{city.region}})</a></td>
 								<td class = "tdright">{{city.count}}</td>
 								<td class = "tdright">{{city.count_active}}</td>
 							</tr>

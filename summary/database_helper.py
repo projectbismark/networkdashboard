@@ -257,6 +257,54 @@ def update_capacity(device):
 		cache_capacity_new = JsonCache(deviceid = device, data =json.dumps(capacity_data), datatype = 'capacity', eventstamp = latest_capacity)
 		cache_capacity_new.save()
 	return
+	
+def compare_lmrtt_by_city(city,max_results,days):
+	# Calculate earliest date of the series based on user selection:
+	earliest = datetime_helper.get_daterange_start(int(days))
+	devices = views_helper.get_devices_by_city_name(city)
+	# Create list of lists. The first list contains data series for the linegraph.
+	# The second contains series for the bar graph (averages):
+	result = [[] for x in range(2)]
+	result_count = 0
+	for dev in devices:
+		if(result_count == max_results):
+			break
+		# Get the most recent RTT measurement for this device:
+		latest= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')[:1]
+		if len(latest)!=0:
+			# Ensure the most recent measurement for this device is not too old:
+			if (datetime_helper.is_recent(latest[0].eventstamp,days)):
+				data= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
+				isp = geoip_helper.get_isp_by_device(dev)
+				graph_data = cvs_helper.linegraph_compare(data,isp,1,1,2)
+				result[0].append(graph_data[0])
+				result[1].append(graph_data[1])
+				result_count += 1
+	return result
+	
+def compare_bitrate_by_city(city,max_results,days,dir):
+	devices = views_helper.get_devices_by_city(city)
+	# Calculate earliest date of the series based on user selection:
+	earliest = datetime_helper.get_daterange_start(int(days))
+	result = [[] for x in range(2)]
+	result_count = 0
+	data = MBitrate.objects.filter(direction = dir, toolid = 'NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
+	# Graph data for user's own device:
+	for dev in devices:
+		if(result_count == max_results):
+			break
+		# Get the most recent RTT measurement for this device:
+		latest = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
+		if len(latest)!=0:
+			# Ensure the most recent measurement for this device is not too old:
+			if (datetime_helper.is_recent(latest[0].eventstamp,days)):
+				data = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid = 'NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
+				isp = geoip_helper.get_isp_by_device(dev)
+				graph_data = cvs_helper.linegraph_compare(data,isp,1000,18000,2)
+				result[0].append(graph_data[0])
+				result[1].append(graph_data[1])
+				result_count += 1
+	return result
 
 def update_shaperate(device):
 	series_id=5
