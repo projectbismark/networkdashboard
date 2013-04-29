@@ -126,12 +126,12 @@ def update_rtt(device):
 		for ip in distinct_ips:
 			dst_ip = ip['dstip']
 			try:
-				ip_lookup = IpResolver.objects.filter(ip=dst_ip)[0]
+				ip_lookup = IpResolver.objects.filter(ip=dst_ip)
 				# not an active measurement server:
 				if len(ip_lookup)==0:
 					continue
 				else:
-					location = ip_lookup.location
+					location = ip_lookup[0].location
 			except:
 				continue
 			device_details = full_details.filter(dstip = ip['dstip'])
