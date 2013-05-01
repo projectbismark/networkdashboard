@@ -35,6 +35,7 @@ def compare(request):
 	return render_to_response('compare.html', {'device' : device})
 	
 def compare_by_city(request, city):
+	print 3
 	print city
 	return render_to_response('compare_by_city.html', {'city' : city})
 	

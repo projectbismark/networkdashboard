@@ -80,7 +80,7 @@ def linegraph_compare(data,title,factor,roundit,line_width):
 			count += 1
 			output.append((datetime_helper.datetime_to_JSON(measure.eventstamp),float(measure.average) * factor))
 	avg = 0
-	if len(data)!=0:
+	if (len(data)!=0 and count!=0):
 		avg = (total/count)
 	average.append(avg)
 	result.append(dict(name=title, type='column', data=average))

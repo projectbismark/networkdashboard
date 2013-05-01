@@ -224,7 +224,7 @@ def get_ips_by_city(city):
 	for ip in ip_list:
 		try:
 			record = gi.record_by_addr(ip[0])
-			if (record['city']==city):	
+			if (record['city']==city):
 				ret.append(ip[0])
 		except:
 			continue
