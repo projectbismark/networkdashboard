@@ -46,13 +46,31 @@
     <div class ="outerContainer" id="outer_container_5">
         <div class ="graphdiv" id="map"></div>
 		<ul id="tab_2" class="nav nav-tabs" style="clear: both">
-			<li class="active"><a href="#country_list" data-toggle="tab">Country</a></li>
-			<li><a href="#city_list" data-toggle="tab">City</a></li>
+			<li class="active"><a href="#city_list" data-toggle="tab">City</a></li>
+			<li><a href="#country_list" data-toggle="tab">Country</a></li>
 			<li><a href="#isp_list" data-toggle="tab">ISP</a></li>
 			<li><a href="#filter_markers" data-toggle="tab">Filter</a></li>
 		</ul>
 		<div class="tab-content">
-			<div class="tab-pane active in" id="country_list">
+			<div class="tab-pane active in" id="city_list">
+				<div class ="statsdiv" id="stats2">
+					<table class="table table-striped table-condensed">
+						<tr>
+							<td></td>
+							<td class = "tdright"><h3>Device Count ({{device_count}})</h3></td>
+							<td class = "tdright"><h3>Active ({{active_count}})</h3></td>
+						</tr>
+						{% for city in city_data %}
+							<tr>
+								<td><a href="/compare_by_city/{{city.city}}">{{city.city}}, {{city.country}} ({{city.region}})</a></td>
+								<td class = "tdright">{{city.count}}</td>
+								<td class = "tdright">{{city.count_active}}</td>
+							</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+			<div class="tab-pane" id="country_list">
 				<div class ="statsdiv" id="stats1">
 					<!--<table class = "tableheader">
 						<tr>
@@ -72,24 +90,6 @@
 								<td>{{country.country}}</td>
 								<td class = "tdright" id="countryCountStat">{{country.count}}</td>
 								<td class = "tdright">{{country.count_active}}</td>
-							</tr>
-						{% endfor %}
-					</table>
-				</div>
-			</div>
-			<div class="tab-pane" id="city_list">
-				<div class ="statsdiv" id="stats2">
-					<table class="table table-striped table-condensed">
-						<tr>
-							<td></td>
-							<td class = "tdright"><h3>Device Count ({{device_count}})</h3></td>
-							<td class = "tdright"><h3>Active ({{active_count}})</h3></td>
-						</tr>
-						{% for city in city_data %}
-							<tr>
-								<td><a href="/compare_by_city/{{city.city}}">{{city.city}}, {{city.country}} ({{city.region}})</a></td>
-								<td class = "tdright">{{city.count}}</td>
-								<td class = "tdright">{{city.count_active}}</td>
 							</tr>
 						{% endfor %}
 					</table>
