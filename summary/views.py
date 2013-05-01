@@ -35,6 +35,7 @@ def compare(request):
 	return render_to_response('compare.html', {'device' : device})
 	
 def compare_by_city(request, city):
+	print city
 	return render_to_response('compare_by_city.html', {'city' : city})
 	
 def compare_bitrate_by_city(request):
