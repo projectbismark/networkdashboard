@@ -43,8 +43,10 @@ def get_devices_by_isp(device):
 	return devices
 	
 def get_devices_by_city_name(city):
-	ips = geoio_helper.get_ips_by_city(city)
+	ips = geoip_helper.get_ips_by_city(city)
+	print ips
 	devices = geoip_helper.get_devices_by_ips(ips)
+	print len(devices)
 	return devices
 	
 def get_devices_by_city(device):

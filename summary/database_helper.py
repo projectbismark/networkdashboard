@@ -25,6 +25,8 @@ def add_new_devices(devices):
 			new_details.save()
 	return
 
+# appends new bitrate measurements to precomputed (cached) JSON dictionaries for each device. This method updates
+# a db record and returns nothing.
 def update_bitrate(device):
 	chosen_limit = 100000000
 	most_recent = []
@@ -103,6 +105,8 @@ def update_bitrate(device):
 			cache_up_new.save()
 		return
 
+# appends new rtt measurements to precomputed (cached) JSON dictionaries for each device. This method updates
+# a db record and returns nothing. 		
 def update_rtt(device):
 	rtt_data=[]
 	series_id=3
@@ -181,6 +185,8 @@ def update_rtt(device):
 		cache_new.save()
 		return
 
+# appends new lmrtt measurements to precomputed (cached) JSON dictionaries for each device. This method updates
+# a db record and returns nothing.
 def update_lmrtt(device):
 	lmrtt_data=[]
 	series_id=4
@@ -211,7 +217,9 @@ def update_lmrtt(device):
 		new_cache = JsonCache(deviceid = device, data = json.dumps(lmrtt_data), datatype = 'lmrtt', eventstamp = latest_measurement)
 		new_cache.save()
 		return
-		
+
+# appends new capacity measurements to precomputed (cached) JSON dictionaries for each device. This method updates
+# a db record and returns nothing.		
 def update_capacity(device):
 	series_id=5
 	# series data for capacity, in json format:
@@ -258,54 +266,8 @@ def update_capacity(device):
 		cache_capacity_new.save()
 	return
 	
-def compare_lmrtt_by_city(city,max_results,days):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(int(days))
-	devices = views_helper.get_devices_by_city_name(city)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
-	result = [[] for x in range(2)]
-	result_count = 0
-	for dev in devices:
-		if(result_count == max_results):
-			break
-		# Get the most recent RTT measurement for this device:
-		latest= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')[:1]
-		if len(latest)!=0:
-			# Ensure the most recent measurement for this device is not too old:
-			if (datetime_helper.is_recent(latest[0].eventstamp,days)):
-				data= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
-				isp = geoip_helper.get_isp_by_device(dev)
-				graph_data = cvs_helper.linegraph_compare(data,isp,1,1,2)
-				result[0].append(graph_data[0])
-				result[1].append(graph_data[1])
-				result_count += 1
-	return result
-	
-def compare_bitrate_by_city(city,max_results,days,dir):
-	devices = views_helper.get_devices_by_city(city)
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(int(days))
-	result = [[] for x in range(2)]
-	result_count = 0
-	data = MBitrate.objects.filter(direction = dir, toolid = 'NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
-	# Graph data for user's own device:
-	for dev in devices:
-		if(result_count == max_results):
-			break
-		# Get the most recent RTT measurement for this device:
-		latest = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
-		if len(latest)!=0:
-			# Ensure the most recent measurement for this device is not too old:
-			if (datetime_helper.is_recent(latest[0].eventstamp,days)):
-				data = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid = 'NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
-				isp = geoip_helper.get_isp_by_device(dev)
-				graph_data = cvs_helper.linegraph_compare(data,isp,1000,18000,2)
-				result[0].append(graph_data[0])
-				result[1].append(graph_data[1])
-				result_count += 1
-	return result
-
+# appends new shaperate measurements to precomputed (cached) JSON dictionaries for each device. This method updates
+# a db record and returns nothing.
 def update_shaperate(device):
 	series_id=5
 	# series data for shaperate, in json format:
@@ -355,8 +317,10 @@ def update_shaperate(device):
 		shaperate_data.append(cvs_helper.linegraph_normal(shape_measure_down,'Shape rate Down',1000,1,1,series_id))
 		cache_shaperate_new = JsonCache(deviceid = device, data = json.dumps(shaperate_data), datatype = 'shaperate', eventstamp = most_recent_cached)
 		cache_shaperate_new.save()
-	return
-	
+	return	
+
+# appends new underload measurements to precomputed (cached) JSON dictionaries for each device. This method updates
+# a db record and returns nothing.
 def update_unload(device):
 	series_id=6
 	# series data in json format:
@@ -416,6 +380,55 @@ def update_unload(device):
 		cache_unload_new = JsonCache(deviceid = device, data =json.dumps(unload_data), datatype = 'unload', eventstamp = latest_eventstamp)
 		cache_unload_new.save()
 	return
+	
+# creates and returns series for lmrtt measurements for devices in a given city:	
+def compare_lmrtt_by_city(city,max_results,days):
+	# Calculate earliest date of the series based on user selection:
+	earliest = datetime_helper.get_daterange_start(days)
+	devices = views_helper.get_devices_by_city_name(city)
+	# Create list of lists. The first list contains data series for the linegraph.
+	# The second contains series for the bar graph (averages):
+	result = [[] for x in range(2)]
+	result_count = 0
+	for dev in devices:
+		if(result_count == max_results):
+			break
+		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
+		if len(latest_measurements)==0:
+			continue
+		else:
+			data= latest_measurements.order_by('eventstamp')
+			isp = geoip_helper.get_isp_by_device(dev)
+			graph_data = cvs_helper.linegraph_compare(data,isp,1,1,2)
+			result[0].append(graph_data[0])
+			result[1].append(graph_data[1])
+			result_count += 1
+	return result
+
+# creates and returns series for bitrate measurements for devices in a given city:	
+def compare_bitrate_by_city(city,max_results,days,dir):
+	devices = views_helper.get_devices_by_city_name(city)
+	# Calculate earliest date of the series based on user selection:
+	earliest = datetime_helper.get_daterange_start(days)
+	# Create list of lists. The first list contains data series for the linegraph.
+	# The second contains series for the bar graph (averages):
+	result = [[] for x in range(2)]
+	result_count = 0
+	for dev in devices:
+		if(result_count == max_results):
+			break
+		recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest)
+		if len(recent_measurements)==0:
+			continue
+		else:
+			data = recent_measurements.order_by('eventstamp')
+			isp = geoip_helper.get_isp_by_device(dev)
+			graph_data = cvs_helper.linegraph_compare(data,isp,1000,18000,2)
+			result[0].append(graph_data[0])
+			result[1].append(graph_data[1])
+			result_count += 1
+	return result
+
 
 def fetch_deviceid_soft(device):
     device_search = Devicedetails.objects.filter(deviceid=device)

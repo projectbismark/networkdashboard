@@ -39,16 +39,16 @@ def compare_by_city(request, city):
 	
 def compare_bitrate_by_city(request):
 	city = request.GET.get('city')
-	max_results = request.GET.get('max')
-	days = request.GET.get('days')
+	max_results = int(request.GET.get('max_results'))
+	days = int(request.GET.get('days'))
 	direction = request.GET.get('direction')
 	result = database_helper.compare_bitrate_by_city(city,max_results,days,direction)
 	return HttpResponse(json.dumps(result))
 
 def compare_lmrtt_by_city(request):
 	city = request.GET.get('city')
-	max_results = request.GET.get('max')
-	days = requset.GET.get('days')
+	max_results = int(request.GET.get('max_results'))
+	days = int(request.GET.get('days'))
 	result = database_helper.compare_lmrtt_by_city(city,max_results,days)
 	return HttpResponse(json.dumps(result))
 		
