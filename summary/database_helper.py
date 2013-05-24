@@ -404,7 +404,7 @@ def compare_lmrtt_by_city(city,max_results,days):
 			isp_count=0
 			for included_isp in isps:
 				if included_isp == isp:
-					isp_count++
+					isp_count += 1
 			series_name = isp + ' ' + str(isp_count)
 			graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
 			result[0].append(graph_data[0])
@@ -433,7 +433,7 @@ def compare_rtt_by_city(city,max_results,days):
 			isp_count=0
 			for included_isp in isps:
 				if included_isp == isp:
-					isp_count++
+					isp_count += 1
 			series_name = isp + ' ' + str(isp_count)
 			graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
 			result[0].append(graph_data[0])
@@ -464,7 +464,7 @@ def compare_bitrate_by_city(city,max_results,days,dir):
 			isp_count=0
 			for included_isp in isps:
 				if included_isp == isp:
-					isp_count++
+					isp_count += 1
 			series_name = isp + ' ' + str(isp_count)
 			graph_data = cvs_helper.linegraph_compare(data,series_name,1000,18000,2)
 			result[0].append(graph_data[0])
