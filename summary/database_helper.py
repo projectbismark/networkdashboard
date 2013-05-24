@@ -390,6 +390,7 @@ def compare_lmrtt_by_city(city,max_results,days):
 	# The second contains series for the bar graph (averages):
 	result = [[] for x in range(2)]
 	result_count = 0
+	isps = []
 	for dev in devices:
 		if(result_count == max_results):
 			break
@@ -399,7 +400,13 @@ def compare_lmrtt_by_city(city,max_results,days):
 		else:
 			data= latest_measurements.order_by('eventstamp')
 			isp = geoip_helper.get_isp_by_device(dev)
-			graph_data = cvs_helper.linegraph_compare(data,isp,1,1,2)
+			isps.append(isp)
+			isp_count=0
+			for included_isp in isps:
+				if included_isp == isp:
+					isp_count++
+			series_name = isp + ' ' + str(isp_count)
+			graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
 			result[0].append(graph_data[0])
 			result[1].append(graph_data[1])
 			result_count += 1
@@ -412,7 +419,7 @@ def compare_rtt_by_city(city,max_results,days):
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
 	result = [[] for x in range(2)]
-	result_count = 0
+	isps = []
 	for dev in devices:
 		if(result_count == max_results):
 			break
@@ -422,7 +429,13 @@ def compare_rtt_by_city(city,max_results,days):
 		else:
 			data= latest_measurements.order_by('eventstamp')
 			isp = geoip_helper.get_isp_by_device(dev)
-			graph_data = cvs_helper.linegraph_compare(data,isp,1,1,2)
+			isps.append(isp)
+			isp_count=0
+			for included_isp in isps:
+				if included_isp == isp:
+					isp_count++
+			series_name = isp + ' ' + str(isp_count)
+			graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
 			result[0].append(graph_data[0])
 			result[1].append(graph_data[1])
 			result_count += 1
@@ -437,6 +450,7 @@ def compare_bitrate_by_city(city,max_results,days,dir):
 	# The second contains series for the bar graph (averages):
 	result = [[] for x in range(2)]
 	result_count = 0
+	isps = []
 	for dev in devices:
 		if(result_count == max_results):
 			break
@@ -446,7 +460,13 @@ def compare_bitrate_by_city(city,max_results,days,dir):
 		else:
 			data = recent_measurements.order_by('eventstamp')
 			isp = geoip_helper.get_isp_by_device(dev)
-			graph_data = cvs_helper.linegraph_compare(data,isp,1000,18000,2)
+			isps.append(isp)
+			isp_count=0
+			for included_isp in isps:
+				if included_isp == isp:
+					isp_count++
+			series_name = isp + ' ' + str(isp_count)
+			graph_data = cvs_helper.linegraph_compare(data,series_name,1000,18000,2)
 			result[0].append(graph_data[0])
 			result[1].append(graph_data[1])
 			result_count += 1
