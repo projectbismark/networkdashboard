@@ -390,9 +390,11 @@ def linegraph_compare_lmrtt_by_city(city,max_results,days):
 	# The second contains series for the bar graph (averages):
 	result = []
 	isps = []
+	included_devices = []
 	isp_distribution=0
 	distributing = True
 	while distributing:
+		print "old dev length" + str(len(devices))
 		new_device = False
 		for dev in devices:
 			if(len(result) == max_results):
@@ -405,6 +407,7 @@ def linegraph_compare_lmrtt_by_city(city,max_results,days):
 				data = latest_measurements.order_by('eventstamp')
 				isp = geoip_helper.get_isp_by_device(dev)
 				new_isp = True
+				duplicate_device = False
 				for i in isps:
 					if i == isp:
 						new_isp = False
@@ -414,7 +417,13 @@ def linegraph_compare_lmrtt_by_city(city,max_results,days):
 						isp_count += 1
 				if not new_isp:
 					if isp_count>isp_distribution:
+						unincluded_devices.append(dev)
 						continue
+				for d in included_devices:
+					if d==dev:
+						duplicate_device = True
+				if duplicate_device:
+					continue
 				series_name = isp + ' ' + str(isp_count + 1)
 				isps.append(isp)
 				graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
@@ -423,6 +432,8 @@ def linegraph_compare_lmrtt_by_city(city,max_results,days):
 		if not new_device:
 			distributing = False
 		isp_distribution += 1
+		devices = unincluded_devices
+		print "new device length" + str(len(devices))
 	return result
 	
 # creates and returns series for lmrtt measurements for devices in a given city:	
@@ -458,6 +469,7 @@ def linegraph_compare_rtt_by_city(city,max_results,days):
 	# The second contains series for the bar graph (averages):
 	isps = []
 	result = []
+	included_devices=[]
 	isp_distribution=0
 	distributing = True
 	while distributing:
@@ -472,6 +484,7 @@ def linegraph_compare_rtt_by_city(city,max_results,days):
 			else:
 				data = latest_measurements.order_by('eventstamp')
 				isp = geoip_helper.get_isp_by_device(dev)
+				duplicate_device = False
 				new_isp = True
 				for i in isps:
 					if i == isp:
@@ -483,6 +496,11 @@ def linegraph_compare_rtt_by_city(city,max_results,days):
 				if not new_isp:
 					if isp_count>isp_distribution:
 						continue
+				for d in included_devices:
+					if d==dev:
+						duplicate_device = True
+				if duplicate_device:
+					continue
 				series_name = isp + ' ' + str(isp_count + 1)
 				isps.append(isp)
 				graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
@@ -526,6 +544,7 @@ def linegraph_compare_bitrate_by_city(city,max_results,days,dir):
 	result = []
 	isps = []
 	isp_distribution=0
+	included_devices=[]
 	distributing = True
 	while distributing:
 		new_device = False
@@ -540,6 +559,7 @@ def linegraph_compare_bitrate_by_city(city,max_results,days,dir):
 				data = recent_measurements.order_by('eventstamp')
 				isp = geoip_helper.get_isp_by_device(dev)
 				new_isp = True
+				duplicate_device = False
 				for i in isps:
 					if i == isp:
 						new_isp = False
@@ -550,10 +570,16 @@ def linegraph_compare_bitrate_by_city(city,max_results,days,dir):
 				if not new_isp:
 					if isp_count>isp_distribution:
 						continue
+				for d in included_devices:
+					if d==dev:
+						duplicate_device = True
+				if duplicate_device:
+					continue
 				series_name = isp + ' ' + str(isp_count + 1)
 				isps.append(isp)
 				graph_data = cvs_helper.linegraph_compare(data,series_name,1000,18000,2)
 				new_device = True
+				included_devices.append(dev)
 				result.append(graph_data)
 		if not new_device:
 			distributing = False
