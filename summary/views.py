@@ -42,21 +42,27 @@ def compare_bitrate_by_city(request):
 	max_results = int(request.GET.get('max_results'))
 	days = int(request.GET.get('days'))
 	direction = request.GET.get('direction')
-	result = database_helper.compare_bitrate_by_city(city,max_results,days,direction)
+	result = []
+	result.append(database_helper.bargraph_compare_bitrate_by_city(city,max_results,days,direction))
+	result.append(database_helper.linegraph_compare_bitrate_by_city(city,max_results,days,direction))
 	return HttpResponse(json.dumps(result))
 
 def compare_lmrtt_by_city(request):
 	city = request.GET.get('city')
 	max_results = int(request.GET.get('max_results'))
 	days = int(request.GET.get('days'))
-	result = database_helper.compare_lmrtt_by_city(city,max_results,days)
+	result = []
+	result.append(database_helper.bargraph_compare_lmrtt_by_city(city,max_results,days))
+	result.append(database_helper.linegraph_compare_lmrtt_by_city(city,max_results,days))
 	return HttpResponse(json.dumps(result))
 	
 def compare_rtt_by_city(request):
 	city = request.GET.get('city')
 	max_results = int(request.GET.get('max_results'))
 	days = int(request.GET.get('days'))
-	result = database_helper.compare_rtt_by_city(city,max_results,days)
+	result = []
+	result.append(database_helper.bargraph_compare_rtt_by_city(city,max_results,days))
+	result.append(database_helper.linegraph_compare_rtt_by_city(city,max_results,days))
 	return HttpResponse(json.dumps(result))
 		
 def compare_rtt(request):

@@ -68,25 +68,53 @@ def linegraph_normal(data,title,factor,roundit,priority,id):
                      float(measure.average) * factor))
     return dict(name=title, type='line', data=output, priority=priority, id=id)
 	
+# def linegraph_compare(data,title,factor,roundit,line_width):
+	# output = []
+	# result = []
+	# average = []
+	# total = 0
+	# count = 0
+	# for measure in data:
+		# if measure.average > 0:
+			# total += measure.average*factor
+			# count += 1
+			# output.append((datetime_helper.datetime_to_JSON(measure.eventstamp),float(measure.average) * factor))
+	# avg = 0
+	# if (len(data)!=0 and count!=0):
+		# avg = (total/count)
+	# average.append(avg)
+	# result.append(dict(name=title, type='column', data=average))
+	# result.append(dict(name=title, type='line',data=output))
+	# return result
+	
 def linegraph_compare(data,title,factor,roundit,line_width):
 	output = []
-	result = []
-	average = []
-	total = 0
-	count = 0
 	for measure in data:
 		if measure.average > 0:
-			total += measure.average*factor
-			count += 1
 			output.append((datetime_helper.datetime_to_JSON(measure.eventstamp),float(measure.average) * factor))
-	avg = 0
-	if (len(data)!=0 and count!=0):
-		avg = (total/count)
-	average.append(avg)
-	result.append(dict(name=title, type='column', data=average))
-	result.append(dict(name=title, type='line',data=output))
+	result = dict(name=title, type='line',data=output)
 	return result
-
+	
+def bargraph_compare(data,factor):
+	result = []
+	# final totals used to compute averages:
+	meta_totals = []
+	for d in data:
+		isp = d['isp']
+		new_isp = True
+		for m in meta_totals:
+			if m['isp'] == isp:
+				new_isp = False
+				m['total'] += d['total']
+				m['count'] += d['count']
+				break
+		if new_isp:
+			new_total = {'isp' : isp, 'total' : d['total'], 'count' : d['count']}
+			meta_totals.append(new_total)
+	for m in meta_totals:
+		avg = (m['total']/m['count'])* factor
+		result.append(dict(name=m['isp'], type='column', data=avg))
+	return result
 
 def linegraph_normal_passive(data,title):
     result={}
