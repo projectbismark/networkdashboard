@@ -427,6 +427,7 @@ def linegraph_compare_lmrtt_by_city(city,max_results,days):
 				isps.append(isp)
 				graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
 				new_device = True
+				included_devices.append(dev)
 				result.append(graph_data)
 		if not new_device:
 			distributing = False
@@ -503,6 +504,7 @@ def linegraph_compare_rtt_by_city(city,max_results,days):
 				isps.append(isp)
 				graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
 				new_device = True
+				included_devices.append(dev)
 				result.append(graph_data)
 		if not new_device:
 			distributing = False
