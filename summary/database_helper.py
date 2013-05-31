@@ -417,7 +417,6 @@ def linegraph_compare_lmrtt_by_city(city,max_results,days):
 						isp_count += 1
 				if not new_isp:
 					if isp_count>isp_distribution:
-						unincluded_devices.append(dev)
 						continue
 				for d in included_devices:
 					if d==dev:
