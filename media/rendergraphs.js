@@ -776,6 +776,63 @@ function onSuccessCompare(graphParams) {
     }
 }
 
+function onSuccessCountryCompare(graphParams) {
+    return function(data) {
+		if (data.length > 200) {
+			data = JSON.parse(data)[0];
+			var graphData = new Array();
+			var categories = new Array();
+			for(var i=0;i<data.length; i++){
+				graphData[i] = parseFloat(data[i]['data']);
+				categories[i] = data[i]['name'];
+			}
+            window.chart2 = new Highcharts.Chart({
+                chart: {
+					type: 'column',
+                    renderTo: graphParams.divid,
+                },
+				title: {
+					text: 'Performance Averages'
+				},
+				yAxis:{
+					title:{
+						text: graphParams.units
+					}
+				},
+				xAxis:{
+					categories: categories
+				},
+				tooltip:{
+					formatter: function(){
+						var units;
+						var val;
+						if (graphParams.units == "Bits Per Second"){
+							units = "Mbps";
+							val = recDivide(this.y, this.y, 0);
+						}
+						else{
+							units = "ms";
+							val = this.y;
+						}
+						return val.toFixed(2) + units;
+					}
+				},
+				legend:{
+					enabled: false
+				},
+				series: [{
+					data: graphData,
+					name: categories
+				}]
+            });
+        } else {
+            var div = document.getElementById(graphParams.divid2);
+            div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
+        }
+		$('#load_bar').hide();
+    }
+}
+
 function compareGraphs(deviceid){
 	$('#load_bar').show();
 	var sel1 = document.getElementById("max_devices");
@@ -826,7 +883,7 @@ function compareByCountry(country){
 		type: "GET",
 		url: params.url,
 		data: {'days': days, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'country' : country},
-		success: onSuccessCompare(params)
+		success: onSuccessCountryCompare(params)
 	});
 }
 
