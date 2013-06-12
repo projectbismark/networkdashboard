@@ -230,6 +230,19 @@ def get_ips_by_city(city):
 			continue
 	return ret
 	
+def get_ips_by_country(country):
+	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	ret = []
+	ip_list = getIPList()
+	for ip in ip_list:
+		try:
+			record = gi.record_by_addr(ip[0])
+			if (record['country_name']==country):
+				ret.append(ip[0])
+		except:
+			continue
+	return ret
+	
 def get_devices_by_ips(ips):
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
 	conn = psycopg2.connect(conn_string)

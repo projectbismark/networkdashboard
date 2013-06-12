@@ -33,12 +33,17 @@ def get_lmrtt_description():
 	desc_string=''
 	return desc_string
 	
-def get_devices_by_isp(device):
-	ip = geoip_helper.get_ip_by_device(device)
-	isp = geoip_helper.get_provider_by_ip(ip)
+# def get_devices_by_isp(device):
+	# ip = geoip_helper.get_ip_by_device(device)
+	# isp = geoip_helper.get_provider_by_ip(ip)
 	#all other ips with this provider
-	ips = geoip_helper.get_ips_by_provider(isp)
+	# ips = geoip_helper.get_ips_by_provider(isp)
 	#devices for these ips
+	# devices = geoip_helper.get_devices_by_ips(ips)
+	# return devices
+	
+def get_devices_by_isp(isp):
+	ips = geoip_helper.get_ips_by_provider(isp)
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
 	
@@ -47,6 +52,11 @@ def get_devices_by_city_name(city):
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
 	
+def get_devices_by_country_name(country):
+	ips = geoip_helper.get_ips_by_country(country)
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
+
 def get_devices_by_city(device):
 	ip = geoip_helper.get_ip_by_device(device)
 	city = geoip_helper.get_city_by_ip(ip)
