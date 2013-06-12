@@ -89,6 +89,21 @@ function formatBytes(bytes) {
     return '<b>' + number + '</b> ' + units;
 }
 
+function getUnits(bits) {
+    var magnitude = Math.log(bits) / Math.log(10);
+    var units;
+    if (magnitude < 3) {
+        units = 'bps';
+    } else if (magnitude < 6) {
+        units = 'Kbps';
+    } else if (magnitude < 9) {
+        units = 'Mbps';
+    } else {
+        units = 'Gbps';
+    }
+    return units;
+}
+
 function createParameters(i) {
     var ret = {
         legend: {
@@ -807,7 +822,7 @@ function onSuccessCountryCompare(graphParams) {
 						var units;
 						var val;
 						if (graphParams.units == "Bits Per Second"){
-							units = "Mbps";
+							units = getUnits(this.y);
 							val = recDivide(this.y, this.y, 0);
 						}
 						else{
