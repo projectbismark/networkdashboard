@@ -1,21 +1,31 @@
 from django.core.management.base import NoArgsCommand
 from networkdashboard.summary import database_helper
 from networkdashboard.summary.models import *
-import threading
+import os
+import fcntl
 
-lock = threading.Lock()
+class UpdateLock:
+	def __init__(self, filename):
+		self.filename = filename
+		self.handle = open(filename, 'w')
+		
+	def acquire(self):
+		# bitwise OR implements non-blocking request
+		fcntl.flock(self.handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+		
+	def release(self):
+		fcntl.flock(self.handle, fcntl.LOCK_UN)
+		
+	def __del__(self):
+		self.handle.close()
 
 class Command(NoArgsCommand):
 	def handle_noargs(self, **options):
-		update()
-	
-
-def update():
-	t = threading.Thread(target = update_json, args = ())
-	t.start()
+		update_json()
 	
 def update_json():
-	if(lock.acquire(False)):
+	lock = UpdateLock('/tmp/UpdateLock.tmp')
+	if (lock.acquire()):
 		all_devices = Devicedetails.objects.all().values('deviceid')
 		device_list = []
 		for device in all_devices:
