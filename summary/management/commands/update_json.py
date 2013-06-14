@@ -10,8 +10,12 @@ class UpdateLock:
 		self.handle = open(filename, 'w')
 		
 	def acquire(self):
-		# bitwise OR implements non-blocking request
-		fcntl.flock(self.handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+		try:
+			# non blocking
+			fcntl.flock(self.handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+			return True
+		except IOError:
+			return False
 		
 	def release(self):
 		fcntl.flock(self.handle, fcntl.LOCK_UN)
