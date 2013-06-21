@@ -883,8 +883,13 @@ function onSuccessCountryCompare(graphParams, country) {
 				},
 				xAxis:{
 					categories: categories,
-					labels: {
-						rotation: 90
+					labels:{
+						rotation: 90,
+						justify: false,
+						y: 55,
+						style: {
+							fontWeight: 'bold'
+						}
 					}
 				},
 				plotOptions: graphParams.plotOptions,
