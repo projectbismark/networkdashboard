@@ -108,13 +108,14 @@ def bargraph_compare(data,factor):
 				new_isp = False
 				m['total'] += d['total']
 				m['count'] += d['count']
+				m['dev_count'] += 1
 				break
 		if new_isp:
-			new_total = {'isp' : isp, 'total' : d['total'], 'count' : d['count']}
+			new_total = {'isp' : isp, 'total' : d['total'], 'count' : d['count'], 'dev_count' : 1}
 			meta_totals.append(new_total)
 	for m in meta_totals:
 		avg = (m['total']/m['count'])* factor
-		result.append(dict(name=m['isp'], type='column', data=avg))
+		result.append(dict(name=m['isp'], type='column', data=avg, count=m['dev_count']))
 	return result
 	
 # computes averages for an isp with respect to city
@@ -130,13 +131,14 @@ def bargraph_compare_city(data,factor):
 				new_city = False
 				m['total'] += d['total']
 				m['count'] += d['count']
+				m['dev_count'] += 1
 				break
 		if new_city:
-			new_total = {'city' : city, 'total' : d['total'], 'count' : d['count']}
+			new_total = {'city' : city, 'total' : d['total'], 'count' : d['count'], 'dev_count' : 1}
 			meta_totals.append(new_total)
 	for m in meta_totals:
 		avg = (m['total']/m['count'])* factor
-		result.append(dict(name=m['city'], type='column', data=avg))
+		result.append(dict(name=m['city'], type='column', data=avg, count=m['dev_count']))
 	return result
 	
 # computes averages for an isp with respect to country
@@ -152,14 +154,15 @@ def bargraph_compare_country(data,factor):
 				new_country = False
 				m['total'] += d['total']
 				m['count'] += d['count']
+				m['country_count'] += 1
 				break
 		if new_country:
-			new_total = {'country' : country, 'total' : d['total'], 'count' : d['count']}
+			new_total = {'country' : country, 'total' : d['total'], 'count' : d['count'], 'country_count' : 1}
 			print country
 			meta_totals.append(new_total)
 	for m in meta_totals:
 		avg = (m['total']/m['count'])* factor
-		result.append(dict(name=m['country'], type='column', data=avg))
+		result.append(dict(name=m['country'], type='column', data=avg, count=m['country_count']))
 	return result
 
 def linegraph_normal_passive(data,title):

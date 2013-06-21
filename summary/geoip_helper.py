@@ -196,9 +196,12 @@ def get_country_by_city(city):
 	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	ips = getIPList()
 	for ip in ips:
-		record = gi.record_by_addr(ip[0])
-		if record['city']==city:
-			return record['country_name']
+		try:
+			record = gi.record_by_addr(ip[0])
+			if record['city']==city:
+				return record['country_name']
+		except:
+			continue
 	return ''
 	return ''
 		

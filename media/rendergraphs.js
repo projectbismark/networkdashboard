@@ -786,7 +786,12 @@ function onSuccessCompare(graphParams,country) {
 					name : data[i]['name'],
 					country : country
 				}
-				categories[i] = data[i]['name'];
+				if (data[i]['count']=='1'){
+					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+				}
+				else{
+					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+				}
 			}
             window.chart2 = new Highcharts.Chart({
                 chart: {
@@ -802,7 +807,15 @@ function onSuccessCompare(graphParams,country) {
 					}
 				},
 				xAxis:{
-					categories: categories
+					categories: categories,
+					labels:{
+						rotation: 90,
+						justify: false,
+						y: 55,
+						style: {
+							fontWeight: 'bold'
+						}
+					}
 				},
 				plotOptions: graphParams.plotOptions,
 				tooltip:{
@@ -848,7 +861,12 @@ function onSuccessCountryCompare(graphParams, country) {
 					name : data[i]['name'],
 					country : country				
 				}
-				categories[i] = data[i]['name'];
+				if (data[i]['count']=='1'){
+					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+				}
+				else{
+					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+				}
 			}
             window.chart2 = new Highcharts.Chart({
                 chart: {
@@ -864,7 +882,10 @@ function onSuccessCountryCompare(graphParams, country) {
 					}
 				},
 				xAxis:{
-					categories: categories
+					categories: categories,
+					labels: {
+						rotation: 90
+					}
 				},
 				plotOptions: graphParams.plotOptions,
 				tooltip:{
