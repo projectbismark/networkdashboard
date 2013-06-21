@@ -187,6 +187,11 @@ def getDeviceIDList():
 	#print records
 	return records
 	
+def get_city_by_device(device):
+	ip = get_ip_by_device(device)
+	city = get_city_by_ip(ip)
+	return city['city']
+	
 def get_ip_by_device(device):
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
 	conn = psycopg2.connect(conn_string)
@@ -212,6 +217,26 @@ def get_ips_by_provider(isp):
 					name = m[1]
 					break
 			if (name==isp):	
+				ret.append(ip[0])
+		except:
+			continue
+	return ret
+	
+def get_ips_by_provider_and_country(isp,country):
+	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
+	gi2 = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	mappings = isp_mappings.mappings
+	ret = []
+	ip_list = getIPList()
+	for ip in ip_list:
+		try:
+			name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+			ip_country = gi2.record_by_addr(ip[0])['country_name']
+			for m in mappings:
+				if(name.lower().find(m[0].lower())!=-1):
+					name = m[1]
+					break
+			if (((name==isp) and (ip_country==country)) or ((name==isp) and (country=="none"))):	
 				ret.append(ip[0])
 		except:
 			continue

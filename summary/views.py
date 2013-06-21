@@ -34,14 +34,14 @@ def compare(request):
 	device = request.POST.get("device").strip("/")
 	return render_to_response('compare.html', {'device' : device})
 	
-def compare_by_city(request, city):
-	return render_to_response('compare_by_city.html', {'city' : city})
+def compare_by_city(request, city, country):
+	return render_to_response('compare_by_city.html', {'city' : city, 'country' : country})
 	
 def compare_by_country(request, country):
 	return render_to_response('compare_by_country.html', {'country' : country})
 	
-def compare_by_isp(request, isp):
-	return render_to_response('compare_by_isp.html', {'isp' : isp})
+def compare_by_isp(request, isp, country):
+	return render_to_response('compare_by_isp.html', {'isp' : isp, 'country' : country})
 	
 def compare_bitrate_by_city(request):
 	city = request.GET.get('city')
@@ -66,12 +66,13 @@ def compare_bitrate_by_country(request):
 	
 def compare_bitrate_by_isp(request):
 	isp = request.GET.get('isp')
+	country = request.GET.get('country')
 	max_results = int(request.GET.get('max_results'))
 	days = int(request.GET.get('days'))
 	direction = request.GET.get('direction')
 	result = []
 	empty = []
-	result.append(empty)
+	result.append(database_helper.bargraph_compare_bitrate_by_isp(isp,max_results,days,direction,country))
 	result.append(database_helper.linegraph_compare_bitrate_by_isp(isp,max_results,days,direction))
 	return HttpResponse(json.dumps(result))
 
@@ -100,7 +101,7 @@ def compare_lmrtt_by_isp(request):
 	days = int(request.GET.get('days'))
 	result = []
 	empty = []
-	result.append(empty)
+	result.append(database_helper.bargraph_compare_lmrtt_by_isp(isp,max_results,days))
 	result.append(database_helper.linegraph_compare_lmrtt_by_isp(isp,max_results,days))
 	return HttpResponse(json.dumps(result))
 	
@@ -129,7 +130,7 @@ def compare_rtt_by_isp(request):
 	days = int(request.GET.get('days'))
 	result = []
 	empty = []
-	result.append(empty)
+	result.append(database_helper.bargraph_compare_rtt_by_isp(isp,max_results,days))
 	result.append(database_helper.linegraph_compare_rtt_by_isp(isp,max_results,days))
 	return HttpResponse(json.dumps(result))
 	

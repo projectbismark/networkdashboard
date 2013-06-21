@@ -56,6 +56,11 @@ def get_devices_by_country_name(country):
 	ips = geoip_helper.get_ips_by_country(country)
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
+	
+def get_devices_by_provider_and_country(isp,country):
+	ips = geoip_helper.get_ips_by_provider_and_country(isp,country)
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
 
 def get_devices_by_city(device):
 	ip = geoip_helper.get_ip_by_device(device)

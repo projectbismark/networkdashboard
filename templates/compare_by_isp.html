@@ -62,8 +62,8 @@
 		</tr>
     </table>
 	<ul id="tab" class="nav nav-tabs" style="clear: both">
-        <!--<li class="active"><a href="#graph_plot" data-toggle="tab">Plot</a></li>-->
-		<li class="active"><a href="#graph_avg" data-toggle="tab">Average</a></li>
+        <li class="active"><a href="#graph_plot" data-toggle="tab">Plot</a></li>
+		<li><a href="#graph_avg" data-toggle="tab">Average</a></li>
 	</ul>
 	<div class="tab-content">
 		<div class="tab-pane active in" id="graph_plot">
@@ -81,6 +81,6 @@
 </div>
 
 <script type="text/javascript">
-    compareByIsp("{{isp}}");
+    compareByIsp("{{isp}}", "{{country}}");
 </script>
 {% endblock %}

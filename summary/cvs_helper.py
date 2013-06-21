@@ -95,6 +95,7 @@ def linegraph_compare(data,title,factor,roundit,line_width):
 	result = dict(name=title, type='line',data=output)
 	return result
 	
+	
 def bargraph_compare(data,factor):
 	result = []
 	# final totals used to compute averages:
@@ -114,6 +115,29 @@ def bargraph_compare(data,factor):
 	for m in meta_totals:
 		avg = (m['total']/m['count'])* factor
 		result.append(dict(name=m['isp'], type='column', data=avg))
+	return result
+	
+# computes averages for an isp within a given city
+def bargraph_compare_city(data,factor):
+	result = []
+	# final totals used to compute averages:
+	meta_totals = []
+	for d in data:
+		print d
+		city = d['city']
+		new_city = True
+		for m in meta_totals:
+			if m['city'] == city:
+				new_city = False
+				m['total'] += d['total']
+				m['count'] += d['count']
+				break
+		if new_city:
+			new_total = {'city' : city, 'total' : d['total'], 'count' : d['count']}
+			meta_totals.append(new_total)
+	for m in meta_totals:
+		avg = (m['total']/m['count'])* factor
+		result.append(dict(name=m['city'], type='column', data=avg))
 	return result
 
 def linegraph_normal_passive(data,title):

@@ -381,7 +381,19 @@ function compareByCityParameters(i) {
         plotOptions: {
             line: {
                 gapSize: null
-            }
+            },
+			column: {
+				point: {
+					events: {
+						click: function(e){
+							isp = e.point.name;
+							country = e.point.country;
+							window.location = "/compare_by_isp/" + isp + "/" + country;
+							e.preventDefault()
+						}
+					}
+				}
+			}
         }
     };
 	ret.divid2 = 'graph_div_7';
@@ -484,7 +496,19 @@ function compareByCountryParameters(i) {
         plotOptions: {
             line: {
                 gapSize: null
-            }
+            },
+			column: {
+				point: {
+					events: {
+						click: function(e){
+							isp = e.point.name;
+							country = e.point.country;
+							window.location = "/compare_by_isp/" + isp + "/" + country;
+							e.preventDefault()
+						}
+					}
+				}
+			}
         }
     };
 	ret.divid2 = 'graph_div_7';
@@ -587,7 +611,7 @@ function compareByIspParameters(i) {
         plotOptions: {
             line: {
                 gapSize: null
-            }
+            },
         }
     };
 	ret.divid2 = 'graph_div_7';
@@ -703,7 +727,7 @@ function onSuccessGraph(graphParams) {
     }
 }
 
-function onSuccessCompare(graphParams) {
+function onSuccessCompare(graphParams,country) {
     return function(data) {
         if (data.length > 200) {
             window.chart = new Highcharts.StockChart({
@@ -741,7 +765,11 @@ function onSuccessCompare(graphParams) {
 			var graphData = new Array();
 			var categories = new Array();
 			for(var i=0;i<data.length; i++){
-				graphData[i] = parseFloat(data[i]['data']);
+				graphData[i] = {
+					y : parseFloat(data[i]['data']),
+					name : data[i]['name'],
+					country : country
+				}
 				categories[i] = data[i]['name'];
 			}
             window.chart2 = new Highcharts.Chart({
@@ -760,6 +788,7 @@ function onSuccessCompare(graphParams) {
 				xAxis:{
 					categories: categories
 				},
+				plotOptions: graphParams.plotOptions,
 				tooltip:{
 					formatter: function(){
 						var units;
@@ -791,14 +820,18 @@ function onSuccessCompare(graphParams) {
     }
 }
 
-function onSuccessCountryCompare(graphParams) {
+function onSuccessCountryCompare(graphParams, country) {
     return function(data) {
 		if (data.length > 200) {
 			data = JSON.parse(data)[0];
 			var graphData = new Array();
 			var categories = new Array();
 			for(var i=0;i<data.length; i++){
-				graphData[i] = parseFloat(data[i]['data']);
+				graphData[i] = {
+					y : parseFloat(data[i]['data']),
+					name : data[i]['name'],
+					country : country				
+				}
 				categories[i] = data[i]['name'];
 			}
             window.chart2 = new Highcharts.Chart({
@@ -817,6 +850,7 @@ function onSuccessCountryCompare(graphParams) {
 				xAxis:{
 					categories: categories
 				},
+				plotOptions: graphParams.plotOptions,
 				tooltip:{
 					formatter: function(){
 						var units;
@@ -868,7 +902,7 @@ function compareGraphs(deviceid){
 	});
 }
 
-function compareByCity(city){
+function compareByCity(city, country){
 	$('#load_bar').show();
 	var sel1 = document.getElementById("max_devices");
 	var sel2 = document.getElementById("measurement_type");
@@ -881,7 +915,7 @@ function compareByCity(city){
 		type: "GET",
 		url: params.url,
 		data: {'days': days, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'city' : city},
-		success: onSuccessCompare(params)
+		success: onSuccessCompare(params,country)
 	});
 }
 
@@ -898,11 +932,11 @@ function compareByCountry(country){
 		type: "GET",
 		url: params.url,
 		data: {'days': days, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'country' : country},
-		success: onSuccessCountryCompare(params)
+		success: onSuccessCountryCompare(params, country)
 	});
 }
 
-function compareByIsp(isp){
+function compareByIsp(isp,country){
 	$('#load_bar').show();
 	var sel1 = document.getElementById("max_devices");
 	var sel2 = document.getElementById("measurement_type");
@@ -914,7 +948,7 @@ function compareByIsp(isp){
 	$.ajax({
 		type: "GET",
 		url: params.url,
-		data: {'days': days, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'isp' : isp},
+		data: {'days': days, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'isp' : isp, 'country' : country},
 		success: onSuccessCompare(params)
 	});
 }
