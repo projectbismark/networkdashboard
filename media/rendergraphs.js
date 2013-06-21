@@ -808,14 +808,6 @@ function onSuccessCompare(graphParams,country) {
 				},
 				xAxis:{
 					categories: categories,
-					labels:{
-						rotation: 90,
-						justify: false,
-						y: 55,
-						style: {
-							fontWeight: 'bold'
-						}
-					}
 				},
 				plotOptions: graphParams.plotOptions,
 				tooltip:{
@@ -883,14 +875,6 @@ function onSuccessCountryCompare(graphParams, country) {
 				},
 				xAxis:{
 					categories: categories,
-					labels:{
-						rotation: 90,
-						justify: false,
-						y: 55,
-						style: {
-							fontWeight: 'bold'
-						}
-					}
 				},
 				plotOptions: graphParams.plotOptions,
 				tooltip:{
