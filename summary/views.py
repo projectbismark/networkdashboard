@@ -43,6 +43,11 @@ def compare_by_country(request, country):
 def compare_by_isp(request, isp, country):
 	return render_to_response('compare_by_isp.html', {'isp' : isp, 'country' : country})
 	
+def compare_by_isp_and_city(request, isp, city):
+	country = geoip_helper.get_country_by_city(city)
+	print country
+	return render_to_response('compare_by_isp.html', {'isp' : isp, 'country' : country})
+	
 def compare_bitrate_by_city(request):
 	city = request.GET.get('city')
 	max_results = int(request.GET.get('max_results'))

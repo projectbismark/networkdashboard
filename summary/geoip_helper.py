@@ -192,6 +192,23 @@ def get_city_by_device(device):
 	city = get_city_by_ip(ip)
 	return city['city']
 	
+def get_country_by_city(city):
+	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	ips = getIPList()
+	for ip in ips:
+		record = gi.record_by_addr(ip[0])
+		if record['city']==city:
+			return record['country_name']
+	return ''
+	return ''
+		
+	
+def get_country_by_device(device):
+	ip = get_ip_by_device(device)
+	country = get_city_by_ip(ip)
+	return country['country_name']
+	
+	
 def get_ip_by_device(device):
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
 	conn = psycopg2.connect(conn_string)

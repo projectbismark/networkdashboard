@@ -117,13 +117,12 @@ def bargraph_compare(data,factor):
 		result.append(dict(name=m['isp'], type='column', data=avg))
 	return result
 	
-# computes averages for an isp within a given city
+# computes averages for an isp with respect to city
 def bargraph_compare_city(data,factor):
 	result = []
 	# final totals used to compute averages:
 	meta_totals = []
 	for d in data:
-		print d
 		city = d['city']
 		new_city = True
 		for m in meta_totals:
@@ -138,6 +137,29 @@ def bargraph_compare_city(data,factor):
 	for m in meta_totals:
 		avg = (m['total']/m['count'])* factor
 		result.append(dict(name=m['city'], type='column', data=avg))
+	return result
+	
+# computes averages for an isp with respect to country
+def bargraph_compare_country(data,factor):
+	result = []
+	# final totals used to compute averages:
+	meta_totals = []
+	for d in data:
+		country = d['country']
+		new_country = True
+		for m in meta_totals:
+			if m['country'] == country:
+				new_country = False
+				m['total'] += d['total']
+				m['count'] += d['count']
+				break
+		if new_country:
+			new_total = {'country' : country, 'total' : d['total'], 'count' : d['count']}
+			print country
+			meta_totals.append(new_total)
+	for m in meta_totals:
+		avg = (m['total']/m['count'])* factor
+		result.append(dict(name=m['country'], type='column', data=avg))
 	return result
 
 def linegraph_normal_passive(data,title):

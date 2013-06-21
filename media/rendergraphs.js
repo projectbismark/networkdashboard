@@ -582,7 +582,7 @@ function compareByCountryParameters(i) {
     return ret;
 }
 
-function compareByIspParameters(i) {
+function compareByIspParameters(i, country, isp) {
     var ret = {
         legend: {
             enabled: true,
@@ -612,6 +612,22 @@ function compareByIspParameters(i) {
             line: {
                 gapSize: null
             },
+			column: {
+				point: {
+					events: {
+						click: function(e){
+							if (country=="none"){
+								city = e.point.name;
+								window.location = "/compare_by_isp_and_city/" + isp + "/" + city;
+								e.preventDefault()
+							}
+							else {
+								return
+							}
+						}
+					}
+				}
+			}
         }
     };
 	ret.divid2 = 'graph_div_7';
@@ -944,7 +960,7 @@ function compareByIsp(isp,country){
 	var max = sel1.options[sel1.selectedIndex].value;
 	var mtype = sel2.options[sel2.selectedIndex].value;
 	var days = sel3.options[sel3.selectedIndex].value;
-	var params = compareByIspParameters(mtype);
+	var params = compareByIspParameters(mtype, country, isp);
 	$.ajax({
 		type: "GET",
 		url: params.url,
