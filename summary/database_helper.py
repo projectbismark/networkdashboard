@@ -433,12 +433,10 @@ def linegraph_compare_lmrtt_by_city(city,max_results,days):
 		isp_distribution += 1
 	return result
 	
-def linegraph_compare_lmrtt_by_isp(isp,max_results,days):
+def linegraph_compare_lmrtt_by_isp(isp,max_results,days,country):
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
-	devices = views_helper.get_devices_by_isp(isp)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
+	devices = views_helper.get_devices_by_provider_and_country(isp,country)
 	result = []
 	isps = []
 	included_devices = []
@@ -584,10 +582,10 @@ def linegraph_compare_rtt_by_city(city,max_results,days):
 		isp_distribution += 1
 	return result
 	
-def linegraph_compare_rtt_by_isp(isp,max_results,days):
+def linegraph_compare_rtt_by_isp(isp,max_results,days,country):
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
-	devices = views_helper.get_devices_by_isp(isp)
+	devices = views_helper.get_devices_by_provider_and_country(isp,country)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
 	isps = []
@@ -681,7 +679,7 @@ def bargraph_compare_rtt_by_country(country,max_results,days):
 	result = cvs_helper.bargraph_compare(totals,1)
 	return result
 	
-def bargraph_compare_lmrtt_by_isp(isp,max_results,days,direction,country):
+def bargraph_compare_lmrtt_by_isp(isp,max_results,days,country):
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_provider_and_country(isp,country)
@@ -777,8 +775,8 @@ def linegraph_compare_bitrate_by_city(city,max_results,days,dir):
 		isp_distribution += 1
 	return result
 	
-def linegraph_compare_bitrate_by_isp(isp,max_results,days,dir):
-	devices = views_helper.get_devices_by_isp(isp)
+def linegraph_compare_bitrate_by_isp(isp,max_results,days,dir,country):
+	devices = views_helper.get_devices_by_provider_and_country(isp,country)
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
 	# Create list of lists. The first list contains data series for the linegraph.

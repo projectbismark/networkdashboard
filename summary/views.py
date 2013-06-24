@@ -78,7 +78,7 @@ def compare_bitrate_by_isp(request):
 	result = []
 	empty = []
 	result.append(database_helper.bargraph_compare_bitrate_by_isp(isp,max_results,days,direction,country))
-	result.append(database_helper.linegraph_compare_bitrate_by_isp(isp,max_results,days,direction))
+	result.append(database_helper.linegraph_compare_bitrate_by_isp(isp,max_results,days,direction,country))
 	return HttpResponse(json.dumps(result))
 
 def compare_lmrtt_by_city(request):
@@ -104,10 +104,11 @@ def compare_lmrtt_by_isp(request):
 	isp = request.GET.get('isp')
 	max_results = int(request.GET.get('max_results'))
 	days = int(request.GET.get('days'))
+	country = request.GET.get('country_name')
 	result = []
 	empty = []
-	result.append(database_helper.bargraph_compare_lmrtt_by_isp(isp,max_results,days))
-	result.append(database_helper.linegraph_compare_lmrtt_by_isp(isp,max_results,days))
+	result.append(database_helper.bargraph_compare_lmrtt_by_isp(isp,max_results,days, country))
+	result.append(database_helper.linegraph_compare_lmrtt_by_isp(isp,max_results,days,country))
 	return HttpResponse(json.dumps(result))
 	
 def compare_rtt_by_city(request):
@@ -133,10 +134,11 @@ def compare_rtt_by_isp(request):
 	country = request.GET.get('country')
 	max_results = int(request.GET.get('max_results'))
 	days = int(request.GET.get('days'))
+	isp = request.GET.get('isp')
 	result = []
 	empty = []
-	result.append(database_helper.bargraph_compare_rtt_by_isp(isp,max_results,days))
-	result.append(database_helper.linegraph_compare_rtt_by_isp(isp,max_results,days))
+	result.append(database_helper.bargraph_compare_rtt_by_isp(isp,max_results,days,country))
+	result.append(database_helper.linegraph_compare_rtt_by_isp(isp,max_results,days, country))
 	return HttpResponse(json.dumps(result))
 	
 def compare_rtt(request):
