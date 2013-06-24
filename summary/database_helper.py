@@ -681,6 +681,28 @@ def bargraph_compare_rtt_by_country(country,max_results,days):
 	result = cvs_helper.bargraph_compare(totals,1)
 	return result
 	
+def bargraph_compare_lmrtt_by_isp(isp,max_results,days,direction,country):
+	# Calculate earliest date of the series based on user selection:
+	earliest = datetime_helper.get_daterange_start(days)
+	devices = views_helper.get_devices_by_provider_and_country(isp,country)
+	totals = []
+	for dev in devices:
+		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
+		if len(latest_measurements)==0:
+			continue
+		else:
+			data= latest_measurements
+			total = 0
+			count = 0
+			for d in data:
+				count += 1
+				total += d.average
+			city = geoip_helper.get_city_by_device(dev)
+			new_total = {'city' : city, 'total' : total, 'count' : count}
+			totals.append(new_total)	
+	result = cvs_helper.bargraph_compare_city(totals,1)
+	return result
+	
 def bargraph_compare_rtt_by_isp(isp,max_results,days,direction,country):
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
