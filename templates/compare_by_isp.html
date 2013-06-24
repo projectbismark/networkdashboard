@@ -5,12 +5,12 @@
 	<div style="float: right">
         <a class="btn" href="/"><i class="icon-home"></i> Home</a>
     </div>
-	{% if city != 'none' %}
+	{% if country != 'none' %}
 		<br />
 		<br />
 		<h2>{{isp}} Devices in {{country}}</h2>
 	{% endif %}
-	{% if city == 'none' %}
+	{% if country == 'none' %}
 		<br />
 		<br />
 		<h2>{{isp}} Devices, Averaged by city)</h2>
