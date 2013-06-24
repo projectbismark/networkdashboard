@@ -123,6 +123,7 @@ def bargraph_compare_city(data,factor):
 	result = []
 	# final totals used to compute averages:
 	meta_totals = []
+	print len(data)
 	for d in data:
 		city = d['city']
 		new_city = True

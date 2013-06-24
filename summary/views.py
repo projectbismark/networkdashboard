@@ -60,6 +60,7 @@ def compare_bitrate_by_city(request):
 def compare_bitrate_by_country(request):
 	country = request.GET.get('country')
 	max_results = int(request.GET.get('max_results'))
+	print max_results
 	days = int(request.GET.get('days'))
 	direction = request.GET.get('direction')
 	result = []

@@ -1,12 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
 
-
 <div class="content">
-    <div style="float: right">
+	<div style="float: right">
         <a class="btn" href="/"><i class="icon-home"></i> Home</a>
     </div>
+	{% if city != 'none' %}
+		<br />
+		<br />
+		<h2>{{isp}} Devices in {{country}}</h2>
+	{% endif %}
+	{% if city == 'none' %}
+		<br />
+		<br />
+		<h2>{{isp}} Devices, Averaged by city)</h2>
+	{% endif %}
 	<br /><br /><br />
+	<form>
+		<input id="country_name" type="hidden" value="{{country}}"/>
+		<input id="isp_name" type="hidden" value="{{isp}}"/>
+	</form>
     <table class="table table-striped table-condensed" id="table_3">
         <tr>
             <td>Show:</td>
@@ -63,10 +76,13 @@
 		</tr>
     </table>
 	<ul id="tab" class="nav nav-tabs" style="clear: both">
-        <li class="active"><a href="#graph_plot" data-toggle="tab">Plot</a></li>
-		<li><a href="#graph_avg" data-toggle="tab">Average</a></li>
+		<li class="active"><a href="#graph_plot" data-toggle="tab">Device Graphs</a></li>
+		<li><a href="#graph_avg" data-toggle="tab">Performance Averages</a></li>
 	</ul>
 	<div class="tab-content">
+		<div class="tab-pane" id="graph_avg">
+			<div class="graphdiv" id="graph_div_7"></div>
+		</div>
 		<div class="tab-pane active in" id="graph_plot">
 			<div class="graphdiv" id="graph_div_6"></div>
 			<div id="load_bar" class="progress_wrapper">
@@ -75,13 +91,10 @@
 				</div>
 			</div>
 		</div>
-		<div class="tab-pane" id="graph_avg">
-			<div class="graphdiv" id="graph_div_7"></div>
-		</div>
 	</div>
 </div>
 
 <script type="text/javascript">
-    compareByIsp("{{isp}}", "{{country}}");
+    compareByIsp();
 </script>
 {% endblock %}

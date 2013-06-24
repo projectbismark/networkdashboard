@@ -928,7 +928,7 @@ function compareGraphs(deviceid){
 	});
 }
 
-function compareByCity(city, country){
+function compareByCity(){
 	$('#load_bar').show();
 	var sel1 = document.getElementById("max_devices");
 	var sel2 = document.getElementById("measurement_type");
@@ -937,6 +937,8 @@ function compareByCity(city, country){
 	var mtype = sel2.options[sel2.selectedIndex].value;
 	var days = sel3.options[sel3.selectedIndex].value;
 	var params = compareByCityParameters(mtype);
+	var city = document.getElementById("city_name").value
+	var country = document.getElementById("country_name").value
 	$.ajax({
 		type: "GET",
 		url: params.url,
@@ -945,24 +947,23 @@ function compareByCity(city, country){
 	});
 }
 
-function compareByCountry(country){
+function compareByCountry(){
 	$('#load_bar').show();
-	var sel1 = document.getElementById("max_devices");
 	var sel2 = document.getElementById("measurement_type");
 	var sel3 = document.getElementById("days");
-	var max = sel1.options[sel1.selectedIndex].value;
 	var mtype = sel2.options[sel2.selectedIndex].value;
 	var days = sel3.options[sel3.selectedIndex].value;
 	var params = compareByCountryParameters(mtype);
+	var country = document.getElementById("country_name").value;
 	$.ajax({
 		type: "GET",
 		url: params.url,
-		data: {'days': days, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'country' : country},
+		data: {'days': days, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': 9, 'country' : country},
 		success: onSuccessCountryCompare(params, country)
 	});
 }
 
-function compareByIsp(isp,country){
+function compareByIsp(){
 	$('#load_bar').show();
 	var sel1 = document.getElementById("max_devices");
 	var sel2 = document.getElementById("measurement_type");
@@ -970,6 +971,8 @@ function compareByIsp(isp,country){
 	var max = sel1.options[sel1.selectedIndex].value;
 	var mtype = sel2.options[sel2.selectedIndex].value;
 	var days = sel3.options[sel3.selectedIndex].value;
+	var country = document.getElementById("country_name").value;
+	var isp = document.getElementById("isp_name").value;
 	var params = compareByIspParameters(mtype, country, isp);
 	$.ajax({
 		type: "GET",

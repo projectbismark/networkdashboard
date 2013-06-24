@@ -394,7 +394,6 @@ def linegraph_compare_lmrtt_by_city(city,max_results,days):
 	isp_distribution=0
 	distributing = True
 	while distributing:
-		print "old dev length" + str(len(devices))
 		new_device = False
 		for dev in devices:
 			if(len(result) == max_results):
@@ -432,7 +431,6 @@ def linegraph_compare_lmrtt_by_city(city,max_results,days):
 		if not new_device:
 			distributing = False
 		isp_distribution += 1
-		print "new device length" + str(len(devices))
 	return result
 	
 def linegraph_compare_lmrtt_by_isp(isp,max_results,days):
