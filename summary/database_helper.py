@@ -533,7 +533,7 @@ def bargraph_compare_lmrtt_by_country(country,max_results,days):
 	
 def linegraph_compare_rtt_by_city(city,max_results,days):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
+	earliest = datetime_helper.get_daterange_start(400)
 	devices = views_helper.get_devices_by_city_name(city)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
@@ -548,7 +548,7 @@ def linegraph_compare_rtt_by_city(city,max_results,days):
 			if(len(result) == max_results):
 				distributing = False
 				break
-			latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
+			latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='143.215.131.173')
 			if len(latest_measurements)==0:
 				continue
 			else:
@@ -645,13 +645,12 @@ def bargraph_compare_rtt_by_city(city,max_results,days):
 		if len(latest_measurements)==0:
 			continue
 		else:
-			data= latest_measurements
 			isp = geoip_helper.get_isp_by_device(dev)
 			total = 0
 			count = 0
-			for d in data:
+			for m in latest_measurements:
 				count += 1
-				total += d.average
+				total += m.average
 			new_total = {'isp' : isp, 'total' : total, 'count' : count}
 			totals.append(new_total)	
 	result = cvs_helper.bargraph_compare(totals,1)
