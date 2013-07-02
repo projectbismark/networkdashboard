@@ -228,7 +228,8 @@ def compare_bitrate(request):
 	result_count = 0
 	data = MBitrate.objects.filter(deviceid = deviceid, direction = dir, toolid = 'NETPERF_3', eventstamp__gte=earliest).order_by('eventstamp')
 	# Graph data for user's own device:
-	graph_data = cvs_helper.linegraph_compare(data,"Your Device",1000,18000,5)
+	line_data = cvs_helper.linegraph_compare(data,"Your Device",1000,18000,5)
+	bar_graph = cvs_helper.bargraph_compare(data,1000)
 	result[0].append(graph_data[0])
 	result[1].append(graph_data[1])
 	for dev in devices:

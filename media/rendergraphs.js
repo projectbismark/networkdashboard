@@ -908,22 +908,22 @@ function onSuccessIspCompare(graphParams,country) {
             div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
         }
 		if (data.length > 200) {
-			data = JSON.parse(data)[0];
+			dataParse = JSON.parse(data)[0];
 			var graphData = new Array();
 			var categories = new Array();
 			var labels;
-			for(var i=0;i<data.length; i++){
+			for(var i=0;i<dataParse.length; i++){
 				graphData[i] = {
-					y : parseFloat(data[i]['data']),
-					name : data[i]['name'],
+					y : parseFloat(dataParse[i]['data']),
+					name : dataParse[i]['name'],
 					country : country,
-					count : data[i]['count']
+					count : dataParse[i]['count']
 				}
-				if (data[i]['count']=='1'){
-					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+				if (dataParse[i]['count']=='1'){
+					categories[i] = dataParse[i]['name'] + ' (' + dataParse[i]['count'] + ')';
 				}
 				else{
-					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+					categories[i] = dataParse[i]['name'] + ' (' + dataParse[i]['count'] + ')';
 				}
 			}
 			if(graphData.length>6){
