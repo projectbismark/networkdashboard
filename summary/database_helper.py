@@ -646,6 +646,7 @@ def bargraph_compare_rtt_by_city(city,max_results,days):
 			continue
 		else:
 			data= latest_measurements
+			isp = geoip_helper.get_isp_by_device(dev)
 			total = 0
 			count = 0
 			for d in data:
@@ -669,6 +670,7 @@ def bargraph_compare_rtt_by_country(country,max_results,days):
 			continue
 		else:
 			data= latest_measurements
+			isp = geoip_helper.get_isp_by_device(dev)
 			total = 0
 			count = 0
 			for d in data:
