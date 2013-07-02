@@ -533,7 +533,7 @@ def bargraph_compare_lmrtt_by_country(country,max_results,days):
 	
 def linegraph_compare_rtt_by_city(city,max_results,days):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(400)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_city_name(city)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
