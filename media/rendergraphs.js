@@ -396,10 +396,10 @@ function compareByCityParameters(i) {
 			}
         }
     };
-	ret.divid2 = 'graph_div_7';
+	ret.divid2 = 'graph_div_6';
     switch (i) {
         case "down":
-            ret.divid = 'graph_div_6';
+            ret.divid = 'graph_div_7';
             ret.graphid = 0;
             ret.graphno = 1;
 			ret.direction = 'dw';
@@ -417,7 +417,7 @@ function compareByCityParameters(i) {
             break;
 
         case "up":
-            ret.divid = 'graph_div_6';
+            ret.divid = 'graph_div_7';
             ret.graphid = 0;
             ret.graphno = 1;
 			ret.direction = 'up';
@@ -435,7 +435,7 @@ function compareByCityParameters(i) {
             break;
 		
 		case "lm":
-            ret.divid = "graph_div_6";
+            ret.divid = "graph_div_7";
             ret.formatter = function() {
                 var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
@@ -450,7 +450,7 @@ function compareByCityParameters(i) {
             break;
 			
 		case "rtt":
-            ret.divid = "graph_div_6";
+            ret.divid = "graph_div_7";
             ret.formatter = function() {
                 var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
@@ -511,10 +511,10 @@ function compareByCountryParameters(i) {
 			}
         }
     };
-	ret.divid2 = 'graph_div_7';
+	ret.divid2 = 'graph_div_6';
     switch (i) {
         case "down":
-            ret.divid = 'graph_div_6';
+            ret.divid = 'graph_div_7';
             ret.graphid = 0;
             ret.graphno = 1;
 			ret.direction = 'dw';
@@ -532,7 +532,7 @@ function compareByCountryParameters(i) {
             break;
 
         case "up":
-            ret.divid = 'graph_div_6';
+            ret.divid = 'graph_div_7';
             ret.graphid = 0;
             ret.graphno = 1;
 			ret.direction = 'up';
@@ -550,7 +550,7 @@ function compareByCountryParameters(i) {
             break;
 		
 		case "lm":
-            ret.divid = "graph_div_6";
+            ret.divid = "graph_div_7";
             ret.formatter = function() {
                 var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
@@ -565,7 +565,7 @@ function compareByCountryParameters(i) {
             break;
 			
 		case "rtt":
-            ret.divid = "graph_div_6";
+            ret.divid = "graph_div_7";
             ret.formatter = function() {
                 var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
@@ -630,10 +630,10 @@ function compareByIspParameters(i, country, isp) {
 			}
         }
     };
-	ret.divid2 = 'graph_div_7';
+	ret.divid2 = 'graph_div_6';
     switch (i) {
         case "down":
-            ret.divid = 'graph_div_6';
+            ret.divid = 'graph_div_7';
             ret.graphid = 0;
             ret.graphno = 1;
 			ret.direction = 'dw';
@@ -651,7 +651,7 @@ function compareByIspParameters(i, country, isp) {
             break;
 
         case "up":
-            ret.divid = 'graph_div_6';
+            ret.divid = 'graph_div_7';
             ret.graphid = 0;
             ret.graphno = 1;
 			ret.direction = 'up';
@@ -669,7 +669,7 @@ function compareByIspParameters(i, country, isp) {
             break;
 		
 		case "lm":
-            ret.divid = "graph_div_6";
+            ret.divid = "graph_div_7";
             ret.formatter = function() {
                 var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
@@ -684,7 +684,7 @@ function compareByIspParameters(i, country, isp) {
             break;
 			
 		case "rtt":
-            ret.divid = "graph_div_6";
+            ret.divid = "graph_div_7";
             ret.formatter = function() {
                 var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
@@ -780,17 +780,40 @@ function onSuccessCompare(graphParams,country) {
 			data = JSON.parse(data)[0];
 			var graphData = new Array();
 			var categories = new Array();
+			var labels;
 			for(var i=0;i<data.length; i++){
 				graphData[i] = {
 					y : parseFloat(data[i]['data']),
 					name : data[i]['name'],
-					country : country
+					country : country,
+					count : data[i]['count']
 				}
 				if (data[i]['count']=='1'){
 					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
 				}
 				else{
 					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+				}
+			}
+			if(graphData.length>6){
+				labels = {
+					rotation: 90,
+					align: "left",
+					formatter: function (){
+						var label = this.value;
+						label = label.split(" ");
+						if (label[0].length>1){
+							return label[0] + ".";
+						}
+						else{
+							return label[1] + ".";
+						}
+					}
+				}
+			}
+			else{
+				labels = {
+					rotation: 0
 				}
 			}
             window.chart2 = new Highcharts.Chart({
@@ -808,12 +831,22 @@ function onSuccessCompare(graphParams,country) {
 				},
 				xAxis:{
 					categories: categories,
+					labels: labels
 				},
 				plotOptions: graphParams.plotOptions,
 				tooltip:{
+					useHTML: true,
 					formatter: function(){
 						var units;
 						var val;
+						var devicesString;
+						if(this.point.count==1){
+							devicesString = " device)";
+						}
+						else{
+							devicesString = " devices)";
+						}
+						var title = this.point.name + " (" + this.point.count + devicesString;
 						if (graphParams.units == "Bits Per Second"){
 							units = "Mbps";
 							val = recDivide(this.y, this.y, 0);
@@ -822,7 +855,128 @@ function onSuccessCompare(graphParams,country) {
 							units = "ms";
 							val = this.y;
 						}
-						return val.toFixed(2) + units;
+						return title + "<br/>" + val.toFixed(2) + units + "<br/> (Click for more information)";
+					}
+				},
+				legend:{
+					enabled: false
+				},
+				series: [{
+					data: graphData,
+					name: categories
+				}]
+            });
+        } else {
+            var div = document.getElementById(graphParams.divid2);
+            div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
+        }
+		$('#load_bar').hide();
+    }
+}
+
+function onSuccessIspCompare(graphParams,country) {
+    return function(data) {
+        if (data.length > 200) {
+            window.chart = new Highcharts.StockChart({
+                chart: {
+                    renderTo: graphParams.divid,
+                },
+                legend: graphParams.legend,
+                rangeSelector: graphParams.rangeSelector,
+                plotOptions: graphParams.plotOptions,
+                xAxis: {
+                    maxZoom: 1 * 24 * 3600000, // fourteen days
+                    ordinal: false
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: graphParams.units,
+                        style:{
+                            fontSize: 15
+                        }
+                    }
+
+                },
+                tooltip: {
+                    formatter: graphParams.formatter
+                },
+                series: JSON.parse(data)[1]
+            });
+        } else {
+            var div = document.getElementById(graphParams.divid);
+            div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
+        }
+		if (data.length > 200) {
+			data = JSON.parse(data)[0];
+			var graphData = new Array();
+			var categories = new Array();
+			var labels;
+			for(var i=0;i<data.length; i++){
+				graphData[i] = {
+					y : parseFloat(data[i]['data']),
+					name : data[i]['name'],
+					country : country,
+					count : data[i]['count']
+				}
+				if (data[i]['count']=='1'){
+					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+				}
+				else{
+					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+				}
+			}
+			if(graphData.length>6){
+				labels = {
+					rotation: 90,
+					align: "left"
+				}
+			}
+			else{
+				labels = {
+					rotation: 0
+				}
+			}
+            window.chart2 = new Highcharts.Chart({
+                chart: {
+					type: 'column',
+                    renderTo: graphParams.divid2,
+                },
+				title: {
+					text: 'Performance Averages'
+				},
+				yAxis:{
+					title:{
+						text: graphParams.units
+					}
+				},
+				xAxis:{
+					categories: categories,
+					labels: labels
+				},
+				plotOptions: graphParams.plotOptions,
+				tooltip:{
+					useHTML: true,
+					formatter: function(){
+						var units;
+						var val;
+						var devicesString;
+						if(this.point.count==1){
+							devicesString = " device)";
+						}
+						else{
+							devicesString = " devices)";
+						}
+						var title = this.point.name + " (" + this.point.count + devicesString;
+						if (graphParams.units == "Bits Per Second"){
+							units = "Mbps";
+							val = recDivide(this.y, this.y, 0);
+						}
+						else{
+							units = "ms";
+							val = this.y;
+						}
+						return title + "<br/>" + val.toFixed(2) + units + "<br/> (Click for more information)";
 					}
 				},
 				legend:{
@@ -847,17 +1001,40 @@ function onSuccessCountryCompare(graphParams, country) {
 			data = JSON.parse(data)[0];
 			var graphData = new Array();
 			var categories = new Array();
+			var labels;
 			for(var i=0;i<data.length; i++){
 				graphData[i] = {
 					y : parseFloat(data[i]['data']),
 					name : data[i]['name'],
-					country : country				
+					country : country,
+					count : data[i]['count']
 				}
 				if (data[i]['count']=='1'){
 					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
 				}
 				else{
 					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+				}
+			}
+			if(graphData.length>6){
+				labels = {
+					rotation: 90,
+					align: "left",
+					formatter: function (){
+						var label = this.value;
+						label = label.split(" ");
+						if (label[0].length>1){
+							return label[0] + ".";
+						}
+						else{
+							return label[1] + ".";
+						}
+					}
+				}
+			}
+			else{
+				labels = {
+					rotation: 0
 				}
 			}
             window.chart2 = new Highcharts.Chart({
@@ -875,12 +1052,22 @@ function onSuccessCountryCompare(graphParams, country) {
 				},
 				xAxis:{
 					categories: categories,
+					labels: labels
 				},
 				plotOptions: graphParams.plotOptions,
 				tooltip:{
+					useHTML: true,
 					formatter: function(){
 						var units;
 						var val;
+						var devicesString;
+						if(this.point.count==1){
+							devicesString = " device)";
+						}
+						else{
+							devicesString = " devices)";
+						}
+						var title = this.point.name + " (" + this.point.count + devicesString;
 						if (graphParams.units == "Bits Per Second"){
 							units = getUnits(this.y);
 							val = recDivide(this.y, this.y, 0);
@@ -889,7 +1076,7 @@ function onSuccessCountryCompare(graphParams, country) {
 							units = "ms";
 							val = this.y;
 						}
-						return val.toFixed(2) + units;
+						return title + "<br />" + val.toFixed(2) + units + "<br /> (Click for more information)";
 					}
 				},
 				legend:{
@@ -901,7 +1088,7 @@ function onSuccessCountryCompare(graphParams, country) {
 				}]
             });
         } else {
-            var div = document.getElementById(graphParams.divid2);
+            var div = document.getElementById(graphParams.divid);
             div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
         }
 		$('#load_bar').hide();
@@ -978,7 +1165,7 @@ function compareByIsp(){
 		type: "GET",
 		url: params.url,
 		data: {'days': days, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'isp' : isp, 'country' : country},
-		success: onSuccessCompare(params)
+		success: onSuccessIspCompare(params, country)
 	});
 }
 
