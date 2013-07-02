@@ -641,7 +641,7 @@ def bargraph_compare_rtt_by_city(city,max_results,days):
 	# The second contains series for the bar graph (averages):
 	totals = []
 	for dev in devices:
-		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='4.71.254.153')
+		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
 		if len(latest_measurements)==0:
 			continue
 		else:
@@ -664,7 +664,7 @@ def bargraph_compare_rtt_by_country(country,max_results,days):
 	# The second contains series for the bar graph (averages):
 	totals = []
 	for dev in devices:
-		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='4.71.254.153')
+		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
 		if len(latest_measurements)==0:
 			continue
 		else:
@@ -701,13 +701,13 @@ def bargraph_compare_lmrtt_by_isp(isp,max_results,days,country):
 	result = cvs_helper.bargraph_compare_city(totals,1)
 	return result
 	
-def bargraph_compare_rtt_by_isp(isp,max_results,days,direction,country):
+def bargraph_compare_rtt_by_isp(isp,max_results,days,country):
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_provider_and_country(isp,country)
 	totals = []
 	for dev in devices:
-		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='4.71.254.153')
+		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
 		if len(latest_measurements)==0:
 			continue
 		else:
