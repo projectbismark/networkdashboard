@@ -849,7 +849,7 @@ function onSuccessCompare(graphParams,country, city) {
 						}
 						var title = this.point.name + " (" + this.point.count + devicesString;
 						if (graphParams.units == "Bits Per Second"){
-							units = "Mbps";
+							units = getUnits(this.y);
 							val = recDivide(this.y, this.y, 0);
 						}
 						else{
@@ -970,8 +970,8 @@ function onSuccessIspCompare(graphParams,country) {
 						}
 						var title = this.point.name + " (" + this.point.count + devicesString;
 						if (graphParams.units == "Bits Per Second"){
-							units = "Mbps";
-							val = getUnits(this.y);
+							units = getUnits(this.y);
+							val = recDivide(this.y, this.y, 0);
 						}
 						else{
 							units = "ms";
