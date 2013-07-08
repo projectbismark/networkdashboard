@@ -7,7 +7,18 @@
     </div>
 	<br /><br />
 	<h2>Devices in {{city}}</h2>
-	<br /><br /><br />
+	<ul class="breadcrumb">
+		<li>
+				<a href="/">Home</a> <span class="divider">/</span>
+		</li>
+		<li>
+			<a href="/compare_by_country/{{country}}">{{country}}</a> <span class="divider">/</span>
+		</li>
+		<li class="active">
+			{{city}}
+		</li>
+    </ul>
+	<br />
 	<form>
 		<input id="city_name" type ="hidden" value="{{city}}" />
 		<input id="country_name" type = "hidden" value="{{country}}" />

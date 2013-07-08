@@ -41,11 +41,11 @@ def compare_by_country(request, country):
 	return render_to_response('compare_by_country.html', {'country' : country})
 	
 def compare_by_isp(request, isp, country):
-	return render_to_response('compare_by_isp.html', {'isp' : isp, 'country' : country})
+	return render_to_response('compare_by_isp.html', {'isp' : isp, 'country' : country, 'city' : 'none'})
 	
 def compare_by_isp_and_city(request, isp, city):
 	country = geoip_helper.get_country_by_city(city)
-	return render_to_response('compare_by_isp.html', {'isp' : isp, 'country' : country})
+	return render_to_response('compare_by_isp.html', {'isp' : isp, 'country' : country, 'city' : city})
 	
 def compare_bitrate_by_city(request):
 	city = request.GET.get('city')
@@ -60,7 +60,6 @@ def compare_bitrate_by_city(request):
 def compare_bitrate_by_country(request):
 	country = request.GET.get('country')
 	max_results = int(request.GET.get('max_results'))
-	print max_results
 	days = int(request.GET.get('days'))
 	direction = request.GET.get('direction')
 	result = []
@@ -104,7 +103,7 @@ def compare_lmrtt_by_isp(request):
 	isp = request.GET.get('isp')
 	max_results = int(request.GET.get('max_results'))
 	days = int(request.GET.get('days'))
-	country = request.GET.get('country_name')
+	country = request.GET.get('country')
 	result = []
 	empty = []
 	result.append(database_helper.bargraph_compare_lmrtt_by_isp(isp,max_results,days, country))

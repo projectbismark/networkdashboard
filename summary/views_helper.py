@@ -47,8 +47,11 @@ def get_devices_by_isp(isp):
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
 	
-def get_devices_by_city_name(city):
-	ips = geoip_helper.get_ips_by_city(city)
+def get_devices_by_city_name(city,diversify):
+	if diversify:
+		ips = geoip_helper.get_diversified_ips_by_city(city)
+	else:
+		ips = geoip_helper.get_ips_by_city(city)
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
 	
@@ -57,8 +60,11 @@ def get_devices_by_country_name(country):
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
 	
-def get_devices_by_provider_and_country(isp,country):
-	ips = geoip_helper.get_ips_by_provider_and_country(isp,country)
+def get_devices_by_provider_and_country(isp,country,diversify):
+	if diversify:
+		ips = geoip_helper.get_diversified_ips_by_provider_and_country(isp,country)
+	else:
+		ips = geoip_helper.get_ips_by_provider_and_country(isp,country)
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
 

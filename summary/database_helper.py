@@ -381,112 +381,82 @@ def update_unload(device):
 		cache_unload_new.save()
 	return
 	
-# creates and returns series for lmrtt measurements for devices in a given city:	
-def linegraph_compare_lmrtt_by_city(city,max_results,days):
+
+# creates and returns series for average bitrate measurements for devices in a given city:	
+def bargraph_compare_bitrate_by_city(city,max_results,days,dir):
+	devices = views_helper.get_devices_by_city_name(city, False)
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
-	devices = views_helper.get_devices_by_city_name(city)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
-	result = []
-	isps = []
-	included_devices = []
-	isp_distribution=0
-	distributing = True
-	while distributing:
-		new_device = False
-		for dev in devices:
-			if(len(result) == max_results):
-				distributing = False
-				break
-			latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
-			if len(latest_measurements)==0:
-				continue
-			else:
-				data = latest_measurements.order_by('eventstamp')
-				isp = geoip_helper.get_isp_by_device(dev)
-				new_isp = True
-				duplicate_device = False
-				for i in isps:
-					if i == isp:
-						new_isp = False
-				isp_count=0
-				for included_isp in isps:
-					if included_isp == isp:
-						isp_count += 1
-				if not new_isp:
-					if isp_count>isp_distribution:
-						continue
-				for d in included_devices:
-					if d==dev:
-						duplicate_device = True
-				if duplicate_device:
-					continue
-				series_name = isp + ' ' + str(isp_count + 1)
-				isps.append(isp)
-				graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
-				new_device = True
-				included_devices.append(dev)
-				result.append(graph_data)
-		if not new_device:
-			distributing = False
-		isp_distribution += 1
+	totals = []
+	for dev in devices:
+		recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest)
+		if len(recent_measurements)==0:
+			continue
+		else:
+			data = recent_measurements
+			isp = geoip_helper.get_isp_by_device(dev)
+			total = 0
+			count = 0
+			for d in data:
+				count += 1
+				total += d.average
+			new_total = {'isp' : isp, 'total' : total, 'count' : count}
+			totals.append(new_total)
+	result = cvs_helper.bargraph_compare(totals,1000)
 	return result
 	
-def linegraph_compare_lmrtt_by_isp(isp,max_results,days,country):
+def bargraph_compare_bitrate_by_country(country,max_results,days,dir):
+	devices = views_helper.get_devices_by_country_name(country)
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
-	devices = views_helper.get_devices_by_provider_and_country(isp,country)
-	result = []
-	isps = []
-	included_devices = []
-	isp_distribution=0
-	distributing = True
-	while distributing:
-		new_device = False
-		for dev in devices:
-			if(len(result) == max_results):
-				distributing = False
-				break
-			latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
-			if len(latest_measurements)==0:
-				continue
-			else:
-				data = latest_measurements.order_by('eventstamp')
-				isp = geoip_helper.get_isp_by_device(dev)
-				new_isp = True
-				duplicate_device = False
-				for i in isps:
-					if i == isp:
-						new_isp = False
-				isp_count=0
-				for included_isp in isps:
-					if included_isp == isp:
-						isp_count += 1
-				if not new_isp:
-					if isp_count>isp_distribution:
-						continue
-				for d in included_devices:
-					if d==dev:
-						duplicate_device = True
-				if duplicate_device:
-					continue
-				series_name = isp + ' ' + str(isp_count + 1)
-				isps.append(isp)
-				graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
-				new_device = True
-				included_devices.append(dev)
-				result.append(graph_data)
-		if not new_device:
-			distributing = False
-		isp_distribution += 1
+	totals = []
+	for dev in devices:
+		recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest)
+		if len(recent_measurements)==0:
+			continue
+		else:
+			data = recent_measurements
+			isp = geoip_helper.get_isp_by_device(dev)
+			total = 0
+			count = 0
+			for d in data:
+				count += 1
+				total += d.average
+			new_total = {'isp' : isp, 'total' : total, 'count' : count}
+			totals.append(new_total)
+	result = cvs_helper.bargraph_compare(totals,1000)
 	return result
+	
+	
+def bargraph_compare_bitrate_by_isp(isp,max_results,days,direction,country):
+	# Calculate earliest date of the series based on user selection:
+	earliest = datetime_helper.get_daterange_start(days)
+	devices = views_helper.get_devices_by_provider_and_country(isp,country,False)
+	totals = []
+	for dev in devices:
+		latest_measurements= MBitrate.objects.filter(deviceid = dev, direction = direction, toolid='NETPERF_3', eventstamp__gte=earliest)
+		if len(latest_measurements)==0:
+			continue
+		else:
+			data= latest_measurements
+			total = 0
+			count = 0
+			for d in data:
+				count += 1
+				total += d.average
+			city = geoip_helper.get_city_by_device(dev)
+			new_total = {'city' : city, 'total' : total, 'count' : count}
+			totals.append(new_total)	
+	result = cvs_helper.bargraph_compare_city(totals,1000)
+	return result
+	
+
 	
 # creates and returns series for lmrtt measurements for devices in a given city:	
 def bargraph_compare_lmrtt_by_city(city,max_results,days):
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
-	devices = views_helper.get_devices_by_city_name(city)
+	devices = views_helper.get_devices_by_city_name(city, False)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
 	totals = []
@@ -531,112 +501,32 @@ def bargraph_compare_lmrtt_by_country(country,max_results,days):
 	result = cvs_helper.bargraph_compare(totals,1)
 	return result
 	
-def linegraph_compare_rtt_by_city(city,max_results,days):
+def bargraph_compare_lmrtt_by_isp(isp,max_results,days,country):
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
-	devices = views_helper.get_devices_by_city_name(city)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
-	isps = []
-	result = []
-	included_devices=[]
-	isp_distribution=0
-	distributing = True
-	while distributing:
-		new_device = False
-		for dev in devices:
-			if(len(result) == max_results):
-				distributing = False
-				break
-			latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='143.215.131.173')
-			if len(latest_measurements)==0:
-				continue
-			else:
-				data = latest_measurements.order_by('eventstamp')
-				isp = geoip_helper.get_isp_by_device(dev)
-				duplicate_device = False
-				new_isp = True
-				for i in isps:
-					if i == isp:
-						new_isp = False
-				isp_count=0
-				for included_isp in isps:
-					if included_isp == isp:
-						isp_count += 1
-				if not new_isp:
-					if isp_count>isp_distribution:
-						continue
-				for d in included_devices:
-					if d==dev:
-						duplicate_device = True
-				if duplicate_device:
-					continue
-				series_name = isp + ' ' + str(isp_count + 1)
-				isps.append(isp)
-				graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
-				new_device = True
-				included_devices.append(dev)
-				result.append(graph_data)
-		if not new_device:
-			distributing = False
-		isp_distribution += 1
-	return result
-	
-def linegraph_compare_rtt_by_isp(isp,max_results,days,country):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
-	devices = views_helper.get_devices_by_provider_and_country(isp,country)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
-	isps = []
-	result = []
-	included_devices=[]
-	isp_distribution=0
-	distributing = True
-	while distributing:
-		new_device = False
-		for dev in devices:
-			if(len(result) == max_results):
-				distributing = False
-				break
-			latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
-			if len(latest_measurements)==0:
-				continue
-			else:
-				data = latest_measurements.order_by('eventstamp')
-				isp = geoip_helper.get_isp_by_device(dev)
-				duplicate_device = False
-				new_isp = True
-				for i in isps:
-					if i == isp:
-						new_isp = False
-				isp_count=0
-				for included_isp in isps:
-					if included_isp == isp:
-						isp_count += 1
-				if not new_isp:
-					if isp_count>isp_distribution:
-						continue
-				for d in included_devices:
-					if d==dev:
-						duplicate_device = True
-				if duplicate_device:
-					continue
-				series_name = isp + ' ' + str(isp_count + 1)
-				isps.append(isp)
-				graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
-				new_device = True
-				included_devices.append(dev)
-				result.append(graph_data)
-		if not new_device:
-			distributing = False
-		isp_distribution += 1
+	devices = views_helper.get_devices_by_provider_and_country(isp,country, False)
+	totals = []
+	for dev in devices:
+		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
+		if len(latest_measurements)==0:
+			continue
+		else:
+			data= latest_measurements
+			total = 0
+			count = 0
+			for d in data:
+				count += 1
+				total += d.average
+			city = geoip_helper.get_city_by_device(dev)
+			new_total = {'city' : city, 'total' : total, 'count' : count}
+			totals.append(new_total)	
+	result = cvs_helper.bargraph_compare_city(totals,1)
 	return result
 	
 def bargraph_compare_rtt_by_city(city,max_results,days):
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
-	devices = views_helper.get_devices_by_city_name(city)
+	devices = views_helper.get_devices_by_city_name(city, False)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
 	totals = []
@@ -658,7 +548,7 @@ def bargraph_compare_rtt_by_city(city,max_results,days):
 	
 def bargraph_compare_rtt_by_country(country,max_results,days):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
+	earliest = datetime_helper.get_daterange_start(500)
 	devices = views_helper.get_devices_by_country_name(country)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
@@ -680,32 +570,10 @@ def bargraph_compare_rtt_by_country(country,max_results,days):
 	result = cvs_helper.bargraph_compare(totals,1)
 	return result
 	
-def bargraph_compare_lmrtt_by_isp(isp,max_results,days,country):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
-	devices = views_helper.get_devices_by_provider_and_country(isp,country)
-	totals = []
-	for dev in devices:
-		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
-		if len(latest_measurements)==0:
-			continue
-		else:
-			data= latest_measurements
-			total = 0
-			count = 0
-			for d in data:
-				count += 1
-				total += d.average
-			city = geoip_helper.get_city_by_device(dev)
-			new_total = {'city' : city, 'total' : total, 'count' : count}
-			totals.append(new_total)	
-	result = cvs_helper.bargraph_compare_city(totals,1)
-	return result
-	
 def bargraph_compare_rtt_by_isp(isp,max_results,days,country):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
-	devices = views_helper.get_devices_by_provider_and_country(isp,country)
+	earliest = datetime_helper.get_daterange_start(500)
+	devices = views_helper.get_devices_by_provider_and_country(isp,country, False)
 	totals = []
 	for dev in devices:
 		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
@@ -723,175 +591,216 @@ def bargraph_compare_rtt_by_isp(isp,max_results,days,country):
 			totals.append(new_total)	
 	result = cvs_helper.bargraph_compare_city(totals,1)
 	return result
-
-# creates and returns series for bitrate measurements for devices in a given city:	
+	
 def linegraph_compare_bitrate_by_city(city,max_results,days,dir):
-	devices = views_helper.get_devices_by_city_name(city)
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
+	devices = views_helper.get_devices_by_city_name(city, True)
 	result = []
 	isps = []
-	isp_distribution=0
-	included_devices=[]
-	distributing = True
-	while distributing:
-		new_device = False
-		for dev in devices:
-			if(len(result) == max_results):
-				distributing = False
-				break
-			recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest)
-			if len(recent_measurements)==0:
-				continue
-			else:
-				data = recent_measurements.order_by('eventstamp')
-				isp = geoip_helper.get_isp_by_device(dev)
-				new_isp = True
-				duplicate_device = False
-				for i in isps:
-					if i == isp:
-						new_isp = False
-				isp_count=0
-				for included_isp in isps:
-					if included_isp == isp:
-						isp_count += 1
-				if not new_isp:
-					if isp_count>isp_distribution:
-						continue
-				for d in included_devices:
-					if d==dev:
-						duplicate_device = True
-				if duplicate_device:
-					continue
-				series_name = isp + ' ' + str(isp_count + 1)
-				isps.append(isp)
-				graph_data = cvs_helper.linegraph_compare(data,series_name,1000,18000,2)
-				new_device = True
-				included_devices.append(dev)
-				result.append(graph_data)
-		if not new_device:
-			distributing = False
-		isp_distribution += 1
-	return result
-	
-def linegraph_compare_bitrate_by_isp(isp,max_results,days,dir,country):
-	devices = views_helper.get_devices_by_provider_and_country(isp,country)
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
-	result = []
-	isps = []
-	isp_distribution=0
-	included_devices=[]
-	distributing = True
-	while distributing:
-		new_device = False
-		for dev in devices:
-			if(len(result) == max_results):
-				distributing = False
-				break
-			recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest)
-			if len(recent_measurements)==0:
-				continue
-			else:
-				data = recent_measurements.order_by('eventstamp')
-				isp = geoip_helper.get_isp_by_device(dev)
-				new_isp = True
-				duplicate_device = False
-				for i in isps:
-					if i == isp:
-						new_isp = False
-				isp_count=0
-				for included_isp in isps:
-					if included_isp == isp:
-						isp_count += 1
-				if not new_isp:
-					if isp_count>isp_distribution:
-						continue
-				for d in included_devices:
-					if d==dev:
-						duplicate_device = True
-				if duplicate_device:
-					continue
-				series_name = isp + ' ' + str(isp_count + 1)
-				isps.append(isp)
-				graph_data = cvs_helper.linegraph_compare(data,series_name,1000,18000,2)
-				new_device = True
-				included_devices.append(dev)
-				result.append(graph_data)
-		if not new_device:
-			distributing = False
-		isp_distribution += 1
-	return result
-	
-def bargraph_compare_bitrate_by_isp(isp,max_results,days,direction,country):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
-	devices = views_helper.get_devices_by_provider_and_country(isp,country)
-	totals = []
+	new_device = False
 	for dev in devices:
-		latest_measurements= MBitrate.objects.filter(deviceid = dev, direction = direction, toolid='NETPERF_3', eventstamp__gte=earliest)
+		latest_measurements= MBitrate.objects.filter(deviceid=dev, eventstamp__gte=earliest, direction=dir, toolid='NETPERF_3')
 		if len(latest_measurements)==0:
 			continue
 		else:
-			data= latest_measurements
-			total = 0
-			count = 0
-			for d in data:
-				count += 1
-				total += d.average
-			city = geoip_helper.get_city_by_device(dev)
-			new_total = {'city' : city, 'total' : total, 'count' : count}
-			totals.append(new_total)	
-	result = cvs_helper.bargraph_compare_city(totals,1)
-	return result
-
-# creates and returns series for average bitrate measurements for devices in a given city:	
-def bargraph_compare_bitrate_by_city(city,max_results,days,dir):
-	devices = views_helper.get_devices_by_city_name(city)
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
-	totals = []
-	for dev in devices:
-		recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest)
-		if len(recent_measurements)==0:
-			continue
-		else:
-			data = recent_measurements
+			data = latest_measurements.order_by('eventstamp')
 			isp = geoip_helper.get_isp_by_device(dev)
-			total = 0
-			count = 0
-			for d in data:
-				count += 1
-				total += d.average
-			new_total = {'isp' : isp, 'total' : total, 'count' : count}
-			totals.append(new_total)
-	result = cvs_helper.bargraph_compare(totals,1000)
+			isps.append(isp)
+			isp_count=0
+			for included_isp in isps:
+				if included_isp == isp:
+					isp_count += 1
+			series_name = isp + ' ' + str(isp_count)
+			graph_data = cvs_helper.linegraph_compare(data,series_name,1000,1,2)
+			result.append(graph_data)
+			if (len(result)>=max_results):
+				break
 	return result
 	
-def bargraph_compare_bitrate_by_country(country,max_results,days,dir):
-	devices = views_helper.get_devices_by_country_name(country)
+def linegraph_compare_bitrate_by_isp(isp,max_results,days,dir,country):
 	# Calculate earliest date of the series based on user selection:
 	earliest = datetime_helper.get_daterange_start(days)
-	totals = []
+	devices = views_helper.get_devices_by_provider_and_country(isp,country,True)
+	result = []
+	cities = []
+	new_device = False
 	for dev in devices:
-		recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest)
-		if len(recent_measurements)==0:
+		latest_measurements= MBitrate.objects.filter(deviceid=dev, eventstamp__gte=earliest, direction=dir, toolid='NETPERF_3')
+		if len(latest_measurements)==0:
 			continue
 		else:
-			data = recent_measurements
+			data = latest_measurements.order_by('eventstamp')
+			city = geoip_helper.get_city_by_device(dev)
+			cities.append(city)
+			city_count=0
+			for included_city in cities:
+				if included_city == city:
+					city_count += 1
+			series_name = city + ' ' + str(city_count)
+			graph_data = cvs_helper.linegraph_compare(data,series_name,1000,1,2)
+			result.append(graph_data)
+			if (len(result)>=max_results):
+				break
+	return result
+	
+# creates and returns series for lmrtt measurements for devices in a given city:	
+def linegraph_compare_lmrtt_by_city(city,max_results,days):
+	# Calculate earliest date of the series based on user selection:
+	earliest = datetime_helper.get_daterange_start(days)
+	devices = views_helper.get_devices_by_city_name(city, True)
+	# Create list of lists. The first list contains data series for the linegraph.
+	# The second contains series for the bar graph (averages):
+	result = []
+	isps = []
+	new_device = False
+	for dev in devices:
+		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest)
+		if len(latest_measurements)==0:
+			continue
+		else:
+			data = latest_measurements.order_by('eventstamp')
 			isp = geoip_helper.get_isp_by_device(dev)
-			total = 0
-			count = 0
-			for d in data:
-				count += 1
-				total += d.average
-			new_total = {'isp' : isp, 'total' : total, 'count' : count}
-			totals.append(new_total)
-	result = cvs_helper.bargraph_compare(totals,1000)
+			isps.append(isp)
+			isp_count=0
+			for i in isps:
+				if i==isp:
+					isp_count+=1
+			series_name = isp + ' ' + str(isp_count)
+			graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
+			result.append(graph_data)
+			if (len(result)>=max_results):
+				break
+	return result
+	
+def linegraph_compare_lmrtt_by_isp(isp,max_results,days,country):
+	# Calculate earliest date of the series based on user selection:
+	earliest = datetime_helper.get_daterange_start(days)
+	devices = views_helper.get_devices_by_provider_and_country(isp,country,True)
+	result = []
+	cities = []
+	new_device = False
+	for dev in devices:
+		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
+		if len(latest_measurements)==0:
+			continue
+		else:
+			data = latest_measurements.order_by('eventstamp')
+			city = geoip_helper.get_city_by_device(dev)
+			cities.append(city)
+			city_count=0
+			for included_city in cities:
+				if included_city == city:
+					city_count += 1
+			series_name = city + ' ' + str(city_count)
+			graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
+			result.append(graph_data)
+			if (len(result)>=max_results):
+				break
+	return result
+	
+# def linegraph_compare_rtt_by_city(city,max_results,days):
+	# Calculate earliest date of the series based on user selection:
+	# earliest = datetime_helper.get_daterange_start(days, True)
+	# devices = views_helper.get_devices_by_city_name(city)
+	# Create list of lists. The first list contains data series for the linegraph.
+	# The second contains series for the bar graph (averages):
+	# isps = []
+	# result = []
+	# included_devices=[]
+	# isp_distribution=0
+	# distributing = True
+	# while distributing:
+		# new_device = False
+		# for dev in devices:
+			# if(len(result) == max_results):
+				# distributing = False
+				# break
+			# latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
+			# if len(latest_measurements)==0:
+				# continue
+			# else:
+				# data = latest_measurements.order_by('eventstamp')
+				# isp = geoip_helper.get_isp_by_device(dev)
+				# duplicate_device = False
+				# new_isp = True
+				# for i in isps:
+					# if i == isp:
+						# new_isp = False
+				# isp_count=0
+				# for included_isp in isps:
+					# if included_isp == isp:
+						# isp_count += 1
+				# if not new_isp:
+					# if isp_count>isp_distribution:
+						# continue
+				# for d in included_devices:
+					# if d==dev:
+						# duplicate_device = True
+				# if duplicate_device:
+					# continue
+				# series_name = isp + ' ' + str(isp_count + 1)
+				# isps.append(isp)
+				# graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
+				# new_device = True
+				# included_devices.append(dev)
+				# result.append(graph_data)
+		# if not new_device:
+			# distributing = False
+		# isp_distribution += 1
+	# return result
+	
+def linegraph_compare_rtt_by_city(city,max_results,days):
+	# Calculate earliest date of the series based on user selection:
+	earliest = datetime_helper.get_daterange_start(days)
+	devices = views_helper.get_devices_by_city_name(city, True)
+	# Create list of lists. The first list contains data series for the linegraph.
+	# The second contains series for the bar graph (averages):
+	result = []
+	isps = []
+	new_device = False
+	for dev in devices:
+		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
+		if len(latest_measurements)==0:
+			continue
+		else:
+			data = latest_measurements.order_by('eventstamp')
+			isp = geoip_helper.get_isp_by_device(dev)
+			isps.append(isp)
+			isp_count=0
+			for i in isps:
+				if i==isp:
+					isp_count+=1
+			series_name = isp + ' ' + str(isp_count)
+			graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
+			result.append(graph_data)
+			if (len(result)>=max_results):
+				break
+	return result
+	
+def linegraph_compare_rtt_by_isp(isp,max_results,days,country):
+	# Calculate earliest date of the series based on user selection:
+	earliest = datetime_helper.get_daterange_start(500)
+	devices = views_helper.get_devices_by_provider_and_country(isp,country,True)
+	result = []
+	cities = []
+	for dev in devices:
+		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
+		if len(latest_measurements)==0:
+			continue
+		else:
+			data = latest_measurements.order_by('eventstamp')
+			city = geoip_helper.get_city_by_device(dev)
+			cities.append(city)
+			city_count=0
+			for included_city in cities:
+				if included_city == city:
+					city_count += 1
+			series_name = city + ' ' + str(city_count)
+			graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
+			result.append(graph_data)
+			if (len(result)>=max_results):
+				break
 	return result
 
 
@@ -1070,7 +979,7 @@ def get_location(device):
     if len(details)>0:
         return (details[0].city + ", " + details[0].country)
 
-    dev = MBitrate.objects.filter(deviceid=device, srcip ='143.215.131.173' )
+    dev = MBitrate.objects.filter(deviceid=device, srcip ='8.8.8.8' )
     if len(dev)>0:
         ip = str(dev[0].dstip)
         urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + ip + "&format=json")

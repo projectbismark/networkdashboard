@@ -154,7 +154,6 @@ def getMACList():
 	cursor = conn.cursor()
 	cursor.execute("select id from devices")
 	records = cursor.fetchall()
-	#print records
 	return records
 	
 def get_device_count():
@@ -164,7 +163,6 @@ def get_device_count():
 	# cursor = conn.cursor()
 	# cursor.execute("select COUNT(*) from devices")
 	# count = cursor.fetchone()
-	#print records
 	return device_count
 
 def get_active_count():
@@ -175,7 +173,6 @@ def get_active_count():
 	# cursor = conn.cursor()
 	# cursor.execute("select COUNT(*) from devices")
 	# count = cursor.fetchone()
-	#print records
 	return device_count
 
 def getDeviceIDList():
@@ -184,7 +181,6 @@ def getDeviceIDList():
 	cursor = conn.cursor()
 	cursor.execute("select id from devices")
 	records = cursor.fetchall()
-	#print records
 	return records
 	
 def get_city_by_device(device):
@@ -202,7 +198,6 @@ def get_country_by_city(city):
 				return record['country_name']
 		except:
 			continue
-	return ''
 	return ''
 		
 	
@@ -256,10 +251,50 @@ def get_ips_by_provider_and_country(isp,country):
 				if(name.lower().find(m[0].lower())!=-1):
 					name = m[1]
 					break
-			if (((name==isp) and (ip_country==country)) or ((name==isp) and (country=="none"))):	
+			if (((name==isp) and (ip_country==country)) or ((name==isp) and (country=="none"))):
 				ret.append(ip[0])
 		except:
 			continue
+	return ret
+	
+def get_diversified_ips_by_provider_and_country(isp,country):
+	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
+	gi2 = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	mappings = isp_mappings.mappings
+	ret = []
+	ip_list = getIPList()
+	dist_level = 0
+	country_list = []
+	while True:
+		new_device = False
+		for ip in ip_list:
+			try:
+				country_count = 0
+				new_ip = True
+				for r in ret:
+					if r==ip[0]:
+						new_ip = False
+						break
+				if not new_ip:
+					continue
+				name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+				ip_country = gi2.record_by_addr(ip[0])['country_name']
+				for m in mappings:
+					if(name.lower().find(m[0].lower())!=-1):
+						name = m[1]
+						break
+				for c in country_list:
+					if ip_country==c:
+						country_count+=1
+				if(((name==isp)and(ip_country==country))or((name==isp)and(country=='none')and(country_count<=dist_level))):
+					country_list.append(ip_country)
+					ret.append(ip[0])
+					new_device = True
+			except:
+				continue
+		if not new_device:
+			break
+		dist_level+=1
 	return ret
 	
 def get_ips_by_city(city):
@@ -269,10 +304,50 @@ def get_ips_by_city(city):
 	for ip in ip_list:
 		try:
 			record = gi.record_by_addr(ip[0])
-			if (record['city']==city):
+			if (str(record['city'])==str(city)):
 				ret.append(ip[0])
 		except:
 			continue
+	return ret
+	
+def get_diversified_ips_by_city(city):
+	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
+	gi2 = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	mappings = isp_mappings.mappings
+	dist_level = 0
+	ret = []
+	isp_list = []
+	ip_list = getIPList()
+	while True:
+		new_device = False
+		for ip in ip_list:
+			try:
+				isp_count = 0
+				new_ip = True
+				for r in ret:
+					if r==ip[0]:
+						new_ip = False
+						break
+				if not new_ip:
+					continue
+				name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+				record = gi2.record_by_addr(ip[0])
+				for m in mappings:
+					if(name.lower().find(m[0].lower())!=-1):
+						name = m[1]
+						break
+				for isp in isp_list:
+					if name==isp:
+						isp_count+=1
+				if ((str(record['city'])==str(city)) and (isp_count<=dist_level)):
+					isp_list.append(name)
+					ret.append(ip[0])
+					new_device = True
+			except:
+				continue
+		if not new_device:
+			break
+		dist_level+=1
 	return ret
 	
 def get_ips_by_country(country):
@@ -294,8 +369,15 @@ def get_devices_by_ips(ips):
 	cursor = conn.cursor()
 	ret = []
 	for ip in ips:
+		new_record = True
 		cursor.execute("select SUBSTRING(id,3) from devices where ip='" + ip +"'")
 		record = cursor.fetchall()[0][0].lower()
+		for r in ret:
+			if r == record:
+				new_record = False
+				break
+		if not new_record:
+			continue
 		ret.append(record)
 	conn.close()
 	return ret

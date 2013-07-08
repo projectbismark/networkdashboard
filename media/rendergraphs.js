@@ -386,9 +386,9 @@ function compareByCityParameters(i) {
 				point: {
 					events: {
 						click: function(e){
-							isp = e.point.name;
-							country = e.point.country;
-							window.location = "/compare_by_isp/" + isp + "/" + country;
+							name = e.point.name;
+							city = e.point.city;
+							window.location = "/compare_by_isp_and_city/" + name + "/" + city;
 							e.preventDefault()
 						}
 					}
@@ -511,10 +511,10 @@ function compareByCountryParameters(i) {
 			}
         }
     };
-	ret.divid2 = 'graph_div_6';
+	ret.divid2 = 'graph_div_7';
     switch (i) {
         case "down":
-            ret.divid = 'graph_div_7';
+            ret.divid = 'graph_div_6';
             ret.graphid = 0;
             ret.graphno = 1;
 			ret.direction = 'dw';
@@ -532,7 +532,7 @@ function compareByCountryParameters(i) {
             break;
 
         case "up":
-            ret.divid = 'graph_div_7';
+            ret.divid = 'graph_div_6';
             ret.graphid = 0;
             ret.graphno = 1;
 			ret.direction = 'up';
@@ -550,7 +550,7 @@ function compareByCountryParameters(i) {
             break;
 		
 		case "lm":
-            ret.divid = "graph_div_7";
+            ret.divid = "graph_div_6";
             ret.formatter = function() {
                 var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
@@ -565,7 +565,7 @@ function compareByCountryParameters(i) {
             break;
 			
 		case "rtt":
-            ret.divid = "graph_div_7";
+            ret.divid = "graph_div_6";
             ret.formatter = function() {
                 var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
@@ -743,7 +743,7 @@ function onSuccessGraph(graphParams) {
     }
 }
 
-function onSuccessCompare(graphParams,country) {
+function onSuccessCompare(graphParams,country, city) {
     return function(data) {
         if (data.length > 200) {
             window.chart = new Highcharts.StockChart({
@@ -786,6 +786,7 @@ function onSuccessCompare(graphParams,country) {
 					y : parseFloat(data[i]['data']),
 					name : data[i]['name'],
 					country : country,
+					city: city,
 					count : data[i]['count']
 				}
 				if (data[i]['count']=='1'){
@@ -1130,7 +1131,7 @@ function compareByCity(){
 		type: "GET",
 		url: params.url,
 		data: {'days': days, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'city' : city},
-		success: onSuccessCompare(params,country)
+		success: onSuccessCompare(params,country, city)
 	});
 }
 

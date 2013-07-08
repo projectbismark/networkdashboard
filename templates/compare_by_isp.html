@@ -5,15 +5,53 @@
 	<div style="float: right">
         <a class="btn" href="/"><i class="icon-home"></i> Home</a>
     </div>
-	{% if country != 'none' %}
+	{% if country != 'none' and city != 'none' %}
 		<br />
 		<br />
-		<h2>{{isp}} Devices in {{country}}</h2>
+		<h2>{{isp}} ({{country}})</h2>
+		<ul class="breadcrumb">
+			<li>
+				<a href="/">Home</a> <span class="divider">/</span>
+			</li>
+			<li>
+				<a href="/compare_by_country/{{country}}">{{country}}</a> <span class="divider">/</span>
+			</li>
+			<li>
+				<a href="/compare_by_city/{{city}}/{{country}}">{{city}}</a> <span class="divider">/</span>
+			</li>
+			<li class="active">
+				<a href="#">{{isp}} </a>
+			</li>
+		</ul>
+	{% endif %}
+	{% if country != 'none' and city == 'none' %}
+		<br />
+		<br />
+		<h2>{{isp}} ({{country}})</h2>
+		<ul class="breadcrumb">
+			<li>
+				<a href="/">Home</a> <span class="divider">/</span>
+			</li>
+			<li>
+				<a href="/compare_by_country/{{country}}">{{country}}</a> <span class="divider">/</span>
+			</li>
+			<li class="active">
+				{{isp}}
+			</li>
+		</ul>
 	{% endif %}
 	{% if country == 'none' %}
 		<br />
 		<br />
-		<h2>{{isp}} Devices</h2>
+		<h2>{{isp}} Device Averages</h2>
+		<ul class="breadcrumb">
+			<li>
+				<a href="/">Home</a> <span class="divider">/</span>
+			</li>
+			<li class="active">
+				{{isp}}
+			</li>
+		</ul>
 	{% endif %}
 	<br /><br /><br />
 	<form>
