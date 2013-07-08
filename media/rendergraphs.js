@@ -971,7 +971,7 @@ function onSuccessIspCompare(graphParams,country) {
 						var title = this.point.name + " (" + this.point.count + devicesString;
 						if (graphParams.units == "Bits Per Second"){
 							units = "Mbps";
-							val = recDivide(this.y, this.y, 0);
+							val = getUnits(this.y);
 						}
 						else{
 							units = "ms";
