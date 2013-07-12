@@ -67,12 +67,19 @@ def update_bitrate(device):
 		download_data[1]['data'].extend(cvs_helper.linegraph_normal(downloads_other,"Single-threaded TCP",1000,18000,0,1)['data'])
 		upload_data[0]['data'].extend(cvs_helper.linegraph_normal(uploads_netperf_3,"Multi-threaded TCP",1000,18000,1,2)['data'])
 		upload_data[1]['data'].extend(cvs_helper.linegraph_normal(uploads_other,"Single-threaded TCP",1000,18000,0,2)['data'])
-		cache_down[0].data=json.dumps(download_data)
-		cache_down[0].eventstamp = most_recent_measure
-		cache_up[0].data= json.dumps(upload_data)
-		cache_up[0].eventstamp = most_recent_measure
-		cache_down[0].save()
-		cache_up[0].save()
+		id_down = cache_down[0].id
+		id_up = cache_up[0].id
+		deviceid = cache_down[0].deviceid
+		update_down = JsonCache(id=id,deviceid=deviceid,eventstamp=most_recent_measure,datatype="bitrate_down",data=json.dumps(download_data))
+		update_up = JsonCache(id=id,deviceid=deviceid,eventstamp=most_recent_measure,datatype="bitrate_up", data=json.dumps(upload_data))
+		update_down.save()
+		update_up.save()
+		# cache_down[0].data=json.dumps(download_data)
+		# cache_down[0].eventstamp = most_recent_measure
+		# cache_up[0].data= json.dumps(upload_data)
+		# cache_up[0].eventstamp = most_recent_measure
+		# cache_down[0].save()
+		# cache_up[0].save()
 		return
 	# 1 or both caches are empty:
 	else:
@@ -120,13 +127,13 @@ def update_rtt(device):
 		full_details = MRtt.objects.filter(deviceid=device,average__lte=3000, eventstamp__gt=most_recent_cached)
 		if full_details.count()==0:
 			return
-		full_details = full_details.order_by('eventstamp')
+		#full_details = full_details.order_by('eventstamp')
 		most_recent_uncached = full_details.latest('eventstamp').eventstamp
 		# if (most_recent_uncached<=most_recent_cached):
 			# return
 		rtt_data = json.loads(cache[0].data)
 		# retrieve all uncached measurements:
-		distinct_ips = full_details.values('dstip').distinct()
+		distinct_ips = full_details.distinct('dstip').values('dstip')
 		# full_details = full_details.filter(eventstamp__gt=most_recent_cached).order_by('eventstamp')
 		location = ''
 		dst_ip = ''
@@ -156,9 +163,13 @@ def update_rtt(device):
 				# new series:
 				if (index==(len(rtt_data)-1)):
 					rtt_data.append(cvs_helper.linegraph_normal(device_details,location,1,1,priority,series_id))
-		cache[0].data = json.dumps(rtt_data)
-		cache[0].eventstamp = most_recent_uncached
-		cache[0].save()
+		id = cache[0].id
+		deviceid = cache[0].deviceid
+		cache_update = JsonCache(deviceid=deviceid,id=id,eventstamp=most_recent_uncached,data=json.dumps(rtt_data),datatype='rtt')
+		#cache[0].data = json.dumps(rtt_data)
+		#cache[0].eventstamp = most_recent_uncached
+		#cache[0].save()
+		cache_update.save()
 		return
 	# cache is empty:
 	else:
@@ -168,7 +179,7 @@ def update_rtt(device):
 		most_recent = full_details.latest('eventstamp').eventstamp
 		distinct_ips = full_details.values('dstip').distinct()
 		# must wait until after distinct query before ordering original queryset:
-		full_details = full_details.order_by('eventstamp')
+		#full_details = full_details.order_by('eventstamp')
 		for ip in distinct_ips:
 			try:
 				ip_lookup = IpResolver.objects.filter(ip=ip['dstip'])[0]
@@ -207,9 +218,13 @@ def update_lmrtt(device):
 		# uncached_measurements = all_records.filter(eventstamp__gt=lmrtt_cache[0].eventstamp).order_by('eventstamp')
 		lmrtt_data = json.loads(lmrtt_cache[0].data)
 		lmrtt_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_measurements,'Last mile latency',1,1,1,series_id)['data'])
-		lmrtt_cache[0].data = json.dumps(lmrtt_data)
-		lmrtt_cache[0].eventstamp = latest_record.eventstamp
-		lmrtt_cache[0].save()
+		id = lmrtt_cache[0].id
+		deviceid = lmrtt_cache[0].deviceid
+		update_lmrtt = JsonCache(id=id,deviceid=deviceid,data=json.dumps(lmrtt_data),eventstamp = latest_record.eventstamp, datatype='lmrtt')
+		# lmrtt_cache[0].data = json.dumps(lmrtt_data)
+		# lmrtt_cache[0].eventstamp = latest_record.eventstamp
+		# lmrtt_cache[0].save()
+		update_lmrtt.save(0
 		return
 	else:
 		all_measurements = MLmrtt.objects.filter(deviceid=device,average__lte=3000)
@@ -254,9 +269,13 @@ def update_capacity(device):
 		cap_measure_down = uncached_capacity.filter(direction='dw').order_by('eventstamp')
 		capacity_data[0]['data'].extend(cvs_helper.linegraph_normal(cap_measure_up,'Capacity Up',1000,1,0,series_id)['data'])
 		capacity_data[1]['data'].extend(cvs_helper.linegraph_normal(cap_measure_down,'Capacity Down',1000,1,0,series_id)['data'])
-		capacity_cache[0].data=json.dumps(capacity_data)
-		capacity_cache[0].eventstamp = most_recent_uncached
-		capacity_cache[0].save()
+		id = capacity_cache.id
+		deviceid = capacity_cache.deviceid
+		capacity_update = JsonCache(id=id,deviceid=deviceid,data=json.dumps(capacity_cache),eventstamp=most_recent_uncached,datatype='capacity')
+		# capacity_cache[0].data=json.dumps(capacity_data)
+		# capacity_cache[0].eventstamp = most_recent_uncached
+		# capacity_cache[0].save()
+		capacity_update.save()
 	# cache is empty
 	else:
 		all_capacity= MCapacity.objects.filter(deviceid=device)
@@ -305,9 +324,13 @@ def update_shaperate(device):
 		# convert records to series data and append to cached data:
 		shaperate_data[0]['data'].extend(cvs_helper.linegraph_normal(shape_measure_up,'Shape rate Up',1000,1,0,series_id)['data'])
 		shaperate_data[1]['data'].extend(cvs_helper.linegraph_normal(shape_measure_down,'Shape rate Down',1000,1,1,series_id)['data'])
-		shaperate_cache[0].data=json.dumps(shaperate_data)
-		shaperate_cache[0].eventstamp = most_recent_uncached
-		shaperate_cache[0].save()
+		id = shaperate_cache[0].id
+		deviceid = shaperate_cache[0].deviceid
+		shaperate_update = JsonCache(id=id,deviceid=deviceid,eventstamp=most_recent_uncached,data=json.dumps(shaperate_data),datatype='shaperate')
+		# shaperate_cache[0].data=json.dumps(shaperate_data)
+		# shaperate_cache[0].eventstamp = most_recent_uncached
+		# shaperate_cache[0].save()
+		shaperate_update.save()
 	# 1 or both caches are empty:
 	else:
 		# retrieve all capacity and shaperate measurement records for this device:
@@ -364,9 +387,13 @@ def update_unload(device):
 			most_recent_uncached = most_recent_uncached_down
 		else:
 			most_recent_uncached = most_recent_uncached_up
-		unload_cache[0].data=json.dumps(unload_data)
-		unload_cache[0].eventstamp = most_recent_uncached
-		unload_cache[0].save()
+		id = unload_cache[0].id
+		deviceid = unload_cache[0].deviceid
+		unload_update = JsonCache(id=id,deviceid=deviceid,eventstamp=most_recent_uncached,data=json.dumps(unload_data),datatype='unload')
+		# unload_cache[0].data=json.dumps(unload_data)
+		# unload_cache[0].eventstamp = most_recent_uncached
+		# unload_cache[0].save()
+		unload_update.save()
 	# cache is empty
 	else:
 		all_upload = MUlrttup.objects.filter(deviceid=device)
