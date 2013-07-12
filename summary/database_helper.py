@@ -366,27 +366,34 @@ def update_unload(device):
 		# no measurements:
 		if all_upload.count()==0 and all_download.count()==0:
 			return
+		unload_data = json.loads(unload_cache[0].data)
 		most_recent_uncached_up = all_upload.latest('eventstamp').eventstamp
 		most_recent_uncached_down = all_download.latest('eventstamp').eventstamp
-		if most_recent_uncached_up<=most_recent_cached and most_recent_uncached_down<=most_recent_cached:
+		#if most_recent_uncached_up<=most_recent_cached and most_recent_uncached_down<=most_recent_cached:
 			# cache is up to date
-			return
-		unload_data = json.loads(unload_cache[0].data)
-		if most_recent_uncached_up>most_recent_cached:
-			# retrieve all uncached measurements:
-			uncached_up = all_upload.order_by('eventstamp')
-			if uncached_up.count()!=0:
-				unload_data[1]['data'].extend(cvs_helper.linegraph_normal(uncached_up,'Under Load Up',1,1,0,series_id)['data'])
-		if most_recent_uncached_down>most_recent_cached:
-			# retrieve all uncached measurements:
-			uncached_down = all_download.order_by('eventstamp')
-			if uncached_down.count()!=0:
-				# uncached_down = uncached_down.order_by('eventstamp')
-				unload_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_down,'Under Load Down',1,1,0,series_id)['data'])
-		if most_recent_uncached_down>most_recent_uncached_up:
-			most_recent_uncached = most_recent_uncached_down
-		else:
+			#return
+		if all_upload.count()!=0:
+			if most_recent_uncached_up>most_recent_cached:
+				# retrieve all uncached measurements:
+				uncached_up = all_upload.order_by('eventstamp')
+				if uncached_up.count()!=0:
+					unload_data[1]['data'].extend(cvs_helper.linegraph_normal(uncached_up,'Under Load Up',1,1,0,series_id)['data'])
+		if all_download.count()!=0:
+			if most_recent_uncached_down>most_recent_cached:
+				# retrieve all uncached measurements:
+				uncached_down = all_download.order_by('eventstamp')
+				if uncached_down.count()!=0:
+					# uncached_down = uncached_down.order_by('eventstamp')
+					unload_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_down,'Under Load Down',1,1,0,series_id)['data'])
+		if all_download.count()!=0 and all_upload.count()!=0:
+			if most_recent_uncached_down>most_recent_uncached_up:
+				most_recent_uncached = most_recent_uncached_down
+			else:
+				most_recent_uncached = most_recent_uncached_up
+		if all_download.count()==0:
 			most_recent_uncached = most_recent_uncached_up
+		if all_upload.count()==0:
+			most_recent_uncached = most_recent_uncached_down
 		id = unload_cache[0].id
 		deviceid = unload_cache[0].deviceid
 		unload_update = JsonCache(id=id,deviceid=deviceid,eventstamp=most_recent_uncached,data=json.dumps(unload_data),datatype='unload')
