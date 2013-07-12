@@ -70,8 +70,8 @@ def update_bitrate(device):
 		id_down = cache_down[0].id
 		id_up = cache_up[0].id
 		deviceid = cache_down[0].deviceid
-		update_down = JsonCache(id=id,deviceid=deviceid,eventstamp=most_recent_measure,datatype="bitrate_down",data=json.dumps(download_data))
-		update_up = JsonCache(id=id,deviceid=deviceid,eventstamp=most_recent_measure,datatype="bitrate_up", data=json.dumps(upload_data))
+		update_down = JsonCache(id=id_down,deviceid=deviceid,eventstamp=most_recent_measure,datatype="bitrate_down",data=json.dumps(download_data))
+		update_up = JsonCache(id=id_up,deviceid=deviceid,eventstamp=most_recent_measure,datatype="bitrate_up", data=json.dumps(upload_data))
 		update_down.save()
 		update_up.save()
 		# cache_down[0].data=json.dumps(download_data)
@@ -224,7 +224,7 @@ def update_lmrtt(device):
 		# lmrtt_cache[0].data = json.dumps(lmrtt_data)
 		# lmrtt_cache[0].eventstamp = latest_record.eventstamp
 		# lmrtt_cache[0].save()
-		update_lmrtt.save(0
+		update_lmrtt.save()
 		return
 	else:
 		all_measurements = MLmrtt.objects.filter(deviceid=device,average__lte=3000)
@@ -269,9 +269,9 @@ def update_capacity(device):
 		cap_measure_down = uncached_capacity.filter(direction='dw').order_by('eventstamp')
 		capacity_data[0]['data'].extend(cvs_helper.linegraph_normal(cap_measure_up,'Capacity Up',1000,1,0,series_id)['data'])
 		capacity_data[1]['data'].extend(cvs_helper.linegraph_normal(cap_measure_down,'Capacity Down',1000,1,0,series_id)['data'])
-		id = capacity_cache.id
-		deviceid = capacity_cache.deviceid
-		capacity_update = JsonCache(id=id,deviceid=deviceid,data=json.dumps(capacity_cache),eventstamp=most_recent_uncached,datatype='capacity')
+		id = capacity_cache[0].id
+		deviceid = capacity_cache[0].deviceid
+		capacity_update = JsonCache(id=id,deviceid=deviceid,data=json.dumps(capacity_data),eventstamp=most_recent_uncached,datatype='capacity')
 		# capacity_cache[0].data=json.dumps(capacity_data)
 		# capacity_cache[0].eventstamp = most_recent_uncached
 		# capacity_cache[0].save()
