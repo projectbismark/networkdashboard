@@ -15,7 +15,7 @@ def add_new_devices(devices):
 	all_details = Devicedetails.objects.all()
 	for d in devices:
 		# if no devicedetails record with this device id exists:
-		if len(all_details.filter(deviceid=d['deviceid']))==0:
+		if all_details.filter(deviceid=d['deviceid']).count()==0:
 			# generate hashkey:
 			hash = hashlib.md5()
 			hash.update(d['deviceid'])
@@ -34,16 +34,17 @@ def update_bitrate(device):
 	cache_down = JsonCache.objects.filter(deviceid=device, datatype = "bitrate_down")
 	cache_up = JsonCache.objects.filter(deviceid=device, datatype = "bitrate_up")
 	# both caches already contain cached data:
-	if (len(cache_down)!=0 and len(cache_up)!=0):
-		all_device_details= MBitrate.objects.filter(average__lte=chosen_limit,deviceid=device)
-		# no measurements for this device:
-		if len(all_device_details)==0:
+	if (cache_down.count()!=0 and cache_up.count()!=0):
+		most_recent_cached = cache_down[0].eventstamp
+		all_device_details= MBitrate.objects.filter(average__lte=chosen_limit,deviceid=device, eventstamp__gt=most_recent_cached)
+		# no new measurements for this device:
+		if (all_device_details.count())==0:
 			return
 		most_recent_measure = all_device_details.latest('eventstamp').eventstamp
-		most_recent_cached = cache_down[0].eventstamp
+		all_device_details = all_device_details.order_by('eventstamp')
 		# cache is up to date
-		if most_recent_measure<=most_recent_cached:
-			return
+		# if most_recent_measure<=most_recent_cached:
+			# return
 		download_data = json.loads(cache_down[0].data)
 		upload_data = json.loads(cache_up[0].data)
 		# split into the seperate series, multi-threaded and single-threaded:
@@ -52,16 +53,16 @@ def update_bitrate(device):
 		upload_multi = upload_data[0]
 		upload_single = upload_data[1]
 		# retrieve all uncached measurements:
-		all_device_details= all_device_details.filter(eventstamp__gt=most_recent_cached)
+		# all_device_details= all_device_details.filter(eventstamp__gt=most_recent_cached)
 		# if there are no uncached measurements:
-		if len(all_device_details)==0:
+		if (all_device_details.count())==0:
 			return
 		downloads = all_device_details.filter(direction='dw')
 		uploads = all_device_details.filter(direction='up')
-		downloads_netperf_3 = downloads.filter(toolid='NETPERF_3').order_by('eventstamp')
-		downloads_other = downloads.exclude(toolid='NETPERF_3').order_by('eventstamp')
-		uploads_netperf_3 = uploads.filter(toolid='NETPERF_3').order_by('eventstamp')
-		uploads_other = uploads.exclude(toolid='NETPERF_3').order_by('eventstamp')
+		downloads_netperf_3 = downloads.filter(toolid='NETPERF_3')
+		downloads_other = downloads.exclude(toolid='NETPERF_3')
+		uploads_netperf_3 = uploads.filter(toolid='NETPERF_3')
+		uploads_other = uploads.exclude(toolid='NETPERF_3')
 		download_data[0]['data'].extend(cvs_helper.linegraph_normal(downloads_netperf_3,"Multi-threaded TCP",1000,18000,1,1)['data'])
 		download_data[1]['data'].extend(cvs_helper.linegraph_normal(downloads_other,"Single-threaded TCP",1000,18000,0,1)['data'])
 		upload_data[0]['data'].extend(cvs_helper.linegraph_normal(uploads_netperf_3,"Multi-threaded TCP",1000,18000,1,2)['data'])
@@ -78,19 +79,20 @@ def update_bitrate(device):
 		# check whether caches are empty or not. If only 1 cache is empty, trying to append to the data
 		# portion of the non-empty cache would corrupt the cache. These are booleans which evaluate to true
 		# in the event that the respective cache is indeed empty:
-		cache_check_down = len(JsonCache.objects.filter(deviceid=device, datatype = "bitrate_down"))==0
-		cache_check_up = len(JsonCache.objects.filter(deviceid=device, datatype = "bitrate_up"))==0
+		cache_check_down = JsonCache.objects.filter(deviceid=device, datatype = "bitrate_down").count()==0
+		cache_check_up = JsonCache.objects.filter(deviceid=device, datatype = "bitrate_up").count()==0
 		all_device_details= MBitrate.objects.filter(average__lte=chosen_limit,deviceid=device)
 		# no measurements exist at all:
-		if len(all_device_details)==0:
+		if all_device_details.count()==0:
 			return
+		all_device_details = all_device_details.order_by('eventstamp')
 		most_recent_measure = all_device_details.latest('eventstamp').eventstamp
 		downloads = all_device_details.filter(direction='dw')
 		uploads = all_device_details.filter(direction='up')
-		downloads_netperf_3 = downloads.filter(toolid='NETPERF_3').order_by('eventstamp')
-		downloads_other = downloads.exclude(toolid='NETPERF_3').order_by('eventstamp')
-		uploads_netperf_3 = uploads.filter(toolid='NETPERF_3').order_by('eventstamp')
-		uploads_other = uploads.exclude(toolid='NETPERF_3').order_by('eventstamp')
+		downloads_netperf_3 = downloads.filter(toolid='NETPERF_3')
+		downloads_other = downloads.exclude(toolid='NETPERF_3')
+		uploads_netperf_3 = uploads.filter(toolid='NETPERF_3')
+		uploads_other = uploads.exclude(toolid='NETPERF_3')
 		download_data = []
 		upload_data = []
 		download_data.append(cvs_helper.linegraph_normal(downloads_netperf_3,"Multi-threaded TCP",1000,18000,1,1))
@@ -113,18 +115,19 @@ def update_rtt(device):
 	priority=0
 	cache = JsonCache.objects.filter(deviceid=device, datatype = "rtt")
 	# cache contains cached data:
-	if len(cache)!=0:
-		full_details = MRtt.objects.filter(deviceid=device,average__lte=3000)
-		if len(full_details)==0:
-			return
+	if (cache.count())!=0:
 		most_recent_cached = cache.latest('eventstamp').eventstamp
-		most_recent_uncached = full_details.latest('eventstamp').eventstamp
-		if (most_recent_uncached<=most_recent_cached):
+		full_details = MRtt.objects.filter(deviceid=device,average__lte=3000, eventstamp__gt=most_recent_cached)
+		if full_details.count()==0:
 			return
+		full_details = full_details.order_by('eventstamp')
+		most_recent_uncached = full_details.latest('eventstamp').eventstamp
+		# if (most_recent_uncached<=most_recent_cached):
+			# return
 		rtt_data = json.loads(cache[0].data)
 		# retrieve all uncached measurements:
 		distinct_ips = full_details.values('dstip').distinct()
-		full_details = full_details.filter(eventstamp__gt=most_recent_cached).order_by('eventstamp')
+		# full_details = full_details.filter(eventstamp__gt=most_recent_cached).order_by('eventstamp')
 		location = ''
 		dst_ip = ''
 		for ip in distinct_ips:
@@ -132,14 +135,14 @@ def update_rtt(device):
 			try:
 				ip_lookup = IpResolver.objects.filter(ip=dst_ip)
 				# not an active measurement server:
-				if len(ip_lookup)==0:
+				if (ip_lookup.count())==0:
 					continue
 				else:
 					location = ip_lookup[0].location
 			except:
 				continue
 			device_details = full_details.filter(dstip = ip['dstip'])
-			if len(device_details)==0:
+			if (device_details.count())==0:
 				continue
 			if(location=="Georgia Tech"):
 				priority=1
@@ -160,7 +163,7 @@ def update_rtt(device):
 	# cache is empty:
 	else:
 		full_details = MRtt.objects.filter(deviceid=device,average__lte=3000)
-		if len(full_details)==0:
+		if full_details.count()==0:
 			return
 		most_recent = full_details.latest('eventstamp').eventstamp
 		distinct_ips = full_details.values('dstip').distinct()
@@ -174,7 +177,7 @@ def update_rtt(device):
 			except:
 				continue
 			device_details = full_details.filter(dstip = ip['dstip'])		
-			if len(device_details)==0:
+			if device_details.count()==0:
 				continue
 			if(location=="Georgia Tech"):
 				priority=1
@@ -191,15 +194,17 @@ def update_lmrtt(device):
 	lmrtt_data=[]
 	series_id=4
 	lmrtt_cache = JsonCache.objects.filter(deviceid=device, datatype='lmrtt')
-	if len(lmrtt_cache)!=0:
-		all_records = MLmrtt.objects.filter(deviceid=device,average__lte=3000)
-		if (len(all_records)==0):
+	if lmrtt_cache.count()!=0:
+		latest = lmrtt_cache.latest('eventstamp').eventstamp
+		all_records = MLmrtt.objects.filter(deviceid=device,average__lte=3000, eventstamp__gt=latest)
+		if (all_records.count()==0):
 			return
-		latest_record = all_records.latest('eventstamp')
+		uncached_measurements = all_records.order_by('eventstamp')
+		latest_record = uncached_measurements.latest('eventstamp')
 		# cache is up to date:
-		if latest_record.eventstamp<=lmrtt_cache[0].eventstamp:
-			return
-		uncached_measurements = all_records.filter(eventstamp__gt=lmrtt_cache[0].eventstamp).order_by('eventstamp')
+		#if latest_record.eventstamp<=lmrtt_cache[0].eventstamp:
+			#return
+		# uncached_measurements = all_records.filter(eventstamp__gt=lmrtt_cache[0].eventstamp).order_by('eventstamp')
 		lmrtt_data = json.loads(lmrtt_cache[0].data)
 		lmrtt_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_measurements,'Last mile latency',1,1,1,series_id)['data'])
 		lmrtt_cache[0].data = json.dumps(lmrtt_data)
@@ -209,7 +214,7 @@ def update_lmrtt(device):
 	else:
 		all_measurements = MLmrtt.objects.filter(deviceid=device,average__lte=3000)
 		# no measurements for this device
-		if len(all_measurements)==0:
+		if all_measurements.count()==0:
 			return
 		latest_measurement = all_measurements.latest('eventstamp').eventstamp
 		all_measurements = all_measurements.order_by('eventstamp')
@@ -227,23 +232,24 @@ def update_capacity(device):
 	# retrieve cached data:
 	capacity_cache = JsonCache.objects.filter(deviceid=device,datatype='capacity')
 	# cacehe not empty:
-	if len(capacity_cache)!=0:
-		all_measurements = MCapacity.objects.filter(deviceid=device)
-		# no measurements:
-		if len(all_measurements)==0:
-			return
+	if capacity_cache.count()!=0:
 		most_recent_cached = capacity_cache.latest('eventstamp').eventstamp
-		most_recent_uncached = all_measurements.latest('eventstamp').eventstamp
-		if most_recent_uncached<=most_recent_cached:
-			# cache is up to date
+		all_measurements = MCapacity.objects.filter(deviceid=device, eventstamp__gt=most_recent_cached)
+		# no new measurements:
+		if all_measurements.count()==0:
 			return
+		most_recent_uncached = all_measurements.latest('eventstamp').eventstamp
+		# if most_recent_uncached<=most_recent_cached:
+			# cache is up to date
+			# return
 		capacity_data = json.loads(capacity_cache[0].data)
 		capacity_up = capacity_data[0]
 		capacity_down = capacity_data[1]
 		# retrieve all uncached measurements:
-		uncached_capacity = all_measurements.filter(eventstamp__gt=most_recent_cached)
-		if len(uncached_capacity)==0:
-			return
+		# uncached_capacity = all_measurements.filter(eventstamp__gt=most_recent_cached)
+		uncached_capacity = all_measurements.order_by('eventstamp')
+		# if len(uncached_capacity)==0:
+			# return
 		cap_measure_up = uncached_capacity.filter(direction='up').order_by('eventstamp')
 		cap_measure_down = uncached_capacity.filter(direction='dw').order_by('eventstamp')
 		capacity_data[0]['data'].extend(cvs_helper.linegraph_normal(cap_measure_up,'Capacity Up',1000,1,0,series_id)['data'])
@@ -255,11 +261,12 @@ def update_capacity(device):
 	else:
 		all_capacity= MCapacity.objects.filter(deviceid=device)
 		# no measurements:
-		if len(all_capacity)==0:
+		if all_capacity.count()==0:
 			return
+		all_capacity = all_capacity.order_by('eventstamp')
 		latest_capacity = all_capacity.latest('eventstamp').eventstamp
-		cap_measure_up = all_capacity.filter(direction='up').order_by('eventstamp')
-		cap_measure_down = all_capacity.filter(direction='dw').order_by('eventstamp')
+		cap_measure_up = all_capacity.filter(direction='up')
+		cap_measure_down = all_capacity.filter(direction='dw')
 		capacity_data.append(cvs_helper.linegraph_normal(cap_measure_up,'Capacity Up',1000,1,0,series_id))
 		capacity_data.append(cvs_helper.linegraph_normal(cap_measure_down,'Capacity Down',1000,1,0,series_id))
 		cache_capacity_new = JsonCache(deviceid = device, data =json.dumps(capacity_data), datatype = 'capacity', eventstamp = latest_capacity)
@@ -275,26 +282,26 @@ def update_shaperate(device):
 	# retrieve cached data:
 	shaperate_cache = JsonCache.objects.filter(deviceid=device,datatype='shaperate')
 	# cache already contains data:
-	if len(shaperate_cache)!=0:
-		all_measurements = MShaperate.objects.filter(deviceid=device)
-		if len(all_measurements)==0:
+	if shaperate_cache.count()!=0:
+		most_recent_cached = shaperate_cache.latest('eventstamp').eventstamp
+		all_measurements = MShaperate.objects.filter(deviceid=device, eventstamp__gt=most_recent_cached)
+		if all_measurements.count()==0:
 			return
 		most_recent_uncached = all_measurements.latest('eventstamp').eventstamp
-		most_recent_cached = shaperate_cache[0].eventstamp
-		if most_recent_uncached<= most_recent_cached:
+		# if most_recent_uncached<= most_recent_cached:
 			# up to date:
-			return
+			# return
 		shaperate_data = json.loads(shaperate_cache[0].data)
 		# split into 4 separate series, upload and download for shaperate and capacity:
 		shaperate_up = shaperate_data[0]
 		shaperate_down = shaperate_data[1]
 		# retrieve all uncached measurements:
-		uncached_shaperate = all_measurements.filter(eventstamp__gt=most_recent_cached)
-		if len(uncached_shaperate)==0:
-			return
+		uncached_shaperate = all_measurements.order_by('eventstamp')
+		# if len(uncached_shaperate)==0:
+			# return
 		# separate shaperate records into upload and download
-		shape_measure_up = uncached_shaperate.filter(direction='up').order_by('eventstamp')
-		shape_measure_down = uncached_shaperate.filter(direction='dw').order_by('eventstamp')
+		shape_measure_up = uncached_shaperate.filter(direction='up')
+		shape_measure_down = uncached_shaperate.filter(direction='dw')
 		# convert records to series data and append to cached data:
 		shaperate_data[0]['data'].extend(cvs_helper.linegraph_normal(shape_measure_up,'Shape rate Up',1000,1,0,series_id)['data'])
 		shaperate_data[1]['data'].extend(cvs_helper.linegraph_normal(shape_measure_down,'Shape rate Down',1000,1,1,series_id)['data'])
@@ -305,13 +312,14 @@ def update_shaperate(device):
 	else:
 		# retrieve all capacity and shaperate measurement records for this device:
 		all_shaperate= MShaperate.objects.filter(deviceid=device)
-		if len(all_shaperate)==0:
+		if all_shaperate.count()==0:
 			# no data
 			return
 		most_recent_cached = all_shaperate.latest('eventstamp').eventstamp
+		all_shaperate = all_shaperate.order_by('eventstamp')
 		# separate shaperate records into upload and download:
-		shape_measure_up = all_shaperate.filter(direction='up').order_by('eventstamp')
-		shape_measure_down = all_shaperate.filter(direction='dw').order_by('eventstamp')
+		shape_measure_up = all_shaperate.filter(direction='up')
+		shape_measure_down = all_shaperate.filter(direction='dw')
 		# convert records into new series to be placed in cache:
 		shaperate_data.append(cvs_helper.linegraph_normal(shape_measure_up,'Shape rate Up',1000,1,0,series_id))
 		shaperate_data.append(cvs_helper.linegraph_normal(shape_measure_down,'Shape rate Down',1000,1,1,series_id))
@@ -328,13 +336,13 @@ def update_unload(device):
 	# retrieve cached data:
 	unload_cache = JsonCache.objects.filter(deviceid=device,datatype='unload')
 	# cache not empty:
-	if len(unload_cache)!=0:
-		all_upload = MUlrttup.objects.filter(deviceid=device)
-		all_download = MUlrttdw.objects.filter(deviceid=device)
-		# no measurements:
-		if len(all_upload)==0 and len(all_download)==0:
-			return
+	if unload_cache.count()!=0:
 		most_recent_cached = unload_cache.latest('eventstamp').eventstamp
+		all_upload = MUlrttup.objects.filter(deviceid=device, eventstamp__gt=most_recent_cached)
+		all_download = MUlrttdw.objects.filter(deviceid=device, eventstamp__gt=most_recent_cached)
+		# no measurements:
+		if all_upload.count()==0 and all_download.count()==0:
+			return
 		most_recent_uncached_up = all_upload.latest('eventstamp').eventstamp
 		most_recent_uncached_down = all_download.latest('eventstamp').eventstamp
 		if most_recent_uncached_up<=most_recent_cached and most_recent_uncached_down<=most_recent_cached:
@@ -343,15 +351,14 @@ def update_unload(device):
 		unload_data = json.loads(unload_cache[0].data)
 		if most_recent_uncached_up>most_recent_cached:
 			# retrieve all uncached measurements:
-			uncached_up = all_upload.filter(eventstamp__gt=most_recent_cached)
-			if len(uncached_up)!=0:
-				uncached_up = uncached_up.order_by('eventstamp')
+			uncached_up = all_upload.order_by('eventstamp')
+			if uncached_up.count()!=0:
 				unload_data[1]['data'].extend(cvs_helper.linegraph_normal(uncached_up,'Under Load Up',1,1,0,series_id)['data'])
 		if most_recent_uncached_down>most_recent_cached:
 			# retrieve all uncached measurements:
-			uncached_down = all_download.filter(eventstamp__gt=most_recent_cached)
-			if len(uncached_down)!=0:
-				uncached_down = uncached_down.order_by('eventstamp')
+			uncached_down = all_download.order_by('eventstamp')
+			if uncached_down.count()!=0:
+				# uncached_down = uncached_down.order_by('eventstamp')
 				unload_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_down,'Under Load Down',1,1,0,series_id)['data'])
 		if most_recent_uncached_down>most_recent_uncached_up:
 			most_recent_uncached = most_recent_uncached_down
@@ -365,7 +372,7 @@ def update_unload(device):
 		all_upload = MUlrttup.objects.filter(deviceid=device)
 		all_download = MUlrttdw.objects.filter(deviceid=device)
 		# no measurements:
-		if len(all_upload)==0 or len(all_download)==0:
+		if all_upload.count()==0 or all_download.count()==0:
 			return
 		latest_upload = all_upload.latest('eventstamp').eventstamp
 		latest_download = all_download.latest('eventstamp').eventstamp
@@ -386,11 +393,11 @@ def update_unload(device):
 def bargraph_compare_bitrate_by_city(city,max_results,days,dir):
 	devices = views_helper.get_devices_by_city_name(city, False)
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(300)
+	earliest = datetime_helper.get_daterange_start(days)
 	totals = []
 	for dev in devices:
 		recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest)
-		if len(recent_measurements)==0:
+		if recent_measurements.count()==0:
 			continue
 		else:
 			data = recent_measurements
@@ -408,11 +415,11 @@ def bargraph_compare_bitrate_by_city(city,max_results,days,dir):
 def bargraph_compare_bitrate_by_country(country,max_results,days,dir):
 	devices = views_helper.get_devices_by_country_name(country)
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(300)
+	earliest = datetime_helper.get_daterange_start(days)
 	totals = []
 	for dev in devices:
 		recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest)
-		if len(recent_measurements)==0:
+		if recent_measurements.count()==0:
 			continue
 		else:
 			data = recent_measurements
@@ -430,12 +437,12 @@ def bargraph_compare_bitrate_by_country(country,max_results,days,dir):
 	
 def bargraph_compare_bitrate_by_isp(isp,max_results,days,direction,country):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(300)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_provider_and_country(isp,country,False)
 	totals = []
 	for dev in devices:
 		latest_measurements= MBitrate.objects.filter(deviceid = dev, direction = direction, toolid='NETPERF_3', eventstamp__gte=earliest)
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			data= latest_measurements
@@ -455,14 +462,14 @@ def bargraph_compare_bitrate_by_isp(isp,max_results,days,direction,country):
 # creates and returns series for lmrtt measurements for devices in a given city:	
 def bargraph_compare_lmrtt_by_city(city,max_results,days):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(300)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_city_name(city, False)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
 	totals = []
 	for dev in devices:
 		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			data= latest_measurements
@@ -479,14 +486,14 @@ def bargraph_compare_lmrtt_by_city(city,max_results,days):
 	
 def bargraph_compare_lmrtt_by_country(country,max_results,days):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(300)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_country_name(country)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
 	totals = []
 	for dev in devices:
 		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			data= latest_measurements
@@ -503,12 +510,12 @@ def bargraph_compare_lmrtt_by_country(country,max_results,days):
 	
 def bargraph_compare_lmrtt_by_isp(isp,max_results,days,country):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(300)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_provider_and_country(isp,country, False)
 	totals = []
 	for dev in devices:
 		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			data= latest_measurements
@@ -525,14 +532,14 @@ def bargraph_compare_lmrtt_by_isp(isp,max_results,days,country):
 	
 def bargraph_compare_rtt_by_city(city,max_results,days):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(300)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_city_name(city, False)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
 	totals = []
 	for dev in devices:
 		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			isp = geoip_helper.get_isp_by_device(dev)
@@ -548,14 +555,14 @@ def bargraph_compare_rtt_by_city(city,max_results,days):
 	
 def bargraph_compare_rtt_by_country(country,max_results,days):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(500)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_country_name(country)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
 	totals = []
 	for dev in devices:
 		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			data= latest_measurements
@@ -572,12 +579,12 @@ def bargraph_compare_rtt_by_country(country,max_results,days):
 	
 def bargraph_compare_rtt_by_isp(isp,max_results,days,country):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(500)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_provider_and_country(isp,country, False)
 	totals = []
 	for dev in devices:
 		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			data= latest_measurements
@@ -594,14 +601,14 @@ def bargraph_compare_rtt_by_isp(isp,max_results,days,country):
 	
 def linegraph_compare_bitrate_by_city(city,max_results,days,dir):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(300)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_city_name(city, True)
 	result = []
 	isps = []
 	new_device = False
 	for dev in devices:
 		latest_measurements= MBitrate.objects.filter(deviceid=dev, eventstamp__gte=earliest, direction=dir, toolid='NETPERF_3')
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			data = latest_measurements.order_by('eventstamp')
@@ -620,14 +627,14 @@ def linegraph_compare_bitrate_by_city(city,max_results,days,dir):
 	
 def linegraph_compare_bitrate_by_isp(isp,max_results,days,dir,country):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(300)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_provider_and_country(isp,country,True)
 	result = []
 	cities = []
 	new_device = False
 	for dev in devices:
 		latest_measurements= MBitrate.objects.filter(deviceid=dev, eventstamp__gte=earliest, direction=dir, toolid='NETPERF_3')
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			data = latest_measurements.order_by('eventstamp')
@@ -647,7 +654,7 @@ def linegraph_compare_bitrate_by_isp(isp,max_results,days,dir,country):
 # creates and returns series for lmrtt measurements for devices in a given city:	
 def linegraph_compare_lmrtt_by_city(city,max_results,days):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(300)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_city_name(city, True)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
@@ -656,7 +663,7 @@ def linegraph_compare_lmrtt_by_city(city,max_results,days):
 	new_device = False
 	for dev in devices:
 		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest)
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			data = latest_measurements.order_by('eventstamp')
@@ -675,14 +682,14 @@ def linegraph_compare_lmrtt_by_city(city,max_results,days):
 	
 def linegraph_compare_lmrtt_by_isp(isp,max_results,days,country):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(300)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_provider_and_country(isp,country,True)
 	result = []
 	cities = []
 	new_device = False
 	for dev in devices:
 		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			data = latest_measurements.order_by('eventstamp')
@@ -752,7 +759,7 @@ def linegraph_compare_lmrtt_by_isp(isp,max_results,days,country):
 	
 def linegraph_compare_rtt_by_city(city,max_results,days):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(300)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_city_name(city, True)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
@@ -761,7 +768,7 @@ def linegraph_compare_rtt_by_city(city,max_results,days):
 	new_device = False
 	for dev in devices:
 		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			data = latest_measurements.order_by('eventstamp')
@@ -780,13 +787,13 @@ def linegraph_compare_rtt_by_city(city,max_results,days):
 	
 def linegraph_compare_rtt_by_isp(isp,max_results,days,country):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(500)
+	earliest = datetime_helper.get_daterange_start(days)
 	devices = views_helper.get_devices_by_provider_and_country(isp,country,True)
 	result = []
 	cities = []
 	for dev in devices:
 		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
-		if len(latest_measurements)==0:
+		if latest_measurements.count()==0:
 			continue
 		else:
 			data = latest_measurements.order_by('eventstamp')
@@ -871,10 +878,10 @@ def get_isp_count():
 	return response
 
 def device_count_for_country(cntry):
-    return len(Devicedetails.objects.filter(country=cntry))
+    return Devicedetails.objects.filter(country=cntry).count()
 	
 def device_count_for_isp(provider):
-    return len(Devicedetails.objects.filter(isp=provider))
+    return Devicedetails.objects.filter(isp=provider).count()
     
 
 def list_countries():
@@ -898,13 +905,13 @@ def list_isps():
     return ret
 
 def get_num_common_locations(device_details):
-    return len(Devicedetails.objects.filter(city=device_details.city))-1
+    return Devicedetails.objects.filter(city=device_details.city).count()-1
 
 def get_num_common_providers(device_details):
-    return len(Devicedetails.objects.filter(isp=device_details.isp))-1
+    return Devicedetails.objects.filter(isp=device_details.isp).count()-1
 
 def get_num_devices(device_details):
-    return len(Devicedetails.objects.exclude(deviceid=device_details.deviceid))-1
+    return Devicedetails.objects.exclude(deviceid=device_details.deviceid).count()-1
 
 def get_first_measurement(device):
 	try:
@@ -976,11 +983,11 @@ def get_latest_shaperate(device):
 def get_location(device):
     device = device.replace(':','')
     details = Devicedetails.objects.filter(deviceid=device)
-    if len(details)>0:
+    if details.count()>0:
         return (details[0].city + ", " + details[0].country)
 
     dev = MBitrate.objects.filter(deviceid=device, srcip ='8.8.8.8' )
-    if len(dev)>0:
+    if dev.count()>0:
         ip = str(dev[0].dstip)
         urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + ip + "&format=json")
         r1 = urlobj.read()
