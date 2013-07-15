@@ -361,24 +361,24 @@ def update_unload(device):
 	# cache not empty:
 	if unload_cache.count()!=0:
 		most_recent_cached = unload_cache.latest('eventstamp').eventstamp
-		all_upload = MUlrttup.objects.filter(deviceid=device, eventstamp__gt=most_recent_cached)
-		all_download = MUlrttdw.objects.filter(deviceid=device, eventstamp__gt=most_recent_cached)
+		all_upload = MUlrttup.objects.filter(deviceid=device, eventstamp__gt=most_recent_cached, average__lte=3000)
+		all_download = MUlrttdw.objects.filter(deviceid=device, eventstamp__gt=most_recent_cached, average__lte=3000)
 		# no measurements:
 		if all_upload.count()==0 and all_download.count()==0:
 			return
 		unload_data = json.loads(unload_cache[0].data)
-		most_recent_uncached_up = all_upload.latest('eventstamp').eventstamp
-		most_recent_uncached_down = all_download.latest('eventstamp').eventstamp
 		#if most_recent_uncached_up<=most_recent_cached and most_recent_uncached_down<=most_recent_cached:
 			# cache is up to date
 			#return
 		if all_upload.count()!=0:
+			most_recent_uncached_up = all_upload.latest('eventstamp').eventstamp
 			if most_recent_uncached_up>most_recent_cached:
 				# retrieve all uncached measurements:
 				uncached_up = all_upload.order_by('eventstamp')
 				if uncached_up.count()!=0:
 					unload_data[1]['data'].extend(cvs_helper.linegraph_normal(uncached_up,'Under Load Up',1,1,0,series_id)['data'])
 		if all_download.count()!=0:
+			most_recent_uncached_down = all_download.latest('eventstamp').eventstamp
 			if most_recent_uncached_down>most_recent_cached:
 				# retrieve all uncached measurements:
 				uncached_down = all_download.order_by('eventstamp')
@@ -403,8 +403,8 @@ def update_unload(device):
 		unload_update.save()
 	# cache is empty
 	else:
-		all_upload = MUlrttup.objects.filter(deviceid=device)
-		all_download = MUlrttdw.objects.filter(deviceid=device)
+		all_upload = MUlrttup.objects.filter(deviceid=device, average__lte=3000)
+		all_download = MUlrttdw.objects.filter(deviceid=device, average__lte=3000)
 		# no measurements:
 		if all_upload.count()==0 or all_download.count()==0:
 			return
