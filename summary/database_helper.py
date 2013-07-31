@@ -424,13 +424,14 @@ def update_unload(device):
 	
 
 # creates and returns series for average bitrate measurements for devices in a given city:	
-def bargraph_compare_bitrate_by_city(city,max_results,days,dir):
+def bargraph_compare_bitrate_by_city(city,max_results,start,end,dir):
 	devices = views_helper.get_devices_by_city_name(city, False)
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
 	totals = []
 	for dev in devices:
-		recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest)
+		recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest, eventstamp__lte=latest)
 		if recent_measurements.count()==0:
 			continue
 		else:
@@ -494,15 +495,16 @@ def bargraph_compare_bitrate_by_isp(isp,max_results,days,direction,country):
 
 	
 # creates and returns series for lmrtt measurements for devices in a given city:	
-def bargraph_compare_lmrtt_by_city(city,max_results,days):
+def bargraph_compare_lmrtt_by_city(city,max_results,start,end):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
 	devices = views_helper.get_devices_by_city_name(city, False)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
 	totals = []
 	for dev in devices:
-		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest).order_by('eventstamp')
+		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest).order_by('eventstamp')
 		if latest_measurements.count()==0:
 			continue
 		else:
@@ -564,15 +566,16 @@ def bargraph_compare_lmrtt_by_isp(isp,max_results,days,country):
 	result = cvs_helper.bargraph_compare_city(totals,1)
 	return result
 	
-def bargraph_compare_rtt_by_city(city,max_results,days):
+def bargraph_compare_rtt_by_city(city,max_results,start,end):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
 	devices = views_helper.get_devices_by_city_name(city, False)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
 	totals = []
 	for dev in devices:
-		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
+		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest, dstip='8.8.8.8')
 		if latest_measurements.count()==0:
 			continue
 		else:
@@ -633,15 +636,16 @@ def bargraph_compare_rtt_by_isp(isp,max_results,days,country):
 	result = cvs_helper.bargraph_compare_city(totals,1)
 	return result
 	
-def linegraph_compare_bitrate_by_city(city,max_results,days,dir):
+def linegraph_compare_bitrate_by_city(city,max_results,start,end,dir):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
 	devices = views_helper.get_devices_by_city_name(city, True)
 	result = []
 	isps = []
 	new_device = False
 	for dev in devices:
-		latest_measurements= MBitrate.objects.filter(deviceid=dev, eventstamp__gte=earliest, direction=dir, toolid='NETPERF_3')
+		latest_measurements= MBitrate.objects.filter(deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest, direction=dir, toolid='NETPERF_3')
 		if latest_measurements.count()==0:
 			continue
 		else:
@@ -686,9 +690,10 @@ def linegraph_compare_bitrate_by_isp(isp,max_results,days,dir,country):
 	return result
 	
 # creates and returns series for lmrtt measurements for devices in a given city:	
-def linegraph_compare_lmrtt_by_city(city,max_results,days):
+def linegraph_compare_lmrtt_by_city(city,max_results,start,end):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
 	devices = views_helper.get_devices_by_city_name(city, True)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
@@ -791,9 +796,10 @@ def linegraph_compare_lmrtt_by_isp(isp,max_results,days,country):
 		# isp_distribution += 1
 	# return result
 	
-def linegraph_compare_rtt_by_city(city,max_results,days):
+def linegraph_compare_rtt_by_city(city,max_results,start,end):
 	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(days)
+	earliest = datetime_helper.get_daterange_start(start)
+	latest = datetime_helper.get_daterange_end(end)
 	devices = views_helper.get_devices_by_city_name(city, True)
 	# Create list of lists. The first list contains data series for the linegraph.
 	# The second contains series for the bar graph (averages):
@@ -801,7 +807,7 @@ def linegraph_compare_rtt_by_city(city,max_results,days):
 	isps = []
 	new_device = False
 	for dev in devices:
-		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
+		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest, dstip='8.8.8.8')
 		if latest_measurements.count()==0:
 			continue
 		else:
