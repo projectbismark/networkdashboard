@@ -36,7 +36,7 @@ def compare(request):
 	
 def compare_by_city(request, city, country):
 	end_date=datetime.now()
-	start_date=datetime_helper.get_daterange_start(100)
+	start_date=datetime_helper.get_daterange_start(31)
 	start_day=start_date.day
 	start_month=start_date.month
 	start_year=start_date.year
@@ -46,21 +46,44 @@ def compare_by_city(request, city, country):
 	return render_to_response('compare_by_city.html', {'city' : city, 'country' : country, 'start_day' : start_day, 'start_month' : start_month, 'start_year' : start_year, 'end_day' : end_day, 'end_month' : end_month, 'end_year' : end_year})
 	
 def compare_by_country(request, country):
-	return render_to_response('compare_by_country.html', {'country' : country})
+	end_date=datetime.now()
+	start_date=datetime_helper.get_daterange_start(31)
+	start_day=start_date.day
+	start_month=start_date.month
+	start_year=start_date.year
+	end_day=end_date.day
+	end_month=end_date.month
+	end_year=end_date.year
+	return render_to_response('compare_by_country.html', {'country' : country, 'start_day' : start_day, 'start_month' : start_month, 'start_year' : start_year, 'end_day' : end_day, 'end_month' : end_month, 'end_year' : end_year})
 	
 def compare_by_isp(request, isp, country):
-	return render_to_response('compare_by_isp.html', {'isp' : isp, 'country' : country, 'city' : 'none'})
+	end_date=datetime.now()
+	start_date=datetime_helper.get_daterange_start(31)
+	start_day=start_date.day
+	start_month=start_date.month
+	start_year=start_date.year
+	end_day=end_date.day
+	end_month=end_date.month
+	end_year=end_date.year
+	return render_to_response('compare_by_isp.html', {'isp' : isp, 'country' : country, 'city' : 'none', 'start_day' : start_day, 'start_month' : start_month, 'start_year' : start_year, 'end_day' : end_day, 'end_month' : end_month, 'end_year' : end_year})
 	
 def compare_by_isp_and_city(request, isp, city):
 	country = geoip_helper.get_country_by_city(city)
-	return render_to_response('compare_by_isp.html', {'isp' : isp, 'country' : country, 'city' : city})
+	end_date=datetime.now()
+	start_date=datetime_helper.get_daterange_start(31)
+	start_day=start_date.day
+	start_month=start_date.month
+	start_year=start_date.year
+	end_day=end_date.day
+	end_month=end_date.month
+	end_year=end_date.year
+	return render_to_response('compare_by_isp.html', {'isp' : isp, 'country' : country, 'city' : city, 'start_day' : start_day, 'start_month' : start_month, 'start_year' : start_year, 'end_day' : end_day, 'end_month' : end_month, 'end_year' : end_year})
 	
 def compare_bitrate_by_city(request):
 	city = request.GET.get('city')
 	max_results = int(request.GET.get('max_results'))
 	#days = int(request.GET.get('days'))
 	start = request.GET.get('start')
-	print start
 	end = request.GET.get('end')
 	direction = request.GET.get('direction')
 	result = []
@@ -71,11 +94,13 @@ def compare_bitrate_by_city(request):
 def compare_bitrate_by_country(request):
 	country = request.GET.get('country')
 	max_results = int(request.GET.get('max_results'))
-	days = int(request.GET.get('days'))
+	#days = int(request.GET.get('days'))
+	start = request.GET.get('start')
+	end = request.GET.get('end')
 	direction = request.GET.get('direction')
 	result = []
 	empty = []
-	result.append(database_helper.bargraph_compare_bitrate_by_country(country,max_results,days,direction))
+	result.append(database_helper.bargraph_compare_bitrate_by_country(country,max_results,start,end,direction))
 	result.append(empty)
 	return HttpResponse(json.dumps(result))
 	
@@ -83,12 +108,14 @@ def compare_bitrate_by_isp(request):
 	isp = request.GET.get('isp')
 	country = request.GET.get('country')
 	max_results = int(request.GET.get('max_results'))
-	days = int(request.GET.get('days'))
+	#days = int(request.GET.get('days'))
+	start = request.GET.get('start')
+	end = request.GET.get('end')
 	direction = request.GET.get('direction')
 	result = []
 	empty = []
-	result.append(database_helper.bargraph_compare_bitrate_by_isp(isp,max_results,days,direction,country))
-	result.append(database_helper.linegraph_compare_bitrate_by_isp(isp,max_results,days,direction,country))
+	result.append(database_helper.bargraph_compare_bitrate_by_isp(isp,max_results,start,end,direction,country))
+	result.append(database_helper.linegraph_compare_bitrate_by_isp(isp,max_results,start,end,direction,country))
 	return HttpResponse(json.dumps(result))
 
 def compare_lmrtt_by_city(request):
@@ -105,22 +132,26 @@ def compare_lmrtt_by_city(request):
 def compare_lmrtt_by_country(request):
 	country = request.GET.get('country')
 	max_results = int(request.GET.get('max_results'))
-	days = int(request.GET.get('days'))
+	#days = int(request.GET.get('days'))
+	start = request.GET.get('start')
+	end = request.GET.get('end')
 	result = []
 	empty = []
-	result.append(database_helper.bargraph_compare_lmrtt_by_country(country,max_results,days))
+	result.append(database_helper.bargraph_compare_lmrtt_by_country(country,max_results,start,end))
 	result.append(empty)
 	return HttpResponse(json.dumps(result))
 	
 def compare_lmrtt_by_isp(request):
 	isp = request.GET.get('isp')
 	max_results = int(request.GET.get('max_results'))
-	days = int(request.GET.get('days'))
+	#days = int(request.GET.get('days'))
+	start = request.GET.get('start')
+	end = request.GET.get('end')
 	country = request.GET.get('country')
 	result = []
 	empty = []
-	result.append(database_helper.bargraph_compare_lmrtt_by_isp(isp,max_results,days, country))
-	result.append(database_helper.linegraph_compare_lmrtt_by_isp(isp,max_results,days,country))
+	result.append(database_helper.bargraph_compare_lmrtt_by_isp(isp,max_results,start,end, country))
+	result.append(database_helper.linegraph_compare_lmrtt_by_isp(isp,max_results,start,end,country))
 	return HttpResponse(json.dumps(result))
 	
 def compare_rtt_by_city(request):
@@ -137,22 +168,26 @@ def compare_rtt_by_city(request):
 def compare_rtt_by_country(request):
 	country = request.GET.get('country')
 	max_results = int(request.GET.get('max_results'))
-	days = int(request.GET.get('days'))
+	#days = int(request.GET.get('days'))
+	start = request.GET.get('start')
+	end = request.GET.get('end')
 	result = []
 	empty = []
-	result.append(database_helper.bargraph_compare_rtt_by_country(country,max_results,days))
+	result.append(database_helper.bargraph_compare_rtt_by_country(country,max_results,start,end))
 	result.append(empty)
 	return HttpResponse(json.dumps(result))
 	
 def compare_rtt_by_isp(request):
 	country = request.GET.get('country')
 	max_results = int(request.GET.get('max_results'))
-	days = int(request.GET.get('days'))
+	#days = int(request.GET.get('days'))
+	start = request.GET.get('start')
+	end = request.GET.get('end')
 	isp = request.GET.get('isp')
 	result = []
 	empty = []
-	result.append(database_helper.bargraph_compare_rtt_by_isp(isp,max_results,days,country))
-	result.append(database_helper.linegraph_compare_rtt_by_isp(isp,max_results,days, country))
+	result.append(database_helper.bargraph_compare_rtt_by_isp(isp,max_results,start,end,country))
+	result.append(database_helper.linegraph_compare_rtt_by_isp(isp,max_results,start,end,country))
 	return HttpResponse(json.dumps(result))
 	
 def compare_rtt(request):
