@@ -858,6 +858,27 @@ def linegraph_compare_rtt_by_isp(isp,max_results,start,end,country):
 			if (len(result)>=max_results):
 				break
 	return result
+	
+# creates and sets a hashkey for a device
+def assign_hash(device):
+	dev = Devicedetails.objects.get(deviceid=device)
+	hash = hashlib.md5()
+	hash.update(dev.deviceid)
+	hash = hash.hexdigest()
+	dev.hashkey = hash
+	dev.save()
+	# devicedetails entry for this device does not exist:
+	return
+	
+# calls assign_hash for every device without a hashkey
+def assign_hashkeys():
+	unhashed_devices = Devicedetails.objects.filter(hashkey='')
+	if unhashed_devices.count()!=0:
+		for dev in unhashed_devices:
+			assign_hash(dev.deviceid)
+	return
+		
+	
 
 
 def fetch_deviceid_soft(device):
@@ -1085,12 +1106,20 @@ def save_device_details_from_request(request,device):
 	details.is_default=False
 	details.save()
 
+# creates a new devicedetails entry. returns True on success
 def save_device_details_from_default(device):
-    hashing = views_helper.get_hash(device)
-    device_entry = Devicedetails(
-            deviceid=device, eventstamp=datetime.now(), name="default name",
-            hashkey=hashing, is_default=True)
-    device_entry.save()
+	# check if this is a valid mac address
+	try:
+		hash = hashlib.md5()
+		hash.update(device)
+		hash = hash.hexdigest()
+		device_entry = Devicedetails(
+				deviceid=device, eventstamp=datetime.now(), name="default name",
+				hashkey=hash, is_default=True)
+		device_entry.save()
+		return True
+	except:
+		return False
 
 def deviceid_to_nodeid(device):
     return "OW" + device.upper()

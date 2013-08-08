@@ -1,0 +1,20 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="content">
+<div id="header">
+    <img id="logo" src="/static/images/bismark.gif" alt="BISmark logo"/>
+    <div>
+        <h1>Network Dashboard</h1>
+    </div>
+</div>
+<div class="alert alert-error">
+<big>
+	This device page could not be found or created. <br/> <br/>
+</big>
+	Ensure that {{deviceid}} is a valid mac address.
+</div>
+<a class="btn" href="/"><i class="icon-arrow-left"></i> Try again</a>
+{% endblock %}

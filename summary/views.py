@@ -323,24 +323,29 @@ def sharedDeviceSummary(request,devicehash):
     return views_helper.get_response_for_shared_device(device_details[0])
 
 def devicesummary(request):
-	device = str(request.POST.get("device"))
+	device = str(request.POST.get('device'))
 	device = device.replace(':', '')
-	hashing = views_helper.get_hash(device)
-	if(request.POST.get("edit")):
+	device_details = Devicedetails.objects.filter(deviceid=device)
+	try:
+		if device_details.count()==0:
+			valid_device = database_helper.save_device_details_from_default(device)
+			if valid_device:
+				device_details = Devicedetails.objects.filter(deviceid=device)
+			else: 
+				return render_to_response('invalid_device.html', {'deviceid': device})
+	except:
+		return render_to_response('invalid_device.html', {'deviceid': device})
+	if(request.POST.get('edit')):
 		try:
 			database_helper.save_device_details_from_request(request,device)
 		except:
 			return render_to_response('invalid_edit.html', {'deviceid' : hashing})
 	#if not database_helper.fetch_deviceid_hard(device):
 		#return render_to_response('device_not_found.html', {'deviceid': device})
-	device_details = Devicedetails.objects.filter(deviceid=device)
-	try: 
-		if len(device_details)<1:
-			database_helper.save_device_details_from_default(device)
-			device_details = Devicedetails.objects.filter(deviceid=device)
-	except:
-		return render_to_response('device_not_found.html', {'deviceid': device})
-		
+	hashing = views_helper.get_hash(device)
+	if (hashing==''):
+		database_helper.assign_hash(device)
+		device_details = Devicedetails.objects.filter(deviceid=device)
 	return views_helper.get_response_for_devicehtml(device_details[0])
 
 def getLocation(request, device):   
