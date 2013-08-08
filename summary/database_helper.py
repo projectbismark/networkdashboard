@@ -8,6 +8,9 @@ from time import time,mktime,strftime
 import hashlib,httplib,urllib2
 import cvs_helper,datetime_helper,geoip_helper, views_helper
 import ast
+import psycopg2
+import psycopg2.extras
+from django.conf import settings
 
 # searches the provided queryset for deviceids which are not already in devicedetails. If the deviceid
 # is missing, a new devicedetails record is created:

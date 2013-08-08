@@ -205,6 +205,17 @@ def get_country_by_device(device):
 	ip = get_ip_by_device(device)
 	country = get_city_by_ip(ip)
 	return country['country_name']
+
+def get_country_code_by_device(device):
+	ip = get_ip_by_device(device)
+	country = get_city_by_ip(ip)
+        if country is not None:
+                if len(country)>0:
+                        return country['country_code']
+                else:
+			return "";
+        else:
+                return "";
 	
 	
 def get_ip_by_device(device):

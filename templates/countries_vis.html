@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Network dashboard</title>
+		<link rel="stylesheet" type="text/css" href="/static/bootstrap/docs/assets/css/bootstrap.css" />
+		<link rel="stylesheet" type="text/css" href="/static/style.css" />
+		<link rel="stylesheet" href="/static/jvectormap/jquery-jvectormap-1.2.2.css" type="text/css" media="screen"/>
+		<script src="/static/js/jquery-1.7.2.min.js"></script>
+		<script src="/static/jvectormap/jquery-jvectormap-1.2.2.min.js"></script>
+		<script src="/static/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
+		<script src="/static/jqIpLocation.js"></script>
+
+		<script src="/static/countries_vis.js"></script>
+		
+			<style type='text/css'>
+				
+				.wax-legend .legend-scale ul {
+					margin: 0;
+					padding: 0;
+					float: left;
+					list-style: none;
+				}
+				.wax-legend .legend-scale ul li {
+					display: block;
+					float: left;
+					width: 50px;
+					margin-bottom: 6px;
+					text-align: center;
+					font-size: 80%;
+					list-style: none;
+				}
+				.wax-legend ul.legend-labels li span {
+					display: block;
+					float: left;
+					height: 15px;
+					width: 50px;
+				}
+				.wax-legend a {
+					color: #777;
+				}
+			</style>
+			
+	</head>
+	<body>
+		{% block content %}
+		<div class="content">
+			<div style="float: right">
+				<a class="btn" href="/"><i class="icon-home"></i> Home</a>
+			</div>
+			<h1>Compare Latencies by Country</h1>
+			<br />
+			<br />
+			<br />
+
+			<table class="table table-striped table-condensed">
+				<tr>
+					<td> Measurment server: </td>
+					<td class="right">
+					<select id="serverselector">
+						{% for server in server_list %}
+						<option value='{{server.0}}'>{{server.1}}</option>
+						{% endfor %}
+					</select></td>
+				</tr>
+			</table>
+			<h2>Country Latency Map</h2>
+			<br/>
+			<div id="world-map" style="width: 100%; height:500px; background: url(/static/images/loading.gif) no-repeat center;" ></div>
+			<div class='wax-legend'>
+				
+				<div class='legend-scale'>
+					<ul class='legend-labels'>
+						<li>
+							<span style='background:#003399;'></span>0 - 100 ms
+						</li>
+						<li>
+							<span style='background:#009900;'></span>200 ms
+						</li>
+						<li>
+							<span style='background:#FFCC00;'></span>300 ms
+						</li>
+						<li>
+							<span style='background:#CC0000;'></span>400 ms
+						</li>
+						<li>
+                                                        <span style='background:#000000;'></span>&gt; 400 ms
+                                                </li>
+
+					</ul>
+				</div>
+			</div>
+		<br /><br /><br />
+		<p id="updatedon" style="font-size: 90%;"><i></i></p>
+		</div>
+		{% endblock %}
+	</body>
+</html>

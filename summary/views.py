@@ -1,5 +1,6 @@
 import cvs_helper
 import database_helper
+import countries_vis_helper
 import datetime_helper
 from datetime import datetime, timedelta
 from django.conf import settings
@@ -14,6 +15,7 @@ import hashlib
 import json
 from networkdashboard.summary.models import *
 import psycopg2
+import pygeoip
 import random
 import site
 from time import time,mktime,strftime
@@ -374,9 +376,18 @@ def send_feedback(request):
 	
 	return HttpResponse("feedback received. Thank you!")
 
+def countries_vis(request):
+    json_file = open(settings.PROJECT_ROOT + 'summary/countries_vis_dump/server_list.json')
+    server_list = json.load(json_file);
+    return render_to_response('countries_vis.html', {'server_list': server_list});
+
+def get_countries_vis_data(request, server):
+    json_file = open(settings.PROJECT_ROOT + 'summary/countries_vis_dump/' + server)
+    return HttpResponse(json_file)
+
 '''
 80	80	Web
-443	443	HTTPS
+443	443	HTTPSs
 993	993	IMAPS
 587	587	SMTPS
 995	995	POP3S

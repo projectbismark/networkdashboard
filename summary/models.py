@@ -35,6 +35,9 @@ class Devicedetails(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     is_default = models.BooleanField(default=True,blank=True)
+    geoip_country = models.CharField(max_length=4)
+    ip = models.CharField(max_length=15)
+
     class Meta:
         db_table = u'devicedetails'
 

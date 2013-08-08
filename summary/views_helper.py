@@ -7,7 +7,8 @@ from django.db import transaction
 import random
 from datetime import datetime, timedelta
 from time import time,mktime,strftime
-
+from django.conf import settings
+import psycopg2
 import hashlib
 import cvs_helper,datetime_helper,database_helper,geoip_helper
 
@@ -92,6 +93,21 @@ def get_response_for_devicehtml(device_details):
 	device_details.deviceid = device_details.deviceid.replace(':', '').lower()
 	return render_to_response('device.html', {'detail': device_details,'firstUpdate': first, 'lastUpdate': last, 'deviceid': device_details.deviceid, 'num_location' : num_location, 'num_provider' : num_provider, 'num_all' : num_all, 'latestdownload' : latest_download, 'latestupload' : latest_upload, 'latestlastmile' : latest_lastmile, 'latestroundtrip' : latest_roundtrip, 'latestshaperate': latest_shaperate}) 
 
+def get_json_dump_for_device(device_details):
+	resp = {}
+        resp['first'] = database_helper.get_first_measurement(device_details.deviceid)
+        resp['last'] = database_helper.get_last_measurement(device_details.deviceid)
+	resp['num_location'] = database_helper.get_num_common_locations(device_details)
+        resp['num_provider'] = database_helper.get_num_common_providers(device_details)
+        resp['num_all'] = database_helper.get_num_devices(device_details)
+        resp['latest_download'] = database_helper.get_latest_download(device_details.deviceid)
+        resp['latest_upload'] = database_helper.get_latest_upload(device_details.deviceid)
+        resp['latest_lastmile'] = database_helper.get_latest_lastmile(device_details.deviceid)
+        resp['latest_roundtrip'] = database_helper.get_latest_roundtrip(device_details.deviceid)
+        resp['latest_shaperate'] = database_helper.get_latest_shaperate(device_details.deviceid)
+        resp['device_details.deviceid'] = device_details.deviceid.replace(':', '').lower()
+	return HttpResponse(json.dumps(resp))
+
 def get_response_for_shared_device(device_details):
 	first = database_helper.get_first_measurement(device_details.deviceid)
 	last = database_helper.get_last_measurement(device_details.deviceid)
@@ -154,3 +170,4 @@ def get_sorted_isp_data():
 	isp_data = geoip_helper.get_isp_count()
 	result = sorted(isp_data, key=itemgetter('count'), reverse = True)
 	return result
+
