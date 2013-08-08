@@ -1,6 +1,5 @@
 import cvs_helper
 import database_helper
-import countries_vis_helper
 import datetime_helper
 from datetime import datetime, timedelta
 from django.conf import settings
