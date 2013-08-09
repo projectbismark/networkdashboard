@@ -71,8 +71,6 @@ urlpatterns = patterns('',
      (r'^send_feedback/', 'networkdashboard.summary.views.send_feedback'),
      (r'^ip_test/', 'networkdashboard.summary.views.iptest'),
      (r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root':settings.MEDIA_ROOT}),
-
-## edit by waqar
      (r'^countries_vis/get_countries_vis_data/(?P<server>.+)', 'networkdashboard.summary.views.get_countries_vis_data'),
      (r'^countries_vis/', 'networkdashboard.summary.views.countries_vis')
 )
