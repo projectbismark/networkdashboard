@@ -496,6 +496,10 @@ ul.tabrow li.selected{
 	margin-bottom:0;
 }
 
+div.controls input{
+	height: 25px;
+}
+
 ul.tabrow li:before,
 ul.tabrow li:after {
     position: absolute;
