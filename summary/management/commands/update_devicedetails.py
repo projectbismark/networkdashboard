@@ -28,16 +28,16 @@ def update_devicedetails():
 		isp = geoip_helper.get_provider_by_ip(iprow)
 		city_name = geoip_helper.get_city_by_ip(iprow)
 		if city_name != "" and city_name != None:
-			city_name = city_name.decode('utf8').encode('utf8')
+			city_name = city_name.decode('cp1252').encode('utf8')
 			d.geoip_city = city_name
 		if country_code != "" and country_code != None:
-			country_code = country_code.decode('utf8').encode('utf8')
+			country_code = country_code.decode('cp1252').encode('utf8')
 			d.country_code = country_code
 		if country_name != "" and country_name != None:
-			country_name = country_name.decode('utf8').encode('utf8')
+			country_name = country_name.decode('cp1252').encode('utf8')
 			d.geoip_country = country_name
 		if isp != "" and isp != None:
-			isp = isp.decode('utf8').encode('utf8')
+			isp = isp.decode('cp1252').encode('utf8')
 			d.geoip_isp = isp
 		d.save()
 	return
