@@ -82,26 +82,26 @@ def compare_by_isp_and_city(request, isp, city):
 	
 def compare_bitrate_by_city(request):
 	city = request.GET.get('city')
+	country = request.GET.get('country')
 	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
 	start = request.GET.get('start')
 	end = request.GET.get('end')
 	direction = request.GET.get('direction')
 	result = []
-	result.append(database_helper.bargraph_compare_bitrate_by_city(city,max_results,start,end,direction))
-	result.append(database_helper.linegraph_compare_bitrate_by_city(city,max_results,start,end,direction))
+	result.append(database_helper.bargraph_compare_bitrate_by_city(city,country,start,end,direction))
+	result.append(database_helper.linegraph_compare_bitrate_by_city(city,country,max_results,start,end,direction))
 	return HttpResponse(json.dumps(result))
 	
 def compare_bitrate_by_country(request):
 	country = request.GET.get('country')
-	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
 	start = request.GET.get('start')
 	end = request.GET.get('end')
 	direction = request.GET.get('direction')
 	result = []
+	# JS expects two sets of graph data but only 1 graph is shown for country
+	# so an empty list is appended:
 	empty = []
-	result.append(database_helper.bargraph_compare_bitrate_by_country(country,max_results,start,end,direction))
+	result.append(database_helper.bargraph_compare_bitrate_by_country(country,start,end,direction))
 	result.append(empty)
 	return HttpResponse(json.dumps(result))
 	
@@ -115,30 +115,29 @@ def compare_bitrate_by_isp(request):
 	direction = request.GET.get('direction')
 	result = []
 	empty = []
-	result.append(database_helper.bargraph_compare_bitrate_by_isp(isp,max_results,start,end,direction,country))
+	result.append(database_helper.bargraph_compare_bitrate_by_isp(isp,start,end,direction,country))
 	result.append(database_helper.linegraph_compare_bitrate_by_isp(isp,max_results,start,end,direction,country))
 	return HttpResponse(json.dumps(result))
 
 def compare_lmrtt_by_city(request):
 	city = request.GET.get('city')
 	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
 	start = request.GET.get('start')
 	end = request.GET.get('end')
 	result = []
-	result.append(database_helper.bargraph_compare_lmrtt_by_city(city,max_results,start,end))
+	result.append(database_helper.bargraph_compare_lmrtt_by_city(city,start,end))
 	result.append(database_helper.linegraph_compare_lmrtt_by_city(city,max_results,start,end))
 	return HttpResponse(json.dumps(result))
 	
 def compare_lmrtt_by_country(request):
 	country = request.GET.get('country')
-	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
 	start = request.GET.get('start')
 	end = request.GET.get('end')
 	result = []
+	# JS expects two sets of graph data but only 1 graph is shown for country
+	# so an empty list is appended:
 	empty = []
-	result.append(database_helper.bargraph_compare_lmrtt_by_country(country,max_results,start,end))
+	result.append(database_helper.bargraph_compare_lmrtt_by_country(country,start,end))
 	result.append(empty)
 	return HttpResponse(json.dumps(result))
 	
@@ -151,7 +150,7 @@ def compare_lmrtt_by_isp(request):
 	country = request.GET.get('country')
 	result = []
 	empty = []
-	result.append(database_helper.bargraph_compare_lmrtt_by_isp(isp,max_results,start,end, country))
+	result.append(database_helper.bargraph_compare_lmrtt_by_isp(isp,start,end, country))
 	result.append(database_helper.linegraph_compare_lmrtt_by_isp(isp,max_results,start,end,country))
 	return HttpResponse(json.dumps(result))
 	
@@ -162,19 +161,19 @@ def compare_rtt_by_city(request):
 	start = request.GET.get('start')
 	end = request.GET.get('end')
 	result = []
-	result.append(database_helper.bargraph_compare_rtt_by_city(city,max_results,start,end))
+	result.append(database_helper.bargraph_compare_rtt_by_city(city,start,end))
 	result.append(database_helper.linegraph_compare_rtt_by_city(city,max_results,start,end))
 	return HttpResponse(json.dumps(result))
 		
 def compare_rtt_by_country(request):
 	country = request.GET.get('country')
-	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
 	start = request.GET.get('start')
 	end = request.GET.get('end')
 	result = []
+	# JS expects two sets of graph data but only 1 graph is shown for country
+	# so an empty list is appended:
 	empty = []
-	result.append(database_helper.bargraph_compare_rtt_by_country(country,max_results,start,end))
+	result.append(database_helper.bargraph_compare_rtt_by_country(country,start,end))
 	result.append(empty)
 	return HttpResponse(json.dumps(result))
 	
@@ -187,7 +186,7 @@ def compare_rtt_by_isp(request):
 	isp = request.GET.get('isp')
 	result = []
 	empty = []
-	result.append(database_helper.bargraph_compare_rtt_by_isp(isp,max_results,start,end,country))
+	result.append(database_helper.bargraph_compare_rtt_by_isp(isp,start,end,country))
 	result.append(database_helper.linegraph_compare_rtt_by_isp(isp,max_results,start,end,country))
 	return HttpResponse(json.dumps(result))
 	

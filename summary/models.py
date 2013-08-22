@@ -20,26 +20,29 @@ class ArpLogs(models.Model):
         db_table = u'arp_logs'
 
 class Devicedetails(models.Model):
-    deviceid = models.TextField(primary_key=True) # This field type is a guess.
-    name = models.CharField(max_length=50)
-    isp = models.CharField(max_length=30)
-    serviceplan = models.CharField(max_length=30)
-    servicetype = models.CharField(max_length=20)
-    uploadrate = models.IntegerField()
-    downloadrate = models.IntegerField()
-    city = models.CharField(max_length=30)
-    state = models.CharField(max_length=30)
-    country = models.CharField(max_length=30)
-    eventstamp = models.DateTimeField()
-    hashkey = models.TextField()
-    latitude = models.FloatField()
-    longitude = models.FloatField()
-    is_default = models.BooleanField(default=True,blank=True)
-    geoip_country = models.CharField(max_length=4)
-    ip = models.CharField(max_length=15)
+	deviceid = models.TextField(primary_key=True) # This field type is a guess.
+	name = models.CharField(max_length=50)
+	isp = models.CharField(max_length=30)
+	serviceplan = models.CharField(max_length=30)
+	servicetype = models.CharField(max_length=20)
+	uploadrate = models.IntegerField()
+	downloadrate = models.IntegerField()
+	city = models.CharField(max_length=30)
+	state = models.CharField(max_length=30)
+	country = models.CharField(max_length=30)
+	eventstamp = models.DateTimeField()
+	hashkey = models.TextField()
+	latitude = models.FloatField()
+	longitude = models.FloatField()
+	is_default = models.BooleanField(default=True,blank=True)
+	geoip_country = models.CharField(max_length=100)
+	country_code = models.CharField(max_length=4)
+	geoip_isp = models.CharField(max_length=100)
+	geoip_city = models.CharField(max_length=100)
+	ip = models.IPAddressField()
 
-    class Meta:
-        db_table = u'devicedetails'
+	class Meta:
+		db_table = u'devicedetails'
 
 class DhcpLogs(models.Model):
     deviceid = models.TextField() # This field type is a guess.
@@ -455,21 +458,22 @@ class MLmrtt(models.Model):
         db_table = u'm_lmrtt'
 
 class MRtt(models.Model):
-    deviceid = models.TextField() # This field type is a guess.
-    srcip = models.IPAddressField()
-    dstip = models.IPAddressField()
-    eventstamp = models.DateTimeField()
-    average = models.FloatField()
-    std = models.FloatField()
-    minimum = models.FloatField()
-    maximum = models.FloatField()
-    median = models.FloatField()
-    iqr = models.FloatField()
-    exitstatus = models.IntegerField()
-   
-    toolid = models.TextField() # This field type is a guess.
-    class Meta:
-        db_table = u'm_rtt'
+    #deviceid = models.TextField() # This field type is a guess.
+	deviceid = models.ForeignKey(Devicedetails)
+	srcip = models.IPAddressField()
+	dstip = models.IPAddressField()
+	eventstamp = models.DateTimeField()
+	average = models.FloatField()
+	std = models.FloatField()
+	minimum = models.FloatField()
+	maximum = models.FloatField()
+	median = models.FloatField()
+	iqr = models.FloatField()
+	exitstatus = models.IntegerField()
+
+	toolid = models.TextField() # This field type is a guess.
+	class Meta:
+		db_table = u'm_rtt'
 
 class MUlrttdw(models.Model):
     deviceid = models.TextField() # This field type is a guess.

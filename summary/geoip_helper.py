@@ -74,7 +74,9 @@ def get_coordinates_for_googlemaps():
 			lat = loc['latitude']
 			lat = str(randomize_latitude(loc['latitude']))
 			lon = str(loc['longitude'])
-			cursor.execute("select SUBSTRING(id,3) from devices where ip='" + row[0] +"'")
+			params = []
+			params.append(row[0])
+			cursor.execute("select SUBSTRING(id,3) from devices where ip=%s;", params)
 			device = cursor.fetchone()
 			hash = views_helper.get_hash(device[0])
 			isp = get_provider_by_ip(row)
@@ -110,6 +112,7 @@ def get_coordinates_for_googlemaps():
 			coord_data.append(value)
 		except:
 			continue
+	cursor.close()
 	return coord_data
 
 def getLocation(ip,gi):
@@ -128,8 +131,12 @@ def getIPList():
 	cursor = conn.cursor()
 	for d in devices:
 		id = "OW" + d['deviceid'].upper().replace(":","")
-		cursor.execute("select ip from devices where id='" + id + "'")
+		params = []
+		params.append(id)
+		cursor.execute("select ip from devices where id=%s;", params)
 		ips.append(cursor.fetchone())
+	cursor.close()
+	conn.close()
 	return ips
 	
 def getIPListActive():
@@ -141,8 +148,12 @@ def getIPListActive():
 	cursor = conn.cursor()
 	for d in devices:
 		id = "OW" + d['deviceid'].upper().replace(":","")
-		cursor.execute("select ip from devices where id='" + id + "'")
+		params = []
+		params.append(id)
+		cursor.execute("select ip from devices where id=%s;", params)
 		ips.append(cursor.fetchone())
+	cursor.close()
+	conn.close()
 	return ips
 	
 def format_mac_address(ip):
@@ -152,8 +163,10 @@ def getMACList():
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
 	conn = psycopg2.connect(conn_string)
 	cursor = conn.cursor()
-	cursor.execute("select id from devices")
+	cursor.execute("select id from devices;")
 	records = cursor.fetchall()
+	cursor.close()
+	conn.close()
 	return records
 	
 def get_device_count():
@@ -179,14 +192,26 @@ def getDeviceIDList():
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
 	conn = psycopg2.connect(conn_string)
 	cursor = conn.cursor()
-	cursor.execute("select id from devices")
+	cursor.execute("select id from devices;")
 	records = cursor.fetchall()
+	cursor.close()
+	conn.close()
 	return records
+	
+def get_city_by_ip(ip):
+	rec = get_record_by_ip(ip)
+	if rec != None:
+		return rec['city']
+	else:
+		return ''
 	
 def get_city_by_device(device):
 	ip = get_ip_by_device(device)
-	city = get_city_by_ip(ip)
-	return city['city']
+	rec = get_record_by_ip(ip)
+	if rec != None:
+		return rec['city']
+	else:
+		return ''
 	
 def get_country_by_city(city):
 	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
@@ -203,26 +228,42 @@ def get_country_by_city(city):
 	
 def get_country_by_device(device):
 	ip = get_ip_by_device(device)
-	country = get_city_by_ip(ip)
-	return country['country_name']
+	rec = get_record_by_ip(ip)
+	if rec!= None:
+		return rec['country_name']
+	else:
+		return ''
 
 def get_country_code_by_device(device):
 	ip = get_ip_by_device(device)
-	country = get_city_by_ip(ip)
-        if country is not None:
-                if len(country)>0:
-                        return country['country_code']
-                else:
-			return "";
-        else:
-                return "";
+	rec = get_record_by_ip(ip)
+	if rec != None:
+		return rec['country_code']
+	else:
+		return ''
+
+def get_country_code_by_ip(ip):
+	rec = get_record_by_ip(ip)
+	if rec != None:
+		return rec['country_code']
+	else:
+		return ''
+	
+def get_country_name_by_ip(ip):
+	rec = get_record_by_ip(ip)
+	if rec != None:
+		return rec['country_name']
+	else:
+		return ''
 	
 	
 def get_ip_by_device(device):
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
 	conn = psycopg2.connect(conn_string)
 	cursor = conn.cursor()
-	cursor.execute("select ip from devices where SUBSTRING(id,3)='" + device.upper() +"'")
+	params = []
+	params.append(device.upper())
+	cursor.execute("select ip from devices where SUBSTRING(id,3)=%s;", params)
 	records = cursor.fetchall()
 	if len(records)>0:
 		return records[0]
@@ -248,37 +289,48 @@ def get_ips_by_provider(isp):
 			continue
 	return ret
 	
-def get_ips_by_provider_and_country(isp,country):
+def get_ips_by_provider_and_country(isp,country,max_results):
 	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
 	gi2 = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	mappings = isp_mappings.mappings
+	result_count = 0
 	ret = []
 	ip_list = getIPList()
 	for ip in ip_list:
+		if result_count==max_results and max_results>0:
+			break
 		try:
 			name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
 			ip_country = gi2.record_by_addr(ip[0])['country_name']
+			ip_city = gi2.record_by_addr(ip[0])['city']
+			if ip_city == None or ip_city == '':
+				continue
 			for m in mappings:
 				if(name.lower().find(m[0].lower())!=-1):
 					name = m[1]
 					break
 			if (((name==isp) and (ip_country==country)) or ((name==isp) and (country=="none"))):
 				ret.append(ip[0])
+				result_count+=1
 		except:
 			continue
+	print len(ret)
 	return ret
 	
-def get_diversified_ips_by_provider_and_country(isp,country):
+def get_diversified_ips_by_provider_and_country(isp,country,max_results):
 	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
 	gi2 = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	mappings = isp_mappings.mappings
 	ret = []
+	result_count = 0
 	ip_list = getIPList()
 	dist_level = 0
 	country_list = []
 	while True:
 		new_device = False
 		for ip in ip_list:
+			if result_count==max_results and max_results>0:
+				break
 			try:
 				country_count = 0
 				new_ip = True
@@ -290,6 +342,9 @@ def get_diversified_ips_by_provider_and_country(isp,country):
 					continue
 				name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
 				ip_country = gi2.record_by_addr(ip[0])['country_name']
+				ip_name = gi2.record_by_addr(ip[0])['city']
+				if ip_name == None or ip_name == '':
+					continue
 				for m in mappings:
 					if(name.lower().find(m[0].lower())!=-1):
 						name = m[1]
@@ -300,6 +355,7 @@ def get_diversified_ips_by_provider_and_country(isp,country):
 				if(((name==isp)and(ip_country==country))or((name==isp)and(country=='none')and(country_count<=dist_level))):
 					country_list.append(ip_country)
 					ret.append(ip[0])
+					result_count+=1
 					new_device = True
 			except:
 				continue
@@ -308,23 +364,28 @@ def get_diversified_ips_by_provider_and_country(isp,country):
 		dist_level+=1
 	return ret
 	
-def get_ips_by_city(city):
+def get_ips_by_city(city, max_results):
 	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	result_count = 0
 	ret = []
 	ip_list = getIPList()
 	for ip in ip_list:
+		if (result_count == max_results):
+			break
 		try:
 			record = gi.record_by_addr(ip[0])
 			if (str(record['city'])==str(city)):
 				ret.append(ip[0])
+				result_count+=1
 		except:
 			continue
 	return ret
 	
-def get_diversified_ips_by_city(city):
+def get_diversified_ips_by_city(city, max_results):
 	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
 	gi2 = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	mappings = isp_mappings.mappings
+	result_count = 0
 	dist_level = 0
 	ret = []
 	isp_list = []
@@ -332,6 +393,8 @@ def get_diversified_ips_by_city(city):
 	while True:
 		new_device = False
 		for ip in ip_list:
+			if ((result_count==max_results) and (max_results>0)):
+				break
 			try:
 				isp_count = 0
 				new_ip = True
@@ -353,6 +416,7 @@ def get_diversified_ips_by_city(city):
 				if ((str(record['city'])==str(city)) and (isp_count<=dist_level)):
 					isp_list.append(name)
 					ret.append(ip[0])
+					result_count += 1
 					new_device = True
 			except:
 				continue
@@ -397,7 +461,9 @@ def get_devices_by_ip(ip):
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
 	conn = psycopg2.connect(conn_string)
 	cursor = conn.cursor()
-	cursor.execute("select SUBSTRING(id,3) from devices where ip='" + ip +"'")
+	params = []
+	params.append(ip)
+	cursor.execute("select SUBSTRING(id,3) from devices where ip=%s", params)
 	records = cursor.fetchall()
 	conn.close()
 	return records
@@ -484,7 +550,7 @@ def get_isp_by_device(dev):
 	ip = get_ip_by_device(dev)
 	return get_provider_by_ip(ip)
 	
-def get_city_by_ip(ip):
+def get_record_by_ip(ip):
 	if len(ip)>0:
 		gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 		return gi.record_by_addr(ip[0])
@@ -499,7 +565,6 @@ def get_isp_count():
 	ip_list_active = getIPListActive()
 	for ip in ip_list:
 		new_isp = True
-		
 		try:
 			name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
 			for m in mappings:
