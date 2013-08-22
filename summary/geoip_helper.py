@@ -314,7 +314,6 @@ def get_ips_by_provider_and_country(isp,country,max_results):
 				result_count+=1
 		except:
 			continue
-	print len(ret)
 	return ret
 	
 def get_diversified_ips_by_provider_and_country(isp,country,max_results):

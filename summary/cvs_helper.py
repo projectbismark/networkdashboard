@@ -94,7 +94,6 @@ def linegraph_compare(data,factor):
 		if record['name'] == None:
 			continue
 		if record['deviceid'] not in sorted_data:
-			print record['name']
 			sorted_data[record['deviceid']]=[]
 			sorted_data[record['deviceid']].append(record['name'])
 			sorted_data[record['deviceid']].append([])
