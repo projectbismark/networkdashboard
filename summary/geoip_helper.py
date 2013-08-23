@@ -289,16 +289,13 @@ def get_ips_by_provider(isp):
 			continue
 	return ret
 	
-def get_ips_by_provider_and_country(isp,country,max_results):
+def bargraph_ips_by_provider_and_country(isp,country):
 	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
 	gi2 = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	mappings = isp_mappings.mappings
-	result_count = 0
 	ret = []
 	ip_list = getIPList()
 	for ip in ip_list:
-		if result_count==max_results and max_results>0:
-			break
 		try:
 			name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
 			ip_country = gi2.record_by_addr(ip[0])['country_name']
@@ -311,12 +308,11 @@ def get_ips_by_provider_and_country(isp,country,max_results):
 					break
 			if (((name==isp) and (ip_country==country)) or ((name==isp) and (country=="none"))):
 				ret.append(ip[0])
-				result_count+=1
 		except:
 			continue
 	return ret
 	
-def get_diversified_ips_by_provider_and_country(isp,country,max_results):
+def linegraph_ips_by_provider_and_country(isp,country,max_results,start,end,metric):
 	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
 	gi2 = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	mappings = isp_mappings.mappings
@@ -331,6 +327,10 @@ def get_diversified_ips_by_provider_and_country(isp,country,max_results):
 			if result_count==max_results and max_results>0:
 				break
 			try:
+				device = Devicedetails.objects.filter(ip=ip[0])[0]
+				cached = JsonCache.objects.filter(deviceid=device[0].deviceid, datatype=metric)[0]
+				if cached.eventstamp<start or device.eventstamp>end:
+					continue
 				country_count = 0
 				new_ip = True
 				for r in ret:
@@ -363,24 +363,20 @@ def get_diversified_ips_by_provider_and_country(isp,country,max_results):
 		dist_level+=1
 	return ret
 	
-def get_ips_by_city(city, max_results):
+def bargraph_ips_by_city(city):
 	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
-	result_count = 0
 	ret = []
 	ip_list = getIPList()
 	for ip in ip_list:
-		if (result_count == max_results):
-			break
 		try:
 			record = gi.record_by_addr(ip[0])
 			if (str(record['city'])==str(city)):
 				ret.append(ip[0])
-				result_count+=1
 		except:
 			continue
 	return ret
 	
-def get_diversified_ips_by_city(city, max_results):
+def linegraph_ips_by_city(city, max_results,start,end,metric):
 	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
 	gi2 = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	mappings = isp_mappings.mappings
@@ -395,6 +391,10 @@ def get_diversified_ips_by_city(city, max_results):
 			if ((result_count==max_results) and (max_results>0)):
 				break
 			try:
+				device = Devicedetails.objects.filter(ip=ip[0])[0]
+				cached = JsonCache.objects.filter(deviceid=device.deviceid, datatype=metric)[0]
+				if cached.eventstamp<start or device.eventstamp>end:
+					continue
 				isp_count = 0
 				new_ip = True
 				for r in ret:
@@ -424,7 +424,7 @@ def get_diversified_ips_by_city(city, max_results):
 		dist_level+=1
 	return ret
 	
-def get_ips_by_country(country):
+def bargraph_ips_by_country(country):
 	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	ret = []
 	ip_list = getIPList()

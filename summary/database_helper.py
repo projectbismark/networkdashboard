@@ -428,8 +428,11 @@ def update_unload(device):
 
 # creates and returns series for average bitrate measurements for devices in a given city:	
 def bargraph_compare_bitrate_by_city(city,country,start,end,dir):
-	devices = tuple(views_helper.get_devices_by_city_name(city, True, 0))
+	result = []
 	params = []
+	devices = tuple(views_helper.bargraph_devices_by_city_name(city))
+	if len(devices)==0:
+		return result
 	# parameters for query. Ordering of appending matters:
 	params.append(start)
 	params.append(end)
@@ -482,9 +485,12 @@ def bargraph_compare_bitrate_by_country(country,start,end,dir):
 	return result
 	
 def bargraph_compare_bitrate_by_isp(isp,start,end,direction,country):
-	devices = tuple(views_helper.get_devices_by_provider_and_country(isp,country,False,0))
-	# parameters for query. Ordering of appending matters:
 	params = []
+	result = []
+	devices = tuple(views_helper.bargraph_devices_by_provider_and_country(isp,country))
+	if len(devices)==0:
+		return result
+	# parameters for query. Ordering of appending matters:
 	params.append(start)
 	params.append(end)
 	params.append(direction)
@@ -511,9 +517,12 @@ def bargraph_compare_bitrate_by_isp(isp,start,end,direction,country):
 
 # creates and returns series for lmrtt measurements for devices in a given city:	
 def bargraph_compare_lmrtt_by_city(city,start,end):
-	devices = tuple(views_helper.get_devices_by_city_name(city, True, 0))
-	# parameters for query. Ordering of appending matters:
 	params = []
+	result = []
+	devices = tuple(views_helper.bargraph_devices_by_city_name(city))
+	if len(devices)==0:
+		return result
+	# parameters for query. Ordering of appending matters:
 	params.append(start)
 	params.append(end)
 	params.append(devices)
@@ -561,9 +570,12 @@ def bargraph_compare_lmrtt_by_country(country,start,end):
 	
 	
 def bargraph_compare_lmrtt_by_isp(isp,start,end,country):
-	devices = tuple(views_helper.get_devices_by_provider_and_country(isp,country,False,0))
-	# parameters for query. Ordering of appending matters:
+	result = []
 	params = []
+	devices = tuple(views_helper.bargraph_devices_by_provider_and_country(isp,country))
+	if len(devices)==0:
+		return result
+	# parameters for query. Ordering of appending matters:
 	params.append(start)
 	params.append(end)
 	params.append(devices)
@@ -582,15 +594,19 @@ def bargraph_compare_lmrtt_by_isp(isp,start,end,country):
 	cursor = get_dict_cursor()
 	cursor.execute(SQL,params)
 	records = cursor.fetchall()
+	print len(records) 
 	result = cvs_helper.bargraph_compare(records, 1)
 	cursor.close()
 	return result
 	
 def bargraph_compare_rtt_by_city(city,start,end):
-	devices = tuple(views_helper.get_devices_by_city_name(city, True, 0))
+	params = []
+	result = []
+	devices = tuple(views_helper.bargraph_devices_by_city_name(city))
+	if len(devices)==0:
+		return result
 	dstip = '8.8.8.8'
 	# parameters for query. Ordering of appending matters:
-	params = []
 	params.append(start)
 	params.append(end)
 	params.append(dstip)
@@ -643,11 +659,14 @@ def bargraph_compare_rtt_by_country(country,start,end):
 	return result
 	
 def bargraph_compare_rtt_by_isp(isp,start,end,country):
+	params = []
+	result = []
 	# Calculate earliest date of the series based on user selection:
-	devices = tuple(views_helper.get_devices_by_provider_and_country(isp,country,False,0))
+	devices = tuple(views_helper.bargraph_devices_by_provider_and_country(isp,country))
+	if len(devices)==0:
+		return result
 	dstip = '8.8.8.8'
 	# parameters for query. Ordering of appending matters:
-	params = []
 	params.append(start)
 	params.append(end)
 	params.append(dstip)
@@ -673,9 +692,17 @@ def bargraph_compare_rtt_by_isp(isp,start,end,country):
 	
 def linegraph_compare_bitrate_by_city(city,country,max_results,start,end,dir):
 	params = []
-	devices = tuple(views_helper.get_devices_by_city_name(city, True, max_results))
+	result = []
+	metric = ''
+	if dir == 'dw':
+		metric = 'bitrate_down'
+	else:
+		metric = 'bitrate_up'
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
+	devices = tuple(views_helper.linegraph_devices_by_city_name(city, max_results, earliest, latest, metric))
+	if len(devices)==0:
+		return result
 	params.append(earliest)
 	params.append(latest)
 	params.append(dir)
@@ -700,9 +727,17 @@ def linegraph_compare_bitrate_by_city(city,country,max_results,start,end,dir):
 	
 def linegraph_compare_bitrate_by_isp(isp,max_results,start,end,dir,country):
 	params = []
-	devices = tuple(views_helper.get_devices_by_provider_and_country(isp,country,True,max_results))
+	result = []
+	metric = ''
+	if dir == 'dw':
+		metric = 'bitrate_down'
+	else:
+		metric = 'bitrate_up'
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
+	devices = tuple(views_helper.linegraph_devices_by_provider_and_country(isp,country,max_results,earliest,latest,metric))
+	if len(devices)==0:
+		return result
 	params.append(earliest)
 	params.append(latest)
 	params.append(dir)
@@ -728,9 +763,13 @@ def linegraph_compare_bitrate_by_isp(isp,max_results,start,end,dir,country):
 # creates and returns series for lmrtt measurements for devices in a given city:	
 def linegraph_compare_lmrtt_by_city(city,max_results,start,end):
 	params = []
-	devices = tuple(views_helper.get_devices_by_city_name(city, True, max_results))
+	result = []
+	metric = 'lmrtt'
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
+	devices = tuple(views_helper.linegraph_devices_by_city_name(city, max_results, earliest, latest, metric))
+	if len(devices)==0:
+		return result
 	params.append(earliest)
 	params.append(latest)
 	params.append(devices)
@@ -753,9 +792,13 @@ def linegraph_compare_lmrtt_by_city(city,max_results,start,end):
 	
 def linegraph_compare_lmrtt_by_isp(isp,max_results,start,end,country):
 	params = []
-	devices = tuple(views_helper.get_devices_by_provider_and_country(isp,country,True,max_results))
+	result = []
+	metric = 'lmrtt'
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
+	devices = tuple(views_helper.linegraph_devices_by_provider_and_country(isp,country,max_results,earliest,latest,metric))
+	if len(devices)==0:
+		return result
 	params.append(earliest)
 	params.append(latest)
 	params.append(devices)
@@ -778,10 +821,14 @@ def linegraph_compare_lmrtt_by_isp(isp,max_results,start,end,country):
 	
 def linegraph_compare_rtt_by_city(city,max_results,start,end):
 	params = []
+	result = []
+	metric = 'rtt'
 	dstip = '8.8.8.8'
-	devices = tuple(views_helper.get_devices_by_city_name(city, True, max_results))
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
+	devices = tuple(views_helper.linegraph_devices_by_city_name(city,max_results,earliest,latest,metric))
+	if len(devices)==0:
+		return result
 	params.append(earliest)
 	params.append(latest)
 	params.append(dstip)
@@ -806,10 +853,14 @@ def linegraph_compare_rtt_by_city(city,max_results,start,end):
 	
 def linegraph_compare_rtt_by_isp(isp,max_results,start,end,country):
 	params = []
+	result = []
+	metric = 'rtt'
 	dstip = '8.8.8.8'
-	devices = tuple(views_helper.get_devices_by_provider_and_country(isp,country,False,max_results))
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
+	devices = tuple(views_helper.linegraph_devices_by_provider_and_country(isp,country,max_results,earliest,latest,metric))
+	if len(devices)==0:
+		return result
 	params.append(earliest)
 	params.append(latest)
 	params.append(dstip)

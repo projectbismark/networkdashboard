@@ -48,27 +48,31 @@ def get_devices_by_isp(isp):
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
 	
-def get_devices_by_city_name(city,diversify, max_results):
-	if diversify:
-		ips = geoip_helper.get_diversified_ips_by_city(city, max_results)
-	else:
-		ips = geoip_helper.get_ips_by_city(city, max_results)
-	devices = geoip_helper.get_devices_by_ips(ips)
-	return devices
-	
-def get_devices_by_country_name(country):
-	ips = geoip_helper.get_ips_by_country(country)
-	devices = geoip_helper.get_devices_by_ips(ips)
-	return devices
-	
-def get_devices_by_provider_and_country(isp,country,diversify, max_results):
-	if diversify:
-		ips = geoip_helper.get_diversified_ips_by_provider_and_country(isp,country, max_results)
-	else:
-		ips = geoip_helper.get_ips_by_provider_and_country(isp,country, max_results)
+def bargraph_devices_by_city_name(city):
+	ips = geoip_helper.bargraph_ips_by_city(city)
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
 
+def linegraph_devices_by_city_name(city,max_results,start,end,metric):
+	ips = geoip_helper.linegraph_ips_by_city(city,max_results,start,end,metric)
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
+	
+def bargraph_devices_by_country_name(country):
+	ips = geoip_helper.bargraph_ips_by_country(country)
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
+	
+def bargraph_devices_by_provider_and_country(isp,country):
+	ips = geoip_helper.bargraph_ips_by_provider_and_country(isp,country)
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
+	
+def linegraph_devices_by_provider_and_country(isp,country,max_results,start,end,metric):
+	ips = geoip_helper.linegraph_ips_by_provider_and_country(isp,country,max_results,start,end,metric)
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
+	
 def get_devices_by_city(device):
 	ip = geoip_helper.get_ip_by_device(device)
 	city = geoip_helper.get_city_by_ip(ip)

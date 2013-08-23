@@ -27,6 +27,7 @@ def update_devicedetails():
 		country_name = geoip_helper.get_country_name_by_ip(iprow)
 		isp = geoip_helper.get_provider_by_ip(iprow)
 		city_name = geoip_helper.get_city_by_ip(iprow)
+		# pygeoip names are encoded using cp1252, postgres expects utf8: 
 		if city_name != "" and city_name != None:
 			city_name = city_name.decode('cp1252').encode('utf8')
 			d.geoip_city = city_name

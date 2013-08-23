@@ -277,7 +277,7 @@ function compareParameters(i) {
         },
         plotOptions: {
             line: {
-                gapSize: 10
+                gapSize: null
             }
         }
     };
@@ -380,7 +380,7 @@ function compareByCityParameters(i) {
         },
         plotOptions: {
             line: {
-                gapSize: 10
+                gapSize: null
             },
 			column: {
 				point: {
@@ -495,7 +495,7 @@ function compareByCountryParameters(i) {
         },
         plotOptions: {
             line: {
-                gapSize: 10
+                gapSize: null
             },
 			column: {
 				point: {
@@ -610,7 +610,7 @@ function compareByIspParameters(i, country, isp) {
         },
         plotOptions: {
             line: {
-                gapSize: 10
+                gapSize: null
             },
 			column: {
 				point: {
@@ -998,7 +998,7 @@ function onSuccessIspCompare(graphParams,country) {
 
 function onSuccessCountryCompare(graphParams, country) {
     return function(data) {
-		if (data.length > 10) {
+		if (data.length > 200) {
 			data = JSON.parse(data)[0];
 			var graphData = new Array();
 			var categories = new Array();
