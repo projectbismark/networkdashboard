@@ -306,7 +306,7 @@ def bargraph_ips_by_provider_and_country(isp,country):
 				if(name.lower().find(m[0].lower())!=-1):
 					name = m[1]
 					break
-			if (((name==isp) and (ip_country==country)) or ((name==isp) and (country=="none"))):
+			if (((name.lstrip()==isp.lstrip()) and (ip_country.lstrip()==country.lstrip())) or ((name.lstrip()==isp.lstrip()) and (country=="none"))):
 				ret.append(ip[0])
 		except:
 			continue
@@ -351,7 +351,7 @@ def linegraph_ips_by_provider_and_country(isp,country,max_results,start,end,metr
 				for c in country_list:
 					if ip_country==c:
 						country_count+=1
-				if(((name==isp)and(ip_country==country))or((name==isp)and(country=='none')and(country_count<=dist_level))):
+				if(((name.lstrip()==isp.lstrip())and(ip_country.lstrip()==country.lstrip()))or((name.lstrip()==isp.lstrip())and(country=='none')and(country_count<=dist_level))):
 					country_list.append(ip_country)
 					ret.append(ip[0])
 					result_count+=1
