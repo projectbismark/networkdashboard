@@ -328,7 +328,7 @@ def linegraph_ips_by_provider_and_country(isp,country,max_results,start,end,metr
 				break
 			try:
 				device = Devicedetails.objects.filter(ip=ip[0])[0]
-				cached = JsonCache.objects.filter(deviceid=device[0].deviceid, datatype=metric)[0]
+				cached = JsonCache.objects.filter(deviceid=device.deviceid, datatype=metric)[0]
 				if cached.eventstamp<start or device.eventstamp>end:
 					continue
 				country_count = 0

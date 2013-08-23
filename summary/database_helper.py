@@ -434,13 +434,13 @@ def bargraph_compare_bitrate_by_city(city,country,start,end,dir):
 	if len(devices)==0:
 		return result
 	# parameters for query. Ordering of appending matters:
-	params.append(start)
-	params.append(end)
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	params.append(earliest)
+	params.append(latest)
 	params.append(dir)
 	params.append(devices)
 	# start and end dates based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
 	SQL = "SELECT \
 		avg(average) AS avg, \
 		count(distinct m_bitrate.deviceid) AS count, \
@@ -459,15 +459,15 @@ def bargraph_compare_bitrate_by_city(city,country,start,end,dir):
 	return result
 	
 def bargraph_compare_bitrate_by_country(country,start,end,dir):
-	# parameters for query. Ordering of appending matters:
-	params = []
-	params.append(country)
-	params.append(start)
-	params.append(end)
-	params.append(dir)
 	# start and end dates based on user selection:
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
+	# parameters for query. Ordering of appending matters:
+	params = []
+	params.append(country)
+	params.append(earliest)
+	params.append(latest)
+	params.append(dir)
 	SQL = "SELECT \
 		avg(average) AS avg, \
 		count(distinct m_bitrate.deviceid) AS count, \
@@ -490,14 +490,14 @@ def bargraph_compare_bitrate_by_isp(isp,start,end,direction,country):
 	devices = tuple(views_helper.bargraph_devices_by_provider_and_country(isp,country))
 	if len(devices)==0:
 		return result
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
 	# parameters for query. Ordering of appending matters:
-	params.append(start)
-	params.append(end)
+	params.append(earliest)
+	params.append(latest)
 	params.append(direction)
 	params.append(devices)
 	# start and end dates based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
 	SQL = "SELECT \
 		avg(average) AS avg, \
 		count(distinct m_bitrate.deviceid) AS count, \
@@ -522,13 +522,13 @@ def bargraph_compare_lmrtt_by_city(city,start,end):
 	devices = tuple(views_helper.bargraph_devices_by_city_name(city))
 	if len(devices)==0:
 		return result
-	# parameters for query. Ordering of appending matters:
-	params.append(start)
-	params.append(end)
-	params.append(devices)
 	# start and end dates based on user selection:
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
+	# parameters for query. Ordering of appending matters:
+	params.append(earliest)
+	params.append(latest)
+	params.append(devices)
 	SQL = "SELECT \
 		avg(average) AS avg, \
 		count(distinct m_lmrtt.deviceid) AS count, \
@@ -546,14 +546,14 @@ def bargraph_compare_lmrtt_by_city(city,start,end):
 	return result
 	
 def bargraph_compare_lmrtt_by_country(country,start,end):
-	# parameters for query. Ordering of appending matters:
-	params = []
-	params.append(country)
-	params.append(start)
-	params.append(end)
 	# start and end dates based on user selection:
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
+	# parameters for query. Ordering of appending matters:
+	params = []
+	params.append(country)
+	params.append(earliest)
+	params.append(latest)
 	SQL = "SELECT \
 		avg(average) AS avg, \
 		count(distinct m_lmrtt.deviceid) AS count, \
@@ -575,13 +575,13 @@ def bargraph_compare_lmrtt_by_isp(isp,start,end,country):
 	devices = tuple(views_helper.bargraph_devices_by_provider_and_country(isp,country))
 	if len(devices)==0:
 		return result
-	# parameters for query. Ordering of appending matters:
-	params.append(start)
-	params.append(end)
-	params.append(devices)
 	# start and end dates based on user selection:
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
+	# parameters for query. Ordering of appending matters:
+	params.append(earliest)
+	params.append(latest)
+	params.append(devices)
 	SQL = "SELECT \
 		avg(average) AS avg, \
 		count(distinct m_lmrtt.deviceid) AS count, \
@@ -607,13 +607,13 @@ def bargraph_compare_rtt_by_city(city,start,end):
 		return result
 	dstip = '8.8.8.8'
 	# parameters for query. Ordering of appending matters:
-	params.append(start)
-	params.append(end)
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	params.append(earliest)
+	params.append(latest)
 	params.append(dstip)
 	params.append(devices)
 	# start and end dates based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
 	SQL = "SELECT \
 		avg(average) AS avg, \
 		count(distinct m_rtt.deviceid) AS count, \
@@ -633,15 +633,16 @@ def bargraph_compare_rtt_by_city(city,start,end):
 def bargraph_compare_rtt_by_country(country,start,end):
 	# only measure against a particular server:
 	dstip = '8.8.8.8'
+	# start and end dates based on user selection:
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
 	# parameters for query. Ordering of appending matters:
 	params = []
 	params.append(country)
 	params.append(dstip)
-	params.append(start)
-	params.append(end)
+	params.append(earliest)
+	params.append(latest)
 	# start and end dates based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
 	SQL = "SELECT \
 		avg(average) AS avg, \
 		count(distinct m_rtt.deviceid) AS count, \
@@ -666,14 +667,14 @@ def bargraph_compare_rtt_by_isp(isp,start,end,country):
 	if len(devices)==0:
 		return result
 	dstip = '8.8.8.8'
-	# parameters for query. Ordering of appending matters:
-	params.append(start)
-	params.append(end)
-	params.append(dstip)
-	params.append(devices)
 	# start and end dates based on user selection:
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
+	# parameters for query. Ordering of appending matters:
+	params.append(earliest)
+	params.append(latest)
+	params.append(dstip)
+	params.append(devices)
 	SQL = "SELECT \
 		avg(average) AS avg, \
 		count(distinct m_rtt.deviceid) AS count, \
@@ -701,6 +702,7 @@ def linegraph_compare_bitrate_by_city(city,country,max_results,start,end,dir):
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
 	devices = tuple(views_helper.linegraph_devices_by_city_name(city, max_results, earliest, latest, metric))
+	print devices
 	if len(devices)==0:
 		return result
 	params.append(earliest)
