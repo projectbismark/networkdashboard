@@ -594,7 +594,6 @@ def bargraph_compare_lmrtt_by_isp(isp,start,end,country):
 	cursor = get_dict_cursor()
 	cursor.execute(SQL,params)
 	records = cursor.fetchall()
-	print len(records) 
 	result = cvs_helper.bargraph_compare(records, 1)
 	cursor.close()
 	return result
@@ -702,7 +701,6 @@ def linegraph_compare_bitrate_by_city(city,country,max_results,start,end,dir):
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
 	devices = tuple(views_helper.linegraph_devices_by_city_name(city, max_results, earliest, latest, metric))
-	print devices
 	if len(devices)==0:
 		return result
 	params.append(earliest)

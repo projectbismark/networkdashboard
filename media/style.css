@@ -11,6 +11,10 @@
 	border-top: none;
 }
 
+input#calendar{
+	height:18px;
+}
+
 body { 
     background-color: #ddd;
 /*    color: #333;

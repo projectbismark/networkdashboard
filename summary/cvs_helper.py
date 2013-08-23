@@ -146,7 +146,7 @@ def bargraph_compare(records, factor):
 	for r in records:
 		if r['name']==None:
 			continue
-		result.append(dict(name=r['name'], type='column', data = factor*r['avg'], count = r['count']))
+		result.append(dict(name=r['name'].lstrip(), type='column', data = factor*r['avg'], count = r['count']))
 	result = sorted(result, key=lambda isp: isp['name'])
 	return result	
 		
