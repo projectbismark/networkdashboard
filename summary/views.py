@@ -104,6 +104,7 @@ def compare_bitrate_by_country(request):
 	result.append(database_helper.bargraph_compare_bitrate_by_country(country,start,end,direction))
 	result.append(empty)
 	return HttpResponse(json.dumps(result))
+
 	
 def compare_bitrate_by_isp(request):
 	isp = request.GET.get('isp')
@@ -188,6 +189,18 @@ def compare_rtt_by_isp(request):
 	empty = []
 	result.append(database_helper.bargraph_compare_rtt_by_isp(isp,start,end,country))
 	result.append(database_helper.linegraph_compare_rtt_by_isp(isp,max_results,start,end,country))
+	return HttpResponse(json.dumps(result))
+	
+def rtt_json(request,device,dstip,days):
+	result = database_helper.get_rtt_measurements(device, days, dstip)
+	return HttpResponse(json.dumps(result))
+
+def lmrtt_json(request,device,days):
+	result = database_helper.get_lmrtt_measurements(device,days)
+	return HttpResponse(json.dumps(result))
+
+def bitrate_json(request,device,direction,days,multi):
+	result = database_helper.get_bitrate_measurements(device,days,direction,multi)
 	return HttpResponse(json.dumps(result))
 	
 def compare_rtt(request):

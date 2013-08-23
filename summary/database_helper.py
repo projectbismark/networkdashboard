@@ -883,6 +883,62 @@ def linegraph_compare_rtt_by_isp(isp,max_results,start,end,country):
 	cursor.close()
 	return result
 	
+def get_rtt_measurements(device,days,dstip):
+	threading="multi"
+	data = []
+	end = datetime.now()
+	start = datetime_helper.get_daterange_start(int(days))
+	rows = MRtt.objects.filter(deviceid=device,dstip=dstip,eventstamp__gte=start,eventstamp__lte=end)
+	if len(rows)==0:
+		return []
+	for r in rows:
+		try:
+			eventstamp = datetime_helper.datetime_to_JSON(r.eventstamp)
+			d = [eventstamp, float(r.average)]
+			data.append(d)
+		except:
+			continue
+	return dict(device=device,dstip=dstip,days=days,data=data)
+	
+def get_lmrtt_measurements(device,days):
+	threading = "multi"
+	data = []
+	end = datetime.now()
+	start = datetime_helper.get_daterange_start(int(days))
+	rows = MRtt.objects.filter(deviceid=device,eventstamp__gte=start,eventstamp__lte=end)
+	if len(rows)==0:
+		return []
+	for r in rows:
+		try:
+			eventstamp = datetime_helper.datetime_to_JSON(r.eventstamp)
+			d = [eventstamp, float(r.average)]
+			data.append(d)
+		except:
+			continue
+	return dict(device=device,days=days,data=data)
+	
+def get_bitrate_measurements(device,days,direction,multi):
+	threading = "multi"
+	data = []
+	end = datetime.now()
+	start = datetime_helper.get_daterange_start(int(days))
+	rows = MBitrate.objects.filter(deviceid=device,eventstamp__gte=start,eventstamp__lte=end,direction=direction)
+	if len(rows)==0:
+		return []
+	if multi=="1":
+		rows = rows.filter(toolid='NETPERF_3')
+	else:
+		rows = rows.exclude(toolid='NETPERF_3')
+		threading = "single"
+	for r in rows:
+		try:
+			eventstamp = datetime_helper.datetime_to_JSON(r.eventstamp)
+			d = [eventstamp, float(r.average)]
+			data.append(d)
+		except:
+			continue
+	return dict(device=device,days=days,data=data,direction=direction,threading=threading)
+	
 # creates and sets a hashkey for a device
 def assign_hash(device):
 	dev = Devicedetails.objects.get(deviceid=device)

@@ -458,8 +458,7 @@ class MLmrtt(models.Model):
         db_table = u'm_lmrtt'
 
 class MRtt(models.Model):
-    #deviceid = models.TextField() # This field type is a guess.
-	deviceid = models.ForeignKey(Devicedetails)
+	deviceid = models.TextField() # This field type is a guess.
 	srcip = models.IPAddressField()
 	dstip = models.IPAddressField()
 	eventstamp = models.DateTimeField()
