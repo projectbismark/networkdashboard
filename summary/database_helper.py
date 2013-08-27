@@ -852,44 +852,22 @@ def linegraph_compare_rtt_by_city(city,max_results,start,end):
 	return result
 	
 def linegraph_compare_rtt_by_isp(isp,max_results,start,end,country):
-	#params = []
 	series = []
 	result = []
-	metric = 'rtt'
-	#dstip = '8.8.8.8'
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
-	devices = tuple(views_helper.linegraph_devices_by_provider_and_country(isp,country,max_results,earliest,latest,metric))
+	devices = Devicedetails.objects.filter(isp=isp,eventstamp__lte=latest)
 	if len(devices)==0:
 		return result
 	for d in devices:
-		parse = parse_rtt_measurements(d,earliest,latest)
-		result.append(dict(name=d.isp + ' Device', type='line', data=parse))
-	# params.append(earliest)
-	# params.append(latest)
-	# params.append(dstip)
-	# params.append(devices)
-	# SQL = "SELECT \
-		# average AS avg, \
-		# devicedetails.deviceid AS deviceid, \
-		# geoip_city AS name, \
-		# m_rtt.eventstamp AS eventstamp \
-		# FROM m_rtt \
-		# INNER JOIN devicedetails ON devicedetails.deviceid=m_rtt.deviceid \
-		# WHERE m_rtt.eventstamp>%s AND m_rtt.eventstamp<%s AND m_rtt.dstip=%s \
-		# AND m_rtt.average<3000 \
-		# AND devicedetails.deviceid IN %s \
-		# ORDER BY m_rtt.eventstamp;"
-	# cursor = get_dict_cursor()
-	# cursor.execute(SQL,params)
-	# records = cursor.fetchall()
-	# result = cvs_helper.linegraph_compare(records, 1)
-	# cursor.close()
+		parse = parse_rtt_compare(d.deviceid,earliest,latest)
+		result.append(dict(name=d.city + ' Device', type='line', data=parse))
 	return result
 
-def parse_rtt_measurements(device,earliest,latest):
+def parse_rtt_compare(device,earliest,latest):
 	data = []
-	filename = settings.PROJECT_ROOT + 'summary/measurements/' + device
+	dstip = '8.8.8.8'
+	filename = settings.PROJECT_ROOT + '/summary/measurements/' + device
 	remove = ')("\n'
 	f = open(filename, 'r')
 	with open(filename,'r') as f:
@@ -903,12 +881,14 @@ def parse_rtt_measurements(device,earliest,latest):
 			entry.append(float(record[1]))
 			data.append(entry)
 	sorted_data = sorted(data, key=lambda x: x[0])
-	sorted_data = [(x,y) for x,y in sorted_data if x>earliest and x<latest]
+	sorted_data = [(x,y,z) for x,y,z in sorted_data if x>earliest and x<latest and z==dstip]
 	return sorted_data
 	
 def parse_rtt_measurements(device):
+	result = []
 	data = []
-	filename = settings.PROJECT_ROOT + 'summary/measurements/' + device
+	dstips = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/' + device
 	remove = ')("\n'
 	f = open(filename, 'r')
 	with open(filename,'r') as f:
@@ -920,9 +900,16 @@ def parse_rtt_measurements(device):
 			record = record.split(',')
 			entry.append(int(record[0]))
 			entry.append(float(record[1]))
+			dstip = record[2]
+			entry.append(dstip)
+				if dstip not in dstips and dstip!='':
+					dstips.append(dstip)
 			data.append(entry)
 	sorted_data = sorted(data, key=lambda x: x[0])
-	return sorted_data
+	for dstip in dstips:
+		series_data = [(x,y,z) for x,y,z in sorted_data if  z==dstip]
+		result.append(series_data)
+	return result
 	
 def get_rtt_measurements(device,days,dstip):
 	threading="multi"
