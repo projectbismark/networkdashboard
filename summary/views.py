@@ -369,12 +369,14 @@ def iptest(iptest):
 	return HttpResponse(str(dat))
 	
 def linegraph_rtt(request):
-	data = []
+	# data = []
 	device = request.GET.get('deviceid')
-	cached_rtt = JsonCache.objects.filter(deviceid=device, datatype='rtt')
-	if len(cached_rtt)!=0:
-		data = cached_rtt[0].data
-	return HttpResponse(data)
+	# cached_rtt = JsonCache.objects.filter(deviceid=device, datatype='rtt')
+	# if len(cached_rtt)!=0:
+		# data = cached_rtt[0].data
+	# return HttpResponse(data)
+	data = database_helper.parse_rtt_measurements(device)
+	return HttpResponse(json.dumps(data))
 	
 
 def linegraph_bitrate(request):

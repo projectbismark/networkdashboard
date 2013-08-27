@@ -107,12 +107,6 @@ def linegraph_compare(data,factor):
 		except:
 			continue
 	return output
-		
-	# for measure in data:
-		# if measure.average > 0:
-			# output.append((datetime_helper.datetime_to_JSON(measure.eventstamp),float(measure.average) * factor))
-	# result = dict(name=title, type='line',data=output)
-	# return result
 	
 	
 # def bargraph_compare(data,factor):
