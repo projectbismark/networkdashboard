@@ -10,7 +10,7 @@ import psycopg2.extras
 import time
 from django.core import serializers
 import sys
-#import fcntl
+import fcntl
 
 class UpdateLock:
 	def __init__(self, filename):
@@ -59,54 +59,34 @@ def update_json():
 
 def write_rtt_measurements():
 	devices = Devicedetails.objects.all()
-	dstip = '203.110.245.243'
 	cursor = get_dict_cursor()
 	count = 0
 	t0 = datetime.now()
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
-		filename = settings.PROJECT_ROOT + 'summary/measurements/' + device2
+		filename = settings.PROJECT_ROOT + '/summary/measurements/' + device2
 		f = open(filename, 'w')
 		params = []
 		params.append(d.deviceid)
-		params.append(dstip)
 		SQL = "SELECT \
-			eventstamp, average, dstip \
-			FROM m_rtt JOIN devicedetails on deviecdetails.deviceid=m_rtt.deviceid\
-			WHERE m_rtt.deviceid=%s AND m_rtt.dstip=%s;"
+			m_rtt.eventstamp, average, dstip, country, city, isp \
+			FROM m_rtt JOIN devicedetails on devicedetails.deviceid=m_rtt.deviceid \
+			WHERE m_rtt.deviceid=%s;"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
 		for r in records:
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
-			line = str(eventstamp) + ',' + str(avg) + '\n'
+			dstip = r['dstip']
+			line = str(eventstamp) + ',' + str(avg) + ',' + dstip + '\n'
 			f.write(line)
 		f.close()
 		count += 1
 		t1 = datetime.now()
 		print t1-t0
 		print str(len(devices)-count) + " remaining"
-	return
-
-def parse_rtt_measurements(device,earliest,latest):
-	data = []
-	filename = settings.PROJECT_ROOT + 'summary/measurements/' + device
-	remove = ')("\n'
-	f = open(filename, 'r')
-	with open(filename,'r') as f:
-		for line in f:
-			record=line
-			entry = []
-			for i in range(0,len(remove)):
-				record = record.replace(remove[i],'')
-			record = record.split(',')
-			entry.append(int(record[0]))
-			entry.append(float(record[1]))
-			data.append(entry)
-	sorted_data = sorted(data, key=lambda x: x[0])
-	sorted_data = [(x,y) for x,y in sorted_data if x>earliest and x<latest]
-	return sorted_data
-		
+	cursor.close()
+	return		
 	
 	
 def get_dict_cursor():

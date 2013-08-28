@@ -902,14 +902,20 @@ def parse_rtt_measurements(device):
 			entry.append(float(record[1]))
 			dstip = record[2]
 			entry.append(dstip)
-				if dstip not in dstips and dstip!='':
-					dstips.append(dstip)
+			if dstip not in dstips and dstip!='':
+				dstips.append(dstip)
 			data.append(entry)
 	sorted_data = sorted(data, key=lambda x: x[0])
 	for dstip in dstips:
 		series_data = [(x,y,z) for x,y,z in sorted_data if  z==dstip]
 		result.append(series_data)
 	return result
+	
+def get_measurement_server_name(dstip):
+	ipr = IpResolver.objects.filter(ip=dstip)
+	if len(ipr)!=0:
+		return ipr[0].location 
+	return ''
 	
 def get_rtt_measurements(device,days,dstip):
 	threading="multi"
