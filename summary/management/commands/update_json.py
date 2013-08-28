@@ -78,8 +78,13 @@ def write_rtt_measurements():
 		for r in records:
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
-			mserver = ipr.filter(ip=dstip)
-			if len(mserver)==0:
+			mserver = ''
+			country = r['country']
+			city = r['city']
+			isp = r['isp']
+			try:
+				mserver = ipr.filter(ip=r['dstip'])[0].location
+			except:
 				continue
 			line = str(eventstamp) + ',' + str(avg) + ',' + mserver + ',' + country + ',' + city + ',' + isp +  '\n'
 			f.write(line)
