@@ -62,6 +62,7 @@ def write_rtt_measurements():
 	cursor = get_dict_cursor()
 	count = 0
 	t0 = datetime.now()
+	ipr = IpResolver.objects.all()
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
 		filename = settings.PROJECT_ROOT + '/summary/measurements/' + device2
@@ -77,8 +78,10 @@ def write_rtt_measurements():
 		for r in records:
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
-			dstip = r['dstip']
-			line = str(eventstamp) + ',' + str(avg) + ',' + dstip + '\n'
+			mserver = ipr.filter(ip=dstip)
+			if len(mserver)==0:
+				continue
+			line = str(eventstamp) + ',' + str(avg) + ',' + mserver + ',' + country + ',' + city + ',' + isp +  '\n'
 			f.write(line)
 		f.close()
 		count += 1
