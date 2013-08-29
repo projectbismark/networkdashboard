@@ -863,52 +863,75 @@ def linegraph_compare_rtt_by_isp(isp,max_results,start,end,country):
 		parse = parse_rtt_compare(d.deviceid,earliest,latest)
 		result.append(dict(name=d.city + ' Device', type='line', data=parse))
 	return result
-
-def parse_rtt_compare(device,earliest,latest):
+	
+# returns a single series:
+def parse_rtt_compare_by_isp(device,earliest,latest,city):
 	data = []
 	dstip = '8.8.8.8'
+	city = ''
 	filename = settings.PROJECT_ROOT + '/summary/measurements/' + device
+	# garbage characters to be removed:
 	remove = ')("\n'
 	f = open(filename, 'r')
+	# file is closed automatically after all lines are read:
 	with open(filename,'r') as f:
-		for line in f:
-			record=line
+		# each line represents one measurement record:
+		for record in f:
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
 			record = record.split(',')
+			# eventstamp:
 			entry.append(int(record[0]))
+			# average:
 			entry.append(float(record[1]))
 			data.append(entry)
+	# order measurements by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
-	sorted_data = [(x,y,z) for x,y,z in sorted_data if x>earliest and x<latest and z==dstip]
-	return sorted_data
-	
+	# apply filtering:
+	sorted_data = [(x,y) for x,y,z in sorted_data if x>earliest and x<latest and z==dstip]
+	series = dict(name=city, type='line', data=sorted_data)
+	return series
+
+# returns multiple series for the same device:	
 def parse_rtt_measurements(device):
 	result = []
 	data = []
 	dstips = []
 	filename = settings.PROJECT_ROOT + '/summary/measurements/' + device
+	# garbage characters to be removed:
 	remove = ')("\n'
+	ipr = IpResolver.objects.all()
 	f = open(filename, 'r')
 	with open(filename,'r') as f:
-		for line in f:
-			record=line
+		# each line represents one measurement record:
+		for record in f:
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
 			record = record.split(',')
+			# eventstamp:
 			entry.append(int(record[0]))
+			# average:
 			entry.append(float(record[1]))
+			# mserver address:
 			dstip = record[2]
 			entry.append(dstip)
 			if dstip not in dstips and dstip!='':
 				dstips.append(dstip)
 			data.append(entry)
+	f.close()
+	# sort by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
+	# group data into sub-series by measurement server
 	for dstip in dstips:
-		series_data = [(x,y,z) for x,y,z in sorted_data if  z==dstip]
-		result.append(series_data)
+		mserver = ipr.filter(ip=dstip)
+		if len(mserver)==0:
+			continue
+		# measurements (eventstamp,avg) are grouped by dstip, though dstip itself is discarded:
+		series_data = [(x,y) for x,y,z in sorted_data if  z==dstip]
+		series = dict(name=mserver.location,type='line',data=series_data)
+		result.append(series)
 	return result
 	
 def get_measurement_server_name(dstip):

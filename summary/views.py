@@ -178,17 +178,28 @@ def compare_rtt_by_country(request):
 	result.append(empty)
 	return HttpResponse(json.dumps(result))
 	
+# returns bargraph and linegraph series for a given ISP with respect to various cities:
 def compare_rtt_by_isp(request):
-	country = request.GET.get('country')
+	result = []
+	empty = []
+	line_series = []
+	bar_series = []
+	# country = request.GET.get('country')
+	# for limiting number of line series:
 	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
 	start = request.GET.get('start')
 	end = request.GET.get('end')
 	isp = request.GET.get('isp')
-	result = []
-	empty = []
-	result.append(database_helper.bargraph_compare_rtt_by_isp(isp,start,end,country))
-	result.append(database_helper.linegraph_compare_rtt_by_isp(isp,max_results,start,end,country))
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# all devices under given ISP
+	devices = Devicedetails.objects.filter(isp=isp, eventstamp__lte=latest)
+	for d in devices:
+		if len(line_series)<max_results:
+			line_series.append(database_helper.parse_rtt_compare_by_isp(d.deviceid,earliest,latest,d.city)
+		#bar_series.append(databse_helper.average_rtt_compare_by_isp(d.deviceid,earliest,latest)
+	result.append(empty)
+	result.append(line_series)
 	return HttpResponse(json.dumps(result))
 	
 def rtt_json(request,device,dstip,days):
@@ -368,21 +379,11 @@ def iptest(iptest):
 	dat = geoip_helper.getLocation("117.192.232.202")
 	return HttpResponse(str(dat))
 	
+# returns series data in highstock format
 def linegraph_rtt(request):
-	# data = []
-	result = []
 	device = request.GET.get('deviceid')
-	# cached_rtt = JsonCache.objects.filter(deviceid=device, datatype='rtt')
-	# if len(cached_rtt)!=0:
-		# data = cached_rtt[0].data
-	# return HttpResponse(data)
 	data = database_helper.parse_rtt_measurements(device)
-	for d in data:
-		dstip = d[0][2]
-		name = database_helper.get_measurement_server_name(dstip)
-		series = dict(name=name, type='line', data=d)
-		result.append(series)
-	return HttpResponse(json.dumps(result))
+	return HttpResponse(json.dumps(data))
 	
 
 def linegraph_bitrate(request):
