@@ -868,7 +868,9 @@ def linegraph_compare_rtt_by_isp(isp,max_results,start,end,country):
 def parse_rtt_compare_by_isp(device,earliest,latest,city):
 	data = []
 	dstip = '8.8.8.8'
-	city = ''
+	earliest = datetime_helper.datetime_to_JSON(earliest)
+	latest = datetime_helper.datetime_to_JSON(latest)
+	device = device.replace(':','')
 	filename = settings.PROJECT_ROOT + '/summary/measurements/' + device
 	# garbage characters to be removed:
 	remove = ')("\n'
@@ -885,6 +887,8 @@ def parse_rtt_compare_by_isp(device,earliest,latest,city):
 			entry.append(int(record[0]))
 			# average:
 			entry.append(float(record[1]))
+			# dstip:
+			entry.append(record[2])
 			data.append(entry)
 	# order measurements by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
@@ -930,7 +934,7 @@ def parse_rtt_measurements(device):
 			continue
 		# measurements (eventstamp,avg) are grouped by dstip, though dstip itself is discarded:
 		series_data = [(x,y) for x,y,z in sorted_data if  z==dstip]
-		series = dict(name=mserver.location,type='line',data=series_data)
+		series = dict(name=mserver[0].location,type='line',data=series_data)
 		result.append(series)
 	return result
 	

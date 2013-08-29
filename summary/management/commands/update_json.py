@@ -55,6 +55,7 @@ def update_json():
 		print t1-t0
 		print str(len(all_devices)-count) + " remaining"
 	write_rtt_measurements()
+	write_rtt_averages()
 	return
 
 def write_rtt_measurements():
@@ -71,7 +72,7 @@ def write_rtt_measurements():
 		SQL = "SELECT \
 			m_rtt.eventstamp, average, dstip \
 			FROM m_rtt JOIN devicedetails on devicedetails.deviceid=m_rtt.deviceid \
-			WHERE m_rtt.deviceid=%s;"
+			WHERE m_rtt.deviceid=%s AND m_rtt.average<3000"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
 		for r in records:
@@ -86,7 +87,85 @@ def write_rtt_measurements():
 		print t1-t0
 		print str(len(devices)-count) + " remaining"
 	cursor.close()
-	return		
+	return	
+
+def write_rtt_averages():
+	dstip = '8.8.8.8'
+	cursor = get_dict_cursor()
+	cities = Devicedetails.objects.distinct('geoip_city').exclude(geoip_city='').values('geoip_city')
+	countries = Devicedetails.objects.distinct('geoip_country').exclude(geoip_country='').values('geoip_country')
+	isps = Devicedetails.objects.distinct('geoip_isp').exclude(geoip_isp='').values('geoip_isp')
+	for c in cities:
+		filename = settings.PROJECT_ROOT + '/summary/averages/cities/' + c.geoip_city
+		f = open(filename, 'w')
+		params = []
+		params.append(c.geoip_city)
+		params.append(dstip)
+		SQL = "SELECT \
+			avg(average) AS avg, \
+			count(distinct m_rtt.deviceid) AS count, \
+			geoip_isp AS isp, \
+			FROM m_rtt \
+			INNER JOIN devicedetails ON devicedetails.deviceid=m_rtt.deviceid \
+			WHERE geoip_city=%s AND dstip=%s AND m_rtt.eventstamp>%s AND m_rtt.eventstamp<%s AND m_rtt.average<3000 \
+			GROUP BY geoip_isp;"
+		cursor.execute(SQL,params)
+		records = cursor.fetchall()
+		for r in records:
+			isp = r['isp']
+			avg = r['avg']
+			count = r['count']
+			line = isp ',' + avg + ',' + count + '\n'
+			f.write(line)
+		f.close()
+	for c in countries:
+		filename = settings.PROJECT_ROOT + '/summary/averages/countries/' + c.geoip_country
+		f = open(filename, 'w')
+		params = []
+		params.append(c.geoip_country)
+		params.append(dstip)
+		SQL = "SELECT \
+			avg(average) AS avg, \
+			count(distinct m_rtt.deviceid) AS count, \
+			geoip_isp AS isp, \
+			FROM m_rtt \
+			INNER JOIN devicedetails ON devicedetails.deviceid=m_rtt.deviceid \
+			WHERE geoip_country=%s AND dstip=%s AND m_rtt.eventstamp>%s AND m_rtt.eventstamp<%s AND m_rtt.average<3000 \
+			GROUP BY geoip_isp;"
+		cursor.execute(SQL,params)
+		records = cursor.fetchall()
+		for r in records:
+			isp = r['isp']
+			avg = r['avg']
+			count = r['count']
+			line = isp ',' + avg + ',' + count + '\n'
+			f.write(line)
+		f.close()
+	for isp in isps:
+		filename = settings.PROJECT_ROOT + '/summary/averages/isps/' + c.geoip_isp
+		f = open(filename, 'w')
+		params = []
+		params.append(c.geoip_isp)
+		params.append(dstip)
+		SQL = "SELECT \
+			avg(average) AS avg, \
+			count(distinct m_rtt.deviceid) AS count, \
+			geoip_city AS city, \
+			FROM m_rtt \
+			INNER JOIN devicedetails ON devicedetails.deviceid=m_rtt.deviceid \
+			WHERE geoip_isp=%s AND dstip=%s AND m_rtt.eventstamp>%s AND m_rtt.eventstamp<%s AND m_rtt.average<3000 \
+			GROUP BY geoip_city;"
+		cursor.execute(SQL,params)
+		records = cursor.fetchall()
+		for r in records:
+			city = r['city']
+			avg = r['avg']
+			count = r['count']
+			line = city ',' + avg + ',' + count + '\n'
+			f.write(line)
+		f.close()
+	cursor.close()
+	return	
 	
 	
 def get_dict_cursor():

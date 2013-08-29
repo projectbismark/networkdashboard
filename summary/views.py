@@ -161,9 +161,11 @@ def compare_rtt_by_city(request):
 	#days = int(request.GET.get('days'))
 	start = request.GET.get('start')
 	end = request.GET.get('end')
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
 	result = []
-	result.append(database_helper.bargraph_compare_rtt_by_city(city,start,end))
-	result.append(database_helper.linegraph_compare_rtt_by_city(city,max_results,start,end))
+	result.append(database_helper.bargraph_compare_rtt_by_city(city,earliest,latest))
+	result.append(database_helper.linegraph_compare_rtt_by_city(city,max_results,earliest,latest))
 	return HttpResponse(json.dumps(result))
 		
 def compare_rtt_by_country(request):
@@ -195,9 +197,11 @@ def compare_rtt_by_isp(request):
 	# all devices under given ISP
 	devices = Devicedetails.objects.filter(isp=isp, eventstamp__lte=latest)
 	for d in devices:
-		if len(line_series)<max_results:
-			line_series.append(database_helper.parse_rtt_compare_by_isp(d.deviceid,earliest,latest,d.city)
+		if len(line_series)<max_results and d.geoip_city!='':
+			line_series.append(database_helper.parse_rtt_compare_by_isp(d.deviceid,earliest,latest,d.geoip_city))
 		#bar_series.append(databse_helper.average_rtt_compare_by_isp(d.deviceid,earliest,latest)
+	line_series = sorted(line_series, key = lambda x: x['name'])
+	#bar_series = sorted(bar_series, key= lamba x: x['name'])
 	result.append(empty)
 	result.append(line_series)
 	return HttpResponse(json.dumps(result))
