@@ -96,10 +96,11 @@ def write_rtt_averages():
 	countries = Devicedetails.objects.distinct('geoip_country').exclude(geoip_country='').values('geoip_country')
 	isps = Devicedetails.objects.distinct('geoip_isp').exclude(geoip_isp='').values('geoip_isp')
 	for c in cities:
-		filename = settings.PROJECT_ROOT + '/summary/averages/cities/' + c.geoip_city
+		print c['geoip_city']
+		filename = settings.PROJECT_ROOT + '/summary/averages/cities/' + c['geoip_city']
 		f = open(filename, 'w')
 		params = []
-		params.append(c.geoip_city)
+		params.append(c['geoip_city'])
 		params.append(dstip)
 		SQL = "SELECT \
 			avg(average) AS avg, \
@@ -119,10 +120,11 @@ def write_rtt_averages():
 			f.write(line)
 		f.close()
 	for c in countries:
-		filename = settings.PROJECT_ROOT + '/summary/averages/countries/' + c.geoip_country
+		print c['geoip_country']
+		filename = settings.PROJECT_ROOT + '/summary/averages/countries/' + c['geoip_country']
 		f = open(filename, 'w')
 		params = []
-		params.append(c.geoip_country)
+		params.append(c['geoip_country'])
 		params.append(dstip)
 		SQL = "SELECT \
 			avg(average) AS avg, \
@@ -142,10 +144,11 @@ def write_rtt_averages():
 			f.write(line)
 		f.close()
 	for isp in isps:
-		filename = settings.PROJECT_ROOT + '/summary/averages/isps/' + c.geoip_isp
+		print isp['geoip_isp']
+		filename = settings.PROJECT_ROOT + '/summary/averages/isps/' + c['geoip_isp']
 		f = open(filename, 'w')
 		params = []
-		params.append(c.geoip_isp)
+		params.append(c['geoip_isp'])
 		params.append(dstip)
 		SQL = "SELECT \
 			avg(average) AS avg, \
