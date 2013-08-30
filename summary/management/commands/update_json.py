@@ -108,7 +108,7 @@ def write_rtt_averages():
 			geoip_isp AS isp, \
 			FROM m_rtt \
 			INNER JOIN devicedetails ON devicedetails.deviceid=m_rtt.deviceid \
-			WHERE geoip_city=%s AND dstip=%s AND m_rtt.eventstamp>%s AND m_rtt.eventstamp<%s AND m_rtt.average<3000 \
+			WHERE geoip_city=%s AND dstip=%s AND m_rtt.average<3000 \
 			GROUP BY geoip_isp;"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
@@ -132,7 +132,7 @@ def write_rtt_averages():
 			geoip_isp AS isp, \
 			FROM m_rtt \
 			INNER JOIN devicedetails ON devicedetails.deviceid=m_rtt.deviceid \
-			WHERE geoip_country=%s AND dstip=%s AND m_rtt.eventstamp>%s AND m_rtt.eventstamp<%s AND m_rtt.average<3000 \
+			WHERE geoip_country=%s AND dstip=%s AND m_rtt.average<3000 \
 			GROUP BY geoip_isp;"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
@@ -156,7 +156,7 @@ def write_rtt_averages():
 			geoip_city AS city, \
 			FROM m_rtt \
 			INNER JOIN devicedetails ON devicedetails.deviceid=m_rtt.deviceid \
-			WHERE geoip_isp=%s AND dstip=%s AND m_rtt.eventstamp>%s AND m_rtt.eventstamp<%s AND m_rtt.average<3000 \
+			WHERE geoip_isp=%s AND dstip=%s AND m_rtt.average<3000 \
 			GROUP BY geoip_city;"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
