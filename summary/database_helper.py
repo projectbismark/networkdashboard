@@ -893,7 +893,7 @@ def parse_rtt_compare_by_isp(device,earliest,latest, sort):
 	# apply filtering:
 	data = [(x,y) for x,y,z in data if x>earliest and x<latest and z==dstip]
 	m_count = len(data)
-	m_avg = avg(d[1] for d in data)
+	m_avg = sum(d[1])/m_count for d in data
 	result.append(m_count)
 	result.append(m_avg)
 	result.append(data)
