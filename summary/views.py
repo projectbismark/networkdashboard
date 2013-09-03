@@ -192,6 +192,7 @@ def compare_rtt_by_isp(request):
 	start = request.GET.get('start')
 	end = request.GET.get('end')
 	isp = request.GET.get('isp')
+	country = request.GET.get('country')
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
 	# all devices under given ISP
@@ -199,10 +200,10 @@ def compare_rtt_by_isp(request):
 	for d in devices:
 		if len(line_series)<max_results and d.geoip_city!='':
 			line_series.append(database_helper.parse_rtt_compare_by_isp(d.deviceid,earliest,latest,d.geoip_city))
-		#bar_series.append(databse_helper.average_rtt_compare_by_isp(d.deviceid,earliest,latest)
+			bar_series.append(database_helper.bargraph_compare_rtt_by_isp(d.deviceid,earliest,latest,country)
 	line_series = sorted(line_series, key = lambda x: x['name'])
-	#bar_series = sorted(bar_series, key= lamba x: x['name'])
-	result.append(empty)
+	bar_series = sorted(bar_series, key= lambda x: x['name'])
+	result.append(bar_series)
 	result.append(line_series)
 	return HttpResponse(json.dumps(result))
 	

@@ -658,17 +658,13 @@ def bargraph_compare_rtt_by_country(country,start,end):
 	cursor.close()
 	return result
 	
-def bargraph_compare_rtt_by_isp(isp,start,end,country):
+def bargraph_compare_rtt_by_isp(isp,earliest,latest,country):
 	params = []
 	result = []
-	# Calculate earliest date of the series based on user selection:
 	devices = tuple(views_helper.bargraph_devices_by_provider_and_country(isp,country))
 	if len(devices)==0:
 		return result
 	dstip = '8.8.8.8'
-	# start and end dates based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
 	# parameters for query. Ordering of appending matters:
 	params.append(earliest)
 	params.append(latest)
