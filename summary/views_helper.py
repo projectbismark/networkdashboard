@@ -31,7 +31,8 @@ def create_bargraph_series(avg_data):
 				device_count+=1
 		for ca in c_averages:
 			# apply weight to average
-			average += (ca[0]/total_count)*ca[1]
+			if total_count!=0:
+				average += (ca[0]/total_count)*ca[1]
 		series = dict(name=c, type='bar', data=average, count=device_count)
 		bar_series.append(series)
 	return bar_series

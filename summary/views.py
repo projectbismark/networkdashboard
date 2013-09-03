@@ -184,10 +184,8 @@ def compare_rtt_by_country(request):
 def compare_rtt_by_isp(request):
 	result = []
 	avg_data = []
-	cities = []
 	line_series = []
 	bar_series = []
-	# country = request.GET.get('country')
 	# for limiting number of line series:
 	max_results = int(request.GET.get('max_results'))
 	start = request.GET.get('start')
@@ -199,9 +197,7 @@ def compare_rtt_by_isp(request):
 	# all devices under given ISP
 	devices = Devicedetails.objects.filter(isp=isp, eventstamp__lte=latest)
 	for d in devices:
-		if d.geoip_city!='':
-			if d.geoip_city not in cities:
-				cities.append(d.geoip_city)
+		if d.geoip_city!='' and d.geoip_city!=None
 			data = []
 			if len(line_series)<max_results:
 				data = database_helper.parse_rtt_compare_by_isp(d.deviceid,earliest,latest,True)
