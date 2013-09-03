@@ -860,8 +860,9 @@ def linegraph_compare_rtt_by_isp(isp,max_results,start,end,country):
 		result.append(dict(name=d.city + ' Device', type='line', data=parse))
 	return result
 	
-# returns a single series:
-def parse_rtt_compare_by_isp(device,earliest,latest,city):
+# returns RTT measurements, measurement count, and average for a device:
+def parse_rtt_compare_by_isp(device,earliest,latest, sort):
+	result = []
 	data = []
 	dstip = '8.8.8.8'
 	earliest = datetime_helper.datetime_to_JSON(earliest)
@@ -887,11 +888,16 @@ def parse_rtt_compare_by_isp(device,earliest,latest,city):
 			entry.append(record[2])
 			data.append(entry)
 	# order measurements by eventstamp:
-	sorted_data = sorted(data, key=lambda x: x[0])
+	if sort:
+		data = sorted(data, key=lambda x: x[0])
 	# apply filtering:
-	sorted_data = [(x,y) for x,y,z in sorted_data if x>earliest and x<latest and z==dstip]
-	series = dict(name=city, type='line', data=sorted_data)
-	return series
+	data = [(x,y) for x,y,z in data if x>earliest and x<latest and z==dstip]
+	m_count = len(data)
+	m_avg = avg(d[1] for d in data)
+	result.append(m_count)
+	result.append(m_avg)
+	result.append(data)
+	return result
 
 # returns multiple series for the same device:	
 def parse_rtt_measurements(device):

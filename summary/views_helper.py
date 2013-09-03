@@ -12,6 +12,30 @@ import psycopg2
 import hashlib
 import cvs_helper,datetime_helper,database_helper,geoip_helper
 
+def create_bargraph_series(avg_data):
+	cities = []
+	bar_series = []
+	for a in avg_data:
+		if a[0] not in cities:
+			cities.append(a[0])
+	for c in cities:
+		average = 0
+		total_count = 0
+		device_count = 0
+		c_averages = []
+		for a in avg_data:
+			if a[0]==c:
+				new_avg = [a[1],a[2]]
+				total_count += a[1]
+				c_averages.append(new_avg)
+				device_count+=1
+		for ca in c_averages:
+			# apply weight to average
+			average += (ca[0]/total_count)*ca[1]
+		series = dict(name=c, type='bar', data=average, count=device_count)
+		bar_series.append(series)
+	return bar_series
+				
 def get_devices_for_compare(device,criteria):
 	if (criteria==1):
 		return get_devices_by_isp(device)
