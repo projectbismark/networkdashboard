@@ -197,14 +197,18 @@ def compare_rtt_by_isp(request):
 	# all devices under given ISP
 	devices = Devicedetails.objects.filter(isp=isp, eventstamp__lte=latest)
 	for d in devices:
-		if d.geoip_city!='' and d.geoip_city!=None
+		if d.geoip_city!='' and d.geoip_city!=None:
 			data = []
 			if len(line_series)<max_results:
 				data = database_helper.parse_rtt_compare_by_isp(d.deviceid,earliest,latest,True)
+				if data[0]==0:
+					continue
 				series = dict(name=d.geoip_city,type='line',data=data[2])
 				line_series.append(series)
 			else:
 				data = database_helper.parse_rtt_compare_by_isp(d.deviceid,earliest,latest,False)
+			if data[0]==0:
+				continue
 			avg_entry = []
 			avg_entry.append(d.geoip_city)
 			avg_entry.append(data[0])

@@ -877,7 +877,6 @@ def parse_rtt_compare_by_isp(device,earliest,latest, sort):
 	filename = settings.PROJECT_ROOT + '/summary/measurements/' + device
 	# garbage characters to be removed:
 	remove = ')("\n'
-	f = open(filename, 'r')
 	# file is closed automatically after all lines are read:
 	with open(filename,'r') as f:
 		# each line represents one measurement record:
