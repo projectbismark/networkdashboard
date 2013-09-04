@@ -1001,23 +1001,22 @@ function onSuccessIspCompare(graphParams,country) {
 function onSuccessCountryCompare(graphParams, country) {
     return function(data) {
 		var seriesData = JSON.parse(data)
-		if (seriesData[0].length > 0) {
-			data = seriesData[0];
+		if (seriesData.length > 0) {
 			var graphData = new Array();
 			var categories = new Array();
 			var labels;
-			for(var i=0;i<data.length; i++){
+			for(var i=0;i<seriesData.length; i++){
 				graphData[i] = {
-					y : parseFloat(data[i]['data']),
-					name : data[i]['name'],
+					y : parseFloat(seriesData[i]['data']),
+					name : seriesData[i]['name'],
 					country : country,
-					count : data[i]['count']
+					count : seriesData[i]['count']
 				}
-				if (data[i]['count']=='1'){
-					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+				if (seriesData[i]['count']=='1'){
+					categories[i] = seriesData[i]['name'] + ' (' + seriesData[i]['count'] + ')';
 				}
 				else{
-					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+					categories[i] = seriesData[i]['name'] + ' (' + seriesData[i]['count'] + ')';
 				}
 			}
 			if(graphData.length>6){

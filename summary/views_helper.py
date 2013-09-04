@@ -13,27 +13,35 @@ import hashlib
 import cvs_helper,datetime_helper,database_helper,geoip_helper
 
 def create_bargraph_series(avg_data):
-	cities = []
+	# names of series, such as city, country, or isp names:
+	series_names = []
 	bar_series = []
 	for a in avg_data:
-		if a[0] not in cities:
-			cities.append(a[0])
-	for c in cities:
+		if a[0] not in series_names:
+			series_names.append(a[0])
+	for sn in series_names:
+		# weighted average for this series:
 		average = 0
+		# total measurements for one single device, used to combine multiple averages
+		# accross multiple devices into one single average
 		total_count = 0
+		# number of devices for this series:
 		device_count = 0
-		c_averages = []
+		# contains averages and total measurements for each device in this series:
+		s_averages = []
 		for a in avg_data:
 			if a[0]==c:
+				# count of measurements, average of measurements:
 				new_avg = [a[1],a[2]]
 				total_count += a[1]
-				c_averages.append(new_avg)
+				s_averages.append(new_avg)
 				device_count+=1
-		for ca in c_averages:
-			# apply weight to average
+		for sa in s_averages:
 			if total_count!=0:
-				average += (ca[0]/total_count)*ca[1]
-		series = dict(name=c, type='bar', data=average, count=device_count)
+				# the total average for the series is calculated by summing the
+				# weighted average of each device:
+				average += (sa[0]/total_count)*sa[1]
+		series = dict(name=sn, type='bar', data=average, count=device_count)
 		bar_series.append(series)
 	return bar_series
 				
