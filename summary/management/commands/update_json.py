@@ -10,7 +10,7 @@ import psycopg2.extras
 import time
 from django.core import serializers
 import sys
-import fcntl
+#import fcntl
 
 class UpdateLock:
 	def __init__(self, filename):
@@ -54,8 +54,7 @@ def update_json():
 		#t1 = datetime.now()
 		#print t1-t0
 		#print str(len(all_devices)-count) + " remaining"
-	#write_rtt_measurements()
-	write_rtt_averages()
+	write_rtt_measurements()
 	return
 
 def write_rtt_measurements():

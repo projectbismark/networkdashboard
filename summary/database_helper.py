@@ -143,7 +143,7 @@ def update_rtt(device):
 		rtt_data = json.loads(cache[0].data)
 		# retrieve all uncached measurements:
 		distinct_ips = full_details.distinct('dstip').values('dstip')
-		# full_details = full_details.filter(eventstamp__gt=most_recent_cached).order_by('eventstamp')
+		full_details = full_details.filter(eventstamp__gt=most_recent_cached).order_by('eventstamp')
 		location = ''
 		dst_ip = ''
 		for ip in distinct_ips:
@@ -188,7 +188,7 @@ def update_rtt(device):
 		most_recent = full_details.latest('eventstamp').eventstamp
 		distinct_ips = full_details.values('dstip').distinct()
 		# must wait until after distinct query before ordering original queryset:
-		#full_details = full_details.order_by('eventstamp')
+		full_details = full_details.order_by('eventstamp')
 		for ip in distinct_ips:
 			try:
 				ip_lookup = IpResolver.objects.filter(ip=ip['dstip'])[0]
@@ -224,7 +224,7 @@ def update_lmrtt(device):
 		# cache is up to date:
 		#if latest_record.eventstamp<=lmrtt_cache[0].eventstamp:
 			#return
-		# uncached_measurements = all_records.filter(eventstamp__gt=lmrtt_cache[0].eventstamp).order_by('eventstamp')
+		uncached_measurements = all_records.filter(eventstamp__gt=lmrtt_cache[0].eventstamp).order_by('eventstamp')
 		lmrtt_data = json.loads(lmrtt_cache[0].data)
 		lmrtt_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_measurements,'Last mile latency',1,1,1,series_id)['data'])
 		id = lmrtt_cache[0].id
@@ -867,7 +867,7 @@ def linegraph_compare_rtt_by_isp(isp,max_results,start,end,country):
 	return result
 	
 # returns RTT measurements, measurement count, and average for a device:
-def parse_rtt_compare_by_isp(device,earliest,latest, sort):
+def parse_rtt_compare(device,earliest,latest,sort):
 	result = []
 	data = []
 	dstip = '8.8.8.8'
@@ -882,21 +882,24 @@ def parse_rtt_compare_by_isp(device,earliest,latest, sort):
 		# each line represents one measurement record:
 		for record in f:
 			entry = []
-			for i in range(0,len(remove)):
-				record = record.replace(remove[i],'')
-			record = record.split(',')
-			# eventstamp:
-			entry.append(int(record[0]))
-			# average:
-			entry.append(float(record[1]))
-			# dstip:
-			entry.append(record[2])
-			data.append(entry)
-	# order measurements by eventstamp:
+			try:
+				for i in range(0,len(remove)):
+					record = record.replace(remove[i],'')
+				record = record.split(',')
+				# eventstamp:
+				entry.append(int(record[0]))
+				# average:
+				entry.append(float(record[1]))
+				# dstip:
+				entry.append(record[2])
+				data.append(entry)
+			except:
+				continue
+	# order measurements by eventstamp, only necessary for linegraph series:
 	if sort:
 		data = sorted(data, key=lambda x: x[0])
 	# apply filtering:
-	data = [(x,y) for x,y,z in data if x>earliest and x<latest and z==dstip]
+	data = [(x,y) for x,y,z in data if (x>earliest and x<latest and z==dstip)]
 	m_count = len(data)
 	m_avg = avg([d[1] for d in data])
 	result.append(m_count)

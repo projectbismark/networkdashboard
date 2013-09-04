@@ -168,15 +168,46 @@ def compare_rtt_by_city(request):
 	result.append(database_helper.linegraph_compare_rtt_by_city(city,max_results,earliest,latest))
 	return HttpResponse(json.dumps(result))
 		
+# def compare_rtt_by_country(request):
+	# country = request.GET.get('country')
+	# start = request.GET.get('start')
+	# end = request.GET.get('end')
+	# result = []
+	#JS expects two sets of graph data but only 1 graph is shown for country
+	#so an empty list is appended:
+	# empty = []
+	# result.append(database_helper.bargraph_compare_rtt_by_country(country,start,end))
+	# result.append(empty)
+	# return HttpResponse(json.dumps(result))
+	
+# returns bargraph and linegraph series for a given country with respect to various cities:
 def compare_rtt_by_country(request):
-	country = request.GET.get('country')
+	result = []
+	avg_data = []
+	line_series = []
+	bar_series = []
+	empty = []
 	start = request.GET.get('start')
 	end = request.GET.get('end')
-	result = []
-	# JS expects two sets of graph data but only 1 graph is shown for country
-	# so an empty list is appended:
-	empty = []
-	result.append(database_helper.bargraph_compare_rtt_by_country(country,start,end))
+	country = request.GET.get('country')
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# all devices under given ISP
+	devices = Devicedetails.objects.filter(geoip_country=country, eventstamp__lte=latest)
+	for d in devices:
+		if d.geoip_city!='' and d.geoip_city!=None:
+			data = []
+			data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,False)
+			if data[0]==0:
+				continue
+			avg_entry = []
+			avg_entry.append(d.geoip_country)
+			avg_entry.append(data[0])
+			avg_entry.append(data[1])
+			avg_data.append(avg_entry)
+	bar_series= views_helper.create_bargraph_series(avg_data)
+	bar_series = sorted(bar_series, key= lambda x: x['name'])
+	result.append(bar_series)
 	result.append(empty)
 	return HttpResponse(json.dumps(result))
 	
@@ -200,7 +231,7 @@ def compare_rtt_by_isp(request):
 		if d.geoip_city!='' and d.geoip_city!=None:
 			data = []
 			if len(line_series)<max_results:
-				data = database_helper.parse_rtt_compare_by_isp(d.deviceid,earliest,latest,True)
+				data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,True)
 				if data[0]==0:
 					continue
 				series = dict(name=d.geoip_city,type='line',data=data[2])
