@@ -906,6 +906,44 @@ def parse_rtt_compare(device,earliest,latest,sort):
 	result.append(m_avg)
 	result.append(data)
 	return result
+	
+# returns LMRTT measurements, measurement count, and average for a device:
+def parse_lmrtt_compare(device,earliest,latest,sort):
+	result = []
+	data = []
+	earliest = datetime_helper.datetime_to_JSON(earliest)
+	latest = datetime_helper.datetime_to_JSON(latest)
+	device = device.replace(':','')
+	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	# file is closed automatically after all lines are read:
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			try:
+				for i in range(0,len(remove)):
+					record = record.replace(remove[i],'')
+				record = record.split(',')
+				# eventstamp:
+				entry.append(int(record[0]))
+				# average:
+				entry.append(float(record[1]))
+				data.append(entry)
+			except:
+				continue
+	# order measurements by eventstamp, only necessary for linegraph series:
+	if sort:
+		data = sorted(data, key=lambda x: x[0])
+	# apply filtering:
+	data = [(x,y) for x,y,z in data if (x>earliest and x<latest)]
+	m_count = len(data)
+	m_avg = avg([d[1] for d in data])
+	result.append(m_count)
+	result.append(m_avg)
+	result.append(data)
+	return result
 
 # returns multiple series for the same device:	
 def parse_rtt_measurements(device):
