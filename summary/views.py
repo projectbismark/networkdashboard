@@ -584,9 +584,9 @@ def linegraph_bitrate(request):
 	graphno = int(request.GET.get('graphno'))
 	data = []
 	if graphno==1:
-		data = database_helper.parse_bitrate_measurements(device,'up')
-	else:
 		data = database_helper.parse_bitrate_measurements(device,'dw')
+	else:
+		data = database_helper.parse_bitrate_measurements(device,'up')
 	return HttpResponse(json.dumps(data))
 
 def linegraph_lmrtt(request):
