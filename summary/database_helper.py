@@ -945,6 +945,47 @@ def parse_lmrtt_compare(device,earliest,latest,sort):
 	result.append(data)
 	return result
 	
+def parse_bitrate_compare(device,earliest,latest,sort,dir):
+	result = []
+	data = []
+	earliest = datetime_helper.datetime_to_JSON(earliest)
+	latest = datetime_helper.datetime_to_JSON(latest)
+	device = device.replace(':','')
+	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	# file is closed automatically after all lines are read:
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			try:
+				for i in range(0,len(remove)):
+					record = record.replace(remove[i],'')
+				record = record.split(',')
+				# eventstamp:
+				entry.append(int(record[0]))
+				# average:
+				entry.append(float(record[1]))
+				# direction:
+				entry.append(record[2])
+				# toolid:
+				entry.append(record[3])
+				data.append(entry)
+			except:
+				continue
+	# order measurements by eventstamp, only necessary for linegraph series:
+	if sort:
+		data = sorted(data, key=lambda x: x[0])
+	# apply filtering:
+	data = [(x,y) for x,y,z,t in data if (x>earliest and x<latest and z==dir and t=='NETPERF_3')]
+	m_count = len(data)
+	m_avg = avg([d[1] for d in data])
+	result.append(m_count)
+	result.append(m_avg)
+	result.append(data)
+	return result
+	
 # returns bitrate series for the given device:	
 def parse_bitrate_measurements(device, dir):
 	result = []
