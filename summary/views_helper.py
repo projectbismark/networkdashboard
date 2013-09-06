@@ -32,7 +32,7 @@ def create_bargraph_series(avg_data):
 		for a in avg_data:
 			if a[0]==sn:
 				# count of measurements, average of measurements:
-				new_avg = [a[1],a[2]]
+				new_avg = [a[1],float(a[2])]
 				total_count += a[1]
 				s_averages.append(new_avg)
 				device_count+=1
