@@ -970,7 +970,7 @@ def parse_lmrtt_measurements(device):
 	f.close()
 	# sort by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
-	series = dict(name="Last mile latency', type='line', data=sorted_data)
+	series = dict(name='Last mile latency', type='line', data=sorted_data)
 	return series
 	
 def get_measurement_server_name(dstip):
