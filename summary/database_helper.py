@@ -937,7 +937,7 @@ def parse_lmrtt_compare(device,earliest,latest,sort):
 	if sort:
 		data = sorted(data, key=lambda x: x[0])
 	# apply filtering:
-	data = [(x,y) for x,y,z in data if (x>earliest and x<latest)]
+	data = [(x,y) for x,y in data if (x>earliest and x<latest)]
 	m_count = len(data)
 	m_avg = avg([d[1] for d in data])
 	result.append(m_count)
