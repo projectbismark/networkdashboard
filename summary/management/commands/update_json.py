@@ -117,6 +117,37 @@ def write_lmrtt_measurements():
 		print t1-t0
 		print str(len(devices)-count) + " remaining"
 	cursor.close()
+	return
+
+def write_bitrate_measurements():
+	devices = Devicedetails.objects.all()
+	cursor = get_dict_cursor()
+	count = 0
+	t0 = datetime.now()
+	for d in devices:
+		device2 = d.deviceid.replace(':','')
+		filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate/' + device2
+		f = open(filename, 'w')
+		params = []
+		params.append(d.deviceid)
+		SQL = "SELECT \
+			m_bitrate.eventstamp, average, direction \
+			FROM m_bitrate JOIN devicedetails on devicedetails.deviceid=m_bitrate.deviceid \
+			WHERE m_bitrate.deviceid=%s AND m_bitrate.average>0"
+		cursor.execute(SQL,params)
+		records = cursor.fetchall()
+		for r in records:
+			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
+			direction = r['direction']
+			avg = r['average']
+			line = str(eventstamp) + ',' + str(avg) + ',' + direction + '\n'
+			f.write(line)
+		f.close()
+		count += 1
+		t1 = datetime.now()
+		print t1-t0
+		print str(len(devices)-count) + " remaining"
+	cursor.close()
 	return	
 	
 	
