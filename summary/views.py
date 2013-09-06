@@ -587,7 +587,7 @@ def linegraph_bitrate(request):
 		data = database_helper.parse_bitrate_measurements(device,'up')
 	else:
 		data = database_helper.parse_bitrate_measurements(device,'dw')
-	return HttpResponse(data)
+	return HttpResponse(json.dumps(data))
 
 def linegraph_lmrtt(request):
 	device = request.GET.get('deviceid')

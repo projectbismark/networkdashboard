@@ -144,7 +144,7 @@ def write_bitrate_measurements():
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
 			toolid = r['toolid']
-			line = str(eventstamp) + ',' + str(avg) + ',' + direction + ',' + toolid + '\n'
+			line = str(eventstamp) + ',' + str(avg) + ',' + str(direction) + ',' + str(toolid) + '\n'
 			f.write(line)
 		f.close()
 		count += 1
