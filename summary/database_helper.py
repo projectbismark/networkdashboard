@@ -972,7 +972,7 @@ def parse_bitrate_measurements(device, dir):
 			data.append(entry)
 	# sort by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
-	sorted_multi = [(x,y) for x,y,z,t in sorted_data if z==dir and t='NETPERF_3']
+	sorted_multi = [(x,y) for x,y,z,t in sorted_data if z==dir and t=='NETPERF_3']
 	sorted_single = [(x,y) for x,y,z,t in sorted_data if z==dir and t!='NETPERF_3']
 	multi_series = dict(name='Multi-threaded TCP', type='line',data=sorted_multi)
 	single_series = dict(name='Single-threaded TCP', type='line', data=sorted_single)
