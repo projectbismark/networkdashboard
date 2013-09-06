@@ -966,7 +966,7 @@ def parse_bitrate_compare(device,earliest,latest,sort,dir):
 				# eventstamp:
 				entry.append(int(record[0]))
 				# average:
-				entry.append(float(record[1]))
+				entry.append(float(record[1])*1000)
 				# direction:
 				entry.append(record[2])
 				# toolid:
