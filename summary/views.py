@@ -274,7 +274,7 @@ def compare_rtt_by_isp(request):
 				series = dict(name=d.geoip_city,type='line',data=data[2])
 				line_series.append(series)
 			else:
-				data = database_helper.parse_rtt_compare_by_isp(d.deviceid,earliest,latest,False)
+				data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,False)
 			if data[0]==0:
 				continue
 			avg_entry = []
