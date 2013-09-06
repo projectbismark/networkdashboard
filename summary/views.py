@@ -584,22 +584,15 @@ def linegraph_bitrate(request):
 	graphno = int(request.GET.get('graphno'))
 	data = []
 	if graphno==1:
-		cached_download = JsonCache.objects.filter(deviceid=device, datatype='bitrate_down')
-		if len(cached_download)!=0:
-			data = cached_download[0].data
+		data = database_helper.parse_bitrate_measurements(device,'up')
 	else:
-		cached_upload = JsonCache.objects.filter(deviceid=device, datatype='bitrate_up')
-		if len(cached_upload)!=0:
-			data = cached_upload[0].data
+		data = database_helper.parse_bitrate_measurements(device,'dw')
 	return HttpResponse(data)
 
 def linegraph_lmrtt(request):
-	data = []
 	device = request.GET.get('deviceid')
-	cached_lmrtt = JsonCache.objects.filter(deviceid=device, datatype='lmrtt')
-	if len(cached_lmrtt)!=0:
-		data = cached_lmrtt[0].data
-	return HttpResponse(data)
+	data = database_helper.parse_lmrtt_measurements(device)
+	return HttpResponse(json.dumps(data))
 
 def linegraph_shaperate(request):
 	data = []

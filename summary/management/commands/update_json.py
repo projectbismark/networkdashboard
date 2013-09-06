@@ -54,8 +54,9 @@ def update_json():
 		# t1 = datetime.now()
 		# print t1-t0
 		# print str(len(all_devices)-count) + " remaining"
-	write_rtt_measurements()
-	write_lmrtt_measurements()
+	#rite_rtt_measurements()
+	#write_lmrtt_measurements()
+	write_bitrate_measurements()
 	return
 
 def write_rtt_measurements():
@@ -138,11 +139,12 @@ def write_bitrate_measurements():
 		records = cursor.fetchall()
 		for r in records:
 			direction = r['direction']
-			if direction=='':
+			if direction=='' or direction==None:
 				continue
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
-			line = str(eventstamp) + ',' + str(avg) + ',' + direction + '\n'
+			toolid = r['toolid']
+			line = str(eventstamp) + ',' + str(avg) + ',' + direction + ',' + toolid + '\n'
 			f.write(line)
 		f.close()
 		count += 1

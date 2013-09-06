@@ -944,8 +944,43 @@ def parse_lmrtt_compare(device,earliest,latest,sort):
 	result.append(m_avg)
 	result.append(data)
 	return result
+	
+# returns bitrate series for the given device:	
+def parse_bitrate_measurements(device, dir):
+	result = []
+	data = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	f = open(filename, 'r')
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# eventstamp:
+			entry.append(int(record[0]))
+			# average:
+			entry.append(float(record[1]))
+			# direction:
+			direction = record[2]
+			entry.append(dir)
+			toolid = record[3]
+			entry.append(toolid)
+			data.append(entry)
+	# sort by eventstamp:
+	sorted_data = sorted(data, key=lambda x: x[0])
+	sorted_multi = [(x,y) for x,y,z,t in sorted_data if z==dir and t='NETPERF_3']
+	sorted_single = [(x,y) for x,y,z,t in sorted_data if z==dir and t!='NETPERF_3']
+	multi_series = dict(name='Multi-threaded TCP', type='line',data=sorted_multi)
+	single_series = dict(name='Single-threaded TCP', type='line', data=sorted_single)
+	result.append(multi_series)
+	result.append(single_series)
+	return result
 
-# returns multiple series for the same device:	
+# returns multiple series of RTT measurements for the given device:	
 def parse_rtt_measurements(device):
 	result = []
 	data = []
@@ -986,7 +1021,7 @@ def parse_rtt_measurements(device):
 		result.append(series)
 	return result
 	
-# returns multiple series for the same device:	
+# returns series of lmrtt measurements for a given device:	
 def parse_lmrtt_measurements(device):
 	data = []
 	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt/' + device
