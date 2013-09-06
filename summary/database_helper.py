@@ -963,7 +963,7 @@ def parse_bitrate_measurements(device, dir):
 			# eventstamp:
 			entry.append(int(record[0]))
 			# average:
-			entry.append(float(record[1]))
+			entry.append(float(record[1])*1000)
 			# direction:
 			direction = record[2]
 			entry.append(dir)
