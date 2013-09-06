@@ -132,7 +132,7 @@ def write_bitrate_measurements():
 		params = []
 		params.append(d.deviceid)
 		SQL = "SELECT \
-			m_bitrate.eventstamp, average, direction \
+			m_bitrate.eventstamp, average, direction, toolid \
 			FROM m_bitrate JOIN devicedetails on devicedetails.deviceid=m_bitrate.deviceid \
 			WHERE m_bitrate.deviceid=%s AND m_bitrate.average>0"
 		cursor.execute(SQL,params)
