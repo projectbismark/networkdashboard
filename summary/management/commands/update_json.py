@@ -137,8 +137,10 @@ def write_bitrate_measurements():
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
 		for r in records:
-			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			direction = r['direction']
+			if direction=='':
+				continue
+			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
 			line = str(eventstamp) + ',' + str(avg) + ',' + direction + '\n'
 			f.write(line)
