@@ -966,7 +966,7 @@ def parse_bitrate_measurements(device, dir):
 			entry.append(float(record[1])*1000)
 			# direction:
 			direction = record[2]
-			entry.append(dir)
+			entry.append(direction)
 			toolid = record[3]
 			entry.append(toolid)
 			data.append(entry)
