@@ -96,7 +96,7 @@ def write_lmrtt_measurements():
 	t0 = datetime.now()
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
-		filename = settings.PROJECT_ROOT + '/summary/measurements/rtt/' + device2
+		filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt/' + device2
 		f = open(filename, 'w')
 		params = []
 		params.append(d.deviceid)

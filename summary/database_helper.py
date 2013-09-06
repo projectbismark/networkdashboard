@@ -874,7 +874,7 @@ def parse_rtt_compare(device,earliest,latest,sort):
 	earliest = datetime_helper.datetime_to_JSON(earliest)
 	latest = datetime_helper.datetime_to_JSON(latest)
 	device = device.replace(':','')
-	filename = settings.PROJECT_ROOT + '/summary/measurements/' + device
+	filename = settings.PROJECT_ROOT + '/summary/measurements/rtt/' + device
 	# garbage characters to be removed:
 	remove = ')("\n'
 	# file is closed automatically after all lines are read:
@@ -912,7 +912,7 @@ def parse_rtt_measurements(device):
 	result = []
 	data = []
 	dstips = []
-	filename = settings.PROJECT_ROOT + '/summary/measurements/' + device
+	filename = settings.PROJECT_ROOT + '/summary/measurements/rtt/' + device
 	# garbage characters to be removed:
 	remove = ')("\n'
 	ipr = IpResolver.objects.all()
@@ -947,6 +947,31 @@ def parse_rtt_measurements(device):
 		series = dict(name=mserver[0].location,type='line',data=series_data)
 		result.append(series)
 	return result
+	
+# returns multiple series for the same device:	
+def parse_lmrtt_measurements(device):
+	data = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	f = open(filename, 'r')
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# eventstamp:
+			entry.append(int(record[0]))
+			# average:
+			entry.append(float(record[1]))
+			data.append(entry)
+	f.close()
+	# sort by eventstamp:
+	sorted_data = sorted(data, key=lambda x: x[0])
+	series = dict(name="Last mile latency', type='line', data=sorted_data)
+	return series
 	
 def get_measurement_server_name(dstip):
 	ipr = IpResolver.objects.filter(ip=dstip)
