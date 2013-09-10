@@ -168,7 +168,7 @@ def write_shaperate_measurements():
 		params = []
 		params.append(d.deviceid)
 		SQL = "SELECT \
-			m_bitrate.eventstamp, average, direction \
+			m_shaperate.eventstamp, average, direction \
 			FROM m_shaperate JOIN devicedetails on devicedetails.deviceid=m_shaperate.deviceid \
 			WHERE m_shaperate.deviceid=%s"
 		cursor.execute(SQL,params)
@@ -189,7 +189,7 @@ def write_shaperate_measurements():
 	cursor.close()
 	return
 	
-def write_underload_measurements:
+def write_underload_measurements():
 	devices = Devicedetails.objects.all()
 	cursor = get_dict_cursor()
 	count = 0

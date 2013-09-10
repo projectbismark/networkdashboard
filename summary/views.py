@@ -686,6 +686,11 @@ def linegraph_rtt(request):
 	data = database_helper.parse_rtt_measurements(device)
 	return HttpResponse(json.dumps(data))
 	
+def linegraph_underload(request):
+	device = request.GET.get('deviceid')
+	data = database_helper.parse_underload_measurements(device)
+	return HttpResponse(json.dumps(data))
+	
 
 def linegraph_bitrate(request):
 	device = request.GET.get('deviceid')

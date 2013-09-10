@@ -1020,6 +1020,39 @@ def parse_bitrate_measurements(device, dir):
 	result.append(multi_series)
 	result.append(single_series)
 	return result
+	
+# returns bitrate series for the given device:	
+def parse_underload_measurements(device):
+	result = []
+	data = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/underload/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	f = open(filename, 'r')
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# eventstamp:
+			entry.append(int(record[0]))
+			# average:
+			entry.append(float(record[1])*1000)
+			# direction:
+			direction = record[2]
+			entry.append(direction)
+			data.append(entry)
+	# sort by eventstamp:
+	sorted_data = sorted(data, key=lambda x: x[0])
+	sorted_up = [(x,y) for x,y,z in sorted_data if z=='up']
+	sorted_dw = [(x,y) for x,y,z in sorted_data if z=='dw']
+	series_up = dict(name='Under Load Up', type='line',data=sorted_up)
+	series_dw = dict(name='Under Load Down', type='line', data=sorted_dw)
+	result.append(series_up)
+	result.append(series_dw)
+	return result
 
 # returns multiple series of RTT measurements for the given device:	
 def parse_rtt_measurements(device):
