@@ -56,7 +56,9 @@ def update_json():
 		# print str(len(all_devices)-count) + " remaining"
 	#rite_rtt_measurements()
 	#write_lmrtt_measurements()
-	write_bitrate_measurements()
+	#write_bitrate_measurements()
+	write_shaperate_measurements()
+	write_underload_measurements()
 	return
 
 def write_rtt_measurements():
@@ -167,8 +169,55 @@ def write_shaperate_measurements():
 		params.append(d.deviceid)
 		SQL = "SELECT \
 			m_bitrate.eventstamp, average, direction \
-			FROM m_bitrate JOIN devicedetails on devicedetails.deviceid=m_bitrate.deviceid \
-			WHERE m_bitrate.deviceid=%s"
+			FROM m_shaperate JOIN devicedetails on devicedetails.deviceid=m_shaperate.deviceid \
+			WHERE m_shaperate.deviceid=%s"
+		cursor.execute(SQL,params)
+		records = cursor.fetchall()
+		for r in records:
+			direction = r['direction']
+			if direction=='' or direction==None:
+				continue
+			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
+			avg = r['average']
+			line = str(eventstamp) + ',' + str(avg) + ',' + str(direction) + '\n'
+			f.write(line)
+		f.close()
+		count += 1
+		t1 = datetime.now()
+		print t1-t0
+		print str(len(devices)-count) + " remaining"
+	cursor.close()
+	return
+	
+def write_underload_measurements:
+	devices = Devicedetails.objects.all()
+	cursor = get_dict_cursor()
+	count = 0
+	t0 = datetime.now()
+	for d in devices:
+		device2 = d.deviceid.replace(':','')
+		filename = settings.PROJECT_ROOT + '/summary/measurements/underload/' + device2
+		f = open(filename, 'w')
+		params = []
+		params.append(d.deviceid)
+		SQL = "SELECT \
+			m_ulrttdw.eventstamp, average, direction \
+			FROM m_ulrttdw JOIN devicedetails on devicedetails.deviceid=m_ulrttdw.deviceid \
+			WHERE m_ulrttdw.deviceid=%s"
+		cursor.execute(SQL,params)
+		records = cursor.fetchall()
+		for r in records:
+			direction = r['direction']
+			if direction=='' or direction==None:
+				continue
+			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
+			avg = r['average']
+			line = str(eventstamp) + ',' + str(avg) + ',' + str(direction) + '\n'
+			f.write(line)
+		SQL = "SELECT \
+			m_ulrttup.eventstamp, average, direction \
+			FROM m_ulrttup JOIN devicedetails on devicedetails.deviceid=m_ulrttup.deviceid \
+			WHERE m_ulrttup.deviceid=%s"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
 		for r in records:
