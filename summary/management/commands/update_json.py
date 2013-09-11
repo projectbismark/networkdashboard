@@ -57,8 +57,9 @@ def update_json():
 	#rite_rtt_measurements()
 	#write_lmrtt_measurements()
 	#write_bitrate_measurements()
-	write_shaperate_measurements()
-	write_underload_measurements()
+	#write_shaperate_measurements()
+	#write_underload_measurements()
+	write_capacity_measurements()
 	return
 
 def write_rtt_measurements():
@@ -227,6 +228,37 @@ def write_underload_measurements():
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
 			line = str(eventstamp) + ',' + str(avg) + ',' + str(direction) + '\n'
+			f.write(line)
+		f.close()
+		count += 1
+		t1 = datetime.now()
+		print t1-t0
+		print str(len(devices)-count) + " remaining"
+	cursor.close()
+	return
+	
+def write_capacity_measurements():
+	devices = Devicedetails.objects.all()
+	cursor = get_dict_cursor()
+	count = 0
+	t0 = datetime.now()
+	for d in devices:
+		device2 = d.deviceid.replace(':','')
+		filename = settings.PROJECT_ROOT + '/summary/measurements/capacity/' + device2
+		f = open(filename, 'w')
+		params = []
+		params.append(d.deviceid)
+		SQL = "SELECT \
+			m_capacity.eventstamp, average, direction \
+			FROM m_capacity JOIN devicedetails on devicedetails.deviceid=m_capacity.deviceid \
+			WHERE m_capacity.deviceid=%s"
+		cursor.execute(SQL,params)
+		records = cursor.fetchall()
+		for r in records:
+			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
+			avg = r['average']
+			direction = r['direction']
+			line = str(eventstamp) + ',' + str(avg) + ',' + direction + '\n'
 			f.write(line)
 		f.close()
 		count += 1
