@@ -1098,6 +1098,7 @@ def parse_rtt_measurements(device):
 # returns series of lmrtt measurements for a given device:	
 def parse_lmrtt_measurements(device):
 	data = []
+	result = []
 	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt/' + device
 	# garbage characters to be removed:
 	remove = ')("\n'
@@ -1118,7 +1119,8 @@ def parse_lmrtt_measurements(device):
 	# sort by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
 	series = dict(name='Last mile latency', type='line', data=sorted_data)
-	return series
+	result.append(series)
+	return result
 	
 def get_measurement_server_name(dstip):
 	ipr = IpResolver.objects.filter(ip=dstip)
