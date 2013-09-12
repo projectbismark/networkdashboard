@@ -1122,6 +1122,71 @@ def parse_lmrtt_measurements(device):
 	result.append(series)
 	return result
 	
+# returns series of lmrtt measurements for a given device:	
+def parse_shaperate_measurements(device):
+	data = []
+	result = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/shaperate/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	f = open(filename, 'r')
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# eventstamp:
+			entry.append(int(record[0]))
+			# average:
+			entry.append(float(record[1]))
+			# direction:
+			entry.append(record[2])
+			data.append(entry)
+	f.close()
+	# sort by eventstamp:
+	sorted_data = sorted(data, key=lambda x: x[0])
+	sorted_up = [(x,y) for x,y,z in sorted_data if  z=='up']
+	sorted_down = [(x,y) for x,y,z in sorted_data if  z=='dw']
+	series_up = dict(name='Shaperate Up', type='line', data=sorted_up)
+	series_down = dict(name='Shaperate Down', type='line', data=sorted_dw)
+	result.append(series_up)
+	result.append(series_down)
+	return result
+	
+def parse_capacity_measurements(device):
+	data = []
+	result = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/capacity/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	f = open(filename, 'r')
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# eventstamp:
+			entry.append(int(record[0]))
+			# average:
+			entry.append(float(record[1]))
+			# direction:
+			entry.append(record[2])
+			data.append(entry)
+	f.close()
+	# sort by eventstamp:
+	sorted_data = sorted(data, key=lambda x: x[0])
+	sorted_up = [(x,y) for x,y,z in sorted_data if  z=='up']
+	sorted_down = [(x,y) for x,y,z in sorted_data if  z=='dw']
+	series_up = dict(name='Capacity Up', type='line', data=sorted_up)
+	series_down = dict(name='Capacity Down', type='line', data=sorted_dw)
+	result.append(series_up)
+	result.append(series_down)
+	return result
+	
 def get_measurement_server_name(dstip):
 	ipr = IpResolver.objects.filter(ip=dstip)
 	if len(ipr)!=0:

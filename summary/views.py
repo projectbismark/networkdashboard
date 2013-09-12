@@ -707,23 +707,35 @@ def linegraph_lmrtt(request):
 	data = database_helper.parse_lmrtt_measurements(device)
 	return HttpResponse(json.dumps(data))
 
-def linegraph_shaperate(request):
-	data = []
-	device = request.GET.get('deviceid')
-	cached_shaperate = JsonCache.objects.filter(deviceid=device, datatype='shaperate')
-	cached_capacity = JsonCache.objects.filter(deviceid=device, datatype='capacity')
-	if len(cached_shaperate)!=0:
-		shaperate_data = json.loads(cached_shaperate[0].data)
-		# append both shaperate series
-		for series in shaperate_data:
-			data.append(series)
-		if len(cached_capacity)!=0:
-			capacity_data = json.loads(cached_capacity[0].data)
-			# append both capacity series
-			for series in capacity_data:
-				data.append(series)
-	return HttpResponse(json.dumps(data))
+# def linegraph_shaperate(request):
+	# data = []
+	# device = request.GET.get('deviceid')
+	# cached_shaperate = JsonCache.objects.filter(deviceid=device, datatype='shaperate')
+	# cached_capacity = JsonCache.objects.filter(deviceid=device, datatype='capacity')
+	# if len(cached_shaperate)!=0:
+		# shaperate_data = json.loads(cached_shaperate[0].data)
+		#append both shaperate series
+		# for series in shaperate_data:
+			# data.append(series)
+		# if len(cached_capacity)!=0:
+			# capacity_data = json.loads(cached_capacity[0].data)
+			#append both capacity series
+			# for series in capacity_data:
+				# data.append(series)
+	# return HttpResponse(json.dumps(data))
 
+def linegraph_shaperate(request):
+	device = request.GET.get('deviceid')
+	data = []
+	shaperate_series = database_helper.parse_shaperate_measurements()
+	capacity_series = database_helper.parse_capacity_measurements()
+	for s in shaperate_series:
+		data.append(s)
+	for s in capacity_series:
+		data.append(s)
+	return HttpResponse(json.dumps(data))	
+	
+	
 def linegraph_unload(request):
 	data = []
 	device = request.GET.get('deviceid')
