@@ -3,7 +3,7 @@ import database_helper
 import datetime_helper
 from datetime import datetime, timedelta
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render_to_response
 from django.template import Template, Context
 from django.utils import simplejson
@@ -20,7 +20,10 @@ import site
 from time import time,mktime,strftime
 import urllib2
 import urllib
+from django.db import connection
 import views_helper
+import decimal
+
 site.addsitedir("/home/abhishek/.local/lib/python2.6/site-packages/")
 
 def index(request):
@@ -431,13 +434,34 @@ def send_feedback(request):
 	return HttpResponse("feedback received. Thank you!")
 
 def countries_vis(request):
-    json_file = open(settings.PROJECT_ROOT + 'summary/countries_vis_dump/server_list.json')
-    server_list = json.load(json_file);
+    server_list = CVServers.objects.all()
     return render_to_response('countries_vis.html', {'server_list': server_list});
 
-def get_countries_vis_data(request, server):
-    json_file = open(settings.PROJECT_ROOT + 'summary/countries_vis_dump/' + server)
-    return HttpResponse(json_file)
+def get_countries_vis_data(request):
+    startdate = request.GET.get('startdate')
+    enddate = request.GET.get('enddate')
+    server = request.GET.get('serverip')
+
+    if startdate is None or enddate is None or server is None:
+	    return HttpResponseBadRequest()
+
+    cursor = connection.cursor()
+    query = "SELECT \
+                 country, \
+                 max(ndevices) AS devices, \
+                 sum(nmeasurements) AS measurements, \
+                 avg(latency) AS latency \
+             FROM cv_rtt \
+             WHERE server = '" + server + "' AND \
+             (day > '" + startdate + "' AND day < '" + enddate + "') \
+             GROUP BY country;"
+    cursor.execute(query)
+    
+    def decimal_default(obj):
+        if isinstance(obj, decimal.Decimal):
+            return str(obj)
+
+    return HttpResponse(json.dumps(cursor.fetchall(), default=decimal_default))
 
 '''
 80	80	Web

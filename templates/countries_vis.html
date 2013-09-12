@@ -11,35 +11,10 @@
 		<script src="/static/jqIpLocation.js"></script>
 
 		<script src="/static/countries_vis.js"></script>
+		<script src="/static/calendar/daterangepicker.js"></script>
+		<script src="/static/calendar/moment.js"></script>
+		<link rel="stylesheet" type="text/css" href="/static/calendar/daterangepicker.css" />
 		
-			<style type='text/css'>
-				
-				.wax-legend .legend-scale ul {
-					margin: 0;
-					padding: 0;
-					float: left;
-					list-style: none;
-				}
-				.wax-legend .legend-scale ul li {
-					display: block;
-					float: left;
-					width: 50px;
-					margin-bottom: 6px;
-					text-align: center;
-					font-size: 80%;
-					list-style: none;
-				}
-				.wax-legend ul.legend-labels li span {
-					display: block;
-					float: left;
-					height: 15px;
-					width: 50px;
-				}
-				.wax-legend a {
-					color: #777;
-				}
-			</style>
-			
 	</head>
 	<body>
 		{% block content %}
@@ -52,45 +27,58 @@
 			<br />
 			<br />
 
+			<fieldset>
+			  <div class="control-group">
+			    <label class="control-label" for="daterange">Select date range:</label>
+			    <div class="controls">
+			      <div class="input-prepend">
+				<span class="add-on"><i class="icon-calendar"></i></span><input type="text" name="dates" id="daterange" />
+			      </div>
+			    </div>
+			  </div>
+			  <input type="hidden" name="startdate" id="startdate" value="2012-01-01"/>
+			  <input type="hidden" name="enddate" id="enddate" />
+			</fieldset>
+
+
 			<table class="table table-striped table-condensed">
 				<tr>
 					<td> Measurment server: </td>
 					<td class="right">
 					<select id="serverselector">
 						{% for server in server_list %}
-						<option value='{{server.0}}'>{{server.1}}</option>
+						<script>
+						  servers.push( { 
+						                    name : '{{server.name}}',
+						                    latLng : [{{server.lat}}, {{server.lon}}],
+						                    ip : '{{server.ip}}'
+						  } );
+						</script>
+						<option value={{forloop.counter0}}>{{server.name}}</option>
 						{% endfor %}
 					</select></td>
-				</tr>
+				</tr>						
 			</table>
 			<h2>Country Latency Map</h2>
 			<br/>
 			<div id="world-map" style="width: 100%; height:500px; background: url(/static/images/loading.gif) no-repeat center;" ></div>
-			<div class='wax-legend'>
-				
-				<div class='legend-scale'>
-					<ul class='legend-labels'>
-						<li>
-							<span style='background:#003399;'></span>0 - 100 ms
-						</li>
-						<li>
-							<span style='background:#009900;'></span>200 ms
-						</li>
-						<li>
-							<span style='background:#FFCC00;'></span>300 ms
-						</li>
-						<li>
-							<span style='background:#CC0000;'></span>400 ms
-						</li>
-						<li>
-                                                        <span style='background:#000000;'></span>&gt; 400 ms
-                                                </li>
+			<div id="legend" style="background-image: linear-gradient(left , #FEE5D9 0%, #A50F14 100%);
+						background-image: -o-linear-gradient(left , #FEE5D9 0%, #A50F14 100%);
+						background-image: -moz-linear-gradient(left , #FEE5D9 0%, #A50F14 100%);
+						background-image: -webkit-linear-gradient(left , #FEE5D9 0%, #A50F14 100%);
+						background-image: -ms-linear-gradient(left , #FEE5D9 0%, #A50F14 100%);
 
-					</ul>
-				</div>
+						background-image: -webkit-gradient(
+						linear,
+						left bottom,
+						right bottom,
+						color-stop(0, #FEE5D9),
+						color-stop(1, #A50F14)
+						);
+						width: 300px;
+						height: 15px;">
 			</div>
-		<br /><br /><br />
-		<p id="updatedon" style="font-size: 90%;"><i></i></p>
+			<p style="font-size: 80%; color: #777;">0 ms<img width="240px"/>500 ms</p>
 		</div>
 		{% endblock %}
 	</body>

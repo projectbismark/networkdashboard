@@ -1,55 +1,68 @@
-function fillmap() {
-    ip = $("#serverselector").val();
-    name = $("#serverselector option:selected").text();
+var servers = []
+
+function fillmap(index) {
     $('#world-map').off().empty();
     $.ajax({
-        url : ("get_countries_vis_data/" + ip),
+	type : 'GET',
+        url : 'get_countries_vis_data/',
+	data : { 'startdate' : $('#startdate').val(),
+		 'enddate' : $('#enddate').val(),
+		 'serverip' : servers[index].ip
+	       },
         success : function(result) {
-            drawRegionsMap(result, name);
+            drawRegionsMap(result, index);
         }
     });
 }
 
-function drawRegionsMap(response, server_name) {
+function drawRegionsMap(response, server_index) {
     response = JSON.parse(response);
 
-    color_pallette = ['#003399', '#009900', '#FFCC00', '#CC0000', '#000000'];
-
-    colors = {};
-    $.each(response['mapdata'], function(key, value) {
-	index = Math.floor(value[0]/100);
-	if(index > 4)
-	    index = 4;
-
-        colors[key] = color_pallette[index];
+    var mapdata = {};
+    var condetail = {};
+    $.each(response, function(key, value) {
+	if (value[2] > 500) {    //measurements threshold
+	    mapdata[value[0]] = value[3];
+	    condetail[value[0]] = { ndevices : value[1], nmeasurements : value[2], latency : value[3] };
+	}
     });
-
-    $('#updatedon > i').text("Last updated on: " + response['eventstamp']);
 
     $('#world-map').off().empty();
 
-    $('#world-map').vectorMap({
+    var map = new jvm.WorldMap({
+	container : $('#world-map'),
         map : 'world_mill_en',
+	markersSelectable : true,
         series : {
             regions : [ {
-                values : colors,
-                attribute : 'fill'
+                values : mapdata,
+		scale : ['#FEE5D9', '#A50F15'],
+		min : 0,
+		max : 500
             } ]
         },
+
+	regionStyle : {
+	    initial : {
+		fill : '#FFFF99'
+	    }
+	},
+	backgroundColor : '#006694',
+
         markerStyle : {
             initial : {
                 fill : '#000000',
                 stroke : '#ffffff'
-            }
+            },
+	    selected : {
+		fill : '#4DAC26',
+		r : 7
+	    }
         },
 
-        markers : [ {
-            latLng : [ response['server']['lat'], response['server']['lon'] ],
-            name : server_name + " server"
-        } ],
+        markers : servers,
 
 	onRegionClick : function(e, code) {
-	    var map = $('#world-map').vectorMap('get', 'mapObject');
 	    var name = map.getRegionName(code);
 
 	    if(name === 'United States of America')
@@ -57,20 +70,58 @@ function drawRegionsMap(response, server_name) {
 
 	    window.location = 'http://dev.networkdashboard.org/compare_by_country/' + name;
 	},
+
+	onMarkerClick : function(e, code) {
+	    if(code == server_index)
+		return;
+	    map.label.hide();
+	    fillmap(code);
+	},
+
+	onMarkerLabelShow : function(e, el, code) {
+	    if(code != server_index)
+		el.html( el.html() + " - Click to select" );
+	},
+
+	onMarkerSelected : function(e, code, isSelected, selectedMarkers) {
+	    if(code != server_index)
+		return;
+	    map.setSelectedMarkers([code]);
+	},
+
         onRegionLabelShow : function(e, el, code) {
             countryName = el.html().replace(/<(?:.|\n)*?>/gm, '');
 	    
-	    if (response['mapdata'][code] != null)
-		el.html("<b>" + countryName + "</b><br/><br/>Average latency: " + Math.round(response['mapdata'][code][0]) + " ms<br/>Measured from " + response['mapdata'][code][1] + " device(s)<br/><br/>Click for details");
+	    if (condetail[code] != null)
+		el.html("<b>" + countryName + "</b><br/><br/>Median latency: " + Math.round(condetail[code]['latency']) + " ms<br/>Measured from " + condetail[code]['ndevices'] + " device(s)<br/>" + condetail[code]['nmeasurements'] + " measurements were taken<br/><br/>Click for details");
 
 	    else
 		el.html("<b>" + countryName + "</b><br/><br/>Sorry, we do not have enough devices in this country");
         }
     });
 
+    map.setSelectedMarkers([server_index]);
+    $('#serverselector').val(server_index);
 };
 
 $(document).ready(function() {
-    fillmap();
-    $('#serverselector').change(fillmap);
+    $('#enddate').val(moment().endOf('day').format('YYYY-MM-DD'));
+    $('#daterange').daterangepicker(
+	{
+	    format : 'YYYY-MM-DD',
+	    startDate : $('#startdate').val(),
+	    endDate : $('#enddate').val()
+	},
+	function(start, end)
+	{
+	    $('#startdate').val(start.format('YYYY-MM-DD'));
+	    $('#enddate').val(end.format('YYYY-MM-DD'));
+	    fillmap( $('#serverselector').val() );
+	}
+    );
+    $('#serverselector').change(function() {
+	fillmap($('#serverselector').val());
+    });
+    $('#serverselector').val(9);
+    fillmap(9);
 });

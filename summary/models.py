@@ -544,4 +544,11 @@ class JsonCache(models.Model):
 	class Meta:
 		db_table = u'json_cache'
 
+class CVServers(models.Model):
+    name = models.CharField(max_length=50)
+    ip = models.TextField(primary_key=True) # This field type is a guess.
+    lat = models.FloatField()
+    lon = models.FloatField()
+    class Meta:
+        db_table = u'cv_servers'
 
