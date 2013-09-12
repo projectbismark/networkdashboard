@@ -1140,7 +1140,7 @@ def parse_shaperate_measurements(device):
 			# eventstamp:
 			entry.append(int(record[0]))
 			# average:
-			entry.append(float(record[1]))
+			entry.append(float(record[1])*1000)
 			# direction:
 			entry.append(record[2])
 			data.append(entry)
@@ -1172,7 +1172,7 @@ def parse_capacity_measurements(device):
 			# eventstamp:
 			entry.append(int(record[0]))
 			# average:
-			entry.append(float(record[1]))
+			entry.append(float(record[1])*1000)
 			# direction:
 			entry.append(record[2])
 			data.append(entry)
