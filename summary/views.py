@@ -727,8 +727,8 @@ def linegraph_lmrtt(request):
 def linegraph_shaperate(request):
 	device = request.GET.get('deviceid')
 	data = []
-	shaperate_series = database_helper.parse_shaperate_measurements()
-	capacity_series = database_helper.parse_capacity_measurements()
+	shaperate_series = database_helper.parse_shaperate_measurements(device)
+	capacity_series = database_helper.parse_capacity_measurements(device)
 	for s in shaperate_series:
 		data.append(s)
 	for s in capacity_series:

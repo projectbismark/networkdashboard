@@ -1150,7 +1150,7 @@ def parse_shaperate_measurements(device):
 	sorted_up = [(x,y) for x,y,z in sorted_data if  z=='up']
 	sorted_down = [(x,y) for x,y,z in sorted_data if  z=='dw']
 	series_up = dict(name='Shaperate Up', type='line', data=sorted_up)
-	series_down = dict(name='Shaperate Down', type='line', data=sorted_dw)
+	series_down = dict(name='Shaperate Down', type='line', data=sorted_down)
 	result.append(series_up)
 	result.append(series_down)
 	return result
@@ -1182,7 +1182,7 @@ def parse_capacity_measurements(device):
 	sorted_up = [(x,y) for x,y,z in sorted_data if  z=='up']
 	sorted_down = [(x,y) for x,y,z in sorted_data if  z=='dw']
 	series_up = dict(name='Capacity Up', type='line', data=sorted_up)
-	series_down = dict(name='Capacity Down', type='line', data=sorted_dw)
+	series_down = dict(name='Capacity Down', type='line', data=sorted_down)
 	result.append(series_up)
 	result.append(series_down)
 	return result
