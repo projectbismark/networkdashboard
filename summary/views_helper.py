@@ -12,6 +12,39 @@ import psycopg2
 import hashlib
 import cvs_helper,datetime_helper,database_helper,geoip_helper
 
+def create_bargraph_series(avg_data):
+	# names of series, such as city, country, or isp names:
+	series_names = []
+	bar_series = []
+	for a in avg_data:
+		if a[0] not in series_names:
+			series_names.append(a[0])
+	for sn in series_names:
+		# weighted average for this series:
+		average = 0
+		# total measurements for one single device, used to combine multiple averages
+		# accross multiple devices into one single average
+		total_count = 0
+		# number of devices for this series:
+		device_count = 0
+		# contains averages and total measurements for each device in this series:
+		s_averages = []
+		for a in avg_data:
+			if a[0]==sn:
+				# count of measurements, average of measurements:
+				new_avg = [float(a[1]),float(a[2])]
+				total_count += a[1]
+				s_averages.append(new_avg)
+				device_count+=1
+		for sa in s_averages:
+			if total_count!=0:
+				# the total average for the series is calculated by summing the
+				# weighted average of each device:
+				average += (sa[0]/total_count)*sa[1]
+		series = dict(name=sn, type='bar', data=average, count=device_count)
+		bar_series.append(series)
+	return bar_series
+				
 def get_devices_for_compare(device,criteria):
 	if (criteria==1):
 		return get_devices_by_isp(device)
@@ -48,27 +81,31 @@ def get_devices_by_isp(isp):
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
 	
-def get_devices_by_city_name(city,diversify):
-	if diversify:
-		ips = geoip_helper.get_diversified_ips_by_city(city)
-	else:
-		ips = geoip_helper.get_ips_by_city(city)
-	devices = geoip_helper.get_devices_by_ips(ips)
-	return devices
-	
-def get_devices_by_country_name(country):
-	ips = geoip_helper.get_ips_by_country(country)
-	devices = geoip_helper.get_devices_by_ips(ips)
-	return devices
-	
-def get_devices_by_provider_and_country(isp,country,diversify):
-	if diversify:
-		ips = geoip_helper.get_diversified_ips_by_provider_and_country(isp,country)
-	else:
-		ips = geoip_helper.get_ips_by_provider_and_country(isp,country)
+def bargraph_devices_by_city_name(city):
+	ips = geoip_helper.bargraph_ips_by_city(city)
 	devices = geoip_helper.get_devices_by_ips(ips)
 	return devices
 
+def linegraph_devices_by_city_name(city,max_results,start,end,metric):
+	ips = geoip_helper.linegraph_ips_by_city(city,max_results,start,end,metric)
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
+	
+def bargraph_devices_by_country_name(country):
+	ips = geoip_helper.bargraph_ips_by_country(country)
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
+	
+def bargraph_devices_by_provider_and_country(isp,country):
+	ips = geoip_helper.bargraph_ips_by_provider_and_country(isp,country)
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
+	
+def linegraph_devices_by_provider_and_country(isp,country,max_results,start,end,metric):
+	ips = geoip_helper.linegraph_ips_by_provider_and_country(isp,country,max_results,start,end,metric)
+	devices = geoip_helper.get_devices_by_ips(ips)
+	return devices
+	
 def get_devices_by_city(device):
 	ip = geoip_helper.get_ip_by_device(device)
 	city = geoip_helper.get_city_by_ip(ip)

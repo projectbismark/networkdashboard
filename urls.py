@@ -23,6 +23,9 @@ urlpatterns = patterns('',
      (r'^$', 'networkdashboard.summary.views.index'),
      (r'^devices/', 'networkdashboard.summary.views.showdevices'),
      (r'^compare/', 'networkdashboard.summary.views.compare'),
+	 (r'^rtt_json/(?P<device>.+)/(?P<days>.+)/(?P<dstip>.+)', 'networkdashboard.summary.views.rtt_json'),
+	 (r'^lmrtt_json/(?P<device>.+)/(?P<days>.+)', 'networkdashboard.summary.views.lmrtt_json'),
+	 (r'^bitrate_json/(?P<device>.+)/(?P<days>.+)/(?P<direction>.+)/(?P<multi>.+)', 'networkdashboard.summary.views.bitrate_json'),
 	 (r'^compare_by_city/(?P<city>.+)/(?P<country>.+)', 'networkdashboard.summary.views.compare_by_city'),
 	 (r'^compare_by_country/(?P<country>.+)', 'networkdashboard.summary.views.compare_by_country'),
 	 (r'^compare_by_isp/(?P<isp>.+)/(?P<country>.+)', 'networkdashboard.summary.views.compare_by_isp'),
@@ -73,6 +76,6 @@ urlpatterns = patterns('',
      (r'^static/(?P<path>.*)$','django.views.static.serve',{'document_root':settings.MEDIA_ROOT}),
 
 ## edit by waqar
-     (r'^countries_vis/get_countries_vis_data/', 'networkdashboard.summary.views.get_countries_vis_data'),
+     (r'^countries_vis/get_countries_vis_data/(?P<server>.+)', 'networkdashboard.summary.views.get_countries_vis_data'),
      (r'^countries_vis/', 'networkdashboard.summary.views.countries_vis')
 )

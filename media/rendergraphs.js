@@ -745,7 +745,8 @@ function onSuccessGraph(graphParams) {
 
 function onSuccessCompare(graphParams,country, city) {
     return function(data) {
-        if (data.length > 200) {
+		var seriesData = JSON.parse(data)
+        if (seriesData[1].length > 0) {
             window.chart = new Highcharts.StockChart({
                 chart: {
                     renderTo: graphParams.divid,
@@ -776,8 +777,8 @@ function onSuccessCompare(graphParams,country, city) {
             var div = document.getElementById(graphParams.divid);
             div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
         }
-		if (data.length > 200) {
-			data = JSON.parse(data)[0];
+		if (seriesData[0].length > 0) {
+			data = seriesData[0];
 			var graphData = new Array();
 			var categories = new Array();
 			var labels;
@@ -877,7 +878,8 @@ function onSuccessCompare(graphParams,country, city) {
 
 function onSuccessIspCompare(graphParams,country) {
     return function(data) {
-        if (data.length > 200) {
+		seriesData = JSON.parse(data)
+        if (seriesData[1].length > 0) {
             window.chart = new Highcharts.StockChart({
                 chart: {
                     renderTo: graphParams.divid,
@@ -902,14 +904,14 @@ function onSuccessIspCompare(graphParams,country) {
                 tooltip: {
                     formatter: graphParams.formatter
                 },
-                series: JSON.parse(data)[1]
+                series: seriesData[1]
             });
         } else {
             var div = document.getElementById(graphParams.divid);
             div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
         }
-		if (data.length > 200) {
-			dataParse = JSON.parse(data)[0];
+		if (seriesData[0].length > 0) {
+			dataParse = seriesData[0]
 			var graphData = new Array();
 			var categories = new Array();
 			var labels;
@@ -998,23 +1000,23 @@ function onSuccessIspCompare(graphParams,country) {
 
 function onSuccessCountryCompare(graphParams, country) {
     return function(data) {
-		if (data.length > 200) {
-			data = JSON.parse(data)[0];
+		var seriesData = JSON.parse(data)
+		if (seriesData.length > 0) {
 			var graphData = new Array();
 			var categories = new Array();
 			var labels;
-			for(var i=0;i<data.length; i++){
+			for(var i=0;i<seriesData.length; i++){
 				graphData[i] = {
-					y : parseFloat(data[i]['data']),
-					name : data[i]['name'],
+					y : parseFloat(seriesData[i]['data']),
+					name : seriesData[i]['name'],
 					country : country,
-					count : data[i]['count']
+					count : seriesData[i]['count']
 				}
-				if (data[i]['count']=='1'){
-					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+				if (seriesData[i]['count']=='1'){
+					categories[i] = seriesData[i]['name'] + ' (' + seriesData[i]['count'] + ')';
 				}
 				else{
-					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+					categories[i] = seriesData[i]['name'] + ' (' + seriesData[i]['count'] + ')';
 				}
 			}
 			if(graphData.length>6){

@@ -33,7 +33,7 @@
 				  <label class="control-label" for="calendar">Select Date Range:</label>
 				  <div class="controls">
 					<div class="input-prepend">
-					  <span class="add-on"><i class="icon-calendar"></i></span><input type="text" name="reservation" id="calendar" />
+					  <span class="add-on"><i class="icon-calendar"></i></span><input type="text" name="reservation" id="calendar" value="{{start_year}}-{{start_month}}-{{start_day}}  to  {{end_year}}-{{end_month}}-{{end_day}}" />
 					</div>
 				  </div>
 				</div>
@@ -124,6 +124,7 @@
 			function(start, end) {
 				$('#start_date').val(start.format('YYYY-MM-DD'));
 				$('#end_date').val(end.format('YYYY-MM-DD'));
+				
             }
 	);
 </script>

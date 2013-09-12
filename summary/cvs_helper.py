@@ -87,41 +87,65 @@ def linegraph_normal(data,title,factor,roundit,priority,id):
 	# result.append(dict(name=title, type='line',data=output))
 	# return result
 	
-def linegraph_compare(data,title,factor,roundit,line_width):
+def linegraph_compare(data,factor):
 	output = []
-	for measure in data:
-		if measure.average > 0:
-			output.append((datetime_helper.datetime_to_JSON(measure.eventstamp),float(measure.average) * factor))
-	result = dict(name=title, type='line',data=output)
-	return result
+	sorted_data = {}
+	for record in data:
+		if record['name'] == None:
+			continue
+		if record['deviceid'] not in sorted_data:
+			sorted_data[record['deviceid']]=[]
+			sorted_data[record['deviceid']].append(record['name'])
+			sorted_data[record['deviceid']].append([])
+		eventstamp = datetime_helper.datetime_to_JSON(record['eventstamp'])
+		m = [eventstamp, float(record['avg'])*factor]
+		sorted_data[record['deviceid']][1].append(m)
+	for device in sorted_data:
+		try:
+			series = dict(name=sorted_data[device][0] + ' Device', type='line', data=sorted_data[device][1])
+			output.append(series)
+		except:
+			continue
+	return output
 	
 	
-def bargraph_compare(data,factor):
-	result = []
+# def bargraph_compare(data,factor):
+	# result = []
 	# final totals used to compute averages:
-	meta_totals = []
-	for d in data:
-		isp = d['isp']
-		new_isp = True
-		for m in meta_totals:
-			if m['isp'] == isp:
-				new_isp = False
-				m['total'] += d['total']
-				m['count'] += d['count']
-				m['dev_count'] += 1
-				break
-		if new_isp:
-			new_total = {'isp' : isp, 'total' : d['total'], 'count' : d['count'], 'dev_count' : 1}
-			meta_totals.append(new_total)
-	for m in meta_totals:
-		avg = (m['total']/m['count'])* factor
-		name = m['isp'].lstrip(' ')
-		if len(name)==0:
-			name = 'Unknown'
-		result.append(dict(name=name, type='column', data=avg, count=m['dev_count']))
-	result = sorted(result, key=lambda isp: isp['name'])
-	return result
+	# meta_totals = []
+	# for d in data:
+		# isp = d['isp']
+		# new_isp = True
+		# for m in meta_totals:
+			# if m['isp'] == isp:
+				# new_isp = False
+				# m['total'] += d['total']
+				# m['count'] += d['count']
+				# m['dev_count'] += 1
+				# break
+		# if new_isp:
+			# new_total = {'isp' : isp, 'total' : d['total'], 'count' : d['count'], 'dev_count' : 1}
+			# meta_totals.append(new_total)
+	# for m in meta_totals:
+		# avg = (m['total']/m['count'])* factor
+		# name = m['isp'].lstrip(' ')
+		# if len(name)==0:
+			# name = 'Unknown'
+		# result.append(dict(name=name, type='column', data=avg, count=m['dev_count']))
+	# result = sorted(result, key=lambda isp: isp['name'])
+	# return result
 	
+def bargraph_compare(records, factor):
+	result = []
+	for r in records:
+		if r['name']==None:
+			continue
+		result.append(dict(name=r['name'].lstrip(), type='column', data = factor*r['avg'], count = r['count']))
+	result = sorted(result, key=lambda isp: isp['name'])
+	return result	
+		
+
+
 # computes averages for an isp with respect to city
 def bargraph_compare_city(data,factor):
 	result = []

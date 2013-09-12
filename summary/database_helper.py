@@ -12,6 +12,12 @@ import psycopg2
 import psycopg2.extras
 from django.conf import settings
 
+def avg(l):
+	if l:
+		return sum(l)/len(l)
+	else:
+		return 0
+
 # searches the provided queryset for deviceids which are not already in devicedetails. If the deviceid
 # is missing, a new devicedetails record is created:
 def add_new_devices(devices):
@@ -137,7 +143,7 @@ def update_rtt(device):
 		rtt_data = json.loads(cache[0].data)
 		# retrieve all uncached measurements:
 		distinct_ips = full_details.distinct('dstip').values('dstip')
-		# full_details = full_details.filter(eventstamp__gt=most_recent_cached).order_by('eventstamp')
+		full_details = full_details.filter(eventstamp__gt=most_recent_cached).order_by('eventstamp')
 		location = ''
 		dst_ip = ''
 		for ip in distinct_ips:
@@ -182,7 +188,7 @@ def update_rtt(device):
 		most_recent = full_details.latest('eventstamp').eventstamp
 		distinct_ips = full_details.values('dstip').distinct()
 		# must wait until after distinct query before ordering original queryset:
-		#full_details = full_details.order_by('eventstamp')
+		full_details = full_details.order_by('eventstamp')
 		for ip in distinct_ips:
 			try:
 				ip_lookup = IpResolver.objects.filter(ip=ip['dstip'])[0]
@@ -218,7 +224,7 @@ def update_lmrtt(device):
 		# cache is up to date:
 		#if latest_record.eventstamp<=lmrtt_cache[0].eventstamp:
 			#return
-		# uncached_measurements = all_records.filter(eventstamp__gt=lmrtt_cache[0].eventstamp).order_by('eventstamp')
+		uncached_measurements = all_records.filter(eventstamp__gt=lmrtt_cache[0].eventstamp).order_by('eventstamp')
 		lmrtt_data = json.loads(lmrtt_cache[0].data)
 		lmrtt_data[0]['data'].extend(cvs_helper.linegraph_normal(uncached_measurements,'Last mile latency',1,1,1,series_id)['data'])
 		id = lmrtt_cache[0].id
@@ -427,440 +433,821 @@ def update_unload(device):
 	
 
 # creates and returns series for average bitrate measurements for devices in a given city:	
-def bargraph_compare_bitrate_by_city(city,max_results,start,end,dir):
-	devices = views_helper.get_devices_by_city_name(city, False)
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
-	totals = []
-	for dev in devices:
-		recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest, eventstamp__lte=latest)
-		if recent_measurements.count()==0:
-			continue
-		else:
-			data = recent_measurements
-			isp = geoip_helper.get_isp_by_device(dev)
-			total = 0
-			count = 0
-			for d in data:
-				count += 1
-				total += d.average
-			new_total = {'isp' : isp, 'total' : total, 'count' : count}
-			totals.append(new_total)
-	result = cvs_helper.bargraph_compare(totals,1000)
-	return result
-	
-def bargraph_compare_bitrate_by_country(country,max_results,start,end,dir):
-	devices = views_helper.get_devices_by_country_name(country)
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
-	totals = []
-	for dev in devices:
-		recent_measurements = MBitrate.objects.filter(deviceid = dev, direction = dir, toolid='NETPERF_3', eventstamp__gte=earliest, eventstamp__lte=latest)
-		if recent_measurements.count()==0:
-			continue
-		else:
-			data = recent_measurements
-			isp = geoip_helper.get_isp_by_device(dev)
-			total = 0
-			count = 0
-			for d in data:
-				count += 1
-				total += d.average
-			new_total = {'isp' : isp, 'total' : total, 'count' : count}
-			totals.append(new_total)
-	result = cvs_helper.bargraph_compare(totals,1000)
-	return result
-	
-	
-def bargraph_compare_bitrate_by_isp(isp,max_results,start,end,direction,country):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
-	devices = views_helper.get_devices_by_provider_and_country(isp,country,False)
-	totals = []
-	for dev in devices:
-		latest_measurements= MBitrate.objects.filter(deviceid = dev, direction = direction, toolid='NETPERF_3', eventstamp__gte=earliest, eventstamp__lte=latest)
-		if latest_measurements.count()==0:
-			continue
-		else:
-			data= latest_measurements
-			total = 0
-			count = 0
-			for d in data:
-				count += 1
-				total += d.average
-			city = geoip_helper.get_city_by_device(dev)
-			new_total = {'city' : city, 'total' : total, 'count' : count}
-			totals.append(new_total)	
-	result = cvs_helper.bargraph_compare_city(totals,1000)
-	return result
-	
-
-	
-# creates and returns series for lmrtt measurements for devices in a given city:	
-def bargraph_compare_lmrtt_by_city(city,max_results,start,end):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
-	devices = views_helper.get_devices_by_city_name(city, False)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
-	totals = []
-	for dev in devices:
-		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest).order_by('eventstamp')
-		if latest_measurements.count()==0:
-			continue
-		else:
-			data= latest_measurements
-			isp = geoip_helper.get_isp_by_device(dev)
-			total = 0
-			count = 0
-			for d in data:
-				count += 1
-				total += d.average
-			new_total = {'isp' : isp, 'total' : total, 'count' : count}
-			totals.append(new_total)
-	result = cvs_helper.bargraph_compare(totals,1)
-	return result
-	
-def bargraph_compare_lmrtt_by_country(country,max_results,start,end):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
-	devices = views_helper.get_devices_by_country_name(country)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
-	totals = []
-	for dev in devices:
-		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest).order_by('eventstamp')
-		if latest_measurements.count()==0:
-			continue
-		else:
-			data= latest_measurements
-			isp = geoip_helper.get_isp_by_device(dev)
-			total = 0
-			count = 0
-			for d in data:
-				count += 1
-				total += d.average
-			new_total = {'isp' : isp, 'total' : total, 'count' : count}
-			totals.append(new_total)
-	result = cvs_helper.bargraph_compare(totals,1)
-	return result
-	
-def bargraph_compare_lmrtt_by_isp(isp,max_results,start,end,country):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
-	devices = views_helper.get_devices_by_provider_and_country(isp,country, False)
-	totals = []
-	for dev in devices:
-		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest).order_by('eventstamp')
-		if latest_measurements.count()==0:
-			continue
-		else:
-			data= latest_measurements
-			total = 0
-			count = 0
-			for d in data:
-				count += 1
-				total += d.average
-			city = geoip_helper.get_city_by_device(dev)
-			new_total = {'city' : city, 'total' : total, 'count' : count}
-			totals.append(new_total)	
-	result = cvs_helper.bargraph_compare_city(totals,1)
-	return result
-	
-def bargraph_compare_rtt_by_city(city,max_results,start,end):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
-	devices = views_helper.get_devices_by_city_name(city, False)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
-	totals = []
-	for dev in devices:
-		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest, dstip='8.8.8.8')
-		if latest_measurements.count()==0:
-			continue
-		else:
-			isp = geoip_helper.get_isp_by_device(dev)
-			total = 0
-			count = 0
-			for m in latest_measurements:
-				count += 1
-				total += m.average
-			new_total = {'isp' : isp, 'total' : total, 'count' : count}
-			totals.append(new_total)	
-	result = cvs_helper.bargraph_compare(totals,1)
-	return result
-	
-def bargraph_compare_rtt_by_country(country,max_results,start,end):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
-	devices = views_helper.get_devices_by_country_name(country)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
-	totals = []
-	for dev in devices:
-		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest, dstip='8.8.8.8')
-		if latest_measurements.count()==0:
-			continue
-		else:
-			data= latest_measurements
-			isp = geoip_helper.get_isp_by_device(dev)
-			total = 0
-			count = 0
-			for d in data:
-				count += 1
-				total += d.average
-			new_total = {'isp' : isp, 'total' : total, 'count' : count}
-			totals.append(new_total)	
-	result = cvs_helper.bargraph_compare(totals,1)
-	return result
-	
-def bargraph_compare_rtt_by_isp(isp,max_results,start,end,country):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
-	devices = views_helper.get_devices_by_provider_and_country(isp,country, False)
-	totals = []
-	for dev in devices:
-		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest, dstip='8.8.8.8')
-		if latest_measurements.count()==0:
-			continue
-		else:
-			data= latest_measurements
-			total = 0
-			count = 0
-			for d in data:
-				count += 1
-				total += d.average
-			city = geoip_helper.get_city_by_device(dev)
-			new_total = {'city' : city, 'total' : total, 'count' : count}
-			totals.append(new_total)	
-	result = cvs_helper.bargraph_compare_city(totals,1)
-	return result
-	
-def linegraph_compare_bitrate_by_city(city,max_results,start,end,dir):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
-	devices = views_helper.get_devices_by_city_name(city, True)
+def bargraph_compare_bitrate_by_city(city,country,start,end,dir):
 	result = []
-	isps = []
-	new_device = False
-	for dev in devices:
-		latest_measurements= MBitrate.objects.filter(deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest, direction=dir, toolid='NETPERF_3')
-		if latest_measurements.count()==0:
-			continue
-		else:
-			data = latest_measurements.order_by('eventstamp')
-			isp = geoip_helper.get_isp_by_device(dev)
-			isps.append(isp)
-			isp_count=0
-			for included_isp in isps:
-				if included_isp == isp:
-					isp_count += 1
-			series_name = isp + ' ' + str(isp_count)
-			graph_data = cvs_helper.linegraph_compare(data,series_name,1000,1,2)
-			result.append(graph_data)
-			if (len(result)>=max_results):
-				break
+	params = []
+	devices = tuple(views_helper.bargraph_devices_by_city_name(city))
+	if len(devices)==0:
+		return result
+	# parameters for query. Ordering of appending matters:
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	params.append(earliest)
+	params.append(latest)
+	params.append(dir)
+	params.append(devices)
+	# start and end dates based on user selection:
+	SQL = "SELECT \
+		avg(average) AS avg, \
+		count(distinct m_bitrate.deviceid) AS count, \
+		geoip_isp AS name \
+		FROM m_bitrate \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_bitrate.deviceid \
+		WHERE m_bitrate.eventstamp>%s AND m_bitrate.eventstamp<%s \
+		AND m_bitrate.direction = %s AND m_bitrate.average != 0 \
+		AND devicedetails.deviceid IN %s \
+		GROUP BY geoip_isp;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.bargraph_compare(records, 1000)
+	cursor.close()
+	return result
+	
+def bargraph_compare_bitrate_by_country(country,start,end,dir):
+	# start and end dates based on user selection:
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# parameters for query. Ordering of appending matters:
+	params = []
+	params.append(country)
+	params.append(earliest)
+	params.append(latest)
+	params.append(dir)
+	SQL = "SELECT \
+		avg(average) AS avg, \
+		count(distinct m_bitrate.deviceid) AS count, \
+		geoip_isp AS name \
+		FROM m_bitrate \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_bitrate.deviceid \
+		WHERE geoip_country=%s AND m_bitrate.eventstamp>%s AND m_bitrate.eventstamp<%s \
+		AND devicedetails.geoip_isp != 'unknown' AND devicedetails.geoip_isp != '' \
+		AND m_bitrate.direction =%s AND m_bitrate.average != 0 \
+		GROUP BY geoip_isp;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.bargraph_compare(records, 1000)
+	return result
+	
+def bargraph_compare_bitrate_by_isp(isp,start,end,direction,country):
+	params = []
+	result = []
+	devices = tuple(views_helper.bargraph_devices_by_provider_and_country(isp,country))
+	if len(devices)==0:
+		return result
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# parameters for query. Ordering of appending matters:
+	params.append(earliest)
+	params.append(latest)
+	params.append(direction)
+	params.append(devices)
+	# start and end dates based on user selection:
+	SQL = "SELECT \
+		avg(average) AS avg, \
+		count(distinct m_bitrate.deviceid) AS count, \
+		geoip_city AS name \
+		FROM m_bitrate \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_bitrate.deviceid \
+		WHERE m_bitrate.eventstamp>%s AND m_bitrate.eventstamp<%s \
+		AND m_bitrate.direction=%s AND m_bitrate.average>0 \
+		AND devicedetails.deviceid IN %s \
+		GROUP BY geoip_city;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.bargraph_compare(records, 1000)
+	cursor.close()
+	return result
+
+# creates and returns series for lmrtt measurements for devices in a given city:	
+def bargraph_compare_lmrtt_by_city(city,start,end):
+	params = []
+	result = []
+	devices = tuple(views_helper.bargraph_devices_by_city_name(city))
+	if len(devices)==0:
+		return result
+	# start and end dates based on user selection:
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# parameters for query. Ordering of appending matters:
+	params.append(earliest)
+	params.append(latest)
+	params.append(devices)
+	SQL = "SELECT \
+		avg(average) AS avg, \
+		count(distinct m_lmrtt.deviceid) AS count, \
+		geoip_isp AS name \
+		FROM m_lmrtt \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_lmrtt.deviceid \
+		WHERE m_lmrtt.eventstamp>%s AND m_lmrtt.eventstamp<%s AND m_lmrtt.average<3000 \
+		AND devicedetails.deviceid IN %s \
+		GROUP BY geoip_isp;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.bargraph_compare(records, 1)
+	cursor.close()
+	return result
+	
+def bargraph_compare_lmrtt_by_country(country,start,end):
+	# start and end dates based on user selection:
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# parameters for query. Ordering of appending matters:
+	params = []
+	params.append(country)
+	params.append(earliest)
+	params.append(latest)
+	SQL = "SELECT \
+		avg(average) AS avg, \
+		count(distinct m_lmrtt.deviceid) AS count, \
+		geoip_isp AS name \
+		FROM m_lmrtt \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_lmrtt.deviceid \
+		WHERE geoip_country=%s AND m_lmrtt.eventstamp>%s AND m_lmrtt.eventstamp<%s AND m_lmrtt.average<3000 \
+		GROUP BY geoip_isp;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.bargraph_compare(records, 1)
+	return result
+	
+	
+def bargraph_compare_lmrtt_by_isp(isp,start,end,country):
+	result = []
+	params = []
+	devices = tuple(views_helper.bargraph_devices_by_provider_and_country(isp,country))
+	if len(devices)==0:
+		return result
+	# start and end dates based on user selection:
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# parameters for query. Ordering of appending matters:
+	params.append(earliest)
+	params.append(latest)
+	params.append(devices)
+	SQL = "SELECT \
+		avg(average) AS avg, \
+		count(distinct m_lmrtt.deviceid) AS count, \
+		geoip_city AS name \
+		FROM m_lmrtt \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_lmrtt.deviceid \
+		WHERE m_lmrtt.eventstamp>%s AND m_lmrtt.eventstamp<%s AND m_lmrtt.average<3000 \
+		AND devicedetails.deviceid IN %s \
+		GROUP BY geoip_city;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.bargraph_compare(records, 1)
+	cursor.close()
+	return result
+	
+def bargraph_compare_rtt_by_city(city,start,end):
+	params = []
+	result = []
+	devices = tuple(views_helper.bargraph_devices_by_city_name(city))
+	if len(devices)==0:
+		return result
+	dstip = '8.8.8.8'
+	# parameters for query. Ordering of appending matters:
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	params.append(earliest)
+	params.append(latest)
+	params.append(dstip)
+	params.append(devices)
+	# start and end dates based on user selection:
+	SQL = "SELECT \
+		avg(average) AS avg, \
+		count(distinct m_rtt.deviceid) AS count, \
+		geoip_isp AS name \
+		FROM m_rtt \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_rtt.deviceid \
+		WHERE m_rtt.eventstamp>%s AND m_rtt.eventstamp<%s AND m_rtt.dstip = %s AND m_rtt.average<3000 \
+		AND devicedetails.deviceid IN %s \
+		GROUP BY geoip_isp;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.bargraph_compare(records, 1)
+	cursor.close()
+	return result
+	
+def bargraph_compare_rtt_by_country(country,start,end):
+	# only measure against a particular server:
+	dstip = '8.8.8.8'
+	# start and end dates based on user selection:
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# parameters for query. Ordering of appending matters:
+	params = []
+	params.append(country)
+	params.append(dstip)
+	params.append(earliest)
+	params.append(latest)
+	# start and end dates based on user selection:
+	SQL = "SELECT \
+		avg(average) AS avg, \
+		count(distinct m_rtt.deviceid) AS count, \
+		geoip_isp AS name \
+		FROM m_rtt \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_rtt.deviceid \
+		WHERE geoip_country=%s AND dstip=%s AND m_rtt.eventstamp>%s AND m_rtt.eventstamp<%s AND m_rtt.average<3000 \
+		AND devicedetails.geoip_isp != 'unknown' AND devicedetails.geoip_isp != '' \
+		GROUP BY geoip_isp;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.bargraph_compare(records, 1)
+	cursor.close()
+	return result
+	
+def bargraph_compare_rtt_by_isp(isp,earliest,latest,country):
+	params = []
+	result = []
+	devices = tuple(views_helper.bargraph_devices_by_provider_and_country(isp,country))
+	if len(devices)==0:
+		return result
+	dstip = '8.8.8.8'
+	# parameters for query. Ordering of appending matters:
+	params.append(earliest)
+	params.append(latest)
+	params.append(dstip)
+	params.append(devices)
+	SQL = "SELECT \
+		avg(average) AS avg, \
+		count(distinct m_rtt.deviceid) AS count, \
+		geoip_city AS name \
+		FROM m_rtt \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_rtt.deviceid \
+		WHERE m_rtt.eventstamp>%s AND m_rtt.eventstamp<%s AND m_rtt.dstip = %s AND m_rtt.average<3000 \
+		AND devicedetails.deviceid IN %s \
+		GROUP BY geoip_city;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.bargraph_compare(records, 1)
+	cursor.close()
+	return result
+	
+def linegraph_compare_bitrate_by_city(city,country,max_results,start,end,dir):
+	params = []
+	result = []
+	metric = ''
+	if dir == 'dw':
+		metric = 'bitrate_down'
+	else:
+		metric = 'bitrate_up'
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	devices = tuple(views_helper.linegraph_devices_by_city_name(city, max_results, earliest, latest, metric))
+	if len(devices)==0:
+		return result
+	params.append(earliest)
+	params.append(latest)
+	params.append(dir)
+	params.append(devices)
+	SQL = "SELECT \
+		average AS avg, \
+		devicedetails.deviceid AS deviceid, \
+		geoip_isp AS name, \
+		m_bitrate.eventstamp AS eventstamp \
+		FROM m_bitrate \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_bitrate.deviceid \
+		WHERE m_bitrate.eventstamp>%s AND m_bitrate.eventstamp<%s \
+		AND m_bitrate.direction=%s AND m_bitrate.average != 0 \
+		AND devicedetails.deviceid IN %s \
+		ORDER BY m_bitrate.eventstamp;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.linegraph_compare(records, 1000)
+	cursor.close()
 	return result
 	
 def linegraph_compare_bitrate_by_isp(isp,max_results,start,end,dir,country):
-	# Calculate earliest date of the series based on user selection:
+	params = []
+	result = []
+	metric = ''
+	if dir == 'dw':
+		metric = 'bitrate_down'
+	else:
+		metric = 'bitrate_up'
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
-	devices = views_helper.get_devices_by_provider_and_country(isp,country,True)
-	result = []
-	cities = []
-	new_device = False
-	for dev in devices:
-		latest_measurements= MBitrate.objects.filter(deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest, direction=dir, toolid='NETPERF_3')
-		if latest_measurements.count()==0:
-			continue
-		else:
-			data = latest_measurements.order_by('eventstamp')
-			city = geoip_helper.get_city_by_device(dev)
-			cities.append(city)
-			city_count=0
-			for included_city in cities:
-				if included_city == city:
-					city_count += 1
-			series_name = city + ' ' + str(city_count)
-			graph_data = cvs_helper.linegraph_compare(data,series_name,1000,1,2)
-			result.append(graph_data)
-			if (len(result)>=max_results):
-				break
+	devices = tuple(views_helper.linegraph_devices_by_provider_and_country(isp,country,max_results,earliest,latest,metric))
+	if len(devices)==0:
+		return result
+	params.append(earliest)
+	params.append(latest)
+	params.append(dir)
+	params.append(devices)
+	SQL = "SELECT \
+		average AS avg, \
+		devicedetails.deviceid AS deviceid, \
+		geoip_city AS name, \
+		m_bitrate.eventstamp AS eventstamp \
+		FROM m_bitrate \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_bitrate.deviceid \
+		WHERE m_bitrate.eventstamp>%s AND m_bitrate.eventstamp<%s \
+		AND m_bitrate.direction=%s AND m_bitrate.average != 0 \
+		AND devicedetails.deviceid IN %s \
+		ORDER BY m_bitrate.eventstamp;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.linegraph_compare(records, 1000)
+	cursor.close()
 	return result
 	
 # creates and returns series for lmrtt measurements for devices in a given city:	
 def linegraph_compare_lmrtt_by_city(city,max_results,start,end):
-	# Calculate earliest date of the series based on user selection:
+	params = []
+	result = []
+	metric = 'lmrtt'
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
-	devices = views_helper.get_devices_by_city_name(city, True)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
-	result = []
-	isps = []
-	new_device = False
-	for dev in devices:
-		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest)
-		if latest_measurements.count()==0:
-			continue
-		else:
-			data = latest_measurements.order_by('eventstamp')
-			isp = geoip_helper.get_isp_by_device(dev)
-			isps.append(isp)
-			isp_count=0
-			for i in isps:
-				if i==isp:
-					isp_count+=1
-			series_name = isp + ' ' + str(isp_count)
-			graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
-			result.append(graph_data)
-			if (len(result)>=max_results):
-				break
+	devices = tuple(views_helper.linegraph_devices_by_city_name(city, max_results, earliest, latest, metric))
+	if len(devices)==0:
+		return result
+	params.append(earliest)
+	params.append(latest)
+	params.append(devices)
+	SQL = "SELECT \
+		average AS avg, \
+		devicedetails.deviceid AS deviceid, \
+		geoip_isp AS name, \
+		m_lmrtt.eventstamp AS eventstamp \
+		FROM m_lmrtt \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_lmrtt.deviceid \
+		WHERE m_lmrtt.eventstamp>%s AND m_lmrtt.eventstamp<%s AND m_lmrtt.average<3000 \
+		AND devicedetails.deviceid IN %s \
+		ORDER BY m_lmrtt.eventstamp;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.linegraph_compare(records, 1)
+	cursor.close()
 	return result
 	
 def linegraph_compare_lmrtt_by_isp(isp,max_results,start,end,country):
-	# Calculate earliest date of the series based on user selection:
+	params = []
+	result = []
+	metric = 'lmrtt'
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
-	devices = views_helper.get_devices_by_provider_and_country(isp,country,True)
-	result = []
-	cities = []
-	new_device = False
-	for dev in devices:
-		latest_measurements= MLmrtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest).order_by('eventstamp')
-		if latest_measurements.count()==0:
-			continue
-		else:
-			data = latest_measurements.order_by('eventstamp')
-			city = geoip_helper.get_city_by_device(dev)
-			cities.append(city)
-			city_count=0
-			for included_city in cities:
-				if included_city == city:
-					city_count += 1
-			series_name = city + ' ' + str(city_count)
-			graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
-			result.append(graph_data)
-			if (len(result)>=max_results):
-				break
+	devices = tuple(views_helper.linegraph_devices_by_provider_and_country(isp,country,max_results,earliest,latest,metric))
+	if len(devices)==0:
+		return result
+	params.append(earliest)
+	params.append(latest)
+	params.append(devices)
+	SQL = "SELECT \
+		average AS avg, \
+		devicedetails.deviceid AS deviceid, \
+		geoip_isp AS name, \
+		m_lmrtt.eventstamp AS eventstamp \
+		FROM m_lmrtt \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_lmrtt.deviceid \
+		WHERE m_lmrtt.eventstamp>%s AND m_lmrtt.eventstamp<%s AND m_lmrtt.average<3000 \
+		AND devicedetails.deviceid IN %s \
+		ORDER BY m_lmrtt.eventstamp;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.linegraph_compare(records, 1)
+	cursor.close()
 	return result
 	
-# def linegraph_compare_rtt_by_city(city,max_results,days):
-	# Calculate earliest date of the series based on user selection:
-	# earliest = datetime_helper.get_daterange_start(days, True)
-	# devices = views_helper.get_devices_by_city_name(city)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
-	# isps = []
-	# result = []
-	# included_devices=[]
-	# isp_distribution=0
-	# distributing = True
-	# while distributing:
-		# new_device = False
-		# for dev in devices:
-			# if(len(result) == max_results):
-				# distributing = False
-				# break
-			# latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, dstip='8.8.8.8')
-			# if len(latest_measurements)==0:
-				# continue
-			# else:
-				# data = latest_measurements.order_by('eventstamp')
-				# isp = geoip_helper.get_isp_by_device(dev)
-				# duplicate_device = False
-				# new_isp = True
-				# for i in isps:
-					# if i == isp:
-						# new_isp = False
-				# isp_count=0
-				# for included_isp in isps:
-					# if included_isp == isp:
-						# isp_count += 1
-				# if not new_isp:
-					# if isp_count>isp_distribution:
-						# continue
-				# for d in included_devices:
-					# if d==dev:
-						# duplicate_device = True
-				# if duplicate_device:
-					# continue
-				# series_name = isp + ' ' + str(isp_count + 1)
-				# isps.append(isp)
-				# graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
-				# new_device = True
-				# included_devices.append(dev)
-				# result.append(graph_data)
-		# if not new_device:
-			# distributing = False
-		# isp_distribution += 1
-	# return result
-	
 def linegraph_compare_rtt_by_city(city,max_results,start,end):
-	# Calculate earliest date of the series based on user selection:
-	earliest = datetime_helper.get_daterange_start(start)
-	latest = datetime_helper.get_daterange_end(end)
-	devices = views_helper.get_devices_by_city_name(city, True)
-	# Create list of lists. The first list contains data series for the linegraph.
-	# The second contains series for the bar graph (averages):
+	params = []
 	result = []
-	isps = []
-	new_device = False
-	for dev in devices:
-		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest, dstip='8.8.8.8')
-		if latest_measurements.count()==0:
-			continue
-		else:
-			data = latest_measurements.order_by('eventstamp')
-			isp = geoip_helper.get_isp_by_device(dev)
-			isps.append(isp)
-			isp_count=0
-			for i in isps:
-				if i==isp:
-					isp_count+=1
-			series_name = isp + ' ' + str(isp_count)
-			graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
-			result.append(graph_data)
-			if (len(result)>=max_results):
-				break
+	metric = 'rtt'
+	dstip = '8.8.8.8'
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	devices = tuple(views_helper.linegraph_devices_by_city_name(city,max_results,earliest,latest,metric))
+	if len(devices)==0:
+		return result
+	params.append(earliest)
+	params.append(latest)
+	params.append(dstip)
+	params.append(devices)
+	SQL = "SELECT \
+		average AS avg, \
+		devicedetails.deviceid AS deviceid, \
+		geoip_isp AS name, \
+		m_rtt.eventstamp AS eventstamp \
+		FROM m_rtt \
+		INNER JOIN devicedetails ON devicedetails.deviceid=m_rtt.deviceid \
+		WHERE m_rtt.eventstamp>%s AND m_rtt.eventstamp<%s AND m_rtt.dstip=%s \
+	    AND m_rtt.average<3000 \
+		AND devicedetails.deviceid IN %s \
+		ORDER BY m_rtt.eventstamp;"
+	cursor = get_dict_cursor()
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	result = cvs_helper.linegraph_compare(records, 1)
+	cursor.close()
 	return result
 	
 def linegraph_compare_rtt_by_isp(isp,max_results,start,end,country):
-	# Calculate earliest date of the series based on user selection:
+	series = []
+	result = []
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
-	devices = views_helper.get_devices_by_provider_and_country(isp,country,True)
-	result = []
-	cities = []
-	for dev in devices:
-		latest_measurements= MRtt.objects.filter(average__lte=3000, deviceid=dev, eventstamp__gte=earliest, eventstamp__lte=latest, dstip='8.8.8.8')
-		if latest_measurements.count()==0:
-			continue
-		else:
-			data = latest_measurements.order_by('eventstamp')
-			city = geoip_helper.get_city_by_device(dev)
-			cities.append(city)
-			city_count=0
-			for included_city in cities:
-				if included_city == city:
-					city_count += 1
-			series_name = city + ' ' + str(city_count)
-			graph_data = cvs_helper.linegraph_compare(data,series_name,1,1,2)
-			result.append(graph_data)
-			if (len(result)>=max_results):
-				break
+	devices = Devicedetails.objects.filter(isp=isp,eventstamp__lte=latest)
+	if len(devices)==0:
+		return result
+	for d in devices:
+		parse = parse_rtt_compare(d.deviceid,earliest,latest)
+		result.append(dict(name=d.city + ' Device', type='line', data=parse))
 	return result
+	
+# returns RTT measurements, measurement count, and average for a device:
+def parse_rtt_compare(device,earliest,latest,sort):
+	result = []
+	data = []
+	dstip = '8.8.8.8'
+	earliest = datetime_helper.datetime_to_JSON(earliest)
+	latest = datetime_helper.datetime_to_JSON(latest)
+	device = device.replace(':','')
+	filename = settings.PROJECT_ROOT + '/summary/measurements/rtt/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	# file is closed automatically after all lines are read:
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			try:
+				for i in range(0,len(remove)):
+					record = record.replace(remove[i],'')
+				record = record.split(',')
+				# eventstamp:
+				entry.append(int(record[0]))
+				# average:
+				entry.append(float(record[1]))
+				# dstip:
+				entry.append(record[2])
+				data.append(entry)
+			except:
+				continue
+	# order measurements by eventstamp, only necessary for linegraph series:
+	if sort:
+		data = sorted(data, key=lambda x: x[0])
+	# apply filtering:
+	data = [(x,y) for x,y,z in data if (x>earliest and x<latest and z==dstip)]
+	m_count = len(data)
+	m_avg = avg([d[1] for d in data])
+	result.append(m_count)
+	result.append(m_avg)
+	result.append(data)
+	return result
+	
+# returns LMRTT measurements, measurement count, and average for a device:
+def parse_lmrtt_compare(device,earliest,latest,sort):
+	result = []
+	data = []
+	earliest = datetime_helper.datetime_to_JSON(earliest)
+	latest = datetime_helper.datetime_to_JSON(latest)
+	device = device.replace(':','')
+	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	# file is closed automatically after all lines are read:
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			try:
+				for i in range(0,len(remove)):
+					record = record.replace(remove[i],'')
+				record = record.split(',')
+				# eventstamp:
+				entry.append(int(record[0]))
+				# average:
+				entry.append(float(record[1]))
+				data.append(entry)
+			except:
+				continue
+	# order measurements by eventstamp, only necessary for linegraph series:
+	if sort:
+		data = sorted(data, key=lambda x: x[0])
+	# apply filtering:
+	data = [(x,y) for x,y in data if (x>earliest and x<latest)]
+	m_count = len(data)
+	m_avg = avg([d[1] for d in data])
+	result.append(m_count)
+	result.append(m_avg)
+	result.append(data)
+	return result
+	
+def parse_bitrate_compare(device,earliest,latest,sort,dir):
+	result = []
+	data = []
+	earliest = datetime_helper.datetime_to_JSON(earliest)
+	latest = datetime_helper.datetime_to_JSON(latest)
+	device = device.replace(':','')
+	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	# file is closed automatically after all lines are read:
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			try:
+				for i in range(0,len(remove)):
+					record = record.replace(remove[i],'')
+				record = record.split(',')
+				# eventstamp:
+				entry.append(int(record[0]))
+				# average:
+				entry.append(float(record[1])*1000)
+				# direction:
+				entry.append(record[2])
+				# toolid:
+				entry.append(record[3])
+				data.append(entry)
+			except:
+				continue
+	# order measurements by eventstamp, only necessary for linegraph series:
+	if sort:
+		data = sorted(data, key=lambda x: x[0])
+	# apply filtering:
+	data = [(x,y) for x,y,z,t in data if (x>earliest and x<latest and z==dir and t=='NETPERF_3')]
+	m_count = len(data)
+	m_avg = avg([d[1] for d in data])
+	result.append(m_count)
+	result.append(m_avg)
+	result.append(data)
+	return result
+	
+# returns bitrate series for the given device:	
+def parse_bitrate_measurements(device, dir):
+	result = []
+	data = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	f = open(filename, 'r')
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# eventstamp:
+			entry.append(int(record[0]))
+			# average:
+			entry.append(float(record[1])*1000)
+			# direction:
+			direction = record[2]
+			entry.append(direction)
+			toolid = record[3]
+			entry.append(toolid)
+			data.append(entry)
+	# sort by eventstamp:
+	sorted_data = sorted(data, key=lambda x: x[0])
+	sorted_multi = [(x,y) for x,y,z,t in sorted_data if z==dir and t=='NETPERF_3']
+	sorted_single = [(x,y) for x,y,z,t in sorted_data if z==dir and t!='NETPERF_3']
+	multi_series = dict(name='Multi-threaded TCP', type='line',data=sorted_multi)
+	single_series = dict(name='Single-threaded TCP', type='line', data=sorted_single)
+	result.append(multi_series)
+	result.append(single_series)
+	return result
+	
+# returns bitrate series for the given device:	
+def parse_underload_measurements(device):
+	result = []
+	data = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/underload/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	f = open(filename, 'r')
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# eventstamp:
+			entry.append(int(record[0]))
+			# average:
+			entry.append(float(record[1])*1000)
+			# direction:
+			direction = record[2]
+			entry.append(direction)
+			data.append(entry)
+	# sort by eventstamp:
+	sorted_data = sorted(data, key=lambda x: x[0])
+	sorted_up = [(x,y) for x,y,z in sorted_data if z=='up']
+	sorted_dw = [(x,y) for x,y,z in sorted_data if z=='dw']
+	series_up = dict(name='Under Load Up', type='line',data=sorted_up)
+	series_dw = dict(name='Under Load Down', type='line', data=sorted_dw)
+	result.append(series_up)
+	result.append(series_dw)
+	return result
+
+# returns multiple series of RTT measurements for the given device:	
+def parse_rtt_measurements(device):
+	result = []
+	data = []
+	dstips = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/rtt/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	ipr = IpResolver.objects.all()
+	f = open(filename, 'r')
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# eventstamp:
+			entry.append(int(record[0]))
+			# average:
+			entry.append(float(record[1]))
+			# mserver address:
+			dstip = record[2]
+			entry.append(dstip)
+			if dstip not in dstips and dstip!='':
+				dstips.append(dstip)
+			data.append(entry)
+	f.close()
+	# sort by eventstamp:
+	sorted_data = sorted(data, key=lambda x: x[0])
+	# group data into sub-series by measurement server
+	for dstip in dstips:
+		mserver = ipr.filter(ip=dstip)
+		if len(mserver)==0:
+			continue
+		# measurements (eventstamp,avg) are grouped by dstip, though dstip itself is discarded:
+		series_data = [(x,y) for x,y,z in sorted_data if  z==dstip]
+		series = dict(name=mserver[0].location,type='line',data=series_data)
+		result.append(series)
+	return result
+	
+# returns series of lmrtt measurements for a given device:	
+def parse_lmrtt_measurements(device):
+	data = []
+	result = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	f = open(filename, 'r')
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# eventstamp:
+			entry.append(int(record[0]))
+			# average:
+			entry.append(float(record[1]))
+			data.append(entry)
+	f.close()
+	# sort by eventstamp:
+	sorted_data = sorted(data, key=lambda x: x[0])
+	series = dict(name='Last mile latency', type='line', data=sorted_data)
+	result.append(series)
+	return result
+	
+# returns series of lmrtt measurements for a given device:	
+def parse_shaperate_measurements(device):
+	data = []
+	result = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/shaperate/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	f = open(filename, 'r')
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# eventstamp:
+			entry.append(int(record[0]))
+			# average:
+			entry.append(float(record[1])*1000)
+			# direction:
+			entry.append(record[2])
+			data.append(entry)
+	f.close()
+	# sort by eventstamp:
+	sorted_data = sorted(data, key=lambda x: x[0])
+	sorted_up = [(x,y) for x,y,z in sorted_data if  z=='up']
+	sorted_down = [(x,y) for x,y,z in sorted_data if  z=='dw']
+	series_up = dict(name='Shaperate Up', type='line', data=sorted_up)
+	series_down = dict(name='Shaperate Down', type='line', data=sorted_down)
+	result.append(series_up)
+	result.append(series_down)
+	return result
+	
+def parse_capacity_measurements(device):
+	data = []
+	result = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/capacity/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	f = open(filename, 'r')
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# eventstamp:
+			entry.append(int(record[0]))
+			# average:
+			entry.append(float(record[1])*1000)
+			# direction:
+			entry.append(record[2])
+			data.append(entry)
+	f.close()
+	# sort by eventstamp:
+	sorted_data = sorted(data, key=lambda x: x[0])
+	sorted_up = [(x,y) for x,y,z in sorted_data if  z=='up']
+	sorted_down = [(x,y) for x,y,z in sorted_data if  z=='dw']
+	series_up = dict(name='Capacity Up', type='line', data=sorted_up)
+	series_down = dict(name='Capacity Down', type='line', data=sorted_down)
+	result.append(series_up)
+	result.append(series_down)
+	return result
+	
+def get_measurement_server_name(dstip):
+	ipr = IpResolver.objects.filter(ip=dstip)
+	if len(ipr)!=0:
+		return ipr[0].location 
+	return ''
+	
+def get_rtt_measurements(device,days,dstip):
+	threading="multi"
+	data = []
+	end = datetime.now()
+	start = datetime_helper.get_daterange_start(int(days))
+	rows = MRtt.objects.filter(deviceid=device,dstip=dstip,eventstamp__gte=start,eventstamp__lte=end)
+	if len(rows)==0:
+		return []
+	for r in rows:
+		try:
+			eventstamp = datetime_helper.datetime_to_JSON(r.eventstamp)
+			d = [eventstamp, float(r.average)]
+			data.append(d)
+		except:
+			continue
+	return dict(device=device,dstip=dstip,days=days,data=data)
+	
+def get_lmrtt_measurements(device,days):
+	threading = "multi"
+	data = []
+	end = datetime.now()
+	start = datetime_helper.get_daterange_start(int(days))
+	rows = MRtt.objects.filter(deviceid=device,eventstamp__gte=start,eventstamp__lte=end)
+	if len(rows)==0:
+		return []
+	for r in rows:
+		try:
+			eventstamp = datetime_helper.datetime_to_JSON(r.eventstamp)
+			d = [eventstamp, float(r.average)]
+			data.append(d)
+		except:
+			continue
+	return dict(device=device,days=days,data=data)
+	
+def get_bitrate_measurements(device,days,direction,multi):
+	threading = "multi"
+	data = []
+	end = datetime.now()
+	start = datetime_helper.get_daterange_start(int(days))
+	rows = MBitrate.objects.filter(deviceid=device,eventstamp__gte=start,eventstamp__lte=end,direction=direction)
+	if len(rows)==0:
+		return []
+	if multi=="1":
+		rows = rows.filter(toolid='NETPERF_3')
+	else:
+		rows = rows.exclude(toolid='NETPERF_3')
+		threading = "single"
+	for r in rows:
+		try:
+			eventstamp = datetime_helper.datetime_to_JSON(r.eventstamp)
+			d = [eventstamp, float(r.average)]
+			data.append(d)
+		except:
+			continue
+	return dict(device=device,days=days,data=data,direction=direction,threading=threading)
 	
 # creates and sets a hashkey for a device
 def assign_hash(device):
@@ -1126,4 +1513,13 @@ def save_device_details_from_default(device):
 
 def deviceid_to_nodeid(device):
     return "OW" + device.upper()
+
+def get_dict_cursor():
+    conn_string = "host='" + settings.DATABASES['default']['HOST'] + \
+                   "' dbname='" + settings.DATABASES['default']['NAME'] + \
+                   "' user='" + settings.DATABASES['default']['USER'] + \
+                   "' password='" + settings.DATABASES['default']['PASSWORD'] + "'";
+                   
+    conn = psycopg2.connect(conn_string)
+    return conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 	

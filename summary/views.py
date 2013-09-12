@@ -40,7 +40,7 @@ def compare(request):
 	
 def compare_by_city(request, city, country):
 	end_date=datetime.now()
-	start_date=datetime_helper.get_daterange_start(31)
+	start_date=datetime_helper.get_daterange_start(7)
 	start_day=start_date.day
 	start_month=start_date.month
 	start_year=start_date.year
@@ -51,7 +51,7 @@ def compare_by_city(request, city, country):
 	
 def compare_by_country(request, country):
 	end_date=datetime.now()
-	start_date=datetime_helper.get_daterange_start(31)
+	start_date=datetime_helper.get_daterange_start(7)
 	start_day=start_date.day
 	start_month=start_date.month
 	start_year=start_date.year
@@ -62,7 +62,7 @@ def compare_by_country(request, country):
 	
 def compare_by_isp(request, isp, country):
 	end_date=datetime.now()
-	start_date=datetime_helper.get_daterange_start(31)
+	start_date=datetime_helper.get_daterange_start(7)
 	start_day=start_date.day
 	start_month=start_date.month
 	start_year=start_date.year
@@ -74,7 +74,7 @@ def compare_by_isp(request, isp, country):
 def compare_by_isp_and_city(request, isp, city):
 	country = geoip_helper.get_country_by_city(city)
 	end_date=datetime.now()
-	start_date=datetime_helper.get_daterange_start(31)
+	start_date=datetime_helper.get_daterange_start(7)
 	start_day=start_date.day
 	start_month=start_date.month
 	start_year=start_date.year
@@ -83,115 +83,439 @@ def compare_by_isp_and_city(request, isp, city):
 	end_year=end_date.year
 	return render_to_response('compare_by_isp.html', {'isp' : isp, 'country' : country, 'city' : city, 'start_day' : start_day, 'start_month' : start_month, 'start_year' : start_year, 'end_day' : end_day, 'end_month' : end_month, 'end_year' : end_year})
 	
+# def compare_bitrate_by_city(request):
+	# city = request.GET.get('city')
+	# country = request.GET.get('country')
+	# max_results = int(request.GET.get('max_results'))
+	# start = request.GET.get('start')
+	# end = request.GET.get('end')
+	# direction = request.GET.get('direction')
+	# result = []
+	# result.append(database_helper.bargraph_compare_bitrate_by_city(city,country,start,end,direction))
+	# result.append(database_helper.linegraph_compare_bitrate_by_city(city,country,max_results,start,end,direction))
+	# return HttpResponse(json.dumps(result))
+	
 def compare_bitrate_by_city(request):
+	result = []
+	avg_data = []
+	line_series = []
+	bar_series = []
+	# for limiting number of line series:
+	max_results = int(request.GET.get('max_results'))
+	start = request.GET.get('start')
+	end = request.GET.get('end')
 	city = request.GET.get('city')
-	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
-	start = request.GET.get('start')
-	end = request.GET.get('end')
 	direction = request.GET.get('direction')
-	result = []
-	result.append(database_helper.bargraph_compare_bitrate_by_city(city,max_results,start,end,direction))
-	result.append(database_helper.linegraph_compare_bitrate_by_city(city,max_results,start,end,direction))
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# all devices under given ISP
+	devices = Devicedetails.objects.filter(geoip_city=city, eventstamp__lte=latest)
+	for d in devices:
+		if d.geoip_isp!='' and d.geoip_isp!=None:
+			data = []
+			if len(line_series)<max_results:
+				data = database_helper.parse_bitrate_compare(d.deviceid,earliest,latest,True,direction)
+				if data[0]==0:
+					continue
+				series = dict(name=d.geoip_isp,type='line',data=data[2])
+				line_series.append(series)
+			else:
+				data = database_helper.parse_bitrate_compare(d.deviceid,earliest,latest,False, direction)
+			if data[0]==0:
+				continue
+			avg_entry = []
+			avg_entry.append(d.geoip_isp)
+			avg_entry.append(data[0])
+			avg_entry.append(data[1])
+			avg_data.append(avg_entry)
+	bar_series= views_helper.create_bargraph_series(avg_data)
+	line_series = sorted(line_series, key = lambda x: x['name'].lstrip())
+	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
+	result.append(bar_series)
+	result.append(line_series)
 	return HttpResponse(json.dumps(result))
 	
+# def compare_bitrate_by_country(request):
+	# country = request.GET.get('country')
+	# start = request.GET.get('start')
+	# end = request.GET.get('end')
+	# direction = request.GET.get('direction')
+	# result = []
+	# JS expects two sets of graph data but only 1 graph is shown for country
+	# so an empty list is appended:
+	# empty = []
+	# result.append(database_helper.bargraph_compare_bitrate_by_country(country,start,end,direction))
+	# result.append(empty)
+	# return HttpResponse(json.dumps(result))
+
 def compare_bitrate_by_country(request):
-	country = request.GET.get('country')
-	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
+	result = []
+	avg_data = []
+	line_series = []
+	bar_series = []
 	start = request.GET.get('start')
 	end = request.GET.get('end')
+	country = request.GET.get('country')
 	direction = request.GET.get('direction')
-	result = []
-	empty = []
-	result.append(database_helper.bargraph_compare_bitrate_by_country(country,max_results,start,end,direction))
-	result.append(empty)
-	return HttpResponse(json.dumps(result))
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# all devices under given country
+	devices = Devicedetails.objects.filter(geoip_country=country, eventstamp__lte=latest)
+	for d in devices:
+		if d.geoip_isp!='' and d.geoip_isp!=None:
+			data = []
+			data = database_helper.parse_bitrate_compare(d.deviceid,earliest,latest,False,direction)
+			if data[0]==0:
+				continue
+			avg_entry = []
+			avg_entry.append(d.geoip_isp)
+			avg_entry.append(data[0])
+			avg_entry.append(data[1])
+			avg_data.append(avg_entry)
+	bar_series= views_helper.create_bargraph_series(avg_data)
+	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
+	return HttpResponse(json.dumps(bar_series))
 	
+# def compare_bitrate_by_isp(request):
+	# isp = request.GET.get('isp')
+	# country = request.GET.get('country')
+	# max_results = int(request.GET.get('max_results'))
+	# days = int(request.GET.get('days'))
+	# start = request.GET.get('start')
+	# end = request.GET.get('end')
+	# direction = request.GET.get('direction')
+	# result = []
+	# empty = []
+	# result.append(database_helper.bargraph_compare_bitrate_by_isp(isp,start,end,direction,country))
+	# result.append(database_helper.linegraph_compare_bitrate_by_isp(isp,max_results,start,end,direction,country))
+	# return HttpResponse(json.dumps(result))
+
 def compare_bitrate_by_isp(request):
+	result = []
+	avg_data = []
+	line_series = []
+	bar_series = []
+	# for limiting number of line series:
+	max_results = int(request.GET.get('max_results'))
+	direction = request.GET.get('direction')
+	start = request.GET.get('start')
+	end = request.GET.get('end')
 	isp = request.GET.get('isp')
 	country = request.GET.get('country')
-	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
-	start = request.GET.get('start')
-	end = request.GET.get('end')
-	direction = request.GET.get('direction')
-	result = []
-	empty = []
-	result.append(database_helper.bargraph_compare_bitrate_by_isp(isp,max_results,start,end,direction,country))
-	result.append(database_helper.linegraph_compare_bitrate_by_isp(isp,max_results,start,end,direction,country))
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# all devices under given ISP
+	devices = Devicedetails.objects.filter(geoip_isp=isp, eventstamp__lte=latest)
+	for d in devices:
+		if d.geoip_city!='' and d.geoip_city!=None:
+			data = []
+			if len(line_series)<max_results:
+				data = database_helper.parse_bitrate_compare(d.deviceid,earliest,latest,True,direction)
+				if data[0]==0:
+					continue
+				series = dict(name=d.geoip_city,type='line',data=data[2])
+				line_series.append(series)
+			else:
+				data = database_helper.parse_bitrate_compare(d.deviceid,earliest,latest,False,direction)
+			if data[0]==0:
+				continue
+			avg_entry = []
+			avg_entry.append(d.geoip_city)
+			avg_entry.append(data[0])
+			avg_entry.append(data[1])
+			avg_data.append(avg_entry)
+	bar_series= views_helper.create_bargraph_series(avg_data)
+	line_series = sorted(line_series, key = lambda x: x['name'].lstrip())
+	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
+	result.append(bar_series)
+	result.append(line_series)
 	return HttpResponse(json.dumps(result))
+	
+# def compare_lmrtt_by_city(request):
+	# city = request.GET.get('city')
+	# max_results = int(request.GET.get('max_results'))
+	# start = request.GET.get('start')
+	# end = request.GET.get('end')
+	# result = []
+	# result.append(database_helper.bargraph_compare_lmrtt_by_city(city,start,end))
+	# result.append(database_helper.linegraph_compare_lmrtt_by_city(city,max_results,start,end))
+	# return HttpResponse(json.dumps(result))
 
 def compare_lmrtt_by_city(request):
+	result = []
+	avg_data = []
+	line_series = []
+	bar_series = []
+	# for limiting number of line series:
+	max_results = int(request.GET.get('max_results'))
+	start = request.GET.get('start')
+	end = request.GET.get('end')
 	city = request.GET.get('city')
-	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
-	start = request.GET.get('start')
-	end = request.GET.get('end')
-	result = []
-	result.append(database_helper.bargraph_compare_lmrtt_by_city(city,max_results,start,end))
-	result.append(database_helper.linegraph_compare_lmrtt_by_city(city,max_results,start,end))
-	return HttpResponse(json.dumps(result))
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# all devices under given ISP
+	devices = Devicedetails.objects.filter(geoip_city=city, eventstamp__lte=latest)
+	for d in devices:
+		if d.geoip_isp!='' and d.geoip_isp!=None:
+			data = []
+			if len(line_series)<max_results:
+				data = database_helper.parse_lmrtt_compare(d.deviceid,earliest,latest,True)
+				if data[0]==0:
+					continue
+				series = dict(name=d.geoip_isp,type='line',data=data[2])
+				line_series.append(series)
+			else:
+				data = database_helper.parse_lmrtt_compare(d.deviceid,earliest,latest,False)
+			if data[0]==0:
+				continue
+			avg_entry = []
+			avg_entry.append(d.geoip_isp)
+			avg_entry.append(data[0])
+			avg_entry.append(data[1])
+			avg_data.append(avg_entry)
+	bar_series= views_helper.create_bargraph_series(avg_data)
+	line_series = sorted(line_series, key = lambda x: x['name'])
+	bar_series = sorted(bar_series, key= lambda x: x['name'])
+	result.append(bar_series)
+	result.append(line_series)
+	return HttpResponse(json.dumps(result))	
 	
+# def compare_lmrtt_by_country(request):
+	# country = request.GET.get('country')
+	# start = request.GET.get('start')
+	# end = request.GET.get('end')
+	# result = []
+	# JS expects two sets of graph data but only 1 graph is shown for country
+	# so an empty list is appended:
+	# empty = []
+	# result.append(database_helper.bargraph_compare_lmrtt_by_country(country,start,end))
+	# result.append(empty)
+	# return HttpResponse(json.dumps(result))
+
 def compare_lmrtt_by_country(request):
-	country = request.GET.get('country')
-	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
+	result = []
+	avg_data = []
+	line_series = []
+	bar_series = []
 	start = request.GET.get('start')
 	end = request.GET.get('end')
-	result = []
-	empty = []
-	result.append(database_helper.bargraph_compare_lmrtt_by_country(country,max_results,start,end))
-	result.append(empty)
-	return HttpResponse(json.dumps(result))
+	country = request.GET.get('country')
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# all devices under given country
+	devices = Devicedetails.objects.filter(geoip_country=country, eventstamp__lte=latest)
+	for d in devices:
+		if d.geoip_isp!='' and d.geoip_isp!=None:
+			data = []
+			data = database_helper.parse_lmrtt_compare(d.deviceid,earliest,latest,False)
+			if data[0]==0:
+				continue
+			avg_entry = []
+			avg_entry.append(d.geoip_isp)
+			avg_entry.append(data[0])
+			avg_entry.append(data[1])
+			avg_data.append(avg_entry)
+	bar_series= views_helper.create_bargraph_series(avg_data)
+	bar_series = sorted(bar_series, key= lambda x: x['name'])
+	return HttpResponse(json.dumps(bar_series))	
+	
+# def compare_lmrtt_by_isp(request):
+	# isp = request.GET.get('isp')
+	# max_results = int(request.GET.get('max_results'))
+	# days = int(request.GET.get('days'))
+	# start = request.GET.get('start')
+	# end = request.GET.get('end')
+	# country = request.GET.get('country')
+	# result = []
+	# empty = []
+	# result.append(database_helper.bargraph_compare_lmrtt_by_isp(isp,start,end, country))
+	# result.append(database_helper.linegraph_compare_lmrtt_by_isp(isp,max_results,start,end,country))
+	# return HttpResponse(json.dumps(result))
 	
 def compare_lmrtt_by_isp(request):
-	isp = request.GET.get('isp')
+	result = []
+	avg_data = []
+	line_series = []
+	bar_series = []
+	# for limiting number of line series:
 	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
 	start = request.GET.get('start')
 	end = request.GET.get('end')
+	isp = request.GET.get('isp')
 	country = request.GET.get('country')
-	result = []
-	empty = []
-	result.append(database_helper.bargraph_compare_lmrtt_by_isp(isp,max_results,start,end, country))
-	result.append(database_helper.linegraph_compare_lmrtt_by_isp(isp,max_results,start,end,country))
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# all devices under given ISP
+	devices = Devicedetails.objects.filter(geoip_isp=isp, eventstamp__lte=latest)
+	for d in devices:
+		if d.geoip_city!='' and d.geoip_city!=None:
+			data = []
+			if len(line_series)<max_results:
+				data = database_helper.parse_lmrtt_compare(d.deviceid,earliest,latest,True)
+				if data[0]==0:
+					continue
+				series = dict(name=d.geoip_city,type='line',data=data[2])
+				line_series.append(series)
+			else:
+				data = database_helper.parse_lmrtt_compare(d.deviceid,earliest,latest,False)
+			if data[0]==0:
+				continue
+			avg_entry = []
+			avg_entry.append(d.geoip_city)
+			avg_entry.append(data[0])
+			avg_entry.append(data[1])
+			avg_data.append(avg_entry)
+	bar_series= views_helper.create_bargraph_series(avg_data)
+	line_series = sorted(line_series, key = lambda x: x['name'])
+	bar_series = sorted(bar_series, key= lambda x: x['name'])
+	result.append(bar_series)
+	result.append(line_series)
 	return HttpResponse(json.dumps(result))
 	
+# def compare_rtt_by_city(request):
+	# city = request.GET.get('city')
+	# max_results = int(request.GET.get('max_results'))
+	# days = int(request.GET.get('days'))
+	# start = request.GET.get('start')
+	# end = request.GET.get('end')
+	# earliest = datetime_helper.format_date_from_calendar(start)
+	# latest = datetime_helper.format_date_from_calendar(end)
+	# result = []
+	# result.append(database_helper.bargraph_compare_rtt_by_city(city,earliest,latest))
+	# result.append(database_helper.linegraph_compare_rtt_by_city(city,max_results,earliest,latest))
+	# return HttpResponse(json.dumps(result))
+	
+# returns bargraph and linegraph series for a given city with respect to various ISPs:
 def compare_rtt_by_city(request):
-	city = request.GET.get('city')
+	result = []
+	avg_data = []
+	line_series = []
+	bar_series = []
+	# for limiting number of line series:
 	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
 	start = request.GET.get('start')
 	end = request.GET.get('end')
-	result = []
-	result.append(database_helper.bargraph_compare_rtt_by_city(city,max_results,start,end))
-	result.append(database_helper.linegraph_compare_rtt_by_city(city,max_results,start,end))
+	city = request.GET.get('city')
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# all devices under given ISP
+	devices = Devicedetails.objects.filter(geoip_city=city, eventstamp__lte=latest)
+	for d in devices:
+		if d.geoip_isp!='' and d.geoip_isp!=None:
+			data = []
+			if len(line_series)<max_results:
+				data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,True)
+				if data[0]==0:
+					continue
+				series = dict(name=d.geoip_isp,type='line',data=data[2])
+				line_series.append(series)
+			else:
+				data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,False)
+			if data[0]==0:
+				continue
+			avg_entry = []
+			avg_entry.append(d.geoip_isp)
+			avg_entry.append(data[0])
+			avg_entry.append(data[1])
+			avg_data.append(avg_entry)
+	bar_series= views_helper.create_bargraph_series(avg_data)
+	line_series = sorted(line_series, key = lambda x: x['name'])
+	bar_series = sorted(bar_series, key= lambda x: x['name'])
+	result.append(bar_series)
+	result.append(line_series)
 	return HttpResponse(json.dumps(result))
 		
+# def compare_rtt_by_country(request):
+	# country = request.GET.get('country')
+	# start = request.GET.get('start')
+	# end = request.GET.get('end')
+	# result = []
+	#JS expects two sets of graph data but only 1 graph is shown for country
+	#so an empty list is appended:
+	# empty = []
+	# result.append(database_helper.bargraph_compare_rtt_by_country(country,start,end))
+	# result.append(empty)
+	# return HttpResponse(json.dumps(result))
+	
+# returns bargraph and linegraph series for a given country with respect to various cities:
 def compare_rtt_by_country(request):
-	country = request.GET.get('country')
-	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
+	result = []
+	avg_data = []
+	line_series = []
+	bar_series = []
 	start = request.GET.get('start')
 	end = request.GET.get('end')
-	result = []
-	empty = []
-	result.append(database_helper.bargraph_compare_rtt_by_country(country,max_results,start,end))
-	result.append(empty)
-	return HttpResponse(json.dumps(result))
-	
-def compare_rtt_by_isp(request):
 	country = request.GET.get('country')
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# all devices under given country
+	devices = Devicedetails.objects.filter(geoip_country=country, eventstamp__lte=latest)
+	for d in devices:
+		if d.geoip_isp!='' and d.geoip_isp!=None:
+			data = []
+			data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,False)
+			if data[0]==0:
+				continue
+			avg_entry = []
+			avg_entry.append(d.geoip_isp)
+			avg_entry.append(data[0])
+			avg_entry.append(data[1])
+			avg_data.append(avg_entry)
+	bar_series= views_helper.create_bargraph_series(avg_data)
+	bar_series = sorted(bar_series, key= lambda x: x['name'])
+	return HttpResponse(json.dumps(bar_series))
+	
+# returns bargraph and linegraph series for a given ISP with respect to various cities:
+def compare_rtt_by_isp(request):
+	result = []
+	avg_data = []
+	line_series = []
+	bar_series = []
+	# for limiting number of line series:
 	max_results = int(request.GET.get('max_results'))
-	#days = int(request.GET.get('days'))
 	start = request.GET.get('start')
 	end = request.GET.get('end')
 	isp = request.GET.get('isp')
-	result = []
-	empty = []
-	result.append(database_helper.bargraph_compare_rtt_by_isp(isp,max_results,start,end,country))
-	result.append(database_helper.linegraph_compare_rtt_by_isp(isp,max_results,start,end,country))
+	country = request.GET.get('country')
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	# all devices under given ISP
+	devices = Devicedetails.objects.filter(geoip_isp=isp, eventstamp__lte=latest)
+	for d in devices:
+		if d.geoip_city!='' and d.geoip_city!=None:
+			data = []
+			if len(line_series)<max_results:
+				data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,True)
+				if data[0]==0:
+					continue
+				series = dict(name=d.geoip_city,type='line',data=data[2])
+				line_series.append(series)
+			else:
+				data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,False)
+			if data[0]==0:
+				continue
+			avg_entry = []
+			avg_entry.append(d.geoip_city)
+			avg_entry.append(data[0])
+			avg_entry.append(data[1])
+			avg_data.append(avg_entry)
+	bar_series= views_helper.create_bargraph_series(avg_data)
+	line_series = sorted(line_series, key = lambda x: x['name'])
+	bar_series = sorted(bar_series, key= lambda x: x['name'])
+	result.append(bar_series)
+	result.append(line_series)
+	return HttpResponse(json.dumps(result))
+	
+def rtt_json(request,device,dstip,days):
+	result = database_helper.get_rtt_measurements(device, days, dstip)
+	return HttpResponse(json.dumps(result))
+
+def lmrtt_json(request,device,days):
+	result = database_helper.get_lmrtt_measurements(device,days)
+	return HttpResponse(json.dumps(result))
+
+def bitrate_json(request,device,direction,days,multi):
+	result = database_helper.get_bitrate_measurements(device,days,direction,multi)
 	return HttpResponse(json.dumps(result))
 	
 def compare_rtt(request):
@@ -359,13 +683,16 @@ def iptest(iptest):
 	dat = geoip_helper.getLocation("117.192.232.202")
 	return HttpResponse(str(dat))
 	
+# returns series data in highstock format
 def linegraph_rtt(request):
-	data = []
 	device = request.GET.get('deviceid')
-	cached_rtt = JsonCache.objects.filter(deviceid=device, datatype='rtt')
-	if len(cached_rtt)!=0:
-		data = cached_rtt[0].data
-	return HttpResponse(data)
+	data = database_helper.parse_rtt_measurements(device)
+	return HttpResponse(json.dumps(data))
+	
+def linegraph_underload(request):
+	device = request.GET.get('deviceid')
+	data = database_helper.parse_underload_measurements(device)
+	return HttpResponse(json.dumps(data))
 	
 
 def linegraph_bitrate(request):
@@ -373,40 +700,45 @@ def linegraph_bitrate(request):
 	graphno = int(request.GET.get('graphno'))
 	data = []
 	if graphno==1:
-		cached_download = JsonCache.objects.filter(deviceid=device, datatype='bitrate_down')
-		if len(cached_download)!=0:
-			data = cached_download[0].data
+		data = database_helper.parse_bitrate_measurements(device,'dw')
 	else:
-		cached_upload = JsonCache.objects.filter(deviceid=device, datatype='bitrate_up')
-		if len(cached_upload)!=0:
-			data = cached_upload[0].data
-	return HttpResponse(data)
-
-def linegraph_lmrtt(request):
-	data = []
-	device = request.GET.get('deviceid')
-	cached_lmrtt = JsonCache.objects.filter(deviceid=device, datatype='lmrtt')
-	if len(cached_lmrtt)!=0:
-		data = cached_lmrtt[0].data
-	return HttpResponse(data)
-
-def linegraph_shaperate(request):
-	data = []
-	device = request.GET.get('deviceid')
-	cached_shaperate = JsonCache.objects.filter(deviceid=device, datatype='shaperate')
-	cached_capacity = JsonCache.objects.filter(deviceid=device, datatype='capacity')
-	if len(cached_shaperate)!=0:
-		shaperate_data = json.loads(cached_shaperate[0].data)
-		# append both shaperate series
-		for series in shaperate_data:
-			data.append(series)
-		if len(cached_capacity)!=0:
-			capacity_data = json.loads(cached_capacity[0].data)
-			# append both capacity series
-			for series in capacity_data:
-				data.append(series)
+		data = database_helper.parse_bitrate_measurements(device,'up')
 	return HttpResponse(json.dumps(data))
 
+def linegraph_lmrtt(request):
+	device = request.GET.get('deviceid')
+	data = database_helper.parse_lmrtt_measurements(device)
+	return HttpResponse(json.dumps(data))
+
+# def linegraph_shaperate(request):
+	# data = []
+	# device = request.GET.get('deviceid')
+	# cached_shaperate = JsonCache.objects.filter(deviceid=device, datatype='shaperate')
+	# cached_capacity = JsonCache.objects.filter(deviceid=device, datatype='capacity')
+	# if len(cached_shaperate)!=0:
+		# shaperate_data = json.loads(cached_shaperate[0].data)
+		#append both shaperate series
+		# for series in shaperate_data:
+			# data.append(series)
+		# if len(cached_capacity)!=0:
+			# capacity_data = json.loads(cached_capacity[0].data)
+			#append both capacity series
+			# for series in capacity_data:
+				# data.append(series)
+	# return HttpResponse(json.dumps(data))
+
+def linegraph_shaperate(request):
+	device = request.GET.get('deviceid')
+	data = []
+	shaperate_series = database_helper.parse_shaperate_measurements(device)
+	capacity_series = database_helper.parse_capacity_measurements(device)
+	for s in shaperate_series:
+		data.append(s)
+	for s in capacity_series:
+		data.append(s)
+	return HttpResponse(json.dumps(data))	
+	
+	
 def linegraph_unload(request):
 	data = []
 	device = request.GET.get('deviceid')
