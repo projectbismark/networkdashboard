@@ -268,6 +268,41 @@ def write_capacity_measurements():
 	cursor.close()
 	return
 	
+def dump_all_latencies():
+    cursor = get_dict_cursor()
+    countries = Devicedetails.objects.values('country_code').distinct()
+	count = 0
+	t0 = datetime.now()
+    for c in countries:
+		filename = settings.PROJECT_ROOT + '/summary/measurements/country_averages/' + c
+		f = open(filename, 'w')
+		params = []
+		params.append(c)
+        SQL =  "SELECT \
+				m_rtt.eventstamp::date AS day, \
+				count(distinct m_rtt.srcip) AS ndevices, \
+				count(*) AS nmeasurements, \
+				avg(m_rtt.average) AS latency \
+				FROM m_rtt \
+				JOIN devicedetails AS d ON d.ip = m_rtt.srcip \
+				WHERE d.country_code=%s AND m_rtt.average>0 AND m_rtt.average<3000  \
+				GROUP BY day;"
+        cursor.execute(SQL,params)
+		records = cursor.fetchall()
+		for r in records:
+			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
+			avg = r['average']
+			count = r['nmeasurements']
+			day = r['day']
+			line = str(eventstamp) + ',' + str(avg) + ',' + str(count) + 'n' + day + '\n'
+			f.write(line)
+		f.close()
+		count += 1
+		t1 = datetime.now()
+		print t1-t0
+		print str(len(devices)-count) + " remaining"
+	cursor.close()
+	
 	
 def get_dict_cursor():
     conn_string = "host='" + settings.DATABASES['default']['HOST'] + \
