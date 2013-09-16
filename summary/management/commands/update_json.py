@@ -275,11 +275,12 @@ def dump_all_latencies():
 	count = 0
 	t0 = datetime.now()
 	for c in countries:
-		filename = settings.PROJECT_ROOT + '/summary/measurements/country_averages/' + c
+		print c['country_code']
+		filename = settings.PROJECT_ROOT + '/summary/measurements/country_averages/' + c['country_code']
 		f = open(filename, 'w')
 		params = []
 		params.append(c)
-        SQL =  "SELECT \
+		SQL =  "SELECT \
 				m_rtt.eventstamp::date AS day, \
 				count(distinct m_rtt.srcip) AS ndevices, \
 				count(*) AS nmeasurements, \
@@ -301,7 +302,7 @@ def dump_all_latencies():
 		count += 1
 		t1 = datetime.now()
 		print t1-t0
-		print str(len(devices)-count) + " remaining"
+		print str(len(countries)-count) + " remaining"
 	cursor.close()
 	
 	
