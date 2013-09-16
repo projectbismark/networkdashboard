@@ -275,11 +275,12 @@ def dump_all_latencies():
 	count = 0
 	t0 = datetime.now()
 	for c in countries:
-		print c['country_code']
+		if c['country_code']==None or c['country_code']=='':
+			continue
 		filename = settings.PROJECT_ROOT + '/summary/measurements/country_averages/' + c['country_code']
 		f = open(filename, 'w')
 		params = []
-		params.append(c)
+		params.append(c['country_code'])
 		SQL =  "SELECT \
 				m_rtt.eventstamp::date AS day, \
 				count(distinct m_rtt.srcip) AS ndevices, \
