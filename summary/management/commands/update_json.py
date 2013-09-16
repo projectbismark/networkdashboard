@@ -277,6 +277,7 @@ def dump_all_latencies():
 	for c in countries:
 		if c['country_code']==None or c['country_code']=='':
 			continue
+		print c['country_code']
 		filename = settings.PROJECT_ROOT + '/summary/measurements/country_averages/' + c['country_code']
 		f = open(filename, 'w')
 		params = []
@@ -293,11 +294,11 @@ def dump_all_latencies():
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
 		for r in records:
-			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
+			#eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
 			count = r['nmeasurements']
 			day = r['day']
-			line = str(eventstamp) + ',' + str(avg) + ',' + str(count) + 'n' + day + '\n'
+			line = str(eventstamp) + ',' + str(avg) + ',' + str(count) + 'n' + str(day) + '\n'
 			f.write(line)
 		f.close()
 		count += 1
