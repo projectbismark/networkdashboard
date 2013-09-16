@@ -271,34 +271,33 @@ def write_capacity_measurements():
 	
 def dump_all_latencies():
 	cursor = get_dict_cursor()
-	countries = Devicedetails.objects.values('country_code').distinct()
+	servers = IPResolver.objects.all()
 	count = 0
 	t0 = datetime.now()
-	for c in countries:
-		if c['country_code']==None or c['country_code']=='':
-			continue
-		print c['country_code']
-		filename = settings.PROJECT_ROOT + '/summary/measurements/country_averages/' + c['country_code']
+	for s in servers:
+		filename = settings.PROJECT_ROOT + '/summary/measurements/server_averages/' + str(s['location'])
 		f = open(filename, 'w')
 		params = []
-		params.append(c['country_code'])
+		params.append(s['ip'])
 		SQL =  "SELECT \
+				country_code AS country \
 				m_rtt.eventstamp::date AS day, \
 				count(distinct m_rtt.srcip) AS ndevices, \
 				count(*) AS nmeasurements, \
 				avg(m_rtt.average) AS latency \
 				FROM m_rtt \
 				JOIN devicedetails AS d ON d.ip = m_rtt.srcip \
-				WHERE d.country_code=%s AND m_rtt.average>0 AND m_rtt.average<3000  \
-				GROUP BY day;"
+				WHERE m_rtt.dstip = %s AND m_rtt.average>0 AND m_rtt.average<3000  \
+				GROUP BY day, d.country_code;"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
 		for r in records:
 			#eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
-			avg = r['average']
-			count = r['nmeasurements']
+			avg = r['latency']
+			m_count = r['nmeasurements']
 			day = r['day']
-			line = str(eventstamp) + ',' + str(avg) + ',' + str(count) + 'n' + str(day) + '\n'
+			country = r['country']
+			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + '\n'
 			f.write(line)
 		f.close()
 		count += 1

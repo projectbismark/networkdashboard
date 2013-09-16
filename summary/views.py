@@ -773,10 +773,6 @@ def get_countries_vis_data(request):
     startdate = request.GET.get('startdate')
     enddate = request.GET.get('enddate')
     server = request.GET.get('serverip')
-
-    if startdate is None or enddate is None or server is None:
-	    return HttpResponseBadRequest()
-
     cursor = connection.cursor()
     query = "SELECT \
                  country, \
@@ -788,6 +784,34 @@ def get_countries_vis_data(request):
              (day > '" + startdate + "' AND day < '" + enddate + "') \
              GROUP BY country;"
     cursor.execute(query)
+	
+	filename = settings.PROJECT_ROOT + '/summary/measurements/capacity/' + device
+	# garbage characters to be removed:
+	remove = ')("\n'
+	f = open(filename, 'r')
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# eventstamp:
+			entry.append(int(record[0]))
+			# average:
+			entry.append(float(record[1])*1000)
+			# direction:
+			entry.append(record[2])
+			data.append(entry)
+	f.close()
+	# sort by eventstamp:
+	sorted_data = sorted(data, key=lambda x: x[0])
+	sorted_up = [(x,y) for x,y,z in sorted_data if  z=='up']
+	sorted_down = [(x,y) for x,y,z in sorted_data if  z=='dw']
+	series_up = dict(name='Capacity Up', type='line', data=sorted_up)
+	series_down = dict(name='Capacity Down', type='line', data=sorted_down)
+	result.append(series_up)
+	result.append(series_down)
     
     def decimal_default(obj):
         if isinstance(obj, decimal.Decimal):
