@@ -288,7 +288,7 @@ def dump_all_latencies():
 				JOIN devicedetails AS d ON d.ip = m_rtt.srcip \
 				WHERE d.country_code=%s AND m_rtt.average>0 AND m_rtt.average<3000  \
 				GROUP BY day;"
-        cursor.execute(SQL,params)
+		cursor.execute(SQL,params)
 		records = cursor.fetchall()
 		for r in records:
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
