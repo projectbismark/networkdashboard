@@ -59,7 +59,8 @@ def update_json():
 	#write_bitrate_measurements()
 	#write_shaperate_measurements()
 	#write_underload_measurements()
-	write_capacity_measurements()
+	#write_capacity_measurements()
+	dump_all_latencies()
 	return
 
 def write_rtt_measurements():
@@ -269,11 +270,11 @@ def write_capacity_measurements():
 	return
 	
 def dump_all_latencies():
-    cursor = get_dict_cursor()
-    countries = Devicedetails.objects.values('country_code').distinct()
+	cursor = get_dict_cursor()
+	countries = Devicedetails.objects.values('country_code').distinct()
 	count = 0
 	t0 = datetime.now()
-    for c in countries:
+	for c in countries:
 		filename = settings.PROJECT_ROOT + '/summary/measurements/country_averages/' + c
 		f = open(filename, 'w')
 		params = []
