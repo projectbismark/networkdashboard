@@ -122,6 +122,16 @@ def getLocation(ip,gi):
 	gi_rec = gi.record_by_addr(ip)
 	cache.set(ip,gi_rec,random.randint(1000, 10000))
 	return gi_rec
+	
+def get_latitude_by_ip(ip):
+	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	loc = gi.record_by_addr(ip)
+	return loc['latitude']
+	
+def get_longitude_by_ip(ip):
+	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	loc = gi.record_by_addr(ip)
+	return loc['longitude']
 
 def getIPList():
 	devices = Devicedetails.objects.values('deviceid').distinct()

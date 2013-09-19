@@ -292,7 +292,6 @@ def dump_all_latencies():
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
 		for r in records:
-			#eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['latency']
 			m_count = r['nmeasurements']
 			day = r['day']

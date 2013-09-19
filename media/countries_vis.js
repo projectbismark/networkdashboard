@@ -3,21 +3,20 @@ var servers = []
 function fillmap(index) {
     $('#world-map').off().empty();
     $.ajax({
-	type : 'GET',
-        url : 'get_countries_vis_data/',
-	data : { 'startdate' : $('#startdate').val(),
-		 'enddate' : $('#enddate').val(),
-		 'serverip' : servers[index].ip
-	       },
-        success : function(result) {
-            drawRegionsMap(result, index);
-        }
+		type : 'GET',
+		url : 'get_countries_vis_data/',
+		data : { 'startdate' : $('#startdate').val(),
+			 'enddate' : $('#enddate').val(),
+			 'serverip' : servers[index].ip
+		},
+		success : function(result) {
+				drawRegionsMap(result, index);
+		}
     });
 }
 
 function drawRegionsMap(response, server_index) {
     response = JSON.parse(response);
-
     var mapdata = {};
     var condetail = {};
     $.each(response, function(key, value) {
@@ -28,7 +27,6 @@ function drawRegionsMap(response, server_index) {
     });
 
     $('#world-map').off().empty();
-
     var map = new jvm.WorldMap({
 	container : $('#world-map'),
         map : 'world_mill_en',

@@ -12,6 +12,7 @@ class Command(NoArgsCommand):
 	
 def update_devicedetails():
 	devices = Devicedetails.objects.all()
+	servers = IpResolver.objects.all()
 	conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" + \
 		settings.MGMT_PASS + "'"
 	conn = psycopg2.connect(conn_string)
@@ -41,4 +42,14 @@ def update_devicedetails():
 			isp = isp.decode('cp1252').encode('utf8')
 			d.geoip_isp = isp
 		d.save()
+	return
+	
+def update_server_locs()
+	servers = IpResolver.objects.all()
+	for s in servers:
+		lat = geoip_helper.get_latitude_by_ip(s.ip)
+		lon = geoip_helper.get_longitude_by_ip(s.ip)
+		s.latitude=lat
+		s.longitude=lon
+		s.save()
 	return

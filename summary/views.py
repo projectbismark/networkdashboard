@@ -766,7 +766,7 @@ def send_feedback(request):
 	return HttpResponse("feedback received. Thank you!")
 
 def countries_vis(request):
-    server_list = CVServers.objects.all()
+    server_list = IpResolver.objects.all()
     return render_to_response('countries_vis.html', {'server_list': server_list});
 
 def get_countries_vis_data(request):
@@ -784,7 +784,6 @@ def get_countries_vis_data(request):
              (day > '" + startdate + "' AND day < '" + enddate + "') \
              GROUP BY country;"
     cursor.execute(query)
-	
 	filename = settings.PROJECT_ROOT + '/summary/measurements/capacity/' + device
 	# garbage characters to be removed:
 	remove = ')("\n'

@@ -9,7 +9,6 @@
 		<script src="/static/jvectormap/jquery-jvectormap-1.2.2.min.js"></script>
 		<script src="/static/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
 		<script src="/static/jqIpLocation.js"></script>
-
 		<script src="/static/countries_vis.js"></script>
 		<script src="/static/calendar/daterangepicker.js"></script>
 		<script src="/static/calendar/moment.js"></script>
@@ -39,8 +38,6 @@
 			  <input type="hidden" name="startdate" id="startdate" value="2012-01-01"/>
 			  <input type="hidden" name="enddate" id="enddate" />
 			</fieldset>
-
-
 			<table class="table table-striped table-condensed">
 				<tr>
 					<td> Measurment server: </td>
@@ -50,7 +47,7 @@
 						<script>
 						  servers.push( { 
 						                    name : '{{server.name}}',
-						                    latLng : [{{server.lat}}, {{server.lon}}],
+						                    latLng : [{{server.latitude}}, {{server.longitude}}],
 						                    ip : '{{server.ip}}'
 						  } );
 						</script>
@@ -67,7 +64,6 @@
 						background-image: -moz-linear-gradient(left , #FEE5D9 0%, #A50F14 100%);
 						background-image: -webkit-linear-gradient(left , #FEE5D9 0%, #A50F14 100%);
 						background-image: -ms-linear-gradient(left , #FEE5D9 0%, #A50F14 100%);
-
 						background-image: -webkit-gradient(
 						linear,
 						left bottom,
