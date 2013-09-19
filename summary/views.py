@@ -766,7 +766,7 @@ def send_feedback(request):
 	return HttpResponse("feedback received. Thank you!")
 
 def countries_vis(request):
-    server_list = IpResolver.objects.all()
+	server_list = IpResolver.objects.all()
 	end_date=datetime.now()
 	start_date=datetime_helper.get_daterange_start(31)
 	start_day=start_date.day
@@ -775,11 +775,13 @@ def countries_vis(request):
 	end_day=end_date.day
 	end_month=end_date.month
 	end_year=end_date.year
-    return render_to_response('countries_vis.html', {'server_list': server_list, 'start_day':start_day,'start_month':start_month,'start_year':start_year,'end_day':end_day,'end_month':end_month,'end_year':end_year});
+	return render_to_response('countries_vis.html', {'server_list': server_list, 'start_day':start_day,'start_month':start_month,'start_year':start_year,'end_day':end_day,'end_month':end_month,'end_year':end_year});
 
 def get_countries_vis_data(request):
 	startdate = request.GET.get('startdate')
 	enddate = request.GET.get('enddate')
+	startdate = datetime_helper.format_date_from_calendar(startdate)
+	enddate = datetime_helper.format_date_from_calendar(enddate)
 	start = datetime_helper.datetime_to_JSON(startdate)
 	end = datetime_helper.datetime_to_JSON(enddate)
 	server = request.GET.get('serverip')
