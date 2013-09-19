@@ -21,7 +21,7 @@
 			<div style="float: right">
 				<a class="btn" href="/"><i class="icon-home"></i> Home</a>
 			</div>
-			<h1>Compare Latencies by Country</h1>
+			<h1>World Latency Map</h1>
 			<br />
 			<br />
 			<br />
@@ -31,7 +31,7 @@
 			    <label class="control-label" for="daterange">Select date range:</label>
 			    <div class="controls">
 			      <div class="input-prepend">
-				<span class="add-on"><i class="icon-calendar"></i></span><input type="text" name="dates" id="daterange" value="{{start_year}}-{{start_month}}-{{start_day}}   to  {{end_year}}-{{end_month}}-{{end_day}} />
+				<span class="add-on"><i class="icon-calendar"></i></span><input type="text" name="dates" id="daterange" value="{{start_year}}-{{start_month}}-{{start_day}}   to  {{end_year}}-{{end_month}}-{{end_day}}" />
 			      </div>
 			    </div>
 			  </div>
@@ -51,12 +51,11 @@
 						                    ip : '{{server.ip}}'
 						  } );
 						</script>
-						<option value={{forloop.counter0}}>{{server.name}}</option>
+						<option value={{forloop.counter0}}>{{server.location}}</option>
 						{% endfor %}
 					</select></td>
 				</tr>						
 			</table>
-			<h2>Country Latency Map</h2>
 			<br/>
 			<div id="world-map" style="width: 100%; height:500px; background: url(/static/images/loading.gif) no-repeat center;" ></div>
 			<div id="legend" style="background-image: linear-gradient(left , #FEE5D9 0%, #A50F14 100%);
