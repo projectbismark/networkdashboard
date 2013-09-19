@@ -811,18 +811,21 @@ def get_countries_vis_data(request):
 				record = record.replace(remove[i],'')
 			record = record.split(',')
 			# average:
-			entry.append(int(record[0]))
-			# count:
+			entry.append(float(record[0]))
+			# measurement count:
 			entry.append(float(record[1]))
 			# day
 			entry.append(record[2])
 			# country
-			data.append(record[3])
+			entry.append(record[3])
+			# device count:
+			entry.append(record[4])
+			data.append(entry)
 	f.close()
 	for c in countries:
 		if c==None or c=='':
 			continue
-		filtered = [(x,y,z) for x,y,z,r,s in data if r==c and z>start and z<end]
+		filtered = [(x,y,z,r,s) for x,y,z,r,s in data if r==c and z>start and z<end]
 		d_count - max(x[4] for x in filtered)
 		n_measurements = sum(x[1] for x in filtered)
 		average = sum((x[0]*x[1]/n_measurements) for x in filtered)
