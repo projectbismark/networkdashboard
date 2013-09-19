@@ -823,9 +823,10 @@ def get_countries_vis_data(request):
 			data.append(entry)
 	f.close()
 	for c in countries:
-		if c==None or c=='':
+		cc = c['country_code']
+		if cc==None or cc=='':
 			continue
-		filtered = [(x,y,z,r,s) for x,y,z,r,s in data if r==c and z>start and z<end]
+		filtered = [(x,y,z,r,s) for x,y,z,r,s in data if r==cc and z>start and z<end]
 		try:
 			d_count = max(x[4] for x in filtered)
 		except:
@@ -833,7 +834,7 @@ def get_countries_vis_data(request):
 		n_measurements = sum(x[1] for x in filtered)
 		average = sum((x[0]*x[1]/n_measurements) for x in filtered)
 		entry=[]
-		entry.append(c)
+		entry.append(cc)
 		entry.append(d_count)
 		entry.append(n_measurements)
 		entry.append(average)
