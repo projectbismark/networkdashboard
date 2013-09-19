@@ -830,7 +830,7 @@ def get_countries_vis_data(request):
 	#series_down = dict(name='Capacity Down', type='line', data=sorted_down)
 	#result.append(series_up)
 	#result.append(series_down)
-    return HttpResponse(json.dumps(ret))
+	return HttpResponse(json.dumps(ret))
 
 '''
 80	80	Web
