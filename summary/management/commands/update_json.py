@@ -271,23 +271,23 @@ def write_capacity_measurements():
 	
 def dump_all_latencies():
 	cursor = get_dict_cursor()
-	servers = IPResolver.objects.all()
+	servers = IpResolver.objects.all()
 	count = 0
 	t0 = datetime.now()
 	for s in servers:
-		filename = settings.PROJECT_ROOT + '/summary/measurements/server_averages/' + str(s['location'])
+		filename = settings.PROJECT_ROOT + '/summary/measurements/server_averages/' + str(s.location)
 		f = open(filename, 'w')
 		params = []
-		params.append(s['ip'])
+		params.append(s.ip)
 		SQL =  "SELECT \
-				country_code AS country \
+				country_code AS country, \
 				m_rtt.eventstamp::date AS day, \
 				count(distinct m_rtt.srcip) AS ndevices, \
 				count(*) AS nmeasurements, \
 				avg(m_rtt.average) AS latency \
 				FROM m_rtt \
 				JOIN devicedetails AS d ON d.ip = m_rtt.srcip \
-				WHERE m_rtt.dstip = %s AND m_rtt.average>0 AND m_rtt.average<3000  \
+				WHERE m_rtt.dstip = %s AND m_rtt.average>0 AND m_rtt.average<3000 AND country_code!=''  \
 				GROUP BY day, d.country_code;"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
@@ -303,7 +303,7 @@ def dump_all_latencies():
 		count += 1
 		t1 = datetime.now()
 		print t1-t0
-		print str(len(countries)-count) + " remaining"
+		print str(len(servers)-count) + " remaining"
 	cursor.close()
 	
 	
