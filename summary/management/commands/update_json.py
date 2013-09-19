@@ -297,7 +297,7 @@ def dump_all_latencies():
 			day = datetime_helper.datetime_to_JSON(r['day'])
 			country = r['country']
 			d_count = r['ndevices']
-			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + d_count + '\n'
+			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + str(d_count) + '\n'
 			f.write(line)
 		f.close()
 		count += 1
