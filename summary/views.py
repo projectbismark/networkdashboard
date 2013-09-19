@@ -826,6 +826,8 @@ def get_countries_vis_data(request):
 		cc = c['country_code']
 		if cc==None or cc=='':
 			continue
+		for i in range(0,len(remove)):
+				cc = cc.replace(remove[i],'')
 		filtered = [(x,y,z,r,s) for x,y,z,r,s in data if r==cc and z>start and z<end]
 		try:
 			d_count = max(x[4] for x in filtered)
