@@ -801,7 +801,7 @@ def get_countries_vis_data(request):
     # cursor.execute(query)
 	filename = settings.PROJECT_ROOT + '/summary/measurements/server_averages/' + server
 	# garbage characters to be removed:
-	remove = ')("\n'
+	remove = ')("\n '
 	f = open(filename, 'r')
 	with open(filename,'r') as f:
 		# each line represents one measurement record:
@@ -826,7 +826,10 @@ def get_countries_vis_data(request):
 		if c==None or c=='':
 			continue
 		filtered = [(x,y,z,r,s) for x,y,z,r,s in data if r==c and z>start and z<end]
-		d_count - max(x[4] for x in filtered)
+		try:
+			d_count = max(x[4] for x in filtered)
+		except:
+			continue
 		n_measurements = sum(x[1] for x in filtered)
 		average = sum((x[0]*x[1]/n_measurements) for x in filtered)
 		entry=[]
