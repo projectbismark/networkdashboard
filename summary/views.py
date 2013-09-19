@@ -772,19 +772,24 @@ def countries_vis(request):
 def get_countries_vis_data(request):
     startdate = request.GET.get('startdate')
     enddate = request.GET.get('enddate')
+	start = datetime_helper.datetime_to_JSON(startdate)
+	end = datetime_helper.datetime_to_JSON(enddate)
     server = request.GET.get('serverip')
-    cursor = connection.cursor()
-    query = "SELECT \
-                 country, \
-                 max(ndevices) AS devices, \
-                 sum(nmeasurements) AS measurements, \
-                 avg(latency) AS latency \
-             FROM cv_rtt \
-             WHERE server = '" + server + "' AND \
-             (day > '" + startdate + "' AND day < '" + enddate + "') \
-             GROUP BY country;"
-    cursor.execute(query)
-	filename = settings.PROJECT_ROOT + '/summary/measurements/capacity/' + device
+	countries = Devicedetails.objects.values('country_code').distinct()
+	data = []
+	ret = []
+    # cursor = connection.cursor()
+    # query = "SELECT \
+                 # country, \
+                 # max(ndevices) AS devices, \
+                 # sum(nmeasurements) AS measurements, \
+                 # avg(latency) AS latency \
+             # FROM cv_rtt \
+             # WHERE server = '" + server + "' AND \
+             # (day > '" + startdate + "' AND day < '" + enddate + "') \
+             # GROUP BY country;"
+    # cursor.execute(query)
+	filename = settings.PROJECT_ROOT + '/summary/measurements/server_averages/' + server
 	# garbage characters to be removed:
 	remove = ')("\n'
 	f = open(filename, 'r')
@@ -795,28 +800,37 @@ def get_countries_vis_data(request):
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
 			record = record.split(',')
-			# eventstamp:
-			entry.append(int(record[0]))
 			# average:
-			entry.append(float(record[1])*1000)
-			# direction:
+			entry.append(int(record[0]))
+			# count:
+			entry.append(float(record[1]))
+			# day
 			entry.append(record[2])
-			data.append(entry)
+			# country
+			data.append(record[3])
 	f.close()
+	for c in countries:
+		if c==None or c=='':
+			continue
+		filtered = [(x,y,z) for x,y,z,r,s in data if r==c and z>start and z<end]
+		d_count - max(x[4] for x in filtered)
+		n_measurements = sum(x[1] for x in filtered)
+		average = sum((x[0]*x[1]/n_measurements) for x in filtered)
+		entry=[]
+		entry.append(c)
+		entry.append(d_count)
+		entry.append(n_measurements)
+		entry.append(average)
+		ret.append(entry)
 	# sort by eventstamp:
-	sorted_data = sorted(data, key=lambda x: x[0])
-	sorted_up = [(x,y) for x,y,z in sorted_data if  z=='up']
-	sorted_down = [(x,y) for x,y,z in sorted_data if  z=='dw']
-	series_up = dict(name='Capacity Up', type='line', data=sorted_up)
-	series_down = dict(name='Capacity Down', type='line', data=sorted_down)
-	result.append(series_up)
-	result.append(series_down)
-    
-    def decimal_default(obj):
-        if isinstance(obj, decimal.Decimal):
-            return str(obj)
-
-    return HttpResponse(json.dumps(cursor.fetchall(), default=decimal_default))
+	#sorted_data = sorted(data, key=lambda x: x[0])
+	#sorted_up = [(x,y) for x,y,z in sorted_data if  z=='up']
+	#sorted_down = [(x,y) for x,y,z in sorted_data if  z=='dw']
+	#series_up = dict(name='Capacity Up', type='line', data=sorted_up)
+	#series_down = dict(name='Capacity Down', type='line', data=sorted_down)
+	#result.append(series_up)
+	#result.append(series_down)
+    return HttpResponse(json.dumps(ret))
 
 '''
 80	80	Web

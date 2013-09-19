@@ -275,7 +275,7 @@ def dump_all_latencies():
 	count = 0
 	t0 = datetime.now()
 	for s in servers:
-		filename = settings.PROJECT_ROOT + '/summary/measurements/server_averages/' + str(s.location)
+		filename = settings.PROJECT_ROOT + '/summary/measurements/server_averages/' + str(s.ip)
 		f = open(filename, 'w')
 		params = []
 		params.append(s.ip)
@@ -294,9 +294,10 @@ def dump_all_latencies():
 		for r in records:
 			avg = r['latency']
 			m_count = r['nmeasurements']
-			day = r['day']
+			day = datetime_helper.datetime_to_JSON(r['day'])
 			country = r['country']
-			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + '\n'
+			d_count = r['ndevices']
+			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + d_count + '\n'
 			f.write(line)
 		f.close()
 		count += 1
