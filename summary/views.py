@@ -770,11 +770,11 @@ def countries_vis(request):
     return render_to_response('countries_vis.html', {'server_list': server_list});
 
 def get_countries_vis_data(request):
-    startdate = request.GET.get('startdate')
-    enddate = request.GET.get('enddate')
+	startdate = request.GET.get('startdate')
+	enddate = request.GET.get('enddate')
 	start = datetime_helper.datetime_to_JSON(startdate)
 	end = datetime_helper.datetime_to_JSON(enddate)
-    server = request.GET.get('serverip')
+	server = request.GET.get('serverip')
 	countries = Devicedetails.objects.values('country_code').distinct()
 	data = []
 	ret = []
