@@ -782,8 +782,8 @@ def get_countries_vis_data(request):
 	enddate = request.GET.get('enddate')
 	startdate = datetime_helper.format_date_from_calendar(startdate)
 	enddate = datetime_helper.format_date_from_calendar(enddate)
-	start = datetime_helper.datetime_to_JSON(startdate)
-	end = datetime_helper.datetime_to_JSON(enddate)
+	start = int(datetime_helper.datetime_to_JSON(startdate))
+	end = int(datetime_helper.datetime_to_JSON(enddate))
 	server = request.GET.get('serverip')
 	countries = Devicedetails.objects.values('country_code').distinct()
 	data = []
@@ -815,7 +815,7 @@ def get_countries_vis_data(request):
 			# measurement count:
 			entry.append(float(record[1]))
 			# day
-			entry.append(record[2])
+			entry.append(int(record[2]))
 			# country
 			entry.append(record[3])
 			# device count:
