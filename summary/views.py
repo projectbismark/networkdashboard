@@ -802,7 +802,6 @@ def get_countries_vis_data(request):
 	filename = settings.PROJECT_ROOT + '/summary/measurements/server_averages/' + server
 	# garbage characters to be removed:
 	remove = ')("\n '
-	f = open(filename, 'r')
 	with open(filename,'r') as f:
 		# each line represents one measurement record:
 		for record in f:

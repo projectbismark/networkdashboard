@@ -944,6 +944,66 @@ def parse_lmrtt_compare(device,earliest,latest,sort):
 	result.append(m_avg)
 	result.append(data)
 	return result
+
+def parse_bitrate_city_average(start_date,end_date,city,direction):
+	data = []
+	ret = []
+	start = int(datetime_helper.datetime_to_JSON(start_date))
+	end = int(datetime_helper.datetime_to_JSON(end_date))
+	isps = Devicedetails.objects.values('geoip_isp').distinct()
+	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate_averages/city'
+	# garbage characters to be removed:
+	remove = ')("\n '
+	with open(filename,'r') as f:
+		# each line represents one measurement record:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# average:
+			entry.append(float(record[0]))
+			# measurement count:
+			entry.append(float(record[1]))
+			# day
+			entry.append(int(record[2]))
+			# city
+			entry.append(record[3])
+			# device count:
+			entry.append(record[4])
+			# direction
+			entry.append(record[5])
+			data.append(entry)
+	f.close()
+	for c in countries:
+		cc = c['country_code']
+		if cc==None or cc=='':
+			continue
+		for i in range(0,len(remove)):
+				cc = cc.replace(remove[i],'')
+		filtered = [(x,y,z,r,s) for x,y,z,r,s in data if r==cc and z>start and z<end]
+		try:
+			d_count = max(x[4] for x in filtered)
+		except:
+			continue
+		n_measurements = sum(x[1] for x in filtered)
+		average = sum((x[0]*x[1]/n_measurements) for x in filtered)
+		entry=[]
+		entry.append(cc)
+		entry.append(d_count)
+		entry.append(n_measurements)
+		entry.append(average)
+		ret.append(entry)
+	return HttpResponse(json.dumps(ret))
+def parse_lmrtt_country_average(country):
+def parse_rtt_isp_average(isp):
+def parse_bitrate_city_average(city):
+def parse_lmrtt_country_average(country):
+def parse_rtt_isp_average(isp):
+def parse_bitrate_city_average(city):
+def parse_lmrtt_country_average(country):
+def parse_rtt_isp_average(isp):
+
 	
 def parse_bitrate_compare(device,earliest,latest,sort,dir):
 	result = []
