@@ -250,7 +250,7 @@ def write_lmrtt_city_averages():
 			JOIN devicedetails AS d ON d.ip = m_lmrtt.srcip \
 			WHERE m_lmrtt.average>0 AND m_lmrtt.average<3000 AND geoip_city!=''  \
 			GROUP BY day, d.geoip_city;"
-	cursor.execute(SQL,params)
+	cursor.execute(SQL)
 	records = cursor.fetchall()
 	for r in records:
 		avg = r['latency']
@@ -282,7 +282,7 @@ def write_bitrate_city_averages():
 			JOIN devicedetails AS d ON d.ip = m_bitrate.srcip \
 			WHERE m_bitrate.average>0 AND geoip_city!='' AND toolid='NETPERF_3'  \
 			GROUP BY day, d.geoip_city;"
-	cursor.execute(SQL,params)
+	cursor.execute(SQL)
 	records = cursor.fetchall()
 	for r in records:
 		avg = r['bitrate']
@@ -291,7 +291,7 @@ def write_bitrate_city_averages():
 		city = r['city']
 		d_count = r['ndevices']
 		dir = r['dir']
-		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city + ',' + str(d_count) + ',' + dir '\n'
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city + ',' + str(d_count) + ',' + dir + '\n'
 		f.write(line)
 	f.close()
 	t1 = datetime.now()
@@ -348,7 +348,7 @@ def write_lmrtt_isp_averages():
 			JOIN devicedetails AS d ON d.ip = m_lmrtt.srcip \
 			WHERE m_lmrtt.average>0 AND m_lmrtt.average<3000 AND geoip_isp!=''  \
 			GROUP BY day, d.geoip_isp;"
-	cursor.execute(SQL,params)
+	cursor.execute(SQL)
 	records = cursor.fetchall()
 	for r in records:
 		avg = r['latency']
@@ -380,7 +380,7 @@ def write_bitrate_isp_averages():
 			JOIN devicedetails AS d ON d.ip = m_bitrate.srcip \
 			WHERE m_bitrate.average>0 AND geoip_isp!='' AND toolid='NETPERF_3'  \
 			GROUP BY day, d.geoip_isp;"
-	cursor.execute(SQL,params)
+	cursor.execute(SQL)
 	records = cursor.fetchall()
 	for r in records:
 		avg = r['latency']
