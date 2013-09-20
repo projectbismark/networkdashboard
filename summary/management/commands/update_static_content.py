@@ -10,7 +10,7 @@ import psycopg2.extras
 import time
 from django.core import serializers
 import sys
-#import fcntl
+import fcntl
 
 class UpdateLock:
 	def __init__(self, filename):
@@ -36,8 +36,8 @@ class Command(NoArgsCommand):
 		update_json()
 	
 def update_json():
-	# lock = UpdateLock('/tmp/UpdateLock.tmp')
-	# if (lock.acquire()):
+	lock = UpdateLock('/tmp/UpdateLock.tmp')
+	if (lock.acquire()):
 	# all_devices = Devicedetails.objects.all().values('deviceid')
 	# count = 0
 	# t0 = datetime.now()
@@ -54,29 +54,28 @@ def update_json():
 		# t1 = datetime.now()
 		# print t1-t0
 		# print str(len(all_devices)-count) + " remaining"
-	#rite_rtt_measurements()
-	#write_lmrtt_measurements()
-	#write_bitrate_measurements()
-	#write_shaperate_measurements()
-	#write_underload_measurements()
-	#write_capacity_measurements()
-	#dump_all_latencies()
-	write_rtt_city_averages()
-	write_lmrtt_city_averages()
-	write_bitrate_city_averages()
-	write_rtt_country_averages()
-	write_lmrtt_country_averages()
-	write_bitrate_country_averages()
-	write_rtt_isp_averages()
-	write_lmrtt_isp_averages()
-	write_bitrate_isp_averages()
+		write_rtt_measurements()
+		write_lmrtt_measurements()
+		write_bitrate_measurements()
+		write_shaperate_measurements()
+		write_underload_measurements()
+		write_capacity_measurements()
+		dump_all_latencies()
+		# write_rtt_city_averages()
+		# write_lmrtt_city_averages()
+		# write_bitrate_city_averages()
+		# write_rtt_country_averages()
+		# write_lmrtt_country_averages()
+		# write_bitrate_country_averages()
+		# write_rtt_isp_averages()
+		# write_lmrtt_isp_averages()
+		# write_bitrate_isp_averages()
 	return
 
 def write_rtt_measurements():
 	devices = Devicedetails.objects.all()
 	cursor = get_dict_cursor()
 	count = 0
-	t0 = datetime.now()
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
 		filename = settings.PROJECT_ROOT + '/summary/measurements/rtt/' + device2
@@ -98,15 +97,12 @@ def write_rtt_measurements():
 		f.close()
 		count += 1
 		t1 = datetime.now()
-		print t1-t0
-		print str(len(devices)-count) + " remaining"
 	cursor.close()
 	return
 	
 def write_rtt_country_averages():
 	dstip='8.8.8.8'
 	cursor = get_dict_cursor()
-	t0 = datetime.now()
 	filename = settings.PROJECT_ROOT + '/summary/measurements/rtt_averages/country'
 	f = open(filename, 'w')
 	params = []
@@ -132,14 +128,11 @@ def write_rtt_country_averages():
 		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + str(d_count) + '\n'
 		f.write(line)
 	f.close()
-	t1 = datetime.now()
-	print t1-t0
 	cursor.close()
 	return
 	
 def write_lmrtt_country_averages():
 	cursor = get_dict_cursor()
-	t0 = datetime.now()
 	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt_averages/country'
 	f = open(filename, 'w')
 	SQL =  "SELECT \
@@ -163,14 +156,11 @@ def write_lmrtt_country_averages():
 		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + str(d_count) + '\n'
 		f.write(line)
 	f.close()
-	t1 = datetime.now()
-	print t1-t0
 	cursor.close()
 	return
 
 def write_bitrate_country_averages():
 	cursor = get_dict_cursor()
-	t0 = datetime.now()
 	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate_averages/country'
 	f = open(filename, 'w')
 	SQL =  "SELECT \
@@ -199,15 +189,12 @@ def write_bitrate_country_averages():
 		except:
 			continue
 	f.close()
-	t1 = datetime.now()
-	print t1-t0
 	cursor.close()
 	return
 
 def write_rtt_city_averages():
 	dstip='8.8.8.8'
 	cursor = get_dict_cursor()
-	t0 = datetime.now()
 	filename = settings.PROJECT_ROOT + '/summary/measurements/rtt_averages/city'
 	f = open(filename, 'w')
 	params = []
@@ -233,14 +220,11 @@ def write_rtt_city_averages():
 		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city + ',' + str(d_count) + '\n'
 		f.write(line)
 	f.close()
-	t1 = datetime.now()
-	print t1-t0
 	cursor.close()
 	return
 
 def write_lmrtt_city_averages():
 	cursor = get_dict_cursor()
-	t0 = datetime.now()
 	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt_averages/city'
 	f = open(filename, 'w')
 	SQL =  "SELECT \
@@ -264,14 +248,11 @@ def write_lmrtt_city_averages():
 		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city + ',' + str(d_count) + '\n'
 		f.write(line)
 	f.close()
-	t1 = datetime.now()
-	print t1-t0
 	cursor.close()
 	return
 
 def write_bitrate_city_averages():
 	cursor = get_dict_cursor()
-	t0 = datetime.now()
 	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate_averages/city'
 	f = open(filename, 'w')
 	SQL =  "SELECT \
@@ -300,15 +281,12 @@ def write_bitrate_city_averages():
 		except:
 			continue
 	f.close()
-	t1 = datetime.now()
-	print t1-t0
 	cursor.close()
 	return
 	
 def write_rtt_isp_averages():
 	dstip='8.8.8.8'
 	cursor = get_dict_cursor()
-	t0 = datetime.now()
 	filename = settings.PROJECT_ROOT + '/summary/measurements/rtt_averages/isp'
 	f = open(filename, 'w')
 	params = []
@@ -334,14 +312,11 @@ def write_rtt_isp_averages():
 		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp + ',' + str(d_count) + '\n'
 		f.write(line)
 	f.close()
-	t1 = datetime.now()
-	print t1-t0
 	cursor.close()
 	return
 
 def write_lmrtt_isp_averages():
 	cursor = get_dict_cursor()
-	t0 = datetime.now()
 	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt_averages/isp'
 	f = open(filename, 'w')
 	SQL =  "SELECT \
@@ -365,14 +340,11 @@ def write_lmrtt_isp_averages():
 		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp + ',' + str(d_count) + '\n'
 		f.write(line)
 	f.close()
-	t1 = datetime.now()
-	print t1-t0
 	cursor.close()
 	return
 
 def write_bitrate_isp_averages():
 	cursor = get_dict_cursor()
-	t0 = datetime.now()
 	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate_averages/isp'
 	f = open(filename, 'w')
 	SQL =  "SELECT \
@@ -401,8 +373,6 @@ def write_bitrate_isp_averages():
 		except:
 			continue
 	f.close()
-	t1 = datetime.now()
-	print t1-t0
 	cursor.close()
 	return
 
@@ -410,7 +380,6 @@ def write_lmrtt_measurements():
 	devices = Devicedetails.objects.all()
 	cursor = get_dict_cursor()
 	count = 0
-	t0 = datetime.now()
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
 		filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt/' + device2
@@ -431,16 +400,12 @@ def write_lmrtt_measurements():
 		f.close()
 		count += 1
 		t1 = datetime.now()
-		print t1-t0
-		print str(len(devices)-count) + " remaining"
 	cursor.close()
 	return
 
 def write_bitrate_measurements():
 	devices = Devicedetails.objects.all()
 	cursor = get_dict_cursor()
-	count = 0
-	t0 = datetime.now()
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
 		filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate/' + device2
@@ -463,18 +428,12 @@ def write_bitrate_measurements():
 			line = str(eventstamp) + ',' + str(avg) + ',' + str(direction) + ',' + str(toolid) + '\n'
 			f.write(line)
 		f.close()
-		count += 1
-		t1 = datetime.now()
-		print t1-t0
-		print str(len(devices)-count) + " remaining"
 	cursor.close()
 	return
 	
 def write_shaperate_measurements():
 	devices = Devicedetails.objects.all()
 	cursor = get_dict_cursor()
-	count = 0
-	t0 = datetime.now()
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
 		filename = settings.PROJECT_ROOT + '/summary/measurements/shaperate/' + device2
@@ -496,18 +455,12 @@ def write_shaperate_measurements():
 			line = str(eventstamp) + ',' + str(avg) + ',' + str(direction) + '\n'
 			f.write(line)
 		f.close()
-		count += 1
-		t1 = datetime.now()
-		print t1-t0
-		print str(len(devices)-count) + " remaining"
 	cursor.close()
 	return
 	
 def write_underload_measurements():
 	devices = Devicedetails.objects.all()
 	cursor = get_dict_cursor()
-	count = 0
-	t0 = datetime.now()
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
 		filename = settings.PROJECT_ROOT + '/summary/measurements/underload/' + device2
@@ -543,10 +496,6 @@ def write_underload_measurements():
 			line = str(eventstamp) + ',' + str(avg) + ',' + str(direction) + '\n'
 			f.write(line)
 		f.close()
-		count += 1
-		t1 = datetime.now()
-		print t1-t0
-		print str(len(devices)-count) + " remaining"
 	cursor.close()
 	return
 	
@@ -574,18 +523,12 @@ def write_capacity_measurements():
 			line = str(eventstamp) + ',' + str(avg) + ',' + direction + '\n'
 			f.write(line)
 		f.close()
-		count += 1
-		t1 = datetime.now()
-		print t1-t0
-		print str(len(devices)-count) + " remaining"
 	cursor.close()
 	return
 	
 def dump_all_latencies():
 	cursor = get_dict_cursor()
 	servers = IpResolver.objects.all()
-	count = 0
-	t0 = datetime.now()
 	for s in servers:
 		filename = settings.PROJECT_ROOT + '/summary/measurements/server_averages/' + str(s.ip)
 		f = open(filename, 'w')
@@ -612,10 +555,6 @@ def dump_all_latencies():
 			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + str(d_count) + '\n'
 			f.write(line)
 		f.close()
-		count += 1
-		t1 = datetime.now()
-		print t1-t0
-		print str(len(servers)-count) + " remaining"
 	cursor.close()
 	return
 	
