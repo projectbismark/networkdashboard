@@ -9,6 +9,7 @@ import sys
 class Command(NoArgsCommand):
 	def handle_noargs(self, **options):
 		update_devicedetails()
+		update_server_locs()
 	
 def update_devicedetails():
 	devices = Devicedetails.objects.all()
