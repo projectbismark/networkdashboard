@@ -28,7 +28,7 @@
 
 			<fieldset>
 			  <div class="control-group">
-			    <label class="control-label" for="daterange">Select date range:</label>
+			    <label class="control-label" for="daterange">Date Range:</label>
 			    <div class="controls">
 			      <div class="input-prepend">
 				<span class="add-on"><i class="icon-calendar"></i></span><input type="text" name="reserveation" id="calendar" value="{{start_year}}-{{start_month}}-{{start_day}}   to  {{end_year}}-{{end_month}}-{{end_day}}" />
@@ -40,7 +40,7 @@
 			</fieldset>
 			<table class="table table-striped table-condensed">
 				<tr>
-					<td> Measurment server: </td>
+					<td> Measurement server: </td>
 					<td class="right">
 					<select id="serverselector">
 						{% for server in server_list %}

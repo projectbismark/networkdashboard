@@ -91,10 +91,10 @@ function drawRegionsMap(response, server_index) {
             countryName = el.html().replace(/<(?:.|\n)*?>/gm, '');
 	    
 	    if (condetail[code] != null)
-		el.html("<b>" + countryName + "</b><br/><br/>Median latency: " + Math.round(condetail[code]['latency']) + " ms<br/>Measured from " + condetail[code]['ndevices'] + " device(s)<br/>" + condetail[code]['nmeasurements'] + " measurements were taken<br/><br/>Click for details");
+		el.html("<b>" + countryName + "</b><br/><br/>Average Latency: " + Math.round(condetail[code]['latency']) + " ms<br/>" + condetail[code]['ndevices'] + " device(s)<br/>" + condetail[code]['nmeasurements'] + " Measurements<br/><br/>Click for details");
 
 	    else
-		el.html("<b>" + countryName + "</b><br/><br/>Sorry, we do not have enough devices in this country");
+		el.html("<b>" + countryName + "</b><br/><br/>Not enough measurements for devices in this country, in this date range");
         }
     });
 
