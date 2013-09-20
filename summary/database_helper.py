@@ -979,12 +979,13 @@ def parse_bitrate_compare(device,earliest,latest,sort,dir):
 		data = sorted(data, key=lambda x: x[0])
 	# apply filtering:
 	data = [(x,y) for x,y,z,t in data if (x>earliest and x<latest and z==dir and t=='NETPERF_3')]
-	m_count = len(data)
-	m_avg = avg([d[1] for d in data])
-	result.append(m_count)
-	result.append(m_avg)
-	result.append(data)
-	return result
+	#m_count = len(data)
+	#m_avg = avg([d[1] for d in data])
+	#result.append(m_count)
+	#result.append(m_avg)
+	#result.append(data)
+	#return result
+	return data
 	
 # returns bitrate series for the given device:	
 def parse_bitrate_measurements(device, dir):

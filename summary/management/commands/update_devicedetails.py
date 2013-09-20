@@ -45,7 +45,7 @@ def update_devicedetails():
 		d.save()
 	return
 	
-def update_server_locs()
+def update_server_locs():
 	servers = IpResolver.objects.all()
 	for s in servers:
 		lat = geoip_helper.get_latitude_by_ip(s.ip)

@@ -14,6 +14,19 @@
 input#calendar{
 	height:18px;
 }
+#legend_key{
+	width:300px;
+	font-size: 80%; 
+	color: #777;
+}
+
+#legend_key_left{
+	float:left;
+}
+
+#legend_key_right{
+	float:right;
+}
 
 body { 
     background-color: #ddd;
