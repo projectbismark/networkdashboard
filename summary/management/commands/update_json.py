@@ -193,6 +193,8 @@ def write_bitrate_country_averages():
 		country = r['country']
 		d_count = r['ndevices']
 		dir = r['dir']
+		if dir==None or dir =='':
+			continue
 		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + str(d_count) + ',' + dir + '\n'
 		f.write(line)
 	f.close()
@@ -285,17 +287,16 @@ def write_bitrate_city_averages():
 	cursor.execute(SQL)
 	records = cursor.fetchall()
 	for r in records:
-		try:
-			avg = r['bitrate']
-			m_count = r['nmeasurements']
-			day = datetime_helper.datetime_to_JSON(r['day'])
-			city = r['city']
-			d_count = r['ndevices']
-			dir = r['dir']
-			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city + ',' + str(d_count) + ',' + dir + '\n'
-			f.write(line)
-		except:
+		avg = r['bitrate']
+		m_count = r['nmeasurements']
+		day = datetime_helper.datetime_to_JSON(r['day'])
+		city = r['city']
+		d_count = r['ndevices']
+		dir = r['dir']
+		if dir==None or dir=='':
 			continue
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city + ',' + str(d_count) + ',' + dir + '\n'
+		f.write(line)
 	f.close()
 	t1 = datetime.now()
 	print t1-t0
@@ -392,6 +393,8 @@ def write_bitrate_isp_averages():
 		isp = r['isp']
 		d_count = r['ndevices']
 		dir = r['dir']
+		if dir==None or dir=='':
+			continue
 		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp + ',' + str(d_count) + ',' + dir + '\n'
 		f.write(line)
 	f.close()
