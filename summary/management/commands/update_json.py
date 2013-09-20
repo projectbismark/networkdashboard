@@ -183,7 +183,7 @@ def write_bitrate_country_averages():
 			FROM m_bitrate \
 			JOIN devicedetails AS d ON d.ip = m_bitrate.srcip \
 			WHERE  m_bitrate.average>0 AND geoip_country!='' AND toolid='NETPERF_3'  \
-			GROUP BY day, d.geoip_country;"
+			GROUP BY day, d.geoip_country, dir;"
 	cursor.execute(SQL)
 	records = cursor.fetchall()
 	for r in records:
@@ -281,7 +281,7 @@ def write_bitrate_city_averages():
 			FROM m_bitrate \
 			JOIN devicedetails AS d ON d.ip = m_bitrate.srcip \
 			WHERE m_bitrate.average>0 AND geoip_city!='' AND toolid='NETPERF_3'  \
-			GROUP BY day, d.geoip_city;"
+			GROUP BY day, d.geoip_city, dir;"
 	cursor.execute(SQL)
 	records = cursor.fetchall()
 	for r in records:
@@ -379,7 +379,7 @@ def write_bitrate_isp_averages():
 			FROM m_bitrate \
 			JOIN devicedetails AS d ON d.ip = m_bitrate.srcip \
 			WHERE m_bitrate.average>0 AND geoip_isp!='' AND toolid='NETPERF_3'  \
-			GROUP BY day, d.geoip_isp;"
+			GROUP BY day, d.geoip_isp, dir;"
 	cursor.execute(SQL)
 	records = cursor.fetchall()
 	for r in records:
