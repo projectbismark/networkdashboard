@@ -150,7 +150,7 @@ def write_lmrtt_country_averages():
 			avg(m_lmrtt.average) AS latency \
 			FROM m_lmrtt \
 			JOIN devicedetails AS d ON d.ip = m_lmrtt.srcip \
-			WHERE m_lmrtt.average>0 AND m_rtt.average<3000 AND geoip_country!=''  \
+			WHERE m_lmrtt.average>0 AND m_lmrtt.average<3000 AND geoip_country!=''  \
 			GROUP BY day, d.geoip_country;"
 	cursor.execute(SQL)
 	records = cursor.fetchall()
