@@ -104,7 +104,7 @@ function drawRegionsMap(response, server_index) {
 
 $(document).ready(function() {
     $('#enddate').val(moment().endOf('day').format('YYYY-MM-DD'));
-    $('#daterange').daterangepicker(
+    $('#calendar').daterangepicker(
 	{
 	    format : 'YYYY-MM-DD',
 	    startDate : $('#startdate').val(),
