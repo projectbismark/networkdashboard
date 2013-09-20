@@ -60,7 +60,16 @@ def update_json():
 	#write_shaperate_measurements()
 	#write_underload_measurements()
 	#write_capacity_measurements()
-	dump_all_latencies()
+	#dump_all_latencies()
+	write_rtt_city_averages()
+	write_lmrtt_city_averages()
+	write_bitrate_city_averages()
+	write_rtt_country_averages()
+	write_lmrtt_country_averages()
+	write_bitrate_country_averages()
+	write_rtt_isp_averages()
+	write_lmrtt_isp_averages()
+	write_bitrate_isp_averages()
 	return
 
 def write_rtt_measurements():
@@ -91,6 +100,300 @@ def write_rtt_measurements():
 		t1 = datetime.now()
 		print t1-t0
 		print str(len(devices)-count) + " remaining"
+	cursor.close()
+	return
+	
+def write_rtt_country_averages():
+	dstip='8.8.8.8'
+	cursor = get_dict_cursor()
+	t0 = datetime.now()
+	filename = settings.PROJECT_ROOT + '/summary/measurements/rtt_averages/country'
+	f = open(filename, 'w')
+	params = []
+	params.append(dstip)
+	SQL =  "SELECT \
+			geoip_country AS country, \
+			m_rtt.eventstamp::date AS day, \
+			count(distinct m_rtt.srcip) AS ndevices, \
+			count(*) AS nmeasurements, \
+			avg(m_rtt.average) AS latency \
+			FROM m_rtt \
+			JOIN devicedetails AS d ON d.ip = m_rtt.srcip \
+			WHERE m_rtt.dstip = %s AND m_rtt.average>0 AND m_rtt.average<3000 AND geoip_country!=''  \
+			GROUP BY day, d.geoip_country;"
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	for r in records:
+		avg = r['latency']
+		m_count = r['nmeasurements']
+		day = datetime_helper.datetime_to_JSON(r['day'])
+		country = r['country']
+		d_count = r['ndevices']
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + str(d_count) + '\n'
+		f.write(line)
+	f.close()
+	t1 = datetime.now()
+	print t1-t0
+	cursor.close()
+	return
+	
+def write_lmrtt_country_averages():
+	cursor = get_dict_cursor()
+	t0 = datetime.now()
+	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt_averages/country'
+	f = open(filename, 'w')
+	SQL =  "SELECT \
+			geoip_country AS country, \
+			m_lmrtt.eventstamp::date AS day, \
+			count(distinct m_lmrtt.srcip) AS ndevices, \
+			count(*) AS nmeasurements, \
+			avg(m_lmrtt.average) AS latency \
+			FROM m_lmrtt \
+			JOIN devicedetails AS d ON d.ip = m_lmrtt.srcip \
+			WHERE m_lmrtt.average>0 AND m_rtt.average<3000 AND geoip_country!=''  \
+			GROUP BY day, d.geoip_country;"
+	cursor.execute(SQL)
+	records = cursor.fetchall()
+	for r in records:
+		avg = r['latency']
+		m_count = r['nmeasurements']
+		day = datetime_helper.datetime_to_JSON(r['day'])
+		country = r['country']
+		d_count = r['ndevices']
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + str(d_count) + '\n'
+		f.write(line)
+	f.close()
+	t1 = datetime.now()
+	print t1-t0
+	cursor.close()
+	return
+
+def write_bitrate_country_averages():
+	cursor = get_dict_cursor()
+	t0 = datetime.now()
+	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate_averages/country'
+	f = open(filename, 'w')
+	SQL =  "SELECT \
+			direction AS dir, \
+			geoip_country AS country, \
+			m_bitrate.eventstamp::date AS day, \
+			count(distinct m_bitrate.srcip) AS ndevices, \
+			count(*) AS nmeasurements, \
+			avg(m_bitrate.average) AS bitrate \
+			FROM m_bitrate \
+			JOIN devicedetails AS d ON d.ip = m_bitrate.srcip \
+			WHERE  m_bitrate.average>0 AND geoip_country!='' AND toolid='NETPERF_3'  \
+			GROUP BY day, d.geoip_country;"
+	cursor.execute(SQL)
+	records = cursor.fetchall()
+	for r in records:
+		avg = r['bitrate']
+		m_count = r['nmeasurements']
+		day = datetime_helper.datetime_to_JSON(r['day'])
+		country = r['country']
+		d_count = r['ndevices']
+		dir = r['dir']
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + str(d_count) + ',' + dir + '\n'
+		f.write(line)
+	f.close()
+	t1 = datetime.now()
+	print t1-t0
+	cursor.close()
+	return
+
+def write_rtt_city_averages():
+	dstip='8.8.8.8'
+	cursor = get_dict_cursor()
+	t0 = datetime.now()
+	filename = settings.PROJECT_ROOT + '/summary/measurements/rtt_averages/city'
+	f = open(filename, 'w')
+	params = []
+	params.append(dstip)
+	SQL =  "SELECT \
+			geoip_city AS city, \
+			m_rtt.eventstamp::date AS day, \
+			count(distinct m_rtt.srcip) AS ndevices, \
+			count(*) AS nmeasurements, \
+			avg(m_rtt.average) AS latency \
+			FROM m_rtt \
+			JOIN devicedetails AS d ON d.ip = m_rtt.srcip \
+			WHERE m_rtt.dstip = %s AND m_rtt.average>0 AND m_rtt.average<3000 AND geoip_city!=''  \
+			GROUP BY day, d.geoip_city;"
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	for r in records:
+		avg = r['latency']
+		m_count = r['nmeasurements']
+		day = datetime_helper.datetime_to_JSON(r['day'])
+		city = r['city']
+		d_count = r['ndevices']
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city + ',' + str(d_count) + '\n'
+		f.write(line)
+	f.close()
+	t1 = datetime.now()
+	print t1-t0
+	cursor.close()
+	return
+
+def write_lmrtt_city_averages():
+	cursor = get_dict_cursor()
+	t0 = datetime.now()
+	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt_averages/city'
+	f = open(filename, 'w')
+	SQL =  "SELECT \
+			geoip_city AS city, \
+			m_lmrtt.eventstamp::date AS day, \
+			count(distinct m_lmrtt.srcip) AS ndevices, \
+			count(*) AS nmeasurements, \
+			avg(m_lmrtt.average) AS latency \
+			FROM m_lmrtt \
+			JOIN devicedetails AS d ON d.ip = m_lmrtt.srcip \
+			WHERE m_lmrtt.average>0 AND m_lmrtt.average<3000 AND geoip_city!=''  \
+			GROUP BY day, d.geoip_city;"
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	for r in records:
+		avg = r['latency']
+		m_count = r['nmeasurements']
+		day = datetime_helper.datetime_to_JSON(r['day'])
+		city = r['city']
+		d_count = r['ndevices']
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city + ',' + str(d_count) + '\n'
+		f.write(line)
+	f.close()
+	t1 = datetime.now()
+	print t1-t0
+	cursor.close()
+	return
+
+def write_bitrate_city_averages():
+	cursor = get_dict_cursor()
+	t0 = datetime.now()
+	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate_averages/city'
+	f = open(filename, 'w')
+	SQL =  "SELECT \
+			direction AS dir,\
+			geoip_city AS city, \
+			m_bitrate.eventstamp::date AS day, \
+			count(distinct m_bitrate.srcip) AS ndevices, \
+			count(*) AS nmeasurements, \
+			avg(m_bitrate.average) AS bitrate \
+			FROM m_bitrate \
+			JOIN devicedetails AS d ON d.ip = m_bitrate.srcip \
+			WHERE m_bitrate.average>0 AND geoip_city!='' AND toolid='NETPERF_3'  \
+			GROUP BY day, d.geoip_city;"
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	for r in records:
+		avg = r['bitrate']
+		m_count = r['nmeasurements']
+		day = datetime_helper.datetime_to_JSON(r['day'])
+		city = r['city']
+		d_count = r['ndevices']
+		dir = r['dir']
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city + ',' + str(d_count) + ',' + dir '\n'
+		f.write(line)
+	f.close()
+	t1 = datetime.now()
+	print t1-t0
+	cursor.close()
+	return
+	
+def write_rtt_isp_averages():
+	dstip='8.8.8.8'
+	cursor = get_dict_cursor()
+	t0 = datetime.now()
+	filename = settings.PROJECT_ROOT + '/summary/measurements/rtt_averages/isp'
+	f = open(filename, 'w')
+	params = []
+	params.append(dstip)
+	SQL =  "SELECT \
+			geoip_isp AS isp , \
+			m_rtt.eventstamp::date AS day, \
+			count(distinct m_rtt.srcip) AS ndevices, \
+			count(*) AS nmeasurements, \
+			avg(m_rtt.average) AS latency \
+			FROM m_rtt \
+			JOIN devicedetails AS d ON d.ip = m_rtt.srcip \
+			WHERE m_rtt.dstip = %s AND m_rtt.average>0 AND m_rtt.average<3000 AND geoip_isp!=''  \
+			GROUP BY day, d.geoip_isp;"
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	for r in records:
+		avg = r['latency']
+		m_count = r['nmeasurements']
+		day = datetime_helper.datetime_to_JSON(r['day'])
+		isp = r['isp']
+		d_count = r['ndevices']
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp + ',' + str(d_count) + '\n'
+		f.write(line)
+	f.close()
+	t1 = datetime.now()
+	print t1-t0
+	cursor.close()
+	return
+
+def write_lmrtt_isp_averages():
+	cursor = get_dict_cursor()
+	t0 = datetime.now()
+	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt_averages/isp'
+	f = open(filename, 'w')
+	SQL =  "SELECT \
+			geoip_isp AS isp , \
+			m_lmrtt.eventstamp::date AS day, \
+			count(distinct m_lmrtt.srcip) AS ndevices, \
+			count(*) AS nmeasurements, \
+			avg(m_lmrtt.average) AS latency \
+			FROM m_lmrtt \
+			JOIN devicedetails AS d ON d.ip = m_lmrtt.srcip \
+			WHERE m_lmrtt.average>0 AND m_lmrtt.average<3000 AND geoip_isp!=''  \
+			GROUP BY day, d.geoip_isp;"
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	for r in records:
+		avg = r['latency']
+		m_count = r['nmeasurements']
+		day = datetime_helper.datetime_to_JSON(r['day'])
+		isp = r['isp']
+		d_count = r['ndevices']
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp + ',' + str(d_count) + '\n'
+		f.write(line)
+	f.close()
+	t1 = datetime.now()
+	print t1-t0
+	cursor.close()
+	return
+
+def write_bitrate_isp_averages():
+	cursor = get_dict_cursor()
+	t0 = datetime.now()
+	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate_averages/isp'
+	f = open(filename, 'w')
+	SQL =  "SELECT \
+			direction AS dir, \
+			geoip_isp AS isp , \
+			m_bitrate.eventstamp::date AS day, \
+			count(distinct m_bitrate.srcip) AS ndevices, \
+			count(*) AS nmeasurements, \
+			avg(m_bitrate.average) AS latency \
+			FROM m_bitrate \
+			JOIN devicedetails AS d ON d.ip = m_bitrate.srcip \
+			WHERE m_bitrate.average>0 AND geoip_isp!='' AND toolid='NETPERF_3'  \
+			GROUP BY day, d.geoip_isp;"
+	cursor.execute(SQL,params)
+	records = cursor.fetchall()
+	for r in records:
+		avg = r['latency']
+		m_count = r['nmeasurements']
+		day = datetime_helper.datetime_to_JSON(r['day'])
+		isp = r['isp']
+		d_count = r['ndevices']
+		dir = r['dir']
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp + ',' + str(d_count) + ',' + dir + '\n'
+		f.write(line)
+	f.close()
+	t1 = datetime.now()
+	print t1-t0
 	cursor.close()
 	return
 
@@ -305,6 +608,7 @@ def dump_all_latencies():
 		print t1-t0
 		print str(len(servers)-count) + " remaining"
 	cursor.close()
+	return
 	
 	
 def get_dict_cursor():
