@@ -689,7 +689,7 @@ def linegraph_rtt(request):
 	data = database_helper.parse_rtt_measurements(device)
 	return HttpResponse(json.dumps(data))
 	
-def linegraph_underload(request):
+def linegraph_unload(request):
 	device = request.GET.get('deviceid')
 	data = database_helper.parse_underload_measurements(device)
 	return HttpResponse(json.dumps(data))
@@ -739,13 +739,13 @@ def linegraph_shaperate(request):
 	return HttpResponse(json.dumps(data))	
 	
 	
-def linegraph_unload(request):
-	data = []
-	device = request.GET.get('deviceid')
-	cached_unload = JsonCache.objects.filter(deviceid=device, datatype='unload')
-	if len(cached_unload)!=0:
-		data = cached_unload[0].data
-	return HttpResponse(data)
+# def linegraph_unload(request):
+	# data = []
+	# device = request.GET.get('deviceid')
+	# cached_unload = JsonCache.objects.filter(deviceid=device, datatype='unload')
+	# if len(cached_unload)!=0:
+		# data = cached_unload[0].data
+	# return HttpResponse(data)
 	
   
 def feedback(request):
