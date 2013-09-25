@@ -66,10 +66,13 @@ def write_rtt_measurements():
 		last = ''
 		params = []
 		params.append(d.deviceid)
-		with open(filename, 'r') as fh:
-			# probably a better way to do this:
-			for line in fh:
-				last = line
+		try:
+			with open(filename, 'r') as fh:
+				# probably a better way to do this:
+				for line in fh:
+					last = line
+		except:
+			pass
 		f = open(filename, 'a')
 		if last!='':
 			last=last.split(',')
@@ -407,10 +410,13 @@ def write_lmrtt_measurements():
 		last = ""
 		params = []
 		params.append(d.deviceid)
-		with open(filename, 'r') as fh:
-			# probably a better way to do this:
-			for line in fh:
-				last = line
+		try:
+			with open(filename, 'r') as fh:
+				# probably a better way to do this:
+				for line in fh:
+					last = line
+		except:
+			pass
 		f = open(filename, 'a')
 		if last!='':
 			last=last.split(',')
@@ -447,10 +453,13 @@ def write_bitrate_measurements():
 		last = ""
 		params = []
 		params.append(d.deviceid)
-		with open(filename, 'r') as fh:
-			# probably a better way to do this:
-			for line in fh:
-				last = line
+		try:
+			with open(filename, 'r') as fh:
+				# probably a better way to do this:
+				for line in fh:
+					last = line
+		except:
+			pass
 		f = open(filename, 'a')
 		if last!='':
 			last=last.split(',')
@@ -459,7 +468,7 @@ def write_bitrate_measurements():
 			SQL = "SELECT \
 				m_bitrate.eventstamp, average, direction, toolid \
 				FROM m_bitrate JOIN devicedetails on devicedetails.deviceid=m_bitrate.deviceid \
-				WHERE m_bitrate.deviceid=%s AND m_bitrate.average>0, m_bitrate.eventstamp>%s"
+				WHERE m_bitrate.deviceid=%s AND m_bitrate.average>0 AND m_bitrate.eventstamp>%s"
 		else:
 			SQL = "SELECT \
 			m_bitrate.eventstamp, average, direction, toolid \
@@ -491,10 +500,13 @@ def write_shaperate_measurements():
 		last = ""
 		params = []
 		params.append(d.deviceid)
-		with open(filename, 'r') as fh:
-			# probably a better way to do this:
-			for line in fh:
-				last = line
+		try:	
+			with open(filename, 'r') as fh:
+				# probably a better way to do this:
+				for line in fh:
+					last = line
+		except:
+			pass
 		f = open(filename, 'a')
 		if last!='':
 			last=last.split(',')
@@ -503,7 +515,7 @@ def write_shaperate_measurements():
 			SQL = "SELECT \
 				m_shaperate.eventstamp, average, direction \
 				FROM m_shaperate JOIN devicedetails on devicedetails.deviceid=m_shaperate.deviceid \
-				WHERE m_shaperate.deviceid=%s, m_shaperate.eventstamp>%s"
+				WHERE m_shaperate.deviceid=%s AND m_shaperate.eventstamp>%s"
 		else:
 			SQL = "SELECT \
 			m_shaperate.eventstamp, average, direction \
@@ -534,10 +546,13 @@ def write_underload_measurements():
 		last = ""
 		params = []
 		params.append(d.deviceid)
-		with open(filename, 'r') as fh:
-			# probably a better way to do this:
-			for line in fh:
-				last = line
+		try:	
+			with open(filename, 'r') as fh:
+				# probably a better way to do this:
+				for line in fh:
+					last = line
+		except:
+			pass
 		f = open(filename, 'a')
 		if last!='':
 			last=last.split(',')
@@ -591,10 +606,13 @@ def write_capacity_measurements():
 		last = ""
 		params = []
 		params.append(d.deviceid)
-		with open(filename, 'r') as fh:
-			# probably a better way to do this:
-			for line in fh:
-				last = line
+		try:	
+			with open(filename, 'r') as fh:
+				# probably a better way to do this:
+				for line in fh:
+					last = line
+		except:
+			pass
 		f = open(filename, 'a')
 		if last!='':
 			last=last.split(',')
