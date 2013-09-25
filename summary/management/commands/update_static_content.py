@@ -62,15 +62,31 @@ def write_rtt_measurements():
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
 		filename = settings.PROJECT_ROOT + '/summary/measurements/rtt/' + device2
-		f = open(filename, 'w')
+		SQL = ''
+		last = ''
 		params = []
 		params.append(d.deviceid)
-		SQL = "SELECT \
+		with open(filename, 'r') as fh:
+			# probably a better way to do this:
+			for line in fh:
+				last = line
+		f = open(filename, 'a')
+		if last!='':
+			last=last.split(',')
+			latest = datetime.fromtimestamp(int(last[0])/1000)
+			params.append(latest)
+			SQL = "SELECT \
+				m_rtt.eventstamp, average, dstip \
+				FROM m_rtt JOIN devicedetails on devicedetails.deviceid=m_rtt.deviceid \
+				WHERE m_rtt.deviceid=%s AND m_rtt.average<3000 AND m_rtt.average>0 AND m_rtt.eventstamp>%s"
+		else:
+			SQL = "SELECT \
 			m_rtt.eventstamp, average, dstip \
 			FROM m_rtt JOIN devicedetails on devicedetails.deviceid=m_rtt.deviceid \
 			WHERE m_rtt.deviceid=%s AND m_rtt.average<3000 AND m_rtt.average>0"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
+		records = sorted(records,key=lambda x: datetime_helper.datetime_to_JSON(x['eventstamp']))
 		for r in records:
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
@@ -384,17 +400,31 @@ def write_bitrate_isp_averages():
 def write_lmrtt_measurements():
 	devices = Devicedetails.objects.all()
 	cursor = get_dict_cursor()
-	count = 0
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
 		filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt/' + device2
-		f = open(filename, 'w')
+		SQL = ""
+		last = ""
 		params = []
 		params.append(d.deviceid)
-		SQL = "SELECT \
-			m_lmrtt.eventstamp, average \
-			FROM m_lmrtt JOIN devicedetails on devicedetails.deviceid=m_lmrtt.deviceid \
-			WHERE m_lmrtt.deviceid=%s AND m_lmrtt.average<3000 AND m_lmrtt.average>0"
+		with open(filename, 'r') as fh:
+			# probably a better way to do this:
+			for line in fh:
+				last = line
+		f = open(filename, 'a')
+		if last!='':
+			last=last.split(',')
+			latest = datetime.fromtimestamp(int(last[0])/1000)
+			params.append(latest)
+			SQL = "SELECT \
+				m_lmrtt.eventstamp, average \
+				FROM m_lmrtt JOIN devicedetails on devicedetails.deviceid=m_lmrtt.deviceid \
+				WHERE m_lmrtt.deviceid=%s AND m_lmrtt.average<3000 AND m_lmrtt.average>0 AND m_lmrtt.eventstamp>%s"
+		else:
+			SQL = "SELECT \
+				m_lmrtt.eventstamp, average \
+				FROM m_lmrtt JOIN devicedetails on devicedetails.deviceid=m_lmrtt.deviceid \
+				WHERE m_lmrtt.deviceid=%s AND m_lmrtt.average<3000 AND m_lmrtt.average>0"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
 		records = sorted(records,key=lambda x: datetime_helper.datetime_to_JSON(x['eventstamp']))
@@ -404,8 +434,6 @@ def write_lmrtt_measurements():
 			line = str(eventstamp) + ',' + str(avg) + '\n'
 			f.write(line)
 		f.close()
-		count += 1
-		t1 = datetime.now()
 	cursor.close()
 	return
 
@@ -415,10 +443,25 @@ def write_bitrate_measurements():
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
 		filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate/' + device2
-		f = open(filename, 'w')
+		SQL = ""
+		last = ""
 		params = []
 		params.append(d.deviceid)
-		SQL = "SELECT \
+		with open(filename, 'r') as fh:
+			# probably a better way to do this:
+			for line in fh:
+				last = line
+		f = open(filename, 'a')
+		if last!='':
+			last=last.split(',')
+			latest = datetime.fromtimestamp(int(last[0])/1000)
+			params.append(latest)
+			SQL = "SELECT \
+				m_bitrate.eventstamp, average, direction, toolid \
+				FROM m_bitrate JOIN devicedetails on devicedetails.deviceid=m_bitrate.deviceid \
+				WHERE m_bitrate.deviceid=%s AND m_bitrate.average>0, m_bitrate.eventstamp>%s"
+		else:
+			SQL = "SELECT \
 			m_bitrate.eventstamp, average, direction, toolid \
 			FROM m_bitrate JOIN devicedetails on devicedetails.deviceid=m_bitrate.deviceid \
 			WHERE m_bitrate.deviceid=%s AND m_bitrate.average>0"
@@ -444,10 +487,25 @@ def write_shaperate_measurements():
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
 		filename = settings.PROJECT_ROOT + '/summary/measurements/shaperate/' + device2
-		f = open(filename, 'w')
+		SQL = ""
+		last = ""
 		params = []
 		params.append(d.deviceid)
-		SQL = "SELECT \
+		with open(filename, 'r') as fh:
+			# probably a better way to do this:
+			for line in fh:
+				last = line
+		f = open(filename, 'a')
+		if last!='':
+			last=last.split(',')
+			latest = datetime.fromtimestamp(int(last[0])/1000)
+			params.append(latest)
+			SQL = "SELECT \
+				m_shaperate.eventstamp, average, direction \
+				FROM m_shaperate JOIN devicedetails on devicedetails.deviceid=m_shaperate.deviceid \
+				WHERE m_shaperate.deviceid=%s, m_shaperate.eventstamp>%s"
+		else:
+			SQL = "SELECT \
 			m_shaperate.eventstamp, average, direction \
 			FROM m_shaperate JOIN devicedetails on devicedetails.deviceid=m_shaperate.deviceid \
 			WHERE m_shaperate.deviceid=%s"
@@ -472,14 +530,37 @@ def write_underload_measurements():
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
 		filename = settings.PROJECT_ROOT + '/summary/measurements/underload/' + device2
-		f = open(filename, 'w')
+		SQL = ""
+		last = ""
 		params = []
 		params.append(d.deviceid)
-		SQL = "SELECT \
+		with open(filename, 'r') as fh:
+			# probably a better way to do this:
+			for line in fh:
+				last = line
+		f = open(filename, 'a')
+		if last!='':
+			last=last.split(',')
+			latest = datetime.fromtimestamp(int(last[0])/1000)
+			params.append(latest)
+			SQL1 = "SELECT \
+				m_ulrttdw.eventstamp, average, direction \
+				FROM m_ulrttdw JOIN devicedetails on devicedetails.deviceid=m_ulrttdw.deviceid \
+				WHERE m_ulrttdw.deviceid=%s AND m_ulrttdw.eventstamp>%s"
+			SQL2 = "SELECT \
+				m_ulrttup.eventstamp, average, direction \
+				FROM m_ulrttup JOIN devicedetails on devicedetails.deviceid=m_ulrttup.deviceid \
+				WHERE m_ulrttup.deviceid=%s AND m_ulrttup.eventstamp>%s"
+		else:
+			SQL1 = "SELECT \
 			m_ulrttdw.eventstamp, average, direction \
 			FROM m_ulrttdw JOIN devicedetails on devicedetails.deviceid=m_ulrttdw.deviceid \
 			WHERE m_ulrttdw.deviceid=%s"
-		cursor.execute(SQL,params)
+			SQL2 = "SELECT \
+			m_ulrttup.eventstamp, average, direction \
+			FROM m_ulrttup JOIN devicedetails on devicedetails.deviceid=m_ulrttup.deviceid \
+			WHERE m_ulrttup.deviceid=%s"
+		cursor.execute(SQL1,params)
 		records = cursor.fetchall()
 		records = sorted(records,key=lambda x: datetime_helper.datetime_to_JSON(x['eventstamp']))
 		for r in records:
@@ -487,11 +568,7 @@ def write_underload_measurements():
 			avg = r['average']
 			line = str(eventstamp) + ',' + str(avg) + ',' + 'dw' + '\n'
 			f.write(line)
-		SQL = "SELECT \
-			m_ulrttup.eventstamp, average, direction \
-			FROM m_ulrttup JOIN devicedetails on devicedetails.deviceid=m_ulrttup.deviceid \
-			WHERE m_ulrttup.deviceid=%s"
-		cursor.execute(SQL,params)
+		cursor.execute(SQL2,params)
 		records = cursor.fetchall()
 		for r in records:
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
@@ -514,15 +591,14 @@ def write_capacity_measurements():
 		last = ""
 		params = []
 		params.append(d.deviceid)
-		with open(filename, 'rb') as fh:
-			while True:
-				# probably a better way to do this:
-				for line in fh:
-					last = line
+		with open(filename, 'r') as fh:
+			# probably a better way to do this:
+			for line in fh:
+				last = line
 		f = open(filename, 'a')
 		if last!='':
 			last=last.split(',')
-			latest = datetime.fromtimestamp(int(last[0]))
+			latest = datetime.fromtimestamp(int(last[0])/1000)
 			params.append(latest)
 			SQL = "SELECT \
 			m_capacity.eventstamp, average, direction \
