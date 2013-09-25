@@ -953,35 +953,36 @@ def parse_bitrate_city_average(start_date,end_date,city,direction):
 	isps = Devicedetails.objects.values('geoip_isp').distinct()
 	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate_averages/city'
 	# garbage characters to be removed:
-	remove = ')("\n '
+	remove = ')("\n'
 	with open(filename,'r') as f:
-		# each line represents one measurement record:
 		for record in f:
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
 			record = record.split(',')
-			# average:
-			entry.append(float(record[0]))
-			# measurement count:
-			entry.append(float(record[1]))
-			# day
+			# average (a):
+			entry.append(float(record[0])*1000)
+			# measurement count (b):
+			entry.append(int(record[1]))
+			# day (c)
 			entry.append(int(record[2]))
-			# city
+			# city (d)
 			entry.append(record[3])
-			# device count:
+			# device count (e):
 			entry.append(record[4])
-			# direction
+			# direction (f):
 			entry.append(record[5])
+			# isp (g):
+			entry.apend(record[6])
 			data.append(entry)
 	f.close()
-	for c in countries:
-		cc = c['country_code']
-		if cc==None or cc=='':
+	for isp in isps:
+		provider = isp['geoip_isp']
+		if provider==None or provider=='':
 			continue
 		for i in range(0,len(remove)):
-				cc = cc.replace(remove[i],'')
-		filtered = [(x,y,z,r,s) for x,y,z,r,s in data if r==cc and z>start and z<end]
+				provider = provider.replace(remove[i],'')
+		filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==city and c>start and c<end]
 		try:
 			d_count = max(x[4] for x in filtered)
 		except:
@@ -995,14 +996,15 @@ def parse_bitrate_city_average(start_date,end_date,city,direction):
 		entry.append(average)
 		ret.append(entry)
 	return HttpResponse(json.dumps(ret))
-def parse_lmrtt_country_average(country):
-def parse_rtt_isp_average(isp):
-def parse_bitrate_city_average(city):
-def parse_lmrtt_country_average(country):
-def parse_rtt_isp_average(isp):
-def parse_bitrate_city_average(city):
-def parse_lmrtt_country_average(country):
-def parse_rtt_isp_average(isp):
+
+# def parse_lmrtt_country_average(country):
+# def parse_rtt_isp_average(isp):
+# def parse_bitrate_city_average(city):
+# def parse_lmrtt_country_average(country):
+# def parse_rtt_isp_average(isp):
+# def parse_bitrate_city_average(city):
+# def parse_lmrtt_country_average(country):
+# def parse_rtt_isp_average(isp):
 
 	
 def parse_bitrate_compare(device,earliest,latest,sort,dir):
@@ -1076,7 +1078,11 @@ def parse_bitrate_measurements(device, dir):
 	sorted_data = sorted(data, key=lambda x: x[0])
 	sorted_multi = [(x,y) for x,y,z,t in sorted_data if z==dir and t=='NETPERF_3']
 	sorted_single = [(x,y) for x,y,z,t in sorted_data if z==dir and t!='NETPERF_3']
-	multi_series = dict(name='Multi-threaded TCP', type='line',data=sorted_multi)
+	multi_series = dict(name='Multi-threaded TCP', type='line',data=sorted_multi,priority=1)
+	if dir=='dw':
+		multi_series['id']=1
+	else:
+		multi_series['id']=2
 	single_series = dict(name='Single-threaded TCP', type='line', data=sorted_single)
 	result.append(multi_series)
 	result.append(single_series)
@@ -1179,7 +1185,7 @@ def parse_lmrtt_measurements(device):
 	f.close()
 	# sort by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
-	series = dict(name='Last mile latency', type='line', data=sorted_data)
+	series = dict(name='Last mile latency', type='line', data=sorted_data, priority=1, id=4)
 	result.append(series)
 	return result
 	
@@ -1211,7 +1217,7 @@ def parse_shaperate_measurements(device):
 	sorted_up = [(x,y) for x,y,z in sorted_data if  z=='up']
 	sorted_down = [(x,y) for x,y,z in sorted_data if  z=='dw']
 	series_up = dict(name='Shaperate Up', type='line', data=sorted_up)
-	series_down = dict(name='Shaperate Down', type='line', data=sorted_down)
+	series_down = dict(name='Shaperate Down', type='line', data=sorted_down, priority=1, id=5)
 	result.append(series_up)
 	result.append(series_down)
 	return result

@@ -38,22 +38,22 @@ class Command(NoArgsCommand):
 def update_json():
 	lock = UpdateLock('/tmp/UpdateLock.tmp')
 	if (lock.acquire()):
-		write_rtt_measurements()
-		write_lmrtt_measurements()
 		write_bitrate_measurements()
 		write_shaperate_measurements()
 		write_underload_measurements()
 		write_capacity_measurements()
 		dump_all_latencies()
-		write_rtt_city_averages()
-		write_lmrtt_city_averages()
-		write_bitrate_city_averages()
-		write_rtt_country_averages()
-		write_lmrtt_country_averages()
-		write_bitrate_country_averages()
-		write_rtt_isp_averages()
-		write_lmrtt_isp_averages()
-		write_bitrate_isp_averages()
+		write_lmrtt_measurements()
+		write_rtt_measurements()
+		# write_rtt_city_averages()
+		# write_lmrtt_city_averages()
+		# write_bitrate_city_averages()
+		# write_rtt_country_averages()
+		# write_lmrtt_country_averages()
+		# write_bitrate_country_averages()
+		# write_rtt_isp_averages()
+		# write_lmrtt_isp_averages()
+		# write_bitrate_isp_averages()
 	return
 
 def write_rtt_measurements():
@@ -479,12 +479,9 @@ def write_underload_measurements():
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
 		for r in records:
-			direction = r['direction']
-			if direction=='' or direction==None:
-				continue
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
-			line = str(eventstamp) + ',' + str(avg) + ',' + str(direction) + '\n'
+			line = str(eventstamp) + ',' + str(avg) + ',' + 'dw' + '\n'
 			f.write(line)
 		SQL = "SELECT \
 			m_ulrttup.eventstamp, average, direction \
@@ -493,12 +490,9 @@ def write_underload_measurements():
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
 		for r in records:
-			direction = r['direction']
-			if direction=='' or direction==None:
-				continue
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
-			line = str(eventstamp) + ',' + str(avg) + ',' + str(direction) + '\n'
+			line = str(eventstamp) + ',' + str(avg) + ',' + 'up' + '\n'
 			f.write(line)
 		f.close()
 	cursor.close()
