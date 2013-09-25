@@ -526,7 +526,7 @@ def write_capacity_measurements():
 		f = open(filename, 'a')
 		if last!='':
 			last=last.split(',')
-			latest = datetime_helper.unix_to_date(int(last[0]))
+			latest = datetime.fromtimestamp(int(last[0]))
 			params.append(latest)
 			SQL = "SELECT \
 			m_capacity.eventstamp, average, direction \
