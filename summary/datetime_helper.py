@@ -2,6 +2,9 @@ from calendar import timegm
 import datetime
 from datetime import timedelta
 
+def unix_to_date(time):
+	return time.gmtime(time)
+
 def datetime_to_JSON(time):
     return int(timegm(time.timetuple()) * 1000)
 

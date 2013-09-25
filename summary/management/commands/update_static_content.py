@@ -453,6 +453,7 @@ def write_shaperate_measurements():
 			WHERE m_shaperate.deviceid=%s"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
+		records = sorted(records,key=lambda x: datetime_helper.datetime_to_JSON(x['eventstamp']))
 		for r in records:
 			direction = r['direction']
 			if direction=='' or direction==None:
@@ -480,6 +481,7 @@ def write_underload_measurements():
 			WHERE m_ulrttdw.deviceid=%s"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
+		records = sorted(records,key=lambda x: datetime_helper.datetime_to_JSON(x['eventstamp']))
 		for r in records:
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
@@ -508,15 +510,36 @@ def write_capacity_measurements():
 	for d in devices:
 		device2 = d.deviceid.replace(':','')
 		filename = settings.PROJECT_ROOT + '/summary/measurements/capacity/' + device2
-		f = open(filename, 'w')
+		SQL = ""
+		last = ""
+		offset = -100
 		params = []
 		params.append(d.deviceid)
-		SQL = "SELECT \
+		with open(filename, 'rb') as fh:
+			while True:
+				fh.seek(offset,2)
+				lines = fh.readlines()
+				if len(lines)>1:
+					last = lines[-1]
+					break
+				offset *= 2
+		f = open(filename, 'a')
+		if last!=''
+			last=last.split(',')
+			latest = datetime_helper.unix_to_date(last[0])
+			params.append(latest)
+			SQL = "SELECT \
 			m_capacity.eventstamp, average, direction \
 			FROM m_capacity JOIN devicedetails on devicedetails.deviceid=m_capacity.deviceid \
-			WHERE m_capacity.deviceid=%s"
+			WHERE m_capacity.deviceid=%s AND m_capacity.eventstamp>%s"
+		else:
+			SQL = "SELECT \
+				m_capacity.eventstamp, average, direction \
+				FROM m_capacity JOIN devicedetails on devicedetails.deviceid=m_capacity.deviceid \
+				WHERE m_capacity.deviceid=%s"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
+		records = sorted(records,key=lambda x: datetime_helper.datetime_to_JSON(x['eventstamp']))
 		for r in records:
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
