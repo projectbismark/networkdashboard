@@ -397,6 +397,7 @@ def write_lmrtt_measurements():
 			WHERE m_lmrtt.deviceid=%s AND m_lmrtt.average<3000 AND m_lmrtt.average>0"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
+		records = sorted(records,key=lambda x: datetime_helper.datetime_to_JSON(x['eventstamp']))
 		for r in records:
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
@@ -423,6 +424,7 @@ def write_bitrate_measurements():
 			WHERE m_bitrate.deviceid=%s AND m_bitrate.average>0"
 		cursor.execute(SQL,params)
 		records = cursor.fetchall()
+		records = sorted(records,key=lambda x: datetime_helper.datetime_to_JSON(x['eventstamp']))
 		for r in records:
 			direction = r['direction']
 			if direction=='' or direction==None:
