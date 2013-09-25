@@ -512,17 +512,13 @@ def write_capacity_measurements():
 		filename = settings.PROJECT_ROOT + '/summary/measurements/capacity/' + device2
 		SQL = ""
 		last = ""
-		offset = -100
 		params = []
 		params.append(d.deviceid)
 		with open(filename, 'rb') as fh:
 			while True:
-				fh.seek(offset,2)
-				lines = fh.readlines()
-				if len(lines)>1:
-					last = lines[-1]
-					break
-				offset *= 2
+				# probably a better way to do this:
+				for line in fh:
+					last = line
 		f = open(filename, 'a')
 		if last!='':
 			last=last.split(',')
