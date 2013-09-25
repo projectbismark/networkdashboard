@@ -1,15 +1,16 @@
 from calendar import timegm
 import datetime
 from datetime import timedelta
+import time
 
-def unix_to_date(time):
-	return time.gmtime(time)
+def unix_to_date(t):
+	return time.gmtime(t.timetuple())
 
-def datetime_to_JSON(time):
-    return int(timegm(time.timetuple()) * 1000)
+def datetime_to_JSON(t):
+    return int(timegm(t.timetuple()) * 1000)
 
-def datetime_format_to_unixtime(time):
-    return timegm(time.timetuple())
+def datetime_format_to_unixtime(t):
+    return timegm(t.timetuple())
 	
 def is_recent(last, period):
 	now = datetime.datetime.now()
