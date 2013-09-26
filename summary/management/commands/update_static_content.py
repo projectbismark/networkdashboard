@@ -9,6 +9,7 @@ import psycopg2
 import psycopg2.extras
 import time
 from django.core import serializers
+import pygeoip
 import sys
 import fcntl
 
@@ -604,12 +605,16 @@ def write_coord_data():
 	active_thresh = datetime_helper.get_daterange_start(7)
 	for d in devices:
 		try:
-			id = d['deviceid']
-			loc = geoip_helper.getLocation(d[ip],gi)
-			lat = str(randomize_latitude(loc['latitude']))
+			id = d.deviceid
+			if d.ip=="" or d.ip==None:
+				continue
+			loc = geoip_helper.getLocation(d.ip,gi)
+			if loc==None:
+				continue
+			lat = str(geoip_helper.randomize_latitude(loc['latitude']))
 			lon = str(loc['longitude'])
-			hash = d['hashkey']
-			isp = d['geoip_isp']
+			hash = d.hashkey
+			isp = d.geoip_isp
 			active = 0
 			server = 0
 			if hash=="":
@@ -626,7 +631,9 @@ def write_coord_data():
 			isp = ""
 			active = 1
 			server = 1
-			loc = getLocation(row_ip.ip,gi)
+			loc = geoip_helper.getLocation(s.ip,gi)
+			if loc==None:
+				continue
 			lat = str(row_ip.latitude)
 			lon = str(row_ip.longitude)
 			hash = ""
