@@ -639,7 +639,8 @@ def invalidEdit(request, device):
     return render_to_response('invalid_edit.html', {'deviceid' : device})
     
 def getCoordinates(request):
-	result = geoip_helper.get_coordinates_for_googlemaps()
+	#result = geoip_helper.get_coordinates_for_googlemaps()
+	result = views_helper.parse_coords()
 	return HttpResponse(json.dumps(result))
         
 def sharedDeviceSummary(request,devicehash):

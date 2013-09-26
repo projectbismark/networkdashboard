@@ -12,6 +12,21 @@ import psycopg2
 import hashlib
 import cvs_helper,datetime_helper,database_helper,geoip_helper
 
+def parse_coords():
+	coord_data = []
+	with open(filename,'r') as f:
+		for line in f:
+			entry = {}
+			line = line.split(',')
+			entry['hash'] = line[0]
+			entry['lat'] = line[1]
+			entry['lon'] = line[2]
+			entry['isp'] = line[3]
+			entry['active'] = line[4]
+			entry['server'] = line[5]
+			coord_data.append(entry)
+	return coord_data
+
 def create_bargraph_series(avg_data):
 	# names of series, such as city, country, or isp names:
 	series_names = []

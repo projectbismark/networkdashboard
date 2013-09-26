@@ -1,5 +1,5 @@
 from django.core.management.base import NoArgsCommand
-from networkdashboard.summary import database_helper, datetime_helper
+from networkdashboard.summary import database_helper, datetime_helper, geoip_helper
 from networkdashboard.summary.models import *
 from django.conf import settings
 from datetime import datetime
@@ -43,6 +43,7 @@ def update_json():
 		write_underload_measurements()
 		write_capacity_measurements()
 		dump_all_latencies()
+		write_coord_data()
 		write_lmrtt_measurements()
 		write_rtt_measurements()
 		# write_rtt_city_averages()
@@ -592,6 +593,48 @@ def write_underload_measurements():
 			f.write(line)
 		f.close()
 	cursor.close()
+	return
+	
+def write_coord_data():
+	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	filename = settings.PROJECT_ROOT + '/summary/measurements/map/coord_data'
+	f = open(filename, 'w')
+	devices = Devicedetails.objects.all()
+	servers = IpResolver.objects.all()
+	active_thresh = datetime_helper.get_daterange_start(7)
+	for d in devices:
+		try:
+			id = d['deviceid']
+			loc = geoip_helper.getLocation(d[ip],gi)
+			lat = str(randomize_latitude(loc['latitude']))
+			lon = str(loc['longitude'])
+			hash = d['hashkey']
+			isp = d['geoip_isp']
+			active = 0
+			server = 0
+			if hash=="":
+				continue
+			recent_measurement_count = MRtt.objects.filter(deviceid=id,eventstamp__gte=active_thresh).count()
+			if recent_measurement_count>0:
+				active=1
+			line = hash + ',' + lat + ',' + lon + ',' + isp + ',' + str(active) + ',' + str(server) + '\n'
+			f.write(line)
+		except:
+			continue
+	for s in servers:
+		try:
+			isp = ""
+			active = 1
+			server = 1
+			loc = getLocation(row_ip.ip,gi)
+			lat = str(row_ip.latitude)
+			lon = str(row_ip.longitude)
+			hash = ""
+			line = hash + ',' + lat + ',' + lon + ',' + isp + ',' + str(active) + ',' + str(server) + '\n'
+			f.write(line)
+		except:
+			continue
+	f.close()
 	return
 	
 def write_capacity_measurements():

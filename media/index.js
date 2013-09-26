@@ -172,7 +172,8 @@ function createMarker(d) {
     });
     marker.devicehash = d.hash;
 	marker.isp = d.isp;
-	marker.dev_type = d.dev_type;
+	marker.server = int(d.server);
+	marker.active = int(d.active);
 	if (marker.devicehash != ""){
 		google.maps.event.addListener(marker, "click", function() {
 			boxText.innerHTML = "<a href=/displayDevice/" + marker.devicehash + "\">Show Router Details</a>";
@@ -180,13 +181,10 @@ function createMarker(d) {
 			infowindow.open(map, marker);
 		});
 	}
-	if (d.dev_type == "server") {
+	if (d.server == 1) {
 		marker.setIcon("/static/images/icon-blue.png");
 	}
-	else if (d.dev_type == "unregistered") {
-		marker.setIcon("/static/images/icon-gray-dot.png");
-	}
-	else if (d.dev_type == "active") {
+	else if (d.active ==1) {
 		marker.setIcon("/static/images/icon-green-dot.png");
 	}
 	else {
