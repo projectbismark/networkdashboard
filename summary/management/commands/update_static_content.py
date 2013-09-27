@@ -684,6 +684,8 @@ def write_capacity_measurements():
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
 			direction = r['direction']
+			if direction=='' or direction==None:
+				continue
 			line = str(eventstamp) + ',' + str(avg) + ',' + direction + '\n'
 			f.write(line)
 		f.close()
