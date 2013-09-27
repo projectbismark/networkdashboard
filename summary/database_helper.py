@@ -1088,7 +1088,7 @@ def parse_rtt_isp_average(isp,country,start_date,end_date):
 		if country=="none":
 			filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==isp and c>start and c<end]
 		else:
-			filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==isp and c>start and c<end f==country]
+			filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==isp and c>start and c<end and f==country]
 		try:
 			d_count = max(x[4] for x in filtered)
 		except:
