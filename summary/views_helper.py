@@ -18,6 +18,7 @@ def parse_coords():
 	with open(filename,'r') as f:
 		for line in f:
 			entry = {}
+			line = line.replace('\n','')
 			line = line.split(',')
 			entry['hash'] = line[0]
 			entry['lat'] = line[1]
