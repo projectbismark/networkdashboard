@@ -989,13 +989,9 @@ def parse_bitrate_city_average(start_date,end_date,city,direction):
 			continue
 		n_measurements = sum(x[1] for x in filtered)
 		average = sum((x[0]*x[1]/n_measurements) for x in filtered)
-		entry=[]
-		entry.append(provider)
-		entry.append(d_count)
-		entry.append(n_measurements)
-		entry.append(average)
-		ret.append(entry)
-	return HttpResponse(json.dumps(ret))
+		series = dict(name=provider, type='bar', data=average, count=d_count)
+		ret.append(series)
+	return ret
 
 def parse_lmrtt_country_average(start_date,end_date,country):
 	data = []
@@ -1150,7 +1146,7 @@ def parse_bitrate_compare(device,earliest,latest,sort,dir):
 	result.append(m_count)
 	result.append(m_avg)
 	result.append(data)
-	return result
+	return result	
 	
 # returns bitrate series for the given device:	
 def parse_bitrate_measurements(device, dir):
