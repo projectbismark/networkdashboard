@@ -172,8 +172,8 @@ function createMarker(d) {
     });
     marker.devicehash = d.hash;
 	marker.isp = d.isp;
-	marker.server = int(d.server);
-	marker.active = int(d.active);
+	marker.server = parseInt(d.server);
+	marker.active = parseInt(d.active);
 	if (marker.devicehash != ""){
 		google.maps.event.addListener(marker, "click", function() {
 			boxText.innerHTML = "<a href=/displayDevice/" + marker.devicehash + "\">Show Router Details</a>";
