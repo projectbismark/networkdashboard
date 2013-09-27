@@ -14,6 +14,7 @@ import cvs_helper,datetime_helper,database_helper,geoip_helper
 
 def parse_coords():
 	coord_data = []
+	filename = settings.PROJECT_ROOT + '/summary/measurements/map/coord_data'
 	with open(filename,'r') as f:
 		for line in f:
 			entry = {}
