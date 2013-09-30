@@ -982,7 +982,9 @@ def parse_bitrate_city_average(start_date,end_date,city,direction):
 			continue
 		for i in range(0,len(remove)):
 				provider = provider.replace(remove[i],'')
-		filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==city and c>start and c<end and g==direction]
+		filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==city and c>start and c<end and g==provider and f==direction]
+		if len(filtered)==0:
+			continue
 		try:
 			d_count = max(x[4] for x in filtered)
 		except:
