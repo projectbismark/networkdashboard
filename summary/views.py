@@ -159,7 +159,7 @@ def compare_bitrate_by_city(request):
 			data = []
 			if len(line_series)<max_results:
 				try:
-					data = database_helper.parse_bitrate_measurements(d.deviceid,direction)
+					data = database_helper.parse_bitrate_measurements(d.deviceid,earliest,latest,direction,d.geoip_isp)
 				except:
 					continue
 				if len(data)==0:
