@@ -1086,9 +1086,9 @@ def parse_bitrate_isp_average(start_date,end_date,isp,direction,country):
 				city_name = city_name.replace(remove[i],'')
 		filtered = []
 		if country=="none":
-			filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==isp and c>start and c<end and h==city_name and f==direction]
+			filtered = [(a,b,c,d,e,f,g,h) for a,b,c,d,e,f,g,h in data if d==isp and c>start and c<end and h==city_name and f==direction]
 		else:
-			filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==isp and c>start and c<end and h==city_name and f==direction and g==country]
+			filtered = [(a,b,c,d,e,f,g,h) for a,b,c,d,e,f,g,h in data if d==isp and c>start and c<end and h==city_name and f==direction and g==country]
 		if len(filtered)==0:
 			continue
 		try:
