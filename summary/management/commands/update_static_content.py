@@ -276,7 +276,7 @@ def write_bitrate_city_averages():
 			count(*) AS nmeasurements, \
 			avg(m_bitrate.average) AS bitrate \
 			FROM m_bitrate \
-			JOIN devicedetails AS d ON d.ip = m_bitrate.srcip \
+			JOIN devicedetails AS d ON d.deviceid = m_bitrate.deviceid \
 			WHERE m_bitrate.average>0 AND geoip_city!='' AND toolid='NETPERF_3' AND geoip_isp!=''  \
 			GROUP BY day, d.geoip_city, d.geoip_isp, dir;"
 	cursor.execute(SQL)
