@@ -162,7 +162,7 @@ def compare_bitrate_by_city(request):
 					data = database_helper.parse_bitrate_compare(d.deviceid,earliest,latest,direction,d.geoip_isp)
 				except:
 					continue
-				if len(data)==0:
+				if len(data['data'])==0:
 					continue
 				line_series.append(data)
 	bar_series= database_helper.parse_bitrate_city_average(earliest,latest,city,direction)
