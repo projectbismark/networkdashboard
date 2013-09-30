@@ -215,9 +215,6 @@ def compare_bitrate_by_city(request):
 	# return HttpResponse(json.dumps(bar_series))
 
 def compare_bitrate_by_country(request):
-	result = []
-	line_series = []
-	bar_series = []
 	#for limiting number of line series:
 	max_results = int(request.GET.get('max_results'))
 	start = request.GET.get('start')
@@ -227,24 +224,9 @@ def compare_bitrate_by_country(request):
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
 	#all devices under given country
-	devices = Devicedetails.objects.filter(geoip_city=country, eventstamp__lte=latest)
-	for d in devices:
-		if d.geoip_isp!='' and d.geoip_isp!=None:
-			data = []
-			if len(line_series)<max_results:
-				try:
-					data = database_helper.parse_bitrate_compare(d.deviceid,earliest,latest,direction,d.geoip_isp)
-				except:
-					continue
-				if len(data['data'])==0:
-					continue
-				line_series.append(data)
-	bar_series= database_helper.parse_bitrate_country_average(earliest,latest,country,direction)
-	line_series = sorted(line_series, key = lambda x: x['name'].lstrip())
-	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
-	result.append(bar_series)
-	result.append(line_series)
-	return HttpResponse(json.dumps(result))
+	series= database_helper.parse_bitrate_country_average(earliest,latest,country,direction)
+	series = sorted(series, key= lambda x: x['name'].lstrip())
+	return HttpResponse(json.dumps(series))
 	
 # def compare_bitrate_by_isp(request):
 	# isp = request.GET.get('isp')
