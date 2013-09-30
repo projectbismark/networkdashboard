@@ -117,7 +117,7 @@ def write_rtt_country_averages():
 			count(*) AS nmeasurements, \
 			avg(m_rtt.average) AS latency \
 			FROM m_rtt \
-			JOIN devicedetails AS d ON d.ip = m_rtt.srcip \
+			JOIN devicedetails AS d ON d.deviceid = m_rtt.deviceid \
 			WHERE m_rtt.dstip = %s AND m_rtt.average>0 AND m_rtt.average<3000 AND geoip_country!='' AND geoip_isp != ''  \
 			GROUP BY day, d.geoip_country, d.geoip_isp;"
 	cursor.execute(SQL,params)
@@ -147,7 +147,7 @@ def write_lmrtt_country_averages():
 			count(*) AS nmeasurements, \
 			avg(m_lmrtt.average) AS latency \
 			FROM m_lmrtt \
-			JOIN devicedetails AS d ON d.ip = m_lmrtt.srcip \
+			JOIN devicedetails AS d ON d.deviceid = m_lmrtt.deviceid \
 			WHERE m_lmrtt.average>0 AND m_lmrtt.average<3000 AND geoip_country!='' AND geoip_isp!=''  \
 			GROUP BY day, d.geoip_country, d.geoip_isp;"
 	cursor.execute(SQL)
@@ -178,7 +178,7 @@ def write_bitrate_country_averages():
 			count(*) AS nmeasurements, \
 			avg(m_bitrate.average) AS bitrate \
 			FROM m_bitrate \
-			JOIN devicedetails AS d ON d.ip = m_bitrate.srcip \
+			JOIN devicedetails AS d ON d.deviceid = m_bitrate.deviceid \
 			WHERE  m_bitrate.average>0 AND geoip_country!='' AND toolid='NETPERF_3' AND geoip_isp != ''  \
 			GROUP BY day, d.geoip_country, dir, d.geoip_isp;"
 	cursor.execute(SQL)
@@ -215,7 +215,7 @@ def write_rtt_city_averages():
 			count(*) AS nmeasurements, \
 			avg(m_rtt.average) AS latency \
 			FROM m_rtt \
-			JOIN devicedetails AS d ON d.ip = m_rtt.srcip \
+			JOIN devicedetails AS d ON d.deviceid = m_rtt.deviceid \
 			WHERE m_rtt.dstip = %s AND m_rtt.average>0 AND m_rtt.average<3000 AND geoip_city!='' AND geoip_isp!=''  \
 			GROUP BY day, d.geoip_city, d.geoip_isp;"
 	cursor.execute(SQL,params)
@@ -245,7 +245,7 @@ def write_lmrtt_city_averages():
 			count(*) AS nmeasurements, \
 			avg(m_lmrtt.average) AS latency \
 			FROM m_lmrtt \
-			JOIN devicedetails AS d ON d.ip = m_lmrtt.srcip \
+			JOIN devicedetails AS d ON d.deviceid = m_lmrtt.deviceid \
 			WHERE m_lmrtt.average>0 AND m_lmrtt.average<3000 AND geoip_city!='' AND geoip_isp!=''  \
 			GROUP BY day, d.geoip_city, d.geoip_isp;"
 	cursor.execute(SQL)
@@ -314,7 +314,7 @@ def write_rtt_isp_averages():
 			count(*) AS nmeasurements, \
 			avg(m_rtt.average) AS latency \
 			FROM m_rtt \
-			JOIN devicedetails AS d ON d.ip = m_rtt.srcip \
+			JOIN devicedetails AS d ON d.deviceid = m_rtt.deviceid \
 			WHERE m_rtt.dstip = %s AND m_rtt.average>0 AND m_rtt.average<3000 AND geoip_isp!='' AND geoip_country!='' AND geoip_city!=''  \
 			GROUP BY day, d.geoip_isp, d.geoip_country, d.geoip_city;"
 	cursor.execute(SQL,params)
@@ -346,7 +346,7 @@ def write_lmrtt_isp_averages():
 			count(*) AS nmeasurements, \
 			avg(m_lmrtt.average) AS latency \
 			FROM m_lmrtt \
-			JOIN devicedetails AS d ON d.ip = m_lmrtt.srcip \
+			JOIN devicedetails AS d ON d.deviceid = m_lmrtt.deviceid \
 			WHERE m_lmrtt.average>0 AND m_lmrtt.average<3000 AND geoip_isp!='' AND geoip_country!='' AND geoip_city!=''  \
 			GROUP BY day, d.geoip_isp, d.geoip_country, d.geoip_city;"
 	cursor.execute(SQL)
@@ -379,7 +379,7 @@ def write_bitrate_isp_averages():
 			count(*) AS nmeasurements, \
 			avg(m_bitrate.average) AS latency \
 			FROM m_bitrate \
-			JOIN devicedetails AS d ON d.ip = m_bitrate.srcip \
+			JOIN devicedetails AS d ON d.deviceid = m_bitrate.deviceid \
 			WHERE m_bitrate.average>0 AND geoip_isp!='' AND toolid='NETPERF_3' AND geoip_city!='' AND geoip_country!=''  \
 			GROUP BY day, d.geoip_isp, dir, d.geoip_country, d.geoip_city;"
 	cursor.execute(SQL)
