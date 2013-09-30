@@ -158,11 +158,14 @@ def compare_bitrate_by_city(request):
 		if d.geoip_isp!='' and d.geoip_isp!=None:
 			data = []
 			if len(line_series)<max_results:
-				data = database_helper.parse_bitrate_measurement(d.deviceid,direction)
+				try:
+					data = database_helper.parse_bitrate_measurements(d.deviceid,direction)
+				except:
+					continue
 				if len(data)==0:
 					continue
 				line_series.append(data[0])
-	bar_series= database_helper.parse_bitrate_city_average(start,end,city,direction)
+	bar_series= database_helper.parse_bitrate_city_average(earliest,latest,city,direction)
 	line_series = sorted(line_series, key = lambda x: x['name'].lstrip())
 	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
 	result.append(bar_series)

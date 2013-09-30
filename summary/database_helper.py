@@ -973,7 +973,7 @@ def parse_bitrate_city_average(start_date,end_date,city,direction):
 			# direction (f):
 			entry.append(record[5])
 			# isp (g):
-			entry.apend(record[6])
+			entry.append(record[6])
 			data.append(entry)
 	f.close()
 	for isp in isps:
@@ -1152,10 +1152,10 @@ def parse_bitrate_compare(device,earliest,latest,sort,dir):
 def parse_bitrate_measurements(device, dir):
 	result = []
 	data = []
+	device = device.replace(':','')
 	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate/' + device
 	# garbage characters to be removed:
 	remove = ')("\n'
-	f = open(filename, 'r')
 	with open(filename,'r') as f:
 		# each line represents one measurement record:
 		for record in f:
