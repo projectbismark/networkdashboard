@@ -164,7 +164,7 @@ def compare_bitrate_by_city(request):
 					continue
 				if len(data)==0:
 					continue
-				line_series.append(data[0])
+				line_series.append(data)
 	bar_series= database_helper.parse_bitrate_city_average(earliest,latest,city,direction)
 	line_series = sorted(line_series, key = lambda x: x['name'].lstrip())
 	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
