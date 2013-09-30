@@ -994,6 +994,56 @@ def parse_bitrate_city_average(start_date,end_date,city,direction):
 		series = dict(name=provider, type='bar', data=average, count=d_count)
 		ret.append(series)
 	return ret
+	
+def parse_bitrate_country_average(start_date,end_date,country,direction):
+	data = []
+	ret = []
+	start = int(datetime_helper.datetime_to_JSON(start_date))
+	end = int(datetime_helper.datetime_to_JSON(end_date))
+	isps = Devicedetails.objects.values('geoip_isp').distinct()
+	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate_averages/country'
+	# garbage characters to be removed:
+	remove = ')("\n'
+	with open(filename,'r') as f:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# average (a):
+			entry.append(float(record[0])*1000)
+			# measurement count (b):
+			entry.append(int(record[1]))
+			# day (c)
+			entry.append(int(record[2]))
+			# country (d)
+			entry.append(record[3])
+			# device count (e):
+			entry.append(record[4])
+			# direction (f):
+			entry.append(record[5])
+			# isp (g):
+			entry.append(record[6])
+			data.append(entry)
+	f.close()
+	for isp in isps:
+		provider = isp['geoip_isp']
+		if provider==None or provider=='':
+			continue
+		for i in range(0,len(remove)):
+				provider = provider.replace(remove[i],'')
+		filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==country and c>start and c<end and g==provider and f==direction]
+		if len(filtered)==0:
+			continue
+		try:
+			d_count = max(x[4] for x in filtered)
+		except:
+			continue
+		n_measurements = sum(x[1] for x in filtered)
+		average = sum((x[0]*x[1]/n_measurements) for x in filtered)
+		series = dict(name=provider, type='bar', data=average, count=d_count)
+		ret.append(series)
+	return ret
 
 def parse_lmrtt_country_average(start_date,end_date,country):
 	data = []
