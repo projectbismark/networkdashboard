@@ -457,7 +457,6 @@ def compare_lmrtt_by_country(request):
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
 	bar_series= database_helper.parse_lmrtt_country_average(earliest,latest,country)
-	line_series = sorted(line_series, key = lambda x: x['name'].lstrip())
 	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
 	return HttpResponse(json.dumps(bar_series))	
 	
