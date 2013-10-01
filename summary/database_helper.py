@@ -945,7 +945,7 @@ def parse_rtt_compare(device,earliest,latest,sort):
 	# result.append(data)
 	# return result
 
-def parse_lmrtt_compare(device,earliest,latest):	
+def parse_lmrtt_compare(device,earliest,latest,name):	
 	data = []
 	earliest = datetime_helper.datetime_to_JSON(earliest)
 	latest = datetime_helper.datetime_to_JSON(latest)

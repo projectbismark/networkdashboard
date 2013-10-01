@@ -394,7 +394,7 @@ def compare_lmrtt_by_city(request):
 			data = []
 			if len(line_series)<max_results:
 				try:
-					data = database_helper.parse_lmrtt_compare(d.deviceid,earliest,latest,direction,d.geoip_isp)
+					data = database_helper.parse_lmrtt_compare(d.deviceid,earliest,latest,d.geoip_isp)
 				except:
 					continue
 				if len(data['data'])==0:
