@@ -449,11 +449,9 @@ def compare_lmrtt_by_city(request):
 
 def compare_lmrtt_by_country(request):
 	bar_series = []
-	#for limiting number of line series:
 	start = request.GET.get('start')
 	end = request.GET.get('end')
-	country = request.GET.get('city')
-	direction = request.GET.get('direction')
+	country = request.GET.get('country')
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
 	bar_series= database_helper.parse_lmrtt_country_average(earliest,latest,country)

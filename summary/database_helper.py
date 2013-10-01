@@ -1200,7 +1200,7 @@ def parse_lmrtt_country_average(start_date,end_date,country):
 			entry.append(int(record[1]))
 			# day (c)
 			entry.append(int(record[2]))
-			# counry (d)
+			# country (d)
 			entry.append(record[3])
 			# device count (e):
 			entry.append(record[4])
