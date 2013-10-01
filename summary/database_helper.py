@@ -908,8 +908,44 @@ def parse_rtt_compare(device,earliest,latest,sort):
 	return result
 	
 # returns LMRTT measurements, measurement count, and average for a device:
-def parse_lmrtt_compare(device,earliest,latest,sort):
-	result = []
+# def parse_lmrtt_compare(device,earliest,latest,sort):
+	# result = []
+	# data = []
+	# earliest = datetime_helper.datetime_to_JSON(earliest)
+	# latest = datetime_helper.datetime_to_JSON(latest)
+	# device = device.replace(':','')
+	# filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt/' + device
+	# garbage characters to be removed:
+	# remove = ')("\n'
+	# file is closed automatically after all lines are read:
+	# with open(filename,'r') as f:
+		# each line represents one measurement record:
+		# for record in f:
+			# entry = []
+			# try:
+				# for i in range(0,len(remove)):
+					# record = record.replace(remove[i],'')
+				# record = record.split(',')
+				# eventstamp:
+				# entry.append(int(record[0]))
+				# average:
+				# entry.append(float(record[1]))
+				# data.append(entry)
+			# except:
+				# continue
+	# order measurements by eventstamp, only necessary for linegraph series:
+	# if sort:
+		# data = sorted(data, key=lambda x: x[0])
+	# apply filtering:
+	# data = [(x,y) for x,y in data if (x>earliest and x<latest)]
+	# m_count = len(data)
+	# m_avg = avg([d[1] for d in data])
+	# result.append(m_count)
+	# result.append(m_avg)
+	# result.append(data)
+	# return result
+
+def parse_lmrtt_compare(device,earliest,latest):	
 	data = []
 	earliest = datetime_helper.datetime_to_JSON(earliest)
 	latest = datetime_helper.datetime_to_JSON(latest)
@@ -929,21 +965,15 @@ def parse_lmrtt_compare(device,earliest,latest,sort):
 				# eventstamp:
 				entry.append(int(record[0]))
 				# average:
-				entry.append(float(record[1]))
+				entry.append(float(record[1])*1000)
 				data.append(entry)
 			except:
 				continue
-	# order measurements by eventstamp, only necessary for linegraph series:
-	if sort:
-		data = sorted(data, key=lambda x: x[0])
 	# apply filtering:
 	data = [(x,y) for x,y in data if (x>earliest and x<latest)]
-	m_count = len(data)
-	m_avg = avg([d[1] for d in data])
-	result.append(m_count)
-	result.append(m_avg)
-	result.append(data)
-	return result
+	data = sorted(data, key=lambda x: x[0])
+	series = dict(name=name + ' device', type='line',data=data)
+	return series
 
 def parse_bitrate_city_average(start_date,end_date,city,direction):
 	data = []
@@ -1098,6 +1128,54 @@ def parse_bitrate_isp_average(start_date,end_date,isp,direction,country):
 		n_measurements = sum(x[1] for x in filtered)
 		average = sum((x[0]*x[1]/n_measurements) for x in filtered)
 		series = dict(name=city_name, type='bar', data=average, count=d_count)
+		ret.append(series)
+	return ret
+	
+def parse_lmrtt_city_average(start_date,end_date,city):
+	data = []
+	ret = []
+	start = int(datetime_helper.datetime_to_JSON(start_date))
+	end = int(datetime_helper.datetime_to_JSON(end_date))
+	isps = Devicedetails.objects.values('geoip_isp').distinct()
+	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt_averages/city'
+	# garbage characters to be removed:
+	remove = ')("\n'
+	with open(filename,'r') as f:
+		for record in f:
+			entry = []
+			for i in range(0,len(remove)):
+				record = record.replace(remove[i],'')
+			record = record.split(',')
+			# average (a):
+			entry.append(float(record[0]))
+			# measurement count (b):
+			entry.append(int(record[1]))
+			# day (c)
+			entry.append(int(record[2]))
+			# city (d)
+			entry.append(record[3])
+			# device count (e):
+			entry.append(record[4])
+			# isp (f):
+			entry.append(record[5])
+			data.append(entry)
+	f.close()
+	for isp in isps:
+		provider = isp['geoip_isp']
+		if provider==None or provider=='':
+			continue
+		for i in range(0,len(remove)):
+				provider = provider.replace(remove[i],'')
+		filtered = [(a,b,c,d,e,f) for a,b,c,d,e,f in data if d==city and c>start and c<end and f==provider]
+		if len(filtered)==0:
+			continue
+		try:
+			d_count = max(x[4] for x in filtered)
+		except:
+			continue
+		n_measurements = sum(x[1] for x in filtered)
+		average = sum((x[0]*x[1]/n_measurements) for x in filtered)
+		series = dict(name=provider, type='bar', data=average, count=d_count)
 		ret.append(series)
 	return ret
 
