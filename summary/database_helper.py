@@ -965,7 +965,7 @@ def parse_lmrtt_compare(device,earliest,latest,name):
 				# eventstamp:
 				entry.append(int(record[0]))
 				# average:
-				entry.append(float(record[1])*1000)
+				entry.append(float(record[1]))
 				data.append(entry)
 			except:
 				continue
