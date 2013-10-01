@@ -1097,7 +1097,7 @@ def parse_bitrate_isp_average(start_date,end_date,isp,direction,country):
 			continue
 		n_measurements = sum(x[1] for x in filtered)
 		average = sum((x[0]*x[1]/n_measurements) for x in filtered)
-		series = dict(name=provider, type='bar', data=average, count=d_count)
+		series = dict(name=city_name, type='bar', data=average, count=d_count)
 		ret.append(series)
 	return ret
 
@@ -1256,7 +1256,7 @@ def parse_rtt_isp_average(isp,country,start_date,end_date):
 	# result.append(data)
 	# return result	
 	
-def parse_bitrate_compare(device,earliest,latest,dir,isp):
+def parse_bitrate_compare(device,earliest,latest,dir,name):
 	data = []
 	earliest = datetime_helper.datetime_to_JSON(earliest)
 	latest = datetime_helper.datetime_to_JSON(latest)
@@ -1287,7 +1287,7 @@ def parse_bitrate_compare(device,earliest,latest,dir,isp):
 	data = sorted(data, key=lambda x: x[0])
 	# apply filtering:
 	data = [(x,y) for x,y,z,t in data if (x>earliest and x<latest and z==dir and t=='NETPERF_3')]
-	series = dict(name=isp + ' device', type='line',data=data)
+	series = dict(name=name + ' device', type='line',data=data)
 	return series	
 	
 # returns bitrate series for the given device:	
