@@ -1227,13 +1227,13 @@ def parse_lmrtt_country_average(start_date,end_date,country):
 		ret.append(series)
 	return ret
 
-def parse_rtt_isp_average(isp,country,start_date,end_date):
+def parse_lmrtt_isp_average(start_date,end_date,isp,country):
 	data = []
 	ret = []
 	start = int(datetime_helper.datetime_to_JSON(start_date))
 	end = int(datetime_helper.datetime_to_JSON(end_date))
 	cities = Devicedetails.objects.values('geoip_city').distinct()
-	filename = settings.PROJECT_ROOT + '/summary/measurements/rtt_averages/isp'
+	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt_averages/isp'
 	# garbage characters to be removed:
 	remove = ')("\n'
 	with open(filename,'r') as f:
@@ -1243,7 +1243,7 @@ def parse_rtt_isp_average(isp,country,start_date,end_date):
 				record = record.replace(remove[i],'')
 			record = record.split(',')
 			# average (a):
-			entry.append(float(record[0])*1000)
+			entry.append(float(record[0]))
 			# measurement count (b):
 			entry.append(int(record[1]))
 			# day (c)
@@ -1252,36 +1252,34 @@ def parse_rtt_isp_average(isp,country,start_date,end_date):
 			entry.append(record[3])
 			# device count (e):
 			entry.append(record[4])
-			# country (f):
-			entry.apend(record[5])
-			# city (g):
-			entry.apend(record[6])
+			# country(f):
+			entry.append(record[5])
+			# city(g)
+			entry.append(record[6])
 			data.append(entry)
 	f.close()
-	for c in cities:
-		city = c['geoip_city']
-		filtered = []
-		if provider==None or provider=='':
+	for city in cities:
+		city_name = city['geoip_city']
+		if city_name==None or city_name=='':
 			continue
 		for i in range(0,len(remove)):
-				provider = provider.replace(remove[i],'')
+				city_name = city_name.replace(remove[i],'')
+		filtered = []
 		if country=="none":
-			filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==isp and c>start and c<end]
+			filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==isp and c>start and c<end and g==city_name]
 		else:
-			filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==isp and c>start and c<end and f==country]
+			filtered = [(a,b,c,d,e,f,g) for a,b,c,d,e,f,g in data if d==isp and c>start and c<end and g==city_name and f==country]
+		if len(filtered)==0:
+			continue
 		try:
 			d_count = max(x[4] for x in filtered)
 		except:
 			continue
 		n_measurements = sum(x[1] for x in filtered)
 		average = sum((x[0]*x[1]/n_measurements) for x in filtered)
-		entry=[]
-		entry.append(city)
-		entry.append(d_count)
-		entry.append(n_measurements)
-		entry.append(average)
-		ret.append(entry)
-	return HttpResponse(json.dumps(ret))
+		series = dict(name=city_name, type='bar', data=average, count=d_count)
+		ret.append(series)
+	return ret
 	
 # def parse_bitrate_city_average(city):
 # def parse_lmrtt_country_average(country):
