@@ -86,12 +86,12 @@ def write_devices():
 				FROM devicedetails \
 				WHERE deviceid=%s"
 		cursor.execute(SQL,params)
-		rec = cursor.fetchone()[0]
+		rec = cursor.fetchone()
 		id = rec['deviceid']
 		eventstamp = datetime_helper.datetime_to_JSON(rec['eventstamp'])
 		city = rec['geoip_city']
 		country = rec['geoip_country']
-		isp = rec['isp']
+		isp = rec['geoip_isp']
 		line = id + ',' + str(eventstamp) + ',' + city + ',' + country + ',' + isp + ',' + latest + '\n'
 		f.write(line)
 	f.close()
