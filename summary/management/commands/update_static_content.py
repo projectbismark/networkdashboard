@@ -88,13 +88,21 @@ def write_devices():
 		cursor.execute(SQL,params)
 		rec = cursor.fetchone()
 		id = rec['deviceid']
+		if id==None:
+			id='none'
 		eventstamp = datetime_helper.datetime_to_JSON(rec['eventstamp'])
 		city = rec['geoip_city']
+		if city==None:
+			city='none'
 		country = rec['geoip_country']
+		if country==None:
+			country='none'
 		isp = rec['geoip_isp']
-		line = id + ',' + str(eventstamp) + ',' + city + ',' + country + ',' + isp + ',' + latest + '\n'
-		f.write(line)
-	f.close()
+		if isp==None:
+			isp='none'
+		line = id + ',' + str(eventstamp) + ',' + city + ',' + country + ',' + isp + ',' + str(latest) + '\n'
+		file.write(line)
+	file.close()
 	cursor.close()
 	return
 
