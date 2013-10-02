@@ -201,7 +201,7 @@ def get_active_count():
 	filename = settings.PROJECT_ROOT + '/summary/device_data/devices'
 	with open(filename, 'r') as fh:
 		for line in fh:
-			line = line.split(',')
+			line = line.split('|')
 			latest = int(line[5])
 			if latest>start:
 				active_count += 1

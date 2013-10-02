@@ -100,7 +100,7 @@ def write_devices():
 		isp = rec['geoip_isp']
 		if isp==None:
 			isp='none'
-		line = id + ',' + str(eventstamp) + ',' + city.encode('utf-8') + ',' + country.encode('utf-8') + ',' + isp.encode('utf-8') + ',' + str(latest) + '\n'
+		line = id + '|' + str(eventstamp) + '|' + city.encode('utf-8') + '|' + country.encode('utf-8') + '|' + isp.encode('utf-8') + '|' + str(latest) + '\n'
 		file.write(line)
 	file.close()
 	cursor.close()
