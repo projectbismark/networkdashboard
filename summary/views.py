@@ -650,33 +650,44 @@ def compare_lmrtt_by_isp(request):
 	# return HttpResponse(json.dumps(result))
 	
 # returns bargraph and linegraph series for a given country with respect to various cities:
-def compare_rtt_by_country(request):
-	result = []
-	avg_data = []
-	line_series = []
+# def compare_rtt_by_country(request):
+	# result = []
+	# avg_data = []
+	# line_series = []
+	# bar_series = []
+	# start = request.GET.get('start')
+	# end = request.GET.get('end')
+	# country = request.GET.get('country')
+	# earliest = datetime_helper.format_date_from_calendar(start)
+	# latest = datetime_helper.format_date_from_calendar(end)
+	## all devices under given country
+	# devices = Devicedetails.objects.filter(geoip_country=country, eventstamp__lte=latest)
+	# for d in devices:
+		# if d.geoip_isp!='' and d.geoip_isp!=None:
+			# data = []
+			# data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,False)
+			# if len(data)==0:
+				# continue
+			# if data[0]==0:
+				# continue
+			# avg_entry = []
+			# avg_entry.append(d.geoip_isp)
+			# avg_entry.append(data[0])
+			# avg_entry.append(data[1])
+			# avg_data.append(avg_entry)
+	# bar_series= views_helper.create_bargraph_series(avg_data)
+	# bar_series = sorted(bar_series, key= lambda x: x['name'])
+	# return HttpResponse(json.dumps(bar_series))
+
+def compare_lmrtt_by_country(request):
 	bar_series = []
 	start = request.GET.get('start')
 	end = request.GET.get('end')
 	country = request.GET.get('country')
 	earliest = datetime_helper.format_date_from_calendar(start)
 	latest = datetime_helper.format_date_from_calendar(end)
-	# all devices under given country
-	devices = Devicedetails.objects.filter(geoip_country=country, eventstamp__lte=latest)
-	for d in devices:
-		if d.geoip_isp!='' and d.geoip_isp!=None:
-			data = []
-			data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,False)
-			if len(data)==0:
-				continue
-			if data[0]==0:
-				continue
-			avg_entry = []
-			avg_entry.append(d.geoip_isp)
-			avg_entry.append(data[0])
-			avg_entry.append(data[1])
-			avg_data.append(avg_entry)
-	bar_series= views_helper.create_bargraph_series(avg_data)
-	bar_series = sorted(bar_series, key= lambda x: x['name'])
+	bar_series= database_helper.parse_rtt_country_average(earliest,latest,country)
+	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
 	return HttpResponse(json.dumps(bar_series))
 	
 # returns bargraph and linegraph series for a given ISP with respect to various cities:
