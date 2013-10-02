@@ -679,7 +679,7 @@ def compare_lmrtt_by_isp(request):
 	# bar_series = sorted(bar_series, key= lambda x: x['name'])
 	# return HttpResponse(json.dumps(bar_series))
 
-def compare_lmrtt_by_country(request):
+def compare_rtt_by_country(request):
 	bar_series = []
 	start = request.GET.get('start')
 	end = request.GET.get('end')
