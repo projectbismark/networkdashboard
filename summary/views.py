@@ -527,6 +527,37 @@ def compare_lmrtt_by_country(request):
 	# result.append(database_helper.bargraph_compare_rtt_by_city(city,earliest,latest))
 	# result.append(database_helper.linegraph_compare_rtt_by_city(city,max_results,earliest,latest))
 	# return HttpResponse(json.dumps(result))
+	
+def compare_rtt_by_city(request):	
+	result = []
+	line_series = []
+	bar_series = []
+	#for limiting number of line series:
+	max_results = int(request.GET.get('max_results'))
+	start = request.GET.get('start')
+	end = request.GET.get('end')
+	city = request.GET.get('city')
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	#all devices under given city
+	devices = Devicedetails.objects.filter(geoip_city=city, eventstamp__lte=latest)
+	for d in devices:
+		if d.geoip_isp!='' and d.geoip_isp!=None:
+			data = []
+			if len(line_series)<max_results:
+				try:
+					data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,d.geoip_isp)
+				except:
+					continue
+				if len(data['data'])==0:
+					continue
+				line_series.append(data)
+	bar_series= database_helper.parse_rtt_city_average(earliest,latest,city)
+	line_series = sorted(line_series, key = lambda x: x['name'].lstrip())
+	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
+	result.append(bar_series)
+	result.append(line_series)
+	return HttpResponse(json.dumps(result))
 
 def compare_lmrtt_by_isp(request):	
 	result = []
@@ -561,49 +592,50 @@ def compare_lmrtt_by_isp(request):
 	result.append(bar_series)
 	result.append(line_series)
 	return HttpResponse(json.dumps(result))	
-# returns bargraph and linegraph series for a given city with respect to various ISPs:
-def compare_rtt_by_city(request):
-	result = []
-	avg_data = []
-	line_series = []
-	bar_series = []
-	# for limiting number of line series:
-	max_results = int(request.GET.get('max_results'))
-	start = request.GET.get('start')
-	end = request.GET.get('end')
-	city = request.GET.get('city')
-	earliest = datetime_helper.format_date_from_calendar(start)
-	latest = datetime_helper.format_date_from_calendar(end)
-	# all devices under given ISP
-	devices = Devicedetails.objects.filter(geoip_city=city, eventstamp__lte=latest)
-	for d in devices:
-		if d.geoip_isp!='' and d.geoip_isp!=None:
-			data = []
-			if len(line_series)<max_results:
-				data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,True)
-				if len(data)==0:
-					continue
-				if data[0]==0:
-					continue
-				series = dict(name=d.geoip_isp,type='line',data=data[2])
-				line_series.append(series)
-			else:
-				data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,False)
-			if len(data)==0:
-				continue
-			if data[0]==0:
-				continue
-			avg_entry = []
-			avg_entry.append(d.geoip_isp)
-			avg_entry.append(data[0])
-			avg_entry.append(data[1])
-			avg_data.append(avg_entry)
-	bar_series= views_helper.create_bargraph_series(avg_data)
-	line_series = sorted(line_series, key = lambda x: x['name'])
-	bar_series = sorted(bar_series, key= lambda x: x['name'])
-	result.append(bar_series)
-	result.append(line_series)
-	return HttpResponse(json.dumps(result))
+
+##returns bargraph and linegraph series for a given city with respect to various ISPs:
+# def compare_rtt_by_city(request):
+	# result = []
+	# avg_data = []
+	# line_series = []
+	# bar_series = []
+	##for limiting number of line series:
+	# max_results = int(request.GET.get('max_results'))
+	# start = request.GET.get('start')
+	# end = request.GET.get('end')
+	# city = request.GET.get('city')
+	# earliest = datetime_helper.format_date_from_calendar(start)
+	# latest = datetime_helper.format_date_from_calendar(end)
+	##all devices under given ISP
+	# devices = Devicedetails.objects.filter(geoip_city=city, eventstamp__lte=latest)
+	# for d in devices:
+		# if d.geoip_isp!='' and d.geoip_isp!=None:
+			# data = []
+			# if len(line_series)<max_results:
+				# data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,True)
+				# if len(data)==0:
+					# continue
+				# if data[0]==0:
+					# continue
+				# series = dict(name=d.geoip_isp,type='line',data=data[2])
+				# line_series.append(series)
+			# else:
+				# data = database_helper.parse_rtt_compare(d.deviceid,earliest,latest,False)
+			# if len(data)==0:
+				# continue
+			# if data[0]==0:
+				# continue
+			# avg_entry = []
+			# avg_entry.append(d.geoip_isp)
+			# avg_entry.append(data[0])
+			# avg_entry.append(data[1])
+			# avg_data.append(avg_entry)
+	# bar_series= views_helper.create_bargraph_series(avg_data)
+	# line_series = sorted(line_series, key = lambda x: x['name'])
+	# bar_series = sorted(bar_series, key= lambda x: x['name'])
+	# result.append(bar_series)
+	# result.append(line_series)
+	# return HttpResponse(json.dumps(result))
 		
 # def compare_rtt_by_country(request):
 	# country = request.GET.get('country')
