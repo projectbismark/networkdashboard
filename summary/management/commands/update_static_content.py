@@ -39,6 +39,7 @@ class Command(NoArgsCommand):
 def update_json():
 	lock = UpdateLock('/tmp/UpdateLock.tmp')
 	if (lock.acquire()):
+		write_devices()
 		write_bitrate_measurements()
 		write_shaperate_measurements()
 		write_underload_measurements()
@@ -56,6 +57,45 @@ def update_json():
 		# write_rtt_isp_averages()
 		# write_lmrtt_isp_averages()
 		# write_bitrate_isp_averages()
+	return
+	
+def write_devices():
+	devices = Devicedetails.objects.all()
+	filename = settings.PROJECT_ROOT + '/summary/device_data/devices'
+	cursor = get_dict_cursor()
+	file = open(filename, 'w')
+	for d in devices:
+		SQL = ''
+		last = ''
+		params = []
+		latest = 0
+		params.append(d.deviceid)
+		device2 = d.deviceid.replace(':','')
+		filename2 = settings.PROJECT_ROOT + '/summary/measurements/rtt/' + device2
+		try:
+			with open(filename2, 'r') as fh:
+				for line in fh:
+					last = line
+		except:
+			pass
+		if len(last)>0:
+			last=last.split(',')
+			latest = last[0]
+		SQL = "SELECT \
+				deviceid, eventstamp, geoip_city, geoip_country, geoip_isp \
+				FROM devicedetails \
+				WHERE deviceid=%s"
+		cursor.execute(SQL,params)
+		rec = cursor.fetchone()[0]
+		id = rec['deviceid']
+		eventstamp = datetime_helper.datetime_to_JSON(rec['eventstamp'])
+		city = rec['geoip_city']
+		country = rec['geoip_country']
+		isp = rec['isp']
+		line = id + ',' + str(eventstamp) + ',' + city + ',' + country + ',' + isp + ',' + latest + '\n'
+		f.write(line)
+	f.close()
+	cursor.close()
 	return
 
 def write_rtt_measurements():
