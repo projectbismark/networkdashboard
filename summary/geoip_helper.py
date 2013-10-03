@@ -180,12 +180,22 @@ def getMACList():
 	return records
 	
 def get_device_count():
-	device_count = JsonCache.objects.values('deviceid').distinct().count()
+	#device_count = JsonCache.objects.values('deviceid').distinct().count()
 	# conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
 	# conn = psycopg2.connect(conn_string)
 	# cursor = conn.cursor()
 	# cursor.execute("select COUNT(*) from devices")
 	# count = cursor.fetchone()
+	device_count = 0
+	filename = settings.PROJECT_ROOT + '/summary/device_data/devices'
+	with open(filename, 'r') as fh:
+		for line in fh:
+			line = line.split('|')
+			city = line[2]
+			country = line[3]
+			isp = line[4]
+			if ((city!=None and city!='') or (country!=None and country!='') or (isp!=None and isp!=''))
+				device_count+=1
 	return device_count
 
 def get_active_count():
@@ -486,71 +496,146 @@ def get_devices_by_ip(ip):
 	conn.close()
 	return records
 	
-def get_country_count():
-	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
-	country_list = []
-	ip_list = getIPList()
-	ip_list_active = getIPListActive()
-	for ip in ip_list:
-		new_country = True
-		try:
-			name = gi.country_name_by_addr(ip[0])
-			for c in country_list:
-				if c['country']==name:
-					c['count']+=1
-					new_country = False
-			if new_country:
-				value = {}
-				value['country']=name
-				value['count']=1
-				value['count_active']=0
-				country_list.append(value)
-		except:
-			continue
-	for ip in ip_list_active:
-		try:
-			name = gi.country_name_by_addr(ip[0])
-			for c in country_list:
-				if c['country']==name:
-					c['count_active']+=1
-		except:
-			continue
-	return country_list
-	
+#def get_country_count():
+	# gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	# country_list = []
+	# ip_list = getIPList()
+	# ip_list_active = getIPListActive()
+	# for ip in ip_list:
+		# new_country = True
+		# try:
+			# name = gi.country_name_by_addr(ip[0])
+			# for c in country_list:
+				# if c['country']==name:
+					# c['count']+=1
+					# new_country = False
+			# if new_country:
+				# value = {}
+				# value['country']=name
+				# value['count']=1
+				# value['count_active']=0
+				# country_list.append(value)
+		# except:
+			# continue
+	# for ip in ip_list_active:
+		# try:
+			# name = gi.country_name_by_addr(ip[0])
+			# for c in country_list:
+				# if c['country']==name:
+					# c['count_active']+=1
+		# except:
+			# continue
+	# return country_list
+	# gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	# country_list = []
+	# ip_list = getIPList()
+	# ip_list_active = getIPListActive()
+	# for ip in ip_list:
+		# new_country = True
+		# try:
+			# name = gi.country_name_by_addr(ip[0])
+			# for c in country_list:
+				# if c['country']==name:
+					# c['count']+=1
+					# new_country = False
+			# if new_country:
+				# value = {}
+				# value['country']=name
+				# value['count']=1
+				# value['count_active']=0
+				# country_list.append(value)
+		# except:
+			# continue
+	# for ip in ip_list_active:
+		# try:
+			# name = gi.country_name_by_addr(ip[0])
+			# for c in country_list:
+				# if c['country']==name:
+					# c['count_active']+=1
+		# except:
+			# continue
+	# return country_list
 
-	
+def get_country_count():
+	country_list = []
+	filename = settings.PROJECT_ROOT + '/summary/device_data/country_count'
+	with open(filename, 'r') as fh:
+		for line in fh:
+			line = line.split('|')
+			country = line[0]
+			count = line[1]
+			active_count = line[2]
+			value = {}
+			value['country'] = country
+			value['count'] = count
+			value['count_active'] = active_count
+			country_list.append(value)
+	return country_list
+
 def get_city_count():
-	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	city_list = []
-	ip_list = getIPList()
-	ip_list_active = getIPListActive()
-	for ip in ip_list:
-		new_city = True
-		try:
-			rec = gi.record_by_addr(ip[0])
-			for c in city_list:
-				if ((c['city']==rec['city'])and(c['region']==rec['region_name'])):
-					c['count']+=1
-					new_city = False
-			if ((new_city) and (rec['city']!='')):
-				value = {}
-				value['city']=rec['city']
-				value['region']=rec['region_name']
-				value['country']=rec['country_name']
-				value['count']=1
-				value['count_active']=0
-				city_list.append(value)
-		except:
-			continue	
-	for ip in ip_list_active:
-		try:
-			rec = gi.record_by_addr(ip[0])
-			for c in city_list:
-				if ((c['city']==rec['city'])and(c['region']==rec['region_name'])):
-					c['count_active']+=1
-		except:
-			continue
+	filename = settings.PROJECT_ROOT + '/summary/device_data/city_count'
+	with open(filename, 'r') as fh:
+		for line in fh:
+			line = line.split('|')
+			city = line[0]
+			count = line[1]
+			active_count = line[2]
+			value = {}
+			value['city'] = city
+			value['count'] = count
+			value['count_active'] = active_count
+			country_list.append(value)
 	return city_list
+
+def get_isp_count():
+	isp_list = []
+	filename = settings.PROJECT_ROOT + '/summary/device_data/isp_count'
+	with open(filename, 'r') as fh:
+		for line in fh:
+			line = line.split('|')
+			city = line[0]
+			count = line[1]
+			active_count = line[2]
+			value = {}
+			value['isp'] = isp
+			value['count'] = count
+			value['count_active'] = active_count
+			country_list.append(value)
+	return isp_list
+	
+# def get_city_count():
+	# gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
+	# city_list = []
+	# ip_list = getIPList()
+	# ip_list_active = getIPListActive()
+	# for ip in ip_list:
+		# new_city = True
+		# try:
+			# rec = gi.record_by_addr(ip[0])
+			# for c in city_list:
+				# if ((c['city']==rec['city'])and(c['region']==rec['region_name'])):
+					# c['count']+=1
+					# new_city = False
+			# if ((new_city) and (rec['city']!='')):
+				# value = {}
+				# value['city']=rec['city']
+				# value['region']=rec['region_name']
+				# value['country']=rec['country_name']
+				# value['count']=1
+				# value['count_active']=0
+				# city_list.append(value)
+		# except:
+			# continue	
+	# for ip in ip_list_active:
+		# try:
+			# rec = gi.record_by_addr(ip[0])
+			# for c in city_list:
+				# if ((c['city']==rec['city'])and(c['region']==rec['region_name'])):
+					# c['count_active']+=1
+		# except:
+			# continue
+	# return city_list
 	
 def get_provider_by_ip(ip):
 	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
@@ -575,45 +660,45 @@ def get_record_by_ip(ip):
 	else:
 		return ""
 	
-def get_isp_count():
-	gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
-	mappings = isp_mappings.mappings
-	isp_list = []
-	ip_list = getIPList()
-	ip_list_active = getIPListActive()
-	for ip in ip_list:
-		new_isp = True
-		try:
-			name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
-			for m in mappings:
-				if(name.lower().find(m[0].lower())!=-1):
-					name = m[1]
-					break
-			for isp in isp_list:
-				if isp['isp']==name:
-					isp['count']+=1
-					new_isp = False
-			if ((new_isp) and (name!='')):
-				value = {}
-				value['isp']=name
-				value['count']=1
-				value['count_active']=0
-				isp_list.append(value)
-		except:
-			continue
-	for ip in ip_list_active:
-		try:
-			name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
-			for m in mappings:
-				if(name.lower().find(m[0].lower())!=-1):
-					name = m[1]
-					break
-			for isp in isp_list:
-				if isp['isp']==name:
-					isp['count_active']+=1
-		except:
-			continue
-	return isp_list
+# def get_isp_count():
+	# gi = pygeoip.GeoIP(settings.GEOIP_ASN_LOCATION,pygeoip.MEMORY_CACHE)
+	# mappings = isp_mappings.mappings
+	# isp_list = []
+	# ip_list = getIPList()
+	# ip_list_active = getIPListActive()
+	# for ip in ip_list:
+		# new_isp = True
+		# try:
+			# name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+			# for m in mappings:
+				# if(name.lower().find(m[0].lower())!=-1):
+					# name = m[1]
+					# break
+			# for isp in isp_list:
+				# if isp['isp']==name:
+					# isp['count']+=1
+					# new_isp = False
+			# if ((new_isp) and (name!='')):
+				# value = {}
+				# value['isp']=name
+				# value['count']=1
+				# value['count_active']=0
+				# isp_list.append(value)
+		# except:
+			# continue
+	# for ip in ip_list_active:
+		# try:
+			# name = gi.org_by_addr(ip[0]).lstrip("AS0123456789")
+			# for m in mappings:
+				# if(name.lower().find(m[0].lower())!=-1):
+					# name = m[1]
+					# break
+			# for isp in isp_list:
+				# if isp['isp']==name:
+					# isp['count_active']+=1
+		# except:
+			# continue
+	# return isp_list
 
 def randomize_latitude(lat):
 	return (1-((1-(random.random()*2))*.0001))*lat
