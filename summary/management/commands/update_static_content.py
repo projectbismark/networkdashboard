@@ -793,8 +793,8 @@ def write_country_count():
 			WHERE geoip_country=%s;"
 		SQL2 = "SELECT \
 			COUNT(DISTINCT devicedetails.deviceid) as a_count \
-			FROM devicedetails join m_rtt on devicedetails.deviceid=m_rtt.deviceid \
-			WHERE geoip_country=%s AND m_rtt.eventstamp>%s;"
+			FROM devicedetails join m_bitrate on devicedetails.deviceid=m_bitrate.deviceid \
+			WHERE geoip_country=%s AND m_bitrate.eventstamp>%s;"
 		cursor.execute(SQL1,params)
 		rec = cursor.fetchone()
 		device_count = rec['d_count']
@@ -823,8 +823,8 @@ def write_city_count():
 			WHERE geoip_city=%s;"
 		SQL2 = "SELECT \
 			COUNT(DISTINCT devicedetails.deviceid) as a_count \
-			FROM devicedetails join m_rtt on devicedetails.deviceid=m_rtt.deviceid \
-			WHERE geoip_city=%s AND m_rtt.eventstamp>%s;"
+			FROM devicedetails join m_bitrate on devicedetails.deviceid=m_bitrate.deviceid \
+			WHERE geoip_city=%s AND m_bitrate.eventstamp>%s;"
 		cursor.execute(SQL1,params)
 		rec = cursor.fetchone()
 		device_count = rec['d_count']
@@ -853,8 +853,8 @@ def write_isp_count():
 			WHERE geoip_isp=%s;"
 		SQL2 = "SELECT \
 			COUNT(DISTINCT devicedetails.deviceid) as a_count \
-			FROM devicedetails join m_rtt on devicedetails.deviceid=m_rtt.deviceid \
-			WHERE geoip_isp=%s AND m_rtt.eventstamp>%s;"
+			FROM devicedetails join m_bitrate on devicedetails.deviceid=m_bitrate.deviceid \
+			WHERE geoip_isp=%s AND m_bitrate.eventstamp>%s;"
 		cursor.execute(SQL1,params)
 		rec = cursor.fetchone()
 		device_count = rec['d_count']
