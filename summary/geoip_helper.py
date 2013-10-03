@@ -194,7 +194,7 @@ def get_device_count():
 			city = line[2]
 			country = line[3]
 			isp = line[4]
-			if ((city!=None and city!='') or (country!=None and country!='') or (isp!=None and isp!=''))
+			if ((city!=None and city!='') or (country!=None and country!='') or (isp!=None and isp!='')):
 				device_count+=1
 	return device_count
 

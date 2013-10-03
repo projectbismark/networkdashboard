@@ -782,6 +782,7 @@ def write_country_count():
 	filename = settings.PROJECT_ROOT + '/summary/device_data/country_count'
 	countries = Devicedetails.objects.all().exclude(geoip_country='').values('geoip_country')
 	file = open(filename, 'w')
+	earliest=datetime_helper.get_daterange_start(7)
 	cursor = get_dict_cursor()
 	for c in countries:
 		params=[]
@@ -811,6 +812,7 @@ def write_city_count():
 	filename = settings.PROJECT_ROOT + '/summary/device_data/city_count'
 	cities = Devicedetails.objects.all().exclude(geoip_city='').values('geoip_city')
 	file = open(filename, 'w')
+	earliest=datetime_helper.get_daterange_start(7)
 	cursor = get_dict_cursor()
 	for c in cities:
 		params=[]
@@ -840,6 +842,7 @@ def write_isp_count():
 	filename = settings.PROJECT_ROOT + '/summary/device_data/isp_count'
 	isps = Devicedetails.objects.all().exclude(geoip_country='').values('geoip_isp')
 	file = open(filename, 'w')
+	earliest=datetime_helper.get_daterange_start(7)
 	cursor = get_dict_cursor()
 	for isp in isps:
 		params=[]
