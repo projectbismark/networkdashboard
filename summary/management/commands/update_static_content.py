@@ -794,7 +794,7 @@ def write_country_count():
 		SQL2 = "SELECT \
 			COUNT(DISTINCT devicedetails.deviceid) as a_count \
 			FROM devicedetails join m_rtt on devicedetails.deviceid=m_rtt.deviceid \
-			WHERE geoip_country=%s AND m_rt.eventstamp>%s;"
+			WHERE geoip_country=%s AND m_rtt.eventstamp>%s;"
 		cursor.execute(SQL1,params)
 		rec = cursor.fetchone()
 		device_count = rec['d_count']
@@ -802,7 +802,7 @@ def write_country_count():
 		cursor.execute(SQL2,params)
 		rec = cursor.fetchone()
 		active_count = rec['a_count']
-		line = c['geoip_country'].encode('utf-8') + '|' + device_count + '|' + active_count + '\n'
+		line = c['geoip_country'].encode('utf-8') + '|' + str(device_count) + '|' + str(active_count) + '\n'
 		file.write(line)
 	cursor.close()
 	file.close()
@@ -824,7 +824,7 @@ def write_city_count():
 		SQL2 = "SELECT \
 			COUNT(DISTINCT devicedetails.deviceid) as a_count \
 			FROM devicedetails join m_rtt on devicedetails.deviceid=m_rtt.deviceid \
-			WHERE geoip_city=%s AND m_rt.eventstamp>%s;"
+			WHERE geoip_city=%s AND m_rtt.eventstamp>%s;"
 		cursor.execute(SQL1,params)
 		rec = cursor.fetchone()
 		device_count = rec['d_count']
@@ -832,7 +832,7 @@ def write_city_count():
 		cursor.execute(SQL2,params)
 		rec = cursor.fetchone()
 		active_count = rec['a_count']
-		line = c['geoip_city'].encode('utf-8') + '|' + device_count + '|' + active_count + '\n'
+		line = c['geoip_city'].encode('utf-8') + '|' + str(device_count) + '|' + str(active_count) + '\n'
 		file.write(line)
 	cursor.close()
 	file.close()
@@ -854,7 +854,7 @@ def write_isp_count():
 		SQL2 = "SELECT \
 			COUNT(DISTINCT devicedetails.deviceid) as a_count \
 			FROM devicedetails join m_rtt on devicedetails.deviceid=m_rtt.deviceid \
-			WHERE geoip_isp=%s AND m_rt.eventstamp>%s;"
+			WHERE geoip_isp=%s AND m_rtt.eventstamp>%s;"
 		cursor.execute(SQL1,params)
 		rec = cursor.fetchone()
 		device_count = rec['d_count']
@@ -862,7 +862,7 @@ def write_isp_count():
 		cursor.execute(SQL2,params)
 		rec = cursor.fetchone()
 		active_count = rec['a_count']
-		line = c['geoip_city'].encode('utf-8') + '|' + device_count + '|' + active_count + '\n'
+		line = c['geoip_city'].encode('utf-8') + '|' + str(device_count) + '|' + str(active_count) + '\n'
 		file.write(line)
 	cursor.close()
 	file.close()
