@@ -780,7 +780,7 @@ def dump_all_latencies():
 	
 def write_country_count():
 	filename = settings.PROJECT_ROOT + '/summary/device_data/country_count'
-	countries = Devicedetails.objects.all().exclude(geoip_country='').values('geoip_country')
+	countries = Devicedetails.objects.all().distinct('geoip_country').exclude(geoip_country='').values('geoip_country')
 	file = open(filename, 'w')
 	earliest=datetime_helper.get_daterange_start(7)
 	cursor = get_dict_cursor()
@@ -810,7 +810,7 @@ def write_country_count():
 
 def write_city_count():
 	filename = settings.PROJECT_ROOT + '/summary/device_data/city_count'
-	cities = Devicedetails.objects.all().exclude(geoip_city='').values('geoip_city')
+	cities = Devicedetails.objects.all().distinct('geoip_city').exclude(geoip_city='').values('geoip_city')
 	file = open(filename, 'w')
 	earliest=datetime_helper.get_daterange_start(7)
 	cursor = get_dict_cursor()
@@ -840,13 +840,13 @@ def write_city_count():
 
 def write_isp_count():
 	filename = settings.PROJECT_ROOT + '/summary/device_data/isp_count'
-	isps = Devicedetails.objects.all().exclude(geoip_country='').values('geoip_isp')
+	isps = Devicedetails.objects.all().distinct('geoip_isp').exclude(geoip_isp='').values('geoip_isp')
 	file = open(filename, 'w')
 	earliest=datetime_helper.get_daterange_start(7)
 	cursor = get_dict_cursor()
 	for isp in isps:
 		params=[]
-		params.append(c['geoip_isp'])
+		params.append(isp['geoip_isp'])
 		SQL1 = "SELECT \
 			COUNT(*) as d_count \
 			FROM devicedetails \
@@ -862,7 +862,7 @@ def write_isp_count():
 		cursor.execute(SQL2,params)
 		rec = cursor.fetchone()
 		active_count = rec['a_count']
-		line = c['geoip_city'].encode('utf-8') + '|' + str(device_count) + '|' + str(active_count) + '\n'
+		line = isp['geoip_isp'].encode('utf-8') + '|' + str(device_count) + '|' + str(active_count) + '\n'
 		file.write(line)
 	cursor.close()
 	file.close()
