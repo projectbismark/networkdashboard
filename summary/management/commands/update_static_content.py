@@ -792,7 +792,7 @@ def write_country_count():
 			FROM devicedetails \
 			WHERE geoip_country=%s;"
 		SQL2 = "SELECT \
-			COUNT(DISTINCT deviceid) as a_count \
+			COUNT(DISTINCT devicedetails.deviceid) as a_count \
 			FROM devicedetails join m_rtt on devicedetails.deviceid=m_rtt.deviceid \
 			WHERE geoip_country=%s AND m_rt.eventstamp>%s;"
 		cursor.execute(SQL1,params)
@@ -822,7 +822,7 @@ def write_city_count():
 			FROM devicedetails \
 			WHERE geoip_city=%s;"
 		SQL2 = "SELECT \
-			COUNT(DISTINCT deviceid) as a_count \
+			COUNT(DISTINCT devicedetails.deviceid) as a_count \
 			FROM devicedetails join m_rtt on devicedetails.deviceid=m_rtt.deviceid \
 			WHERE geoip_city=%s AND m_rt.eventstamp>%s;"
 		cursor.execute(SQL1,params)
@@ -852,7 +852,7 @@ def write_isp_count():
 			FROM devicedetails \
 			WHERE geoip_isp=%s;"
 		SQL2 = "SELECT \
-			COUNT(DISTINCT deviceid) as a_count \
+			COUNT(DISTINCT devicedetails.deviceid) as a_count \
 			FROM devicedetails join m_rtt on devicedetails.deviceid=m_rtt.deviceid \
 			WHERE geoip_isp=%s AND m_rt.eventstamp>%s;"
 		cursor.execute(SQL1,params)
