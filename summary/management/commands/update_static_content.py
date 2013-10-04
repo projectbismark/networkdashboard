@@ -49,9 +49,6 @@ def update_json():
 		write_capacity_measurements()
 		dump_all_latencies()
 		write_coord_data()
-		write_country_count()
-		write_city_count()
-		write_isp_count()
 		write_lmrtt_measurements()
 		write_rtt_measurements()
 		write_rtt_city_averages()
@@ -281,7 +278,7 @@ def write_rtt_city_averages():
 		city = r['city']
 		isp = r['isp']
 		d_count = r['ndevices']
-		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city + ',' + str(d_count) + ',' + isp + '\n'
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city.encode('utf-8') + ',' + str(d_count) + ',' + isp.encode('utf-8') + '\n'
 		f.write(line)
 	f.close()
 	cursor.close()
@@ -311,7 +308,7 @@ def write_lmrtt_city_averages():
 		city = r['city']
 		isp = r['isp']
 		d_count = r['ndevices']
-		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city + ',' + str(d_count) + ',' + isp + '\n'
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city.encode('utf-8') + ',' + str(d_count) + ',' + isp.encode('utf-8') + '\n'
 		f.write(line)
 	f.close()
 	cursor.close()
@@ -344,7 +341,7 @@ def write_bitrate_city_averages():
 			isp = r['isp']
 			d_count = r['ndevices']
 			dir = r['dir']
-			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city + ',' + str(d_count) + ',' + dir + ',' + isp + '\n'
+			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city.encode('utf-8') + ',' + str(d_count) + ',' + dir + ',' + isp.encode('utf-8') + '\n'
 			f.write(line)
 		except:
 			continue
@@ -381,7 +378,7 @@ def write_rtt_isp_averages():
 		country = r['country']
 		city = r['city']
 		d_count = r['ndevices']
-		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp + ',' + str(d_count) + ',' + country + ',' + city + '\n'
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp.encode('utf-8') + ',' + str(d_count) + ',' + country.encode('utf-8') + ',' + city.encode('utf-8') + '\n'
 		f.write(line)
 	f.close()
 	cursor.close()
@@ -413,7 +410,7 @@ def write_lmrtt_isp_averages():
 		country = r['country']
 		city = r['city']
 		d_count = r['ndevices']
-		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp + ',' + str(d_count) + ',' + country + ',' + city + '\n'
+		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp.encode('utf-8') + ',' + str(d_count) + ',' + country.encode('utf-8') + ',' + city.encode('utf-8') + '\n'
 		f.write(line)
 	f.close()
 	cursor.close()
@@ -448,7 +445,7 @@ def write_bitrate_isp_averages():
 			country = r['country']
 			d_count = r['ndevices']
 			dir = r['dir']
-			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp + ',' + str(d_count) + ',' + dir + ',' + country + ',' + city + '\n'
+			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp.encode('utf-8') + ',' + str(d_count) + ',' + dir + ',' + country.encode('utf-8') + ',' + city.encode('utf-8') + '\n'
 			f.write(line)
 		except:
 			continue
@@ -772,7 +769,7 @@ def dump_all_latencies():
 			day = datetime_helper.datetime_to_JSON(r['day'])
 			country = r['country']
 			d_count = r['ndevices']
-			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + str(d_count) + '\n'
+			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country.encode('utf-8') + ',' + str(d_count) + '\n'
 			f.write(line)
 		f.close()
 	cursor.close()
