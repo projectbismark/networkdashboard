@@ -594,7 +594,7 @@ def get_isp_count():
 	with open(filename, 'r') as fh:
 		for line in fh:
 			line = line.split('|')
-			city = line[0]
+			isp = line[0]
 			count = line[1]
 			active_count = line[2]
 			value = {}
