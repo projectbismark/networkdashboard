@@ -1072,7 +1072,7 @@ def get_countries_vis_data(request):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# average:
 			entry.append(float(record[0]))
 			# measurement count:

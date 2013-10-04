@@ -19,7 +19,7 @@ def parse_coords():
 		for line in f:
 			entry = {}
 			line = line.replace('\n','')
-			line = line.split(',')
+			line = line.split('|')
 			entry['hash'] = line[0]
 			entry['lat'] = line[1]
 			entry['lon'] = line[2]

@@ -579,10 +579,12 @@ def get_city_count():
 		for line in fh:
 			line = line.split('|')
 			city = line[0]
-			count = line[1]
-			active_count = line[2]
+			country = line[2]
+			count = line[3]
+			active_count = line[4]
 			value = {}
 			value['city'] = city
+			value['country'] = country
 			value['count'] = count
 			value['count_active'] = active_count
 			city_list.append(value)

@@ -82,7 +82,7 @@ def write_devices():
 		except:
 			pass
 		if len(last)>0:
-			last=last.split(',')
+			last=last.split('|')
 			latest = last[0]
 		SQL = "SELECT \
 				deviceid, eventstamp, geoip_city, geoip_country, geoip_isp \
@@ -128,7 +128,7 @@ def write_rtt_measurements():
 			pass
 		f = open(filename, 'a')
 		if last!='':
-			last=last.split(',')
+			last=last.split('|')
 			latest = datetime.fromtimestamp(int(last[0])/1000)
 			params.append(latest)
 			SQL = "SELECT \
@@ -147,7 +147,7 @@ def write_rtt_measurements():
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
 			dstip = r['dstip']
-			line = str(eventstamp) + ',' + str(avg) + ',' + dstip + '\n'
+			line = str(eventstamp) + '|' + str(avg) + '|' + dstip + '\n'
 			f.write(line)
 		f.close()
 	cursor.close()
@@ -180,7 +180,7 @@ def write_rtt_country_averages():
 		country = r['country']
 		isp = r['isp']
 		d_count = r['ndevices']
-		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + str(d_count) + ',' + isp + '\n'
+		line = str(avg) + '|' + str(m_count) + '|' + str(day) + '|' + country + '|' + str(d_count) + '|' + isp + '\n'
 		f.write(line)
 	f.close()
 	cursor.close()
@@ -210,7 +210,7 @@ def write_lmrtt_country_averages():
 		country = r['country']
 		isp = r['isp']
 		d_count = r['ndevices']
-		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + str(d_count) + ',' + isp + '\n'
+		line = str(avg) + '|' + str(m_count) + '|' + str(day) + '|' + country + '|' + str(d_count) + '|' + isp + '\n'
 		f.write(line)
 	f.close()
 	cursor.close()
@@ -243,7 +243,7 @@ def write_bitrate_country_averages():
 			isp = r['isp']
 			d_count = r['ndevices']
 			dir = r['dir']
-			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country + ',' + str(d_count) + ',' + dir + ',' + isp + '\n'
+			line = str(avg) + '|' + str(m_count) + '|' + str(day) + '|' + country + '|' + str(d_count) + '|' + dir + '|' + isp + '\n'
 			f.write(line)
 		except:
 			continue
@@ -278,7 +278,7 @@ def write_rtt_city_averages():
 		city = r['city']
 		isp = r['isp']
 		d_count = r['ndevices']
-		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city.encode('utf-8') + ',' + str(d_count) + ',' + isp.encode('utf-8') + '\n'
+		line = str(avg) + '|' + str(m_count) + '|' + str(day) + '|' + city.encode('utf-8') + '|' + str(d_count) + '|' + isp.encode('utf-8') + '\n'
 		f.write(line)
 	f.close()
 	cursor.close()
@@ -308,7 +308,7 @@ def write_lmrtt_city_averages():
 		city = r['city']
 		isp = r['isp']
 		d_count = r['ndevices']
-		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city.encode('utf-8') + ',' + str(d_count) + ',' + isp.encode('utf-8') + '\n'
+		line = str(avg) + '|' + str(m_count) + '|' + str(day) + '|' + city.encode('utf-8') + '|' + str(d_count) + '|' + isp.encode('utf-8') + '\n'
 		f.write(line)
 	f.close()
 	cursor.close()
@@ -341,7 +341,7 @@ def write_bitrate_city_averages():
 			isp = r['isp']
 			d_count = r['ndevices']
 			dir = r['dir']
-			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + city.encode('utf-8') + ',' + str(d_count) + ',' + dir + ',' + isp.encode('utf-8') + '\n'
+			line = str(avg) + '|' + str(m_count) + '|' + str(day) + '|' + city.encode('utf-8') + '|' + str(d_count) + '|' + dir + '|' + isp.encode('utf-8') + '\n'
 			f.write(line)
 		except:
 			continue
@@ -378,7 +378,7 @@ def write_rtt_isp_averages():
 		country = r['country']
 		city = r['city']
 		d_count = r['ndevices']
-		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp.encode('utf-8') + ',' + str(d_count) + ',' + country.encode('utf-8') + ',' + city.encode('utf-8') + '\n'
+		line = str(avg) + '|' + str(m_count) + '|' + str(day) + '|' + isp.encode('utf-8') + '|' + str(d_count) + '|' + country.encode('utf-8') + '|' + city.encode('utf-8') + '\n'
 		f.write(line)
 	f.close()
 	cursor.close()
@@ -410,7 +410,7 @@ def write_lmrtt_isp_averages():
 		country = r['country']
 		city = r['city']
 		d_count = r['ndevices']
-		line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp.encode('utf-8') + ',' + str(d_count) + ',' + country.encode('utf-8') + ',' + city.encode('utf-8') + '\n'
+		line = str(avg) + '|' + str(m_count) + '|' + str(day) + '|' + isp.encode('utf-8') + '|' + str(d_count) + '|' + country.encode('utf-8') + '|' + city.encode('utf-8') + '\n'
 		f.write(line)
 	f.close()
 	cursor.close()
@@ -445,7 +445,7 @@ def write_bitrate_isp_averages():
 			country = r['country']
 			d_count = r['ndevices']
 			dir = r['dir']
-			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + isp.encode('utf-8') + ',' + str(d_count) + ',' + dir + ',' + country.encode('utf-8') + ',' + city.encode('utf-8') + '\n'
+			line = str(avg) + '|' + str(m_count) + '|' + str(day) + '|' + isp.encode('utf-8') + '|' + str(d_count) + '|' + dir + '|' + country.encode('utf-8') + '|' + city.encode('utf-8') + '\n'
 			f.write(line)
 		except:
 			continue
@@ -472,7 +472,7 @@ def write_lmrtt_measurements():
 			pass
 		f = open(filename, 'a')
 		if last!='':
-			last=last.split(',')
+			last=last.split('|')
 			latest = datetime.fromtimestamp(int(last[0])/1000)
 			params.append(latest)
 			SQL = "SELECT \
@@ -490,7 +490,7 @@ def write_lmrtt_measurements():
 		for r in records:
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
-			line = str(eventstamp) + ',' + str(avg) + '\n'
+			line = str(eventstamp) + '|' + str(avg) + '\n'
 			f.write(line)
 		f.close()
 	cursor.close()
@@ -515,7 +515,7 @@ def write_bitrate_measurements():
 			pass
 		f = open(filename, 'a')
 		if last!='':
-			last=last.split(',')
+			last=last.split('|')
 			latest = datetime.fromtimestamp(int(last[0])/1000)
 			params.append(latest)
 			SQL = "SELECT \
@@ -537,7 +537,7 @@ def write_bitrate_measurements():
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
 			toolid = r['toolid']
-			line = str(eventstamp) + ',' + str(avg) + ',' + str(direction) + ',' + str(toolid) + '\n'
+			line = str(eventstamp) + '|' + str(avg) + '|' + str(direction) + '|' + str(toolid) + '\n'
 			f.write(line)
 		f.close()
 	cursor.close()
@@ -562,7 +562,7 @@ def write_shaperate_measurements():
 			pass
 		f = open(filename, 'a')
 		if last!='':
-			last=last.split(',')
+			last=last.split('|')
 			latest = datetime.fromtimestamp(int(last[0])/1000)
 			params.append(latest)
 			SQL = "SELECT \
@@ -583,7 +583,7 @@ def write_shaperate_measurements():
 				continue
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
-			line = str(eventstamp) + ',' + str(avg) + ',' + str(direction) + '\n'
+			line = str(eventstamp) + '|' + str(avg) + '|' + str(direction) + '\n'
 			f.write(line)
 		f.close()
 	cursor.close()
@@ -608,7 +608,7 @@ def write_underload_measurements():
 			pass
 		f = open(filename, 'a')
 		if last!='':
-			last=last.split(',')
+			last=last.split('|')
 			latest = datetime.fromtimestamp(int(last[0])/1000)
 			params.append(latest)
 			SQL1 = "SELECT \
@@ -634,14 +634,14 @@ def write_underload_measurements():
 		for r in records:
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
-			line = str(eventstamp) + ',' + str(avg) + ',' + 'dw' + '\n'
+			line = str(eventstamp) + '|' + str(avg) + '|' + 'dw' + '\n'
 			f.write(line)
 		cursor.execute(SQL2,params)
 		records = cursor.fetchall()
 		for r in records:
 			eventstamp = datetime_helper.datetime_to_JSON(r['eventstamp'])
 			avg = r['average']
-			line = str(eventstamp) + ',' + str(avg) + ',' + 'up' + '\n'
+			line = str(eventstamp) + '|' + str(avg) + '|' + 'up' + '\n'
 			f.write(line)
 		f.close()
 	cursor.close()
@@ -673,7 +673,7 @@ def write_coord_data():
 			recent_measurement_count = MRtt.objects.filter(deviceid=id,eventstamp__gte=active_thresh).count()
 			if recent_measurement_count>0:
 				active=1
-			line = hash + ',' + lat + ',' + lon + ',' + isp + ',' + str(active) + ',' + str(server) + '\n'
+			line = hash + '|' + lat + '|' + lon + '|' + isp + '|' + str(active) + '|' + str(server) + '\n'
 			f.write(line)
 		except:
 			continue
@@ -688,7 +688,7 @@ def write_coord_data():
 			lat = str(row_ip.latitude)
 			lon = str(row_ip.longitude)
 			hash = ""
-			line = hash + ',' + lat + ',' + lon + ',' + isp + ',' + str(active) + ',' + str(server) + '\n'
+			line = hash + '|' + lat + '|' + lon + '|' + isp + '|' + str(active) + '|' + str(server) + '\n'
 			f.write(line)
 		except:
 			continue
@@ -716,7 +716,7 @@ def write_capacity_measurements():
 			pass
 		f = open(filename, 'a')
 		if last!='':
-			last=last.split(',')
+			last=last.split('|')
 			latest = datetime.fromtimestamp(int(last[0])/1000)
 			params.append(latest)
 			SQL = "SELECT \
@@ -737,7 +737,7 @@ def write_capacity_measurements():
 			direction = r['direction']
 			if direction=='' or direction==None:
 				continue
-			line = str(eventstamp) + ',' + str(avg) + ',' + direction + '\n'
+			line = str(eventstamp) + '|' + str(avg) + '|' + direction + '\n'
 			f.write(line)
 		f.close()
 	cursor.close()
@@ -769,7 +769,7 @@ def dump_all_latencies():
 			day = datetime_helper.datetime_to_JSON(r['day'])
 			country = r['country']
 			d_count = r['ndevices']
-			line = str(avg) + ',' + str(m_count) + ',' + str(day) + ',' + country.encode('utf-8') + ',' + str(d_count) + '\n'
+			line = str(avg) + '|' + str(m_count) + '|' + str(day) + '|' + country.encode('utf-8') + '|' + str(d_count) + '\n'
 			f.write(line)
 		f.close()
 	cursor.close()

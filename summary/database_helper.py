@@ -924,7 +924,7 @@ def parse_rtt_compare(device,earliest,latest,name):
 			try:
 				for i in range(0,len(remove)):
 					record = record.replace(remove[i],'')
-				record = record.split(',')
+				record = record.split('|')
 				# eventstamp:
 				entry.append(int(record[0]))
 				# average:
@@ -994,7 +994,7 @@ def parse_lmrtt_compare(device,earliest,latest,name):
 			try:
 				for i in range(0,len(remove)):
 					record = record.replace(remove[i],'')
-				record = record.split(',')
+				record = record.split('|')
 				# eventstamp:
 				entry.append(int(record[0]))
 				# average:
@@ -1022,7 +1022,7 @@ def parse_bitrate_city_average(start_date,end_date,city,direction):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# average (a):
 			entry.append(float(record[0])*1000)
 			# measurement count (b):
@@ -1072,7 +1072,7 @@ def parse_bitrate_country_average(start_date,end_date,country,direction):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# average (a):
 			entry.append(float(record[0])*1000)
 			# measurement count (b):
@@ -1122,7 +1122,7 @@ def parse_bitrate_isp_average(start_date,end_date,isp,direction,country):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# average (a):
 			entry.append(float(record[0])*1000)
 			# measurement count (b):
@@ -1178,7 +1178,7 @@ def parse_lmrtt_city_average(start_date,end_date,city):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# average (a):
 			entry.append(float(record[0]))
 			# measurement count (b):
@@ -1226,7 +1226,7 @@ def parse_lmrtt_country_average(start_date,end_date,country):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# average (a):
 			entry.append(float(record[0]))
 			# measurement count (b):
@@ -1274,7 +1274,7 @@ def parse_lmrtt_isp_average(start_date,end_date,isp,country):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# average (a):
 			entry.append(float(record[0]))
 			# measurement count (b):
@@ -1328,7 +1328,7 @@ def parse_rtt_city_average(start_date,end_date,city):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# average (a):
 			entry.append(float(record[0]))
 			# measurement count (b):
@@ -1376,7 +1376,7 @@ def parse_rtt_country_average(start_date,end_date,country):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# average (a):
 			entry.append(float(record[0]))
 			# measurement count (b):
@@ -1424,7 +1424,7 @@ def parse_rtt_isp_average(start_date,end_date,isp,country):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# average (a):
 			entry.append(float(record[0]))
 			# measurement count (b):
@@ -1529,7 +1529,7 @@ def parse_bitrate_compare(device,earliest,latest,dir,name):
 			try:
 				for i in range(0,len(remove)):
 					record = record.replace(remove[i],'')
-				record = record.split(',')
+				record = record.split('|')
 				# eventstamp:
 				entry.append(int(record[0]))
 				# average:
@@ -1561,7 +1561,7 @@ def parse_bitrate_measurements(device, dir):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# eventstamp:
 			entry.append(int(record[0]))
 			# average:
@@ -1600,7 +1600,7 @@ def parse_underload_measurements(device):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# eventstamp:
 			entry.append(int(record[0]))
 			# average:
@@ -1635,7 +1635,7 @@ def parse_rtt_measurements(device):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# eventstamp:
 			entry.append(int(record[0]))
 			# average:
@@ -1674,7 +1674,7 @@ def parse_lmrtt_measurements(device):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# eventstamp:
 			entry.append(int(record[0]))
 			# average:
@@ -1701,7 +1701,7 @@ def parse_shaperate_measurements(device):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# eventstamp:
 			entry.append(int(record[0]))
 			# average:
@@ -1733,7 +1733,7 @@ def parse_capacity_measurements(device):
 			entry = []
 			for i in range(0,len(remove)):
 				record = record.replace(remove[i],'')
-			record = record.split(',')
+			record = record.split('|')
 			# eventstamp:
 			entry.append(int(record[0]))
 			# average:
