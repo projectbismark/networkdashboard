@@ -215,16 +215,16 @@ def get_active_count():
 	
 def get_sorted_country_data():
 	country_data = geoip_helper.get_country_count()
-	result = sorted(country_data, key=itemgetter('country'))
+	result = sorted(country_data, key=itemgetter('country').lstrip())
 	return result
 	
 def get_sorted_city_data():
 	city_data = geoip_helper.get_city_count()
-	result = sorted(city_data, key=itemgetter('city'))
+	result = sorted(city_data, key=itemgetter('city').lstrip())
 	return result
 	
 def get_sorted_isp_data():
 	isp_data = geoip_helper.get_isp_count()
-	result = sorted(isp_data, key=itemgetter('isp'))
+	result = sorted(isp_data, key=itemgetter('isp').lstrip())
 	return result
 
