@@ -807,12 +807,12 @@ def write_country_count():
 
 def write_city_count():
 	filename = settings.PROJECT_ROOT + '/summary/device_data/city_count'
-	devices = Devicedetails.objects.all().distinct('geoip_city').exclude(geoip_city='',geoip_country='')
+	devices = Devicedetails.objects.all().distinct('geoip_city').exclude(geoip_city='')
 	file = open(filename, 'w')
 	earliest=datetime_helper.get_daterange_start(7)
 	cursor = get_dict_cursor()
 	for d in devices:
-		if d.geoip_city==None or d.geoip_country==None:
+		if d.geoip_city==None or d.geoip_country==None or d.geoip_country=='':
 			continue
 		params=[]
 		params.append(d.geoip_city)
