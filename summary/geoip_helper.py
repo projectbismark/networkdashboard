@@ -585,7 +585,7 @@ def get_city_count():
 			value['city'] = city
 			value['count'] = count
 			value['count_active'] = active_count
-			country_list.append(value)
+			city_list.append(value)
 	return city_list
 
 def get_isp_count():
