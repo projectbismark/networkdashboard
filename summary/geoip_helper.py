@@ -562,6 +562,8 @@ def get_country_count():
 	with open(filename, 'r') as fh:
 		for line in fh:
 			line = line.split('|')
+			if len(line)!=3:
+				continue
 			country = line[0]
 			count = line[1]
 			active_count = line[2]
@@ -578,10 +580,12 @@ def get_city_count():
 	with open(filename, 'r') as fh:
 		for line in fh:
 			line = line.split('|')
+			if len(line)!=4:
+				continue
 			city = line[0]
-			country = line[2]
-			count = line[3]
-			active_count = line[4]
+			country = line[1]
+			count = line[2]
+			active_count = line[3]
 			value = {}
 			value['city'] = city
 			value['country'] = country
@@ -596,6 +600,8 @@ def get_isp_count():
 	with open(filename, 'r') as fh:
 		for line in fh:
 			line = line.split('|')
+			if len(line)!=3:
+				continue
 			isp = line[0]
 			count = line[1]
 			active_count = line[2]
