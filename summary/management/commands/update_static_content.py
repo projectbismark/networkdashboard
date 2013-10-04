@@ -670,7 +670,7 @@ def write_coord_data():
 			server = 0
 			if hash=="":
 				continue
-			recent_measurement_count = MRtt.objects.filter(deviceid=id,eventstamp__gte=active_thresh).count()
+			recent_measurement_count = MBitrate.objects.filter(deviceid=id,eventstamp__gte=active_thresh).count()
 			if recent_measurement_count>0:
 				active=1
 			line = hash + '|' + lat + '|' + lon + '|' + isp + '|' + str(active) + '|' + str(server) + '\n'
