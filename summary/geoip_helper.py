@@ -606,7 +606,7 @@ def get_isp_count():
 			count = line[1]
 			active_count = line[2]
 			value = {}
-			value['isp'] = isp
+			value['isp'] = isp.lstrip()
 			value['count'] = count
 			value['count_active'] = active_count
 			isp_list.append(value)
