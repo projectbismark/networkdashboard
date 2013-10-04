@@ -812,8 +812,10 @@ def write_city_count():
 	earliest=datetime_helper.get_daterange_start(7)
 	cursor = get_dict_cursor()
 	for d in devices:
+		if d.geoip_city==None or d.geoip_country==None:
+			continue
 		params=[]
-		params.append(d['geoip_city'])
+		params.append(d.geoip_city)
 		SQL1 = "SELECT \
 			COUNT(*) as d_count \
 			FROM devicedetails \
@@ -829,7 +831,7 @@ def write_city_count():
 		cursor.execute(SQL2,params)
 		rec = cursor.fetchone()
 		active_count = rec['a_count']
-		line = d['geoip_city'].encode('utf-8') + '|' + d['geoip_country'].encode('utf-8') + '|' + str(device_count) + '|' + str(active_count) + '\n'
+		line = d.geoip_city.encode('utf-8') + '|' + d.geoip_country.encode('utf-8') + '|' + str(device_count) + '|' + str(active_count) + '\n'
 		file.write(line)
 	cursor.close()
 	file.close()
