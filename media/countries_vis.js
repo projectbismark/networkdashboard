@@ -109,7 +109,7 @@ $(document).ready(function() {
 	    format : 'YYYY-MM-DD',
 	    startDate : $('#startdate').val(),
 	    endDate : $('#enddate').val(),
-		separator : 'to'
+		separator : ' to '
 	},
 	function(start, end){
 	    $('#startdate').val(start.format('YYYY-MM-DD'));
