@@ -839,7 +839,8 @@ def write_city_count():
 
 def write_isp_count():
 	filename = settings.PROJECT_ROOT + '/summary/device_data/isp_count'
-	isps = Devicedetails.objects.all().distinct('geoip_isp').exclude(geoip_isp='').exclude(geop_isp='unknown').values('geoip_isp')
+	isps = Devicedetails.objects.all().distinct('geoip_isp').exclude(geop_isp='unknown').values('geoip_isp')
+	countries = Devicedetails.objects.all().distinct('geoip_country').exclude(geoip_country='').values('geoip_country')
 	file = open(filename, 'w')
 	earliest=datetime_helper.get_daterange_start(7)
 	cursor = get_dict_cursor()
