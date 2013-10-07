@@ -199,8 +199,6 @@ def get_device_count():
 	return device_count
 
 def get_active_count():
-	active_thresh = datetime_helper.get_daterange_start(7)
-	start = int(datetime_helper.datetime_to_JSON(active_thresh))
 	# device_count = JsonCache.objects.filter(eventstamp__gte=active_thresh).values('deviceid').distinct().count()
 	# conn_string = "host='localhost' dbname='" + settings.MGMT_DB + "' user='"+ settings.MGMT_USERNAME  +"' password='" +  settings.MGMT_PASS + "'"
 	# conn = psycopg2.connect(conn_string)
@@ -213,7 +211,7 @@ def get_active_count():
 		for line in fh:
 			line = line.split('|')
 			latest = int(line[5])
-			if latest>start:
+			if latest:
 				active_count += 1
 	return active_count
 
