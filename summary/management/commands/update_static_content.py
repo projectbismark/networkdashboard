@@ -43,23 +43,23 @@ def update_json():
 		write_city_count()
 		write_country_count()
 		write_isp_count()
+		write_coord_data()
 		write_bitrate_measurements()
 		write_shaperate_measurements()
 		write_underload_measurements()
 		write_capacity_measurements()
+		write_bitrate_city_averages()
+		write_bitrate_country_averages()
+		write_bitrate_isp_averages()
 		dump_all_latencies()
-		write_coord_data()
 		write_lmrtt_measurements()
+		write_lmrtt_city_averages()
+		write_lmrtt_country_averages()
+		write_lmrtt_isp_averages()
 		write_rtt_measurements()
 		write_rtt_city_averages()
-		write_lmrtt_city_averages()
-		write_bitrate_city_averages()
 		write_rtt_country_averages()
-		write_lmrtt_country_averages()
-		write_bitrate_country_averages()
 		write_rtt_isp_averages()
-		write_lmrtt_isp_averages()
-		write_bitrate_isp_averages()
 	return
 	
 def write_devices():
@@ -839,7 +839,7 @@ def write_city_count():
 
 def write_isp_count():
 	filename = settings.PROJECT_ROOT + '/summary/device_data/isp_count'
-	isps = Devicedetails.objects.all().distinct('geoip_isp').exclude(geoip_isp='',geoip_isp='unknown').values('geoip_isp')
+	isps = Devicedetails.objects.all().distinct('geoip_isp').exclude(geoip_isp='').exclude(geop_isp='unknown').values('geoip_isp')
 	file = open(filename, 'w')
 	earliest=datetime_helper.get_daterange_start(7)
 	cursor = get_dict_cursor()

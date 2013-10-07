@@ -1604,7 +1604,7 @@ def parse_underload_measurements(device):
 			# eventstamp:
 			entry.append(int(record[0]))
 			# average:
-			entry.append(float(record[1])*1000)
+			entry.append(float(record[1]))
 			# direction:
 			direction = record[2]
 			entry.append(direction)
