@@ -71,26 +71,29 @@ def write_devices():
 		SQL = ''
 		last = ''
 		params = []
-		latest = 0
+		active = 0
 		params.append(d.deviceid)
-		device2 = d.deviceid.replace(':','')
-		filename2 = settings.PROJECT_ROOT + '/summary/measurements/rtt/' + device2
-		try:
-			with open(filename2, 'r') as fh:
-				for line in fh:
-					last = line
-		except:
-			pass
-		if len(last)>0:
-			last=last.split('|')
-			latest = last[0]
+		active_thresh = datetime_helper.get_daterange_start(7)
+		recent_measurement_count = MBitrate.objects.filter(deviceid=d.deviceid,eventstamp__gte=active_thresh).count()
+		if recent_measurement_count>0:
+			active=1
+		# filename2 = settings.PROJECT_ROOT + '/summary/measurements/rtt/' + device2
+		# try:
+			# with open(filename2, 'r') as fh:
+				# for line in fh:
+					# last = line
+		# except:
+			# pass
+		# if len(last)>0:
+			# last=last.split('|')
+			# latest = last[0]
 		SQL = "SELECT \
 				deviceid, eventstamp, geoip_city, geoip_country, geoip_isp \
 				FROM devicedetails \
 				WHERE deviceid=%s"
 		cursor.execute(SQL,params)
 		rec = cursor.fetchone()
-		id = rec['deviceid']
+		id = d.deviceid
 		if id==None:
 			id='none'
 		eventstamp = datetime_helper.datetime_to_JSON(rec['eventstamp'])
@@ -103,7 +106,7 @@ def write_devices():
 		isp = rec['geoip_isp']
 		if isp==None:
 			isp='none'
-		line = id + '|' + str(eventstamp) + '|' + city.encode('utf-8') + '|' + country.encode('utf-8') + '|' + isp.encode('utf-8') + '|' + str(latest) + '\n'
+		line = id + '|' + str(eventstamp) + '|' + city.encode('utf-8') + '|' + country.encode('utf-8') + '|' + isp.encode('utf-8') + '|' + str(recent) + '\n'
 		file.write(line)
 	file.close()
 	cursor.close()
