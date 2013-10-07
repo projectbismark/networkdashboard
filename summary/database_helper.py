@@ -1104,7 +1104,7 @@ def parse_bitrate_country_average(start_date,end_date,country,direction):
 			continue
 		n_measurements = sum(x[1] for x in filtered)
 		average = sum((x[0]*x[1]/n_measurements) for x in filtered)
-		series = dict(name=city_name, type='bar', data=average, count=d_count)
+		series = dict(name=provider, type='bar', data=average, count=d_count)
 		ret.append(series)
 	return ret
 	
