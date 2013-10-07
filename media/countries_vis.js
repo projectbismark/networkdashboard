@@ -108,13 +108,13 @@ $(document).ready(function() {
 	{
 	    format : 'YYYY-MM-DD',
 	    startDate : $('#startdate').val(),
-	    endDate : $('#enddate').val()
+	    endDate : $('#enddate').val(),
+		separator : 'to'
 	},
-	function(start, end)
-	{
+	function(start, end){
 	    $('#startdate').val(start.format('YYYY-MM-DD'));
 	    $('#enddate').val(end.format('YYYY-MM-DD'));
-	    fillmap( $('#serverselector').val() );
+	    fillmap($('#serverselector').val());
 	}
     );
     $('#serverselector').change(function() {

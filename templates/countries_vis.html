@@ -31,7 +31,7 @@
 			    <label class="control-label" for="daterange">Date Range:</label>
 			    <div class="controls">
 			      <div class="input-prepend">
-				<span class="add-on"><i class="icon-calendar"></i></span><input type="text" name="reserveation" id="calendar" value="{{start_year}}-{{start_month}}-{{start_day}}   to  {{end_year}}-{{end_month}}-{{end_day}}" />
+				<span class="add-on"><i class="icon-calendar"></i></span><input type="text" name="calendar" id="calendar" value="{{start_year}}-{{start_month}}-{{start_day}}   to  {{end_year}}-{{end_month}}-{{end_day}}" />
 			      </div>
 			    </div>
 			  </div>
@@ -82,7 +82,7 @@
 				</div>
 			</div>
 		</div>
-		<script type="text/javascript">
+		<!--<script type="text/javascript">
 			$('#calendar').daterangepicker(
 			{ 
 				format: 'YYYY-MM-DD',
@@ -94,7 +94,7 @@
 				$('#enddate').val(end.format('YYYY-MM-DD'));
             }
 	);
-</script>
+</script>-->
 		{% endblock %}
 	</body>
 </html>
