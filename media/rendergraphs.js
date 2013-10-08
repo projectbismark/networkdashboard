@@ -778,7 +778,7 @@ function onSuccessCompareCityLine(graphParams,country,city) {
                 tooltip: {
                     formatter: graphParams.formatter
                 },
-                series: JSON.parse(seriesData)
+                series: seriesData
             });
         } else {
             var div = document.getElementById(graphParams.divid);
