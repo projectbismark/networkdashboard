@@ -1152,14 +1152,14 @@ function compareByCity(){
 	$.ajax({
 		type: "GET",
 		url: params.url,
-		data: {'start' : start, 'end' : end, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'city' : city},
-		success: onSuccessCompare(params,country,city)
+		data: {'start' : start, 'end' : end, 'direction' : params.direction, 'graphno' : params.graphno, 'max_results' : max, 'city' : city},
+		success: onSuccessCompareCityLine(params,country,city)
 	});
 	$.ajax({
 		type: "GET",
 		url: params.url2,
 		data: {'start' : start, 'end' : end, 'direction' : params.direction, 'graphno' : params.graphno, 'city' : city},
-		success: onSuccessCompare(params,country,city)
+		success: onSuccessCompareBarLine(params,country,city)
 	});
 }
 
