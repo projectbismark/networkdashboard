@@ -1159,7 +1159,7 @@ function compareByCity(){
 		type: "GET",
 		url: params.url2,
 		data: {'start' : start, 'end' : end, 'direction' : params.direction, 'graphno' : params.graphno, 'city' : city},
-		success: onSuccessCompareBarLine(params,country,city)
+		success: onSuccessCompareCityBar(params,country,city)
 	});
 }
 
