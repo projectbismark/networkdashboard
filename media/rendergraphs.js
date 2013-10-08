@@ -912,7 +912,7 @@ function onSuccessIspCompareLine(graphParams,country) {
             var div = document.getElementById(graphParams.divid);
             div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
         }
-		$('#load_bar_1').hide();
+		$('#load_bar_2').hide();
     }
 }
 
@@ -1002,7 +1002,7 @@ function onSuccessIspCompareBar(graphParams,country) {
             var div = document.getElementById(graphParams.divid2);
             div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
         }
-		$('#load_bar_2').hide();
+		$('#load_bar_1').hide();
     }
 }
 
