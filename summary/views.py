@@ -304,7 +304,7 @@ def compare_line_bitrate_by_isp(request):
 	for d in devices:
 		if d.geoip_city!='' and d.geoip_city!=None:
 			data = []
-			if len(line_series)<max_results:
+			if len(result)<max_results:
 				try:
 					data = database_helper.parse_bitrate_compare(d.deviceid,earliest,latest,direction,d.geoip_city)
 				except:
