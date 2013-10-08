@@ -382,6 +382,24 @@ div.graphdiv {
 	padding-top:0;
 }
 
+#load_bar_1{
+	position:relative;
+	top: -200px;
+    margin-left:25%;
+	margin-right:25%;
+	text-align: center;
+	padding-top:0;
+}
+
+#load_bar_2{
+	position:relative;
+	top: -200px;
+    margin-left:25%;
+	margin-right:25%;
+	text-align: center;
+	padding-top:0;
+}
+
 #edit_btn{
 	height: 
 }
