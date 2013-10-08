@@ -153,13 +153,13 @@ function createParameters(i) {
             ret.graphid = 0;
             ret.graphno = 1;
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += formatBytes(point.y) + '<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += formatBytes(point.y) + '<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = 'Bits Per Second';
             ret.url = '/line_bitrate/';
@@ -170,13 +170,13 @@ function createParameters(i) {
             ret.graphid = 1;
             ret.graphno = 2;
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += formatBytes(point.y) + '<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += formatBytes(point.y) + '<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = "Bits Per Second";
             ret.url = "/line_bitrate/";
@@ -186,13 +186,13 @@ function createParameters(i) {
             ret.divid = "graph_div_3";
             ret.graphid = 2;
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = "Milliseconds";
             ret.url = "/line_rtt/";
@@ -202,13 +202,13 @@ function createParameters(i) {
             ret.divid = "graph_div_4";
             ret.graphid = 3;
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = "Milliseconds";
             ret.url = "/line_lmrtt/";
@@ -218,13 +218,13 @@ function createParameters(i) {
             ret.divid = "graph_div_5";
             ret.graphid = 4;
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += formatBytes(point.y) + '<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += formatBytes(point.y) + '<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = 'Bits Per Second';
             ret.url = "/line_shaperate/";
@@ -234,13 +234,13 @@ function createParameters(i) {
 			ret.divid = "graph_div_6";
             ret.graphid = 5;
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = "Milliseconds";
             ret.url = "/line_unload/";
@@ -289,13 +289,13 @@ function compareParameters(i) {
             ret.graphno = 1;
 			ret.direction = 'dw';
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += formatBytes(point.y) + '<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += formatBytes(point.y) + '<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = 'Bits Per Second';
             ret.url = '/compare_bitrate/';
@@ -307,13 +307,13 @@ function compareParameters(i) {
             ret.graphno = 1;
 			ret.direction = 'up';
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += formatBytes(point.y) + '<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += formatBytes(point.y) + '<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = 'Bits Per Second';
             ret.url = '/compare_bitrate/';
@@ -322,13 +322,13 @@ function compareParameters(i) {
 		case "lm":
             ret.divid = "graph_div_6";
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = "Milliseconds";
             ret.url = "/compare_lmrtt/";
@@ -337,13 +337,13 @@ function compareParameters(i) {
 		case "rtt":
             ret.divid = "graph_div_6";
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = "Milliseconds";
             ret.url = "/compare_rtt/";
@@ -396,25 +396,26 @@ function compareByCityParameters(i) {
 			}
         }
     };
+	ret.divid = 'graph_div_7';
 	ret.divid2 = 'graph_div_6';
     switch (i) {
         case "down":
-            ret.divid = 'graph_div_7';
             ret.graphid = 0;
             ret.graphno = 1;
 			ret.direction = 'dw';
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += formatBytes(point.y) + '<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += formatBytes(point.y) + '<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = 'Bits Per Second';
-            ret.url = '/compare_bitrate_by_city/';
-            break;
+            ret.url = '/compare_line_bitrate_by_city/';
+            ret.url2 = '/compare_bar_bitrate_by_city/';
+			break;
 
         case "up":
             ret.divid = 'graph_div_7';
@@ -422,47 +423,49 @@ function compareByCityParameters(i) {
             ret.graphno = 1;
 			ret.direction = 'up';
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += formatBytes(point.y) + '<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += formatBytes(point.y) + '<br/>';
                 });
                 return ret;
             };
-            ret.units = 'Bits Per Second';
-            ret.url = '/compare_bitrate_by_city/';
+            ret.url = '/compare_line_bitrate_by_city/';
+            ret.url2 = '/compare_bar_bitrate_by_city/';
             break;
 		
 		case "lm":
             ret.divid = "graph_div_7";
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = "Milliseconds";
-            ret.url = "/compare_lmrtt_by_city/";
-            break;
+            ret.url = "/compare_line_lmrtt_by_city/";
+            ret.url2 = "/compare_bar_lmrtt_by_city/"
+			break;
 			
 		case "rtt":
             ret.divid = "graph_div_7";
             ret.formatter = function() {
-                var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
+                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
                 $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
-                    ret += '<p style="color:' + point.series.color +  ';">';
-                    ret += point.series.name + '</p> ';
-                    ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
+                    result += '<p style="color:' + point.series.color +  ';">';
+                    result += point.series.name + '</p> ';
+                    result += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
                 });
-                return ret;
+                return result;
             };
             ret.units = "Milliseconds";
-            ret.url = "/compare_rtt_by_city/";
-            break;
+            ret.url = "/compare_line_rtt_by_city/";
+            ret.url2 = "/compare_bar_rtt_by_city/";
+			break;
     }
     return ret;
 }
@@ -747,10 +750,10 @@ function onSuccessGraph(graphParams) {
     }
 }
 
-function onSuccessCompare(graphParams,country, city) {
+function onSuccessCompareCityLine(graphParams,country,city) {
     return function(data) {
 		var seriesData = JSON.parse(data)
-        if (seriesData[1].length > 0) {
+        if (seriesData.length > 0) {
             window.chart = new Highcharts.StockChart({
                 chart: {
                     renderTo: graphParams.divid,
@@ -775,30 +778,36 @@ function onSuccessCompare(graphParams,country, city) {
                 tooltip: {
                     formatter: graphParams.formatter
                 },
-                series: JSON.parse(data)[1]
+                series: JSON.parse(seriesData)
             });
         } else {
             var div = document.getElementById(graphParams.divid);
             div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
         }
-		if (seriesData[0].length > 0) {
-			data = seriesData[0];
+		$('#load_bar_2').hide();
+    }
+}
+
+function onSuccessCompareCityBar(graphParams,country, city) {
+    return function(data) {
+		var seriesData = JSON.parse(data)
+		if (seriesData.length > 0) {
 			var graphData = new Array();
 			var categories = new Array();
 			var labels;
-			for(var i=0;i<data.length; i++){
+			for(var i=0;i<seriesData.length; i++){
 				graphData[i] = {
-					y : parseFloat(data[i]['data']),
-					name : data[i]['name'],
+					y : parseFloat(seriesData[i]['data']),
+					name : seriesData[i]['name'],
 					country : country,
 					city: city,
-					count : data[i]['count']
+					count : seriesData[i]['count']
 				}
-				if (data[i]['count']=='1'){
-					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+				if (seriesData[i]['count']=='1'){
+					categories[i] = seriesData[i]['name'] + ' (' + seriesData[i]['count'] + ')';
 				}
 				else{
-					categories[i] = data[i]['name'] + ' (' + data[i]['count'] + ')';
+					categories[i] = seriesData[i]['name'] + ' (' + seriesData[i]['count'] + ')';
 				}
 			}
 			if(graphData.length>6){
@@ -876,7 +885,7 @@ function onSuccessCompare(graphParams,country, city) {
             var div = document.getElementById(graphParams.divid2);
             div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
         }
-		$('#load_bar').hide();
+		$('#load_bar_1').hide();
     }
 }
 
@@ -1129,14 +1138,14 @@ function compareGraphs(deviceid){
 }
 
 function compareByCity(){
-	$('#load_bar').show();
+	$('#load_bar_1').show();
+	$('#load_bar_2').show();
 	var sel1 = document.getElementById("max_devices");
 	var sel2 = document.getElementById("measurement_type");
 	var start = document.getElementById("start_date").value;
 	var end = document.getElementById("end_date").value;
 	var max = sel1.options[sel1.selectedIndex].value;
 	var mtype = sel2.options[sel2.selectedIndex].value;
-	/* var days = sel3.options[sel3.selectedIndex].value; */
 	var params = compareByCityParameters(mtype);
 	var city = document.getElementById("city_name").value
 	var country = document.getElementById("country_name").value
@@ -1144,7 +1153,13 @@ function compareByCity(){
 		type: "GET",
 		url: params.url,
 		data: {'start' : start, 'end' : end, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'city' : city},
-		success: onSuccessCompare(params,country, city)
+		success: onSuccessCompare(params,country,city)
+	});
+	$.ajax({
+		type: "GET",
+		url: params.url2,
+		data: {'start' : start, 'end' : end, 'direction' : params.direction, 'graphno' : params.graphno, 'city' : city},
+		success: onSuccessCompare(params,country,city)
 	});
 }
 
