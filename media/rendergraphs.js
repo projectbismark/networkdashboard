@@ -682,7 +682,8 @@ function compareByIspParameters(i, country, isp) {
                 return ret;
             };
             ret.units = "Milliseconds";
-            ret.url = "/compare_lmrtt_by_isp/";
+            ret.url = "/compare_line_lmrtt_by_isp/";
+			ret.url2 = "/compare_bar_lmrtt_by_isp/";
             break;
 			
 		case "rtt":
@@ -697,7 +698,8 @@ function compareByIspParameters(i, country, isp) {
                 return ret;
             };
             ret.units = "Milliseconds";
-            ret.url = "/compare_rtt_by_isp/";
+            ret.url = "/compare_line_rtt_by_isp/";
+			ret.url2 = "/compare_bar_rtt_by_isp/";
             break;
     }
     return ret;
