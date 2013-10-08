@@ -999,7 +999,7 @@ function onSuccessIspCompareBar(graphParams,country) {
 							units = "ms";
 							val = this.y;
 						}
-						return title + "<br/>" + val.toFixed(2) + units + "<br/> (Click for more information)";
+						return title + "<br/>" + val.toFixed(2) + units;
 					}
 				},
 				legend:{
