@@ -287,11 +287,8 @@ def compare_bitrate_by_country(request):
 	# result.append(line_series)
 	# return HttpResponse(json.dumps(result))
 
-def compare_bitrate_by_isp(request):	
+def compare_line_bitrate_by_isp(request):	
 	result = []
-	line_series = []
-	bar_series = []
-	#for limiting number of line series:
 	max_results = int(request.GET.get('max_results'))
 	start = request.GET.get('start')
 	end = request.GET.get('end')
@@ -314,13 +311,23 @@ def compare_bitrate_by_isp(request):
 					continue
 				if len(data['data'])==0:
 					continue
-				line_series.append(data)
-	bar_series= database_helper.parse_bitrate_isp_average(earliest,latest,isp,direction,country)
-	line_series = sorted(line_series, key = lambda x: x['name'].lstrip())
-	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
-	result.append(bar_series)
-	result.append(line_series)
+				result.append(data)
+	result = sorted(result, key = lambda x: x['name'].lstrip())
 	return HttpResponse(json.dumps(result))
+	
+def compare_bar_bitrate_by_isp(request):	
+	start = request.GET.get('start')
+	end = request.GET.get('end')
+	isp = request.GET.get('isp')
+	country = request.GET.get('country')
+	direction = request.GET.get('direction')
+	earliest = datetime_helper.format_date_from_calendar(start)
+	latest = datetime_helper.format_date_from_calendar(end)
+	#all devices under given isp
+	devices = Devicedetails.objects.filter(geoip_isp=isp, eventstamp__lte=latest)
+	bar_series = database_helper.parse_bitrate_isp_average(earliest,latest,isp,direction,country)
+	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
+	return HttpResponse(json.dumps(bar_series))
 	
 # def compare_lmrtt_by_city(request):
 	# city = request.GET.get('city')

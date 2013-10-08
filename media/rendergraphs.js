@@ -630,10 +630,10 @@ function compareByIspParameters(i, country, isp) {
 			}
         }
     };
+	ret.divid = 'graph_div_7';
 	ret.divid2 = 'graph_div_6';
     switch (i) {
         case "down":
-            ret.divid = 'graph_div_7';
             ret.graphid = 0;
             ret.graphno = 1;
 			ret.direction = 'dw';
@@ -647,7 +647,8 @@ function compareByIspParameters(i, country, isp) {
                 return ret;
             };
             ret.units = 'Bits Per Second';
-            ret.url = '/compare_bitrate_by_isp/';
+            ret.url = '/compare_line_bitrate_by_isp/';
+			ret.url2 = '/compare_bar_bitrate_by_isp/';
             break;
 
         case "up":
@@ -665,8 +666,9 @@ function compareByIspParameters(i, country, isp) {
                 return ret;
             };
             ret.units = 'Bits Per Second';
-            ret.url = '/compare_bitrate_by_isp/';
-            break;
+            ret.url = '/compare_line_bitrate_by_isp/';
+            ret.url2 = '/compare_bar_bitrate_by_isp/';
+			break;
 		
 		case "lm":
             ret.divid = "graph_div_7";
@@ -876,10 +878,10 @@ function onSuccessCompare(graphParams,country, city) {
     }
 }
 
-function onSuccessIspCompare(graphParams,country) {
+function onSuccessIspCompareLine(graphParams,country) {
     return function(data) {
 		seriesData = JSON.parse(data)
-        if (seriesData[1].length > 0) {
+        if (seriesData.length > 0) {
             window.chart = new Highcharts.StockChart({
                 chart: {
                     renderTo: graphParams.divid,
@@ -888,7 +890,7 @@ function onSuccessIspCompare(graphParams,country) {
                 rangeSelector: graphParams.rangeSelector,
                 plotOptions: graphParams.plotOptions,
                 xAxis: {
-                    maxZoom: 1 * 24 * 3600000, // fourteen days
+                    maxZoom: 1 * 24 * 3600000,
                     ordinal: false
                 },
                 yAxis: {
@@ -904,14 +906,20 @@ function onSuccessIspCompare(graphParams,country) {
                 tooltip: {
                     formatter: graphParams.formatter
                 },
-                series: seriesData[1]
+                series: seriesData
             });
         } else {
             var div = document.getElementById(graphParams.divid);
             div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
         }
-		if (seriesData[0].length > 0) {
-			dataParse = seriesData[0]
+		$('#load_bar_1').hide();
+    }
+}
+
+function onSuccessIspCompareBar(graphParams,country) {
+    return function(data) {
+		dataParse = JSON.parse(data)
+		if (dataParse.length > 0) {
 			var graphData = new Array();
 			var categories = new Array();
 			var labels;
@@ -994,7 +1002,7 @@ function onSuccessIspCompare(graphParams,country) {
             var div = document.getElementById(graphParams.divid2);
             div.innerHTML="<div id='error'><b>Insufficient Data</b></div>";
         }
-		$('#load_bar').hide();
+		$('#load_bar_2').hide();
     }
 }
 
@@ -1157,7 +1165,8 @@ function compareByCountry(){
 }
 
 function compareByIsp(){
-	$('#load_bar').show();
+	$('#load_bar_1').show();
+	$('#load_bar_2').show();
 	var sel1 = document.getElementById("max_devices");
 	var sel2 = document.getElementById("measurement_type");
 	var start = document.getElementById("start_date").value;
@@ -1173,7 +1182,13 @@ function compareByIsp(){
 		type: "GET",
 		url: params.url,
 		data: {'start' : start, 'end' : end, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'isp' : isp, 'country' : country},
-		success: onSuccessIspCompare(params, country)
+		success: onSuccessIspCompareLine(params, country)
+	});
+	$.ajax({
+		type: "GET",
+		url: params.url2,
+		data: {'start' : start, 'end' : end, 'direction' : params.direction, 'graphno' : params.graphno, 'isp' : isp, 'country' : country},
+		success: onSuccessIspCompareBar(params, country)
 	});
 }
 
