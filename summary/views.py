@@ -603,7 +603,7 @@ def compare_bar_lmrtt_by_isp(request):
 	latest = datetime_helper.format_date_from_calendar(end)
 	bar_series= database_helper.parse_lmrtt_isp_average(earliest,latest,isp,country)
 	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
-	return HttpResponse(json.dumps(result))	
+	return HttpResponse(json.dumps(bar_series))	
 
 ##returns bargraph and linegraph series for a given city with respect to various ISPs:
 # def compare_rtt_by_city(request):
