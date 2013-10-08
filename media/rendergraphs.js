@@ -431,6 +431,7 @@ function compareByCityParameters(i) {
                 });
                 return ret;
             };
+			ret.units = 'Bits Per Second';
             ret.url = '/compare_line_bitrate_by_city/';
             ret.url2 = '/compare_bar_bitrate_by_city/';
             break;
