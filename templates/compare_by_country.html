@@ -117,7 +117,8 @@
 			{ 
 				format: 'YYYY-MM-DD',
 				startDate: $('#start_date').val(),
-				endDate: $('#end_date').val()
+				endDate: $('#end_date').val(),
+				separator : ' to '
 			},
 			function(start, end) {
 				$('#start_date').val(start.format('YYYY-MM-DD'));

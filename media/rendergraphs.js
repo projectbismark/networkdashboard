@@ -429,7 +429,7 @@ function compareByCityParameters(i) {
                     result += point.series.name + '</p> ';
                     result += formatBytes(point.y) + '<br/>';
                 });
-                return ret;
+                return result;
             };
 			ret.units = 'Bits Per Second';
             ret.url = '/compare_line_bitrate_by_city/';
