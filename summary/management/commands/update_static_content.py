@@ -326,7 +326,7 @@ def write_bitrate_city_averages():
 			direction AS dir,\
 			geoip_city AS city, \
 			m_bitrate.eventstamp::date AS day, \
-			count(distinct m_bitrate.srcip) AS ndevices, \
+			count(distinct m_bitrate.deviceid) AS ndevices, \
 			count(*) AS nmeasurements, \
 			avg(m_bitrate.average) AS bitrate \
 			FROM m_bitrate \
