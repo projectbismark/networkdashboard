@@ -167,7 +167,7 @@ def write_rtt_country_averages():
 			geoip_isp AS isp, \
 			geoip_country AS country, \
 			m_rtt.eventstamp::date AS day, \
-			count(distinct m_rtt.srcip) AS ndevices, \
+			count(distinct m_rtt.deviceid) AS ndevices, \
 			count(*) AS nmeasurements, \
 			avg(m_rtt.average) AS latency \
 			FROM m_rtt \
@@ -197,7 +197,7 @@ def write_lmrtt_country_averages():
 			geoip_isp AS isp, \
 			geoip_country AS country, \
 			m_lmrtt.eventstamp::date AS day, \
-			count(distinct m_lmrtt.srcip) AS ndevices, \
+			count(distinct m_lmrtt.deviceid) AS ndevices, \
 			count(*) AS nmeasurements, \
 			avg(m_lmrtt.average) AS latency \
 			FROM m_lmrtt \
@@ -228,7 +228,7 @@ def write_bitrate_country_averages():
 			direction AS dir, \
 			geoip_country AS country, \
 			m_bitrate.eventstamp::date AS day, \
-			count(distinct m_bitrate.srcip) AS ndevices, \
+			count(distinct m_bitrate.deviceid) AS ndevices, \
 			count(*) AS nmeasurements, \
 			avg(m_bitrate.average) AS bitrate \
 			FROM m_bitrate \
@@ -265,7 +265,7 @@ def write_rtt_city_averages():
 			geoip_isp AS isp, \
 			geoip_city AS city, \
 			m_rtt.eventstamp::date AS day, \
-			count(distinct m_rtt.srcip) AS ndevices, \
+			count(distinct m_rtt.deviceid) AS ndevices, \
 			count(*) AS nmeasurements, \
 			avg(m_rtt.average) AS latency \
 			FROM m_rtt \
@@ -295,7 +295,7 @@ def write_lmrtt_city_averages():
 			geoip_isp AS isp, \
 			geoip_city AS city, \
 			m_lmrtt.eventstamp::date AS day, \
-			count(distinct m_lmrtt.srcip) AS ndevices, \
+			count(distinct m_lmrtt.deviceid) AS ndevices, \
 			count(*) AS nmeasurements, \
 			avg(m_lmrtt.average) AS latency \
 			FROM m_lmrtt \
@@ -364,7 +364,7 @@ def write_rtt_isp_averages():
 			geoip_city AS city, \
 			geoip_country AS country, \
 			m_rtt.eventstamp::date AS day, \
-			count(distinct m_rtt.srcip) AS ndevices, \
+			count(distinct m_rtt.deviceid) AS ndevices, \
 			count(*) AS nmeasurements, \
 			avg(m_rtt.average) AS latency \
 			FROM m_rtt \
@@ -396,7 +396,7 @@ def write_lmrtt_isp_averages():
 			geoip_city AS city, \
 			geoip_isp AS isp, \
 			m_lmrtt.eventstamp::date AS day, \
-			count(distinct m_lmrtt.srcip) AS ndevices, \
+			count(distinct m_lmrtt.deviceid) AS ndevices, \
 			count(*) AS nmeasurements, \
 			avg(m_lmrtt.average) AS latency \
 			FROM m_lmrtt \
@@ -429,7 +429,7 @@ def write_bitrate_isp_averages():
 			direction AS dir, \
 			geoip_isp AS isp , \
 			m_bitrate.eventstamp::date AS day, \
-			count(distinct m_bitrate.srcip) AS ndevices, \
+			count(distinct m_bitrate.deviceid) AS ndevices, \
 			count(*) AS nmeasurements, \
 			avg(m_bitrate.average) AS latency \
 			FROM m_bitrate \
@@ -757,11 +757,11 @@ def dump_all_latencies():
 		SQL =  "SELECT \
 				country_code AS country, \
 				m_rtt.eventstamp::date AS day, \
-				count(distinct m_rtt.srcip) AS ndevices, \
+				count(distinct m_rtt.deviceid) AS ndevices, \
 				count(*) AS nmeasurements, \
 				avg(m_rtt.average) AS latency \
 				FROM m_rtt \
-				JOIN devicedetails AS d ON d.ip = m_rtt.srcip \
+				JOIN devicedetails AS d ON d.deviceid = m_rtt.deviceid \
 				WHERE m_rtt.dstip = %s AND m_rtt.average>0 AND m_rtt.average<3000 AND country_code!=''  \
 				GROUP BY day, d.country_code;"
 		cursor.execute(SQL,params)
