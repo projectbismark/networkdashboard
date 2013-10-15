@@ -1822,7 +1822,6 @@ def assign_hash(device):
 	hash = hash.hexdigest()
 	dev.hashkey = hash
 	dev.save()
-	# devicedetails entry for this device does not exist:
 	return
 	
 # calls assign_hash for every device without a hashkey
@@ -2009,19 +2008,8 @@ def get_location(device):
     device = device.replace(':','')
     details = Devicedetails.objects.filter(deviceid=device)
     if details.count()>0:
-        return (details[0].city + ", " + details[0].country)
-
-    dev = MBitrate.objects.filter(deviceid=device, srcip ='8.8.8.8' )
-    if dev.count()>0:
-        ip = str(dev[0].dstip)
-        urlobj=urllib2.urlopen("http://api.ipinfodb.com/v3/ip-city/?key=c91c266accebc12bc7bbdd7fef4b5055c1485208bb6c20b4cc2991e67a3e3d34&ip=" + ip + "&format=json")
-        r1 = urlobj.read()
-        urlobj.close()
-        datadict = json.loads(r1)
-        res = datadict["cityName"] + "," + datadict["countryName"]
-        return (res)  
-    
-    return ('unavailable')
+        return (details[0].city + ", " + details[0].country)  
+    return "unavailable"
 
 def get_google_maps_result_from_request(address):
     params = urllib.urlencode({'key': 'AIzaSyBHEmkA7XyusAjA9Zf-UnLSR9ydvCExY6k', 'output': 'json', 'q': str(address)})

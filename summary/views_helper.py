@@ -148,7 +148,7 @@ def get_response_for_devicehtml(device_details):
 	latest_roundtrip = database_helper.get_latest_roundtrip(device_details.deviceid)
 	latest_shaperate = database_helper.get_latest_shaperate(device_details.deviceid)
 	device_details.deviceid = device_details.deviceid.replace(':', '').lower()
-	return render_to_response('device.html', {'detail': device_details,'firstUpdate': first, 'lastUpdate': last, 'deviceid': device_details.deviceid, 'num_location' : num_location, 'num_provider' : num_provider, 'num_all' : num_all, 'latestdownload' : latest_download, 'latestupload' : latest_upload, 'latestlastmile' : latest_lastmile, 'latestroundtrip' : latest_roundtrip, 'latestshaperate': latest_shaperate}) 
+	return render_to_response('device.html', {'detail': device_details,'first_update': first, 'last_update': last, 'deviceid': device_details.deviceid}) 
 
 def get_json_dump_for_device(device_details):
 	resp = {}
