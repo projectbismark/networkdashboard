@@ -30,8 +30,8 @@ def index(request):
 	countries = views_helper.get_sorted_country_data()
 	cities = views_helper.get_sorted_city_data()
 	isps = views_helper.get_sorted_isp_data()
-	device_count = views_helper.get_device_count()
-	active_count = views_helper.get_active_count()
+	device_count = geoip_helper.get_device_count()
+	active_count = geoip_helper.get_active_count()
 	return render_to_response('index.html', {'country_data' : countries, 'city_data': cities, 'isp_data': isps, 'device_count':device_count, 'active_count':active_count})
 	
 def compare_by_city(request, city, country):
