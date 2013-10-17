@@ -19,7 +19,7 @@
                 <script type="text/javascript">
                 $.ajax({
                     type: "GET",
-                    url: escape("/getLocation/{{deviceid}}/"),
+                    url: escape("/get_location/{{deviceid}}/"),
                     success: function(data) {
                         document.getElementById('location_column').innerHTML = data;
                     }
@@ -45,11 +45,11 @@
         </tr>
         <tr>
             <td>First Measurement</td>
-            <td>{{firstUpdate}}</td>
+            <td>{{first_update}}</td>
         </tr>
         <tr>
             <td>Last Measurement</td>
-            <td>{{lastUpdate}}</td>
+            <td>{{last_update}}</td>
         </tr>
     </table>
     {% endif %}
@@ -58,7 +58,7 @@
         <button id="permalink_button" data-toggle="button" class="btn" onclick="$('#permalink').toggle()"><i class="icon-bookmark"></i> Link to this page</button>
 	</div>
     <div id="permalink" class="alert alert-info" style="display: none">
-        <a href="http://networkdashboard.org/displayDevice/{{detail.hashkey}}">http://networkdashboard.org/displayDevice/{{detail.hashkey}}</a>
+        <a href="/display_device/{{detail.hashkey}}">http://networkdashboard.org/display_device/{{detail.hashkey}}</a>
     </div>
     <br/>
     <ul id="tab" class="nav nav-tabs" style="clear: both">

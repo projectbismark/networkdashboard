@@ -69,7 +69,7 @@ function load() {
 
     $.ajax({
         type: "GET",
-        url: "/getCoordinates/",
+        url: "/get_coordinates/",
         success: OnSuccess
     });
     /*
@@ -176,7 +176,7 @@ function createMarker(d) {
 	marker.active = parseInt(d.active);
 	if (marker.devicehash != ""){
 		google.maps.event.addListener(marker, "click", function() {
-			boxText.innerHTML = "<a href=/displayDevice/" + marker.devicehash + "\">Show Router Details</a>";
+			boxText.innerHTML = "<a href=/display_device/" + marker.devicehash + "\">Show Router Details</a>";
 			infowindow.setContent(boxText);
 			infowindow.open(map, marker);
 		});
@@ -223,7 +223,7 @@ function OnSuccessMarker(data, marker) {
 	marker.content = data;
 	if(marker.content != "NOT AVAILABLE")
 		boxText.innerHTML = marker.content + 
-			"<a href=\"http://networkdashboard.org/displayDevice/" + marker.devicehash + 
+			"<a href=\"http://networkdashboard.org/display_device/" + marker.devicehash + 
 			"\">Show Router Details</a>";
 	else
 		boxText.innerHTML = "Information not available.";

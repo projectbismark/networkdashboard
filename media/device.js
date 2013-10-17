@@ -99,7 +99,7 @@ function changeTab(active, total, tab, content) {
 }
 
 function updateShareLink(){
-	document.getElementById('url').value =  window.location.hostname + "/displayDevice/" + hashid + "?tab=" + tabid;
+	document.getElementById('url').value =  window.location.hostname + "/display_device/" + hashid + "?tab=" + tabid;
 }
 
 function hideBar(id){

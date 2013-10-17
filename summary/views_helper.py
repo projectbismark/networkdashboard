@@ -74,7 +74,7 @@ def get_response_for_shared_device(device_details):
 	first = database_helper.get_first_measurement(device_details.deviceid)
 	last = database_helper.get_last_measurement(device_details.deviceid)
 	deviceid = device_details.deviceid.replace(':', '').lower()
-	return render_to_response('shared_device.html', {'detail': device_details,'firstUpdate': first, 'lastUpdate': last, 'deviceid': deviceid})
+	return render_to_response('shared_device.html', {'detail': device_details,'first_update': first, 'last_update': last, 'deviceid': deviceid})
 	
 #looks up a device by deviceid and returns its hashkey:
 def get_hash(id):

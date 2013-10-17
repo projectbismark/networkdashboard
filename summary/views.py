@@ -398,7 +398,7 @@ def bitrate_json(request,device,direction,days,multi):
 	return HttpResponse(json.dumps(result))
 
 #returns a webpage where a user may edit the details of the user's own device
-def editDevicePage(request, devicehash):
+def edit_device_page(request, devicehash):
     device_details = Devicedetails.objects.filter(hashkey=devicehash)
     if len(device_details) < 1:
         return render_to_response('device_not_found.html', {'devicename' : devicehash})
@@ -406,17 +406,14 @@ def editDevicePage(request, devicehash):
     isp_options = database_helper.list_isps()
     country_options = database_helper.list_countries()
     return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device, 'isp_options': isp_options, 'country_options': country_options})
-
-def invalidEdit(request, device):
-    return render_to_response('invalid_edit.html', {'deviceid' : device})
   
 #returns coordinates in JSON format for the device map. This method is called from index.js:  
-def getCoordinates(request):
+def get_coordinates(request):
 	result = views_helper.parse_coords()
 	return HttpResponse(json.dumps(result))
         
 #returns a shared device summary page, a device page that may not be edited by the viewer:
-def sharedDeviceSummary(request,devicehash):
+def shared_device_summary(request,devicehash):
     device_details = Devicedetails.objects.filter(hashkey=devicehash)
     if len(device_details)>0:
 		device = device_details[0].deviceid		
@@ -425,7 +422,7 @@ def sharedDeviceSummary(request,devicehash):
     return views_helper.get_response_for_shared_device(device_details[0])
 
 #returns a device summary page for the user's own device
-def devicesummary(request):
+def device_summary(request):
 	device = str(request.POST.get('device'))
 	device = device.replace(':', '')
 	device_details = Devicedetails.objects.filter(deviceid=device)
@@ -453,7 +450,7 @@ def devicesummary(request):
 		device_details = Devicedetails.objects.filter(deviceid=device)
 	return views_helper.get_response_for_devicehtml(device_details[0])
 
-def getLocation(request, device):   
+def get_location(request, device):   
     return HttpResponse(database_helper.get_location(device))
 	
 #returns series data in highstock format (JSON):
