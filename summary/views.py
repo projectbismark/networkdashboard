@@ -379,19 +379,19 @@ def compare_bar_rtt_by_isp(request):
 	bar_series = sorted(bar_series, key= lambda x: x['name'].lstrip())
 	return HttpResponse(json.dumps(bar_series))	
 
-#part of API which allows limited querying through a URL. Not used by dashboard.
+#part of API which allows limited querying through a URL.
 #returns rtt measurements for a device in JSON format: 
 def rtt_json(request,device,dstip,days):
 	result = database_helper.get_rtt_measurements(device, days, dstip)
 	return HttpResponse(json.dumps(result))
 
-#part of API which allows limited querying through a URL. Not used by dashboard.
+#part of API which allows limited querying through a URL.
 #returns LMRTT measurements for a device in JSON format: 
 def lmrtt_json(request,device,days):
 	result = database_helper.get_lmrtt_measurements(device,days)
 	return HttpResponse(json.dumps(result))
 
-#part of API which allows limited querying through a URL. Not used by dashboard.
+#part of API which allows limited querying through a URL.
 #returns bitrate measurements for a device in JSON format: 	
 def bitrate_json(request,device,direction,days,multi):
 	result = database_helper.get_bitrate_measurements(device,days,direction,multi)
@@ -403,9 +403,7 @@ def edit_device_page(request, devicehash):
     if len(device_details) < 1:
         return render_to_response('device_not_found.html', {'devicename' : devicehash})
     device = str(device_details[0].deviceid)
-    isp_options = database_helper.list_isps()
-    country_options = database_helper.list_countries()
-    return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device, 'isp_options': isp_options, 'country_options': country_options})
+    return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device})
   
 #returns coordinates in JSON format for the device map. This method is called from index.js:  
 def get_coordinates(request):

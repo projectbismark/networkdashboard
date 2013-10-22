@@ -67,17 +67,6 @@
                     <select id="input_country" name="country">
                         <option selected>{{detail.country}}</option>
                         {% include "countries.html" %}
-                        
-                        <!--
-                        {% for country in country_options %}
-                            {% if country == detail.country %}
-                                <option selected>{{country}}</option>
-                            {% endif %}
-                            {% if country != detail.country %}
-                                <option>{{country}}</option>
-                            {% endif %}
-                            
-                        {% endfor %}-->
                     </select>
                 </div>
             </div>
