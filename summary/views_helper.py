@@ -29,36 +29,6 @@ def parse_coords():
 			entry['server'] = line[5]
 			coord_data.append(entry)
 	return coord_data
-
-#returns deviceids for devices matching criteria for comparison bargraph:	
-def bargraph_devices_by_city_name(city):
-	ips = geoip_helper.bargraph_ips_by_city(city)
-	devices = geoip_helper.get_devices_by_ips(ips)
-	return devices
-
-#returns deviceids for devices matching criteria for comparison linegraph:	
-def linegraph_devices_by_city_name(city,max_results,start,end,metric):
-	ips = geoip_helper.linegraph_ips_by_city(city,max_results,start,end,metric)
-	devices = geoip_helper.get_devices_by_ips(ips)
-	return devices
-
-#returns deviceids for devices matching criteria for comparison bargraph:	
-def bargraph_devices_by_country_name(country):
-	ips = geoip_helper.bargraph_ips_by_country(country)
-	devices = geoip_helper.get_devices_by_ips(ips)
-	return devices
-	
-#returns deviceids for devices matching criteria for comparison bargraph:	
-def bargraph_devices_by_provider_and_country(isp,country):
-	ips = geoip_helper.bargraph_ips_by_provider_and_country(isp,country)
-	devices = geoip_helper.get_devices_by_ips(ips)
-	return devices
-	
-#returns deviceids for devices matching criteria for comparison linegraph:	
-def linegraph_devices_by_provider_and_country(isp,country,max_results,start,end,metric):
-	ips = geoip_helper.linegraph_ips_by_provider_and_country(isp,country,max_results,start,end,metric)
-	devices = geoip_helper.get_devices_by_ips(ips)
-	return devices
 	
 #returns an html page for a particular device for a user who owns that device 
 #and forwards data to that page:
@@ -92,21 +62,21 @@ def get_hash(id):
 #gets device counts by country and sorts them alphabetically:
 def get_sorted_country_data():
 	#get list of dictionaries:
-	country_data = geoip_helper.get_country_count()
+	country_data = geoip_helper.get_country_data()
 	result = sorted(country_data, key=itemgetter('country'))
 	return result
 
 #gets device counts by city and sorts them alphabetically:	
 def get_sorted_city_data():
 	#get list of dictionaries:
-	city_data = geoip_helper.get_city_count()
+	city_data = geoip_helper.get_city_data()
 	result = sorted(city_data, key=itemgetter('city'))
 	return result
 
 #gets device counts by isp and sorts them alphabetically:	
 def get_sorted_isp_data():
 	#get list of dictionaries:
-	isp_data = geoip_helper.get_isp_count()
+	isp_data = geoip_helper.get_isp_data()
 	result = sorted(isp_data, key=itemgetter('isp'))
 	return result
 

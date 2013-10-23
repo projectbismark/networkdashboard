@@ -662,11 +662,11 @@ def write_coord_data():
 			id = d.deviceid
 			if d.ip=="" or d.ip==None:
 				continue
-			loc = geoip_helper.getLocation(d.ip,gi)
+			loc = geoip_helper.get_location(d.ip,gi)
 			if loc==None:
 				continue
-			lat = str(geoip_helper.randomize_latitude(loc['latitude']))
-			lon = str(loc['longitude'])
+			lat = str(geoip_helper.randomize_coordinate(loc['latitude']))
+			lon = str(geoip_helper.randomize_coordinate(loc['longitude']))
 			hash = d.hashkey
 			isp = d.geoip_isp
 			active = 0
@@ -685,7 +685,7 @@ def write_coord_data():
 			isp = ""
 			active = 1
 			server = 1
-			loc = geoip_helper.getLocation(s.ip,gi)
+			loc = geoip_helper.get_location(s.ip,gi)
 			if loc==None:
 				continue
 			lat = str(row_ip.latitude)
