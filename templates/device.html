@@ -5,11 +5,9 @@
     <div style="float: right">
         <a class="btn" href="/"><i class="icon-home"></i> Home</a>
     </div>
-
     {% if not detail.is_default %}
     <h1>{{detail.name}}</h1>
     {% endif %}
-
     {% if detail.is_default %}
     <div class="alert alert-block">
         <h4 class="alert-heading">Welcome, new Dashboard user!</h4>
@@ -68,12 +66,6 @@
         {% endif %}
         {% comment %}<a class="btn btn-primary bt n-large" href="http://projectbismark.net/data/{{ deviceid }}"><b>Download</b></a>{% endcomment %}
         <button id="permalink_button" data-toggle="button" class="btn" onclick="$('#permalink').toggle()"><i class="icon-bookmark"></i> Link to this page</button>
-		<!--
-		<form class="form-compare" method="post" action="/compare/">
-			<input type="hidden" name="device" value="{{deviceid}}" />
-			<input class="btn" id="compare_btn_1" type="submit" value="Compare my Performance"/>
-		</form>
-		-->
 	</div>
     <div id="permalink" class="alert alert-info" style="display: none">
         <a href="/display_device/{{detail.hashkey}}">http://networkdashboard.org/display_device/{{detail.hashkey}}</a>
@@ -116,11 +108,6 @@
                     </div>
                 </div>
             </div>
-		<!--
-		<div class="latest-measurement" id="latest-measurement-1">
-			Latest Measurement: <b>{{latestdownload.average}} Bits Per Second</b> on {{latestdownload.eventstamp}}.
-		</div>
-		-->
         </div>
         <div class="tab-pane" id="upload_throughput"> 
 			<div style="clear: both">
@@ -149,11 +136,6 @@
                     </div>
                 </div>
             </div>
-			<!--
-			<div class="latest-measurement" id="latest-measurement-2">
-				Latest Measurement: <b>{{latestdownload.average}} Bits Per Second</b> on {{latestdownload.eventstamp}}.
-			</div>
-			-->
         </div>
         <div class="tab-pane" id="round_trip_latency">
 			<div style="clear: both">
@@ -173,11 +155,6 @@
                     </div>
                 </div>
             </div>
-			<!--
-			<div class="latest-measurement" id="latest-measurement-3">
-				Latest Measurement: <b>{{latestdownload.average}} Milliseconds</b> on {{latestdownload.eventstamp}}.
-			</div>
-			-->
         </div>
         <div class="tab-pane" id="last_mile_latency"> 
 			<div style="clear: both">
@@ -197,11 +174,6 @@
                     </div>
                 </div>
             </div>
-			<!--
-			<div class="latest-measurement" id="latest-measurement-4">
-				Latest Measurement: <b>{{latestdownload.average}} Milliseconds</b> on {{latestdownload.eventstamp}}.
-			</div>
-			-->
         </div>
 		<div class="tab-pane" id="shape_rate">  
             <div class="graphdiv" id="graph_div_5">
@@ -211,11 +183,6 @@
                     </div>
                 </div>
             </div>
-			<!--
-			<div class="latest-measurement" id="latest-measurement-4">
-				Latest Measurement: <b>{{latestdownload.average}} Bits Per Second</b> on {{latestdownload.eventstamp}}.
-			</div>
-			-->
         </div>
 		<div class="tab-pane" id="unload_rtt">  
             <div class="graphdiv" id="graph_div_6">
@@ -225,9 +192,6 @@
                     </div>
                 </div>
             </div>
-			<!--
-			<div class="latest-measurement" id="latest-measurement-5"></div>
-			-->
         </div>
 		<div class="tab-pane" id="all_metrics">  
             <div class="graphdiv" id="graph_div_7">
@@ -237,9 +201,6 @@
                     </div>
                 </div>
             </div>
-			<!--
-			<div class="latest-measurement" id="latest-measurement-5"></div>
-			-->
         </div>
 </div>
 <script type="text/javascript">
