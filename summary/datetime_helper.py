@@ -4,17 +4,6 @@ from datetime import timedelta
 
 def datetime_to_JSON(t):
     return int(timegm(t.timetuple()) * 1000)
-
-def datetime_format_to_unixtime(t):
-    return timegm(t.timetuple())
-	
-def is_recent(last, period):
-	now = datetime.datetime.now()
-	delta = now - last
-	if (delta.days<period):
-		return True
-	else:
-		return False
 		
 def get_daterange_start(days):
 	now = datetime.datetime.now()

@@ -1,5 +1,5 @@
 from django.core.management.base import NoArgsCommand
-from networkdashboard.summary import database_helper, geoip_helper
+from networkdashboard.summary import geoip_helper
 from networkdashboard.summary.models import *
 from django.conf import settings
 import os
@@ -9,7 +9,6 @@ import sys
 class Command(NoArgsCommand):
 	def handle_noargs(self, **options):
 		update_devicedetails()
-		update_server_locs()
 	
 def update_devicedetails():
 	devices = Devicedetails.objects.all()
@@ -45,12 +44,4 @@ def update_devicedetails():
 		d.save()
 	return
 	
-def update_server_locs():
-	servers = IpResolver.objects.all()
-	for s in servers:
-		lat = geoip_helper.get_latitude_by_ip(s.ip)
-		lon = geoip_helper.get_longitude_by_ip(s.ip)
-		s.latitude=lat
-		s.longitude=lon
-		s.save()
-	return
+

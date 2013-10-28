@@ -8,6 +8,7 @@ import json
 import psycopg2
 import psycopg2.extras
 import time
+import random
 from django.core import serializers
 import pygeoip
 import sys
@@ -77,16 +78,6 @@ def write_devices():
 		recent_measurement_count = MBitrate.objects.filter(deviceid=d.deviceid,eventstamp__gte=active_thresh).count()
 		if recent_measurement_count>0:
 			active=1
-		# filename2 = settings.PROJECT_ROOT + '/summary/measurements/rtt/' + device2
-		# try:
-			# with open(filename2, 'r') as fh:
-				# for line in fh:
-					# last = line
-		# except:
-			# pass
-		# if len(last)>0:
-			# last=last.split('|')
-			# latest = last[0]
 		SQL = "SELECT \
 				deviceid, eventstamp, geoip_city, geoip_country, geoip_isp \
 				FROM devicedetails \
@@ -651,7 +642,6 @@ def write_underload_measurements():
 	return
 	
 def write_coord_data():
-	gi = pygeoip.GeoIP(settings.GEOIP_SERVER_LOCATION,pygeoip.MEMORY_CACHE)
 	filename = settings.PROJECT_ROOT + '/summary/measurements/map/coord_data'
 	f = open(filename, 'w')
 	devices = Devicedetails.objects.all()
@@ -662,11 +652,11 @@ def write_coord_data():
 			id = d.deviceid
 			if d.ip=="" or d.ip==None:
 				continue
-			loc = geoip_helper.get_location(d.ip,gi)
+			loc = geoip_helper.get_location_by_ip(d.ip)
 			if loc==None:
 				continue
-			lat = str(geoip_helper.randomize_coordinate(loc['latitude']))
-			lon = str(geoip_helper.randomize_coordinate(loc['longitude']))
+			lat = str(randomize_coordinate(loc['latitude']))
+			lon = str(randomize_coordinate(loc['longitude']))
 			hash = d.hashkey
 			isp = d.geoip_isp
 			active = 0
@@ -685,11 +675,11 @@ def write_coord_data():
 			isp = ""
 			active = 1
 			server = 1
-			loc = geoip_helper.get_location(s.ip,gi)
+			loc = geoip_helper.get_location_by_ip(s.ip)
 			if loc==None:
 				continue
-			lat = str(row_ip.latitude)
-			lon = str(row_ip.longitude)
+			lat = loc['latitude']
+			lon = loc['longitude']
 			hash = ""
 			line = hash + '|' + lat + '|' + lon + '|' + isp + '|' + str(active) + '|' + str(server) + '\n'
 			f.write(line)
@@ -878,4 +868,8 @@ def get_dict_cursor():
                    
     conn = psycopg2.connect(conn_string)
     return conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+	
+#offsets given coordinate by a small, random amount:
+def randomize_coordinate(coord):
+	return (1-((1-(random.random()*2))*.0001))*coord
 	
