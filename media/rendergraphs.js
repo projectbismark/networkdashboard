@@ -1,48 +1,6 @@
-
 var filter = "none";
-var ajax;
 var allSeries = new Array();
-
-function renderGraphs(deviceid){
-	for (var i =0; i<6; i++){
-		var params = createParameters(i);
-		$.ajax({
-			type: "GET",
-			url: params.url,
-			data: {'graphno' : params.graphno, 'deviceid': deviceid, 'filter_by': filter},
-			success: OnSuccessGraph(params)
-		});   
-	}
-}
-	
-
-function determineSI(n,i){
-	var d = n/1000;
-	var ret = "";
-	if(d<1){
-		switch(i){
-			case 0:
-			ret = "bps";
-			break;
-			case 1:
-			ret = "Kbps";
-			break;
-			case 2:
-			ret = "Mbps"
-			break;
-			case 3:
-			ret = "Gbps"
-			break;
-			default:
-			ret = "bps"
-			break;
-		}
-		return ret;
-	}
-	else{
-		return determineSI(d,i+1);
-	}
-}
+var dateFormatString = '%a, %b %e, %Y at %l:%M %p';
 
 function recDivide(bits, n, i){
 	var d = n/1000;
@@ -56,9 +14,6 @@ function recDivide(bits, n, i){
 		return recDivide(bits,d,i+1);
 	}
 }
-
-var filter = "none";
-var dateFormatString = '%a, %b %e, %Y at %l:%M %p';
 
 function sortOrdinatesDescending(firstPoint, secondPoint) {
     if (firstPoint.y < secondPoint.y) {
@@ -244,109 +199,6 @@ function createParameters(i) {
             };
             ret.units = "Milliseconds";
             ret.url = "/line_unload/";
-            break;
-    }
-    return ret;
-}
-
-function compareParameters(i) {
-    var ret = {
-        legend: {
-            enabled: true,
-            align: 'center',
-            verticalAlign: 'top',
-            borderColor: '#ddd',
-            borderWidth: 1,
-            shadow: false
-        },
-        rangeSelector: {
-            buttons: [{
-                type: 'day',
-                count: 1,
-                text: '1d'
-            }, {
-                type: 'week',
-                count: 1,
-                text: '1w'
-            }, {
-                type: 'month',
-                count: 1,
-                text: '1m'
-            }],
-            selected: 1
-        },
-        plotOptions: {
-            line: {
-                gapSize: null
-            }
-        }
-    };
-	ret.divid2 = 'graph_div_7';
-    switch (i) {
-        case "down":
-            ret.divid = 'graph_div_6';
-            ret.graphid = 0;
-            ret.graphno = 1;
-			ret.direction = 'dw';
-            ret.formatter = function() {
-                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
-                $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
-                    result += '<p style="color:' + point.series.color +  ';">';
-                    result += point.series.name + '</p> ';
-                    result += formatBytes(point.y) + '<br/>';
-                });
-                return result;
-            };
-            ret.units = 'Bits Per Second';
-            ret.url = '/compare_bitrate/';
-            break;
-
-        case "up":
-            ret.divid = 'graph_div_6';
-            ret.graphid = 0;
-            ret.graphno = 1;
-			ret.direction = 'up';
-            ret.formatter = function() {
-                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
-                $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
-                    result += '<p style="color:' + point.series.color +  ';">';
-                    result += point.series.name + '</p> ';
-                    result += formatBytes(point.y) + '<br/>';
-                });
-                return result;
-            };
-            ret.units = 'Bits Per Second';
-            ret.url = '/compare_bitrate/';
-            break;
-		
-		case "lm":
-            ret.divid = "graph_div_6";
-            ret.formatter = function() {
-                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
-                $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
-                    result += '<p style="color:' + point.series.color +  ';">';
-                    result += point.series.name + '</p> ';
-                    result += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
-                });
-                return result;
-            };
-            ret.units = "Milliseconds";
-            ret.url = "/compare_lmrtt/";
-            break;
-			
-		case "rtt":
-            ret.divid = "graph_div_6";
-            ret.formatter = function() {
-                var result = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
-                $.each(this.points.sort(sortOrdinatesDescending), function(i, point) {
-                    result += '<p style="color:' + point.series.color +  ';">';
-                    result += point.series.name + '</p> ';
-                    result += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
-                });
-                return result;
-            };
-            ret.units = "Milliseconds";
-            ret.url = "/compare_rtt/";
             break;
     }
     return ret;
@@ -890,7 +742,7 @@ function onSuccessCompareCityBar(graphParams,country, city) {
     }
 }
 
-function onSuccessIspCompareLine(graphParams,country) {
+function onSuccessCompareIspLine(graphParams,country) {
     return function(data) {
 		seriesData = JSON.parse(data)
         if (seriesData.length > 0) {
@@ -928,7 +780,7 @@ function onSuccessIspCompareLine(graphParams,country) {
     }
 }
 
-function onSuccessIspCompareBar(graphParams,country) {
+function onSuccessCompareIspBar(graphParams,country) {
     return function(data) {
 		dataParse = JSON.parse(data)
 		if (dataParse.length > 0) {
@@ -1018,7 +870,7 @@ function onSuccessIspCompareBar(graphParams,country) {
     }
 }
 
-function onSuccessCountryCompare(graphParams, country) {
+function onSuccessCompareCountry(graphParams, country) {
     return function(data) {
 		var seriesData = JSON.parse(data)
 		if (seriesData.length > 0) {
@@ -1118,26 +970,6 @@ function onSuccessCountryCompare(graphParams, country) {
     }
 }
 
-function compareGraphs(deviceid){
-	$('#load_bar').show();
-	var sel1 = document.getElementById("max_devices");
-	var sel2 = document.getElementById("compare_criteria");
-	var sel3 = document.getElementById("measurement_type");
-	var sel4 = document.getElementById("days");
-	var max = sel1.options[sel1.selectedIndex].value;
-	var cri = sel2.options[sel2.selectedIndex].value;
-	var mtype = sel3.options[sel3.selectedIndex].value;
-	var serverloc = sel3.options[sel3.selectedIndex].text;
-	var days = sel4.options[sel4.selectedIndex].value;
-	var params = compareParameters(mtype);
-	$.ajax({
-		type: "GET",
-		url: params.url,
-		data: {'days': days,'server_loc': serverloc, 'direction' : params.direction, 'graphno' : params.graphno, 'device': deviceid, 'filter_by': filter, 'max_results': max, 'criteria': cri},
-		success: onSuccessCompare(params)
-	});
-}
-
 function compareByCity(){
 	$('#load_bar_1').show();
 	$('#load_bar_2').show();
@@ -1169,16 +1001,14 @@ function compareByCountry(){
 	var sel2 = document.getElementById("measurement_type");
 	var start = document.getElementById("start_date").value;
 	var end = document.getElementById("end_date").value;
-	/* var sel3 = document.getElementById("days"); */
 	var mtype = sel2.options[sel2.selectedIndex].value;
-	/* var days = sel3.options[sel3.selectedIndex].value; */
 	var params = compareByCountryParameters(mtype);
 	var country = document.getElementById("country_name").value;
 	$.ajax({
 		type: "GET",
 		url: params.url,
 		data: {'start' : start, 'end' : end, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': 9, 'country' : country},
-		success: onSuccessCountryCompare(params, country)
+		success: onSuccessCompareCountry(params, country)
 	});
 }
 
@@ -1189,10 +1019,8 @@ function compareByIsp(){
 	var sel2 = document.getElementById("measurement_type");
 	var start = document.getElementById("start_date").value;
 	var end = document.getElementById("end_date").value;
-	/* var sel3 = document.getElementById("days"); */
 	var max = sel1.options[sel1.selectedIndex].value;
 	var mtype = sel2.options[sel2.selectedIndex].value;
-	/* var days = sel3.options[sel3.selectedIndex].value; */
 	var country = document.getElementById("country_name").value;
 	var isp = document.getElementById("isp_name").value;
 	var params = compareByIspParameters(mtype, country, isp);
@@ -1200,13 +1028,13 @@ function compareByIsp(){
 		type: "GET",
 		url: params.url,
 		data: {'start' : start, 'end' : end, 'direction' : params.direction, 'graphno' : params.graphno,'max_results': max, 'isp' : isp, 'country' : country},
-		success: onSuccessIspCompareLine(params, country)
+		success: onSuccessCompareIspLine(params, country)
 	});
 	$.ajax({
 		type: "GET",
 		url: params.url2,
 		data: {'start' : start, 'end' : end, 'direction' : params.direction, 'graphno' : params.graphno, 'isp' : isp, 'country' : country},
-		success: onSuccessIspCompareBar(params, country)
+		success: onSuccessCompareIspBar(params, country)
 	});
 }
 
@@ -1329,24 +1157,6 @@ function multiGraph(){
 			shared: false,
             formatter: function() {
 				var ret = Highcharts.dateFormat(dateFormatString, this.x) + "<br/>";
-                // $.each(this.points.sort(sortOrdinatesDescending), function(idx, point) {
-                    // ret += '<p style="color:' + point.series.color +  ';">';
-                    // ret += point.series.name + '</p> ';
-					// switch(point.series.name){
-						// case uploadString:
-							// ret += formatBytes(point.y) + '<br/>';
-							// break;
-						// case downloadString:
-							// ret += formatBytes(point.y) + '<br/>';
-							// break;
-						// case RTTString:
-							// ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
-							// break;
-						// case LMString:
-							// ret += '<b>'+ parseInt(point.y) +'</b> milliseconds<br/>';
-							// break;
-					// }
-                // });
 				ret += '<p style="color:' + this.series.color +  ';">';
                 ret += this.series.name + '</p> ';
 				switch(this.series.name){
