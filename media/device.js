@@ -1,9 +1,3 @@
-hashid="";
-
-function setHashid(data){
-	hashid=data;
-}
-
 function expandUploadDesc() {
     $('#upload_desc_content').show();
     $('#upload_desc').hide();

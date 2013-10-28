@@ -12,6 +12,13 @@ import psycopg2.extras
 from django.conf import settings
 
 
+#looks up a device by its hashkey and returns the deviceid:
+def get_device_by_hash(hash):
+	device = Devicedetails.objects.get(hashkey=hash)
+	if device==None:
+		return ''
+	return device.deviceid
+
 #returns a list containing the IP of every device:
 def get_ip_list():
 	devices = Devicedetails.objects.values('deviceid').distinct()

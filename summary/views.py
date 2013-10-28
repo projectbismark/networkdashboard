@@ -319,43 +319,43 @@ def device_summary(request):
 	return views_helper.get_response_for_devicehtml(device_details[0])
 
 #returns a string representing the city and country for a device, as set by the user
-def get_location(request, device):   
-    return HttpResponse(views_helper.get_location(device))
+def get_location(request, hash):
+	return HttpResponse(views_helper.get_location(hash))
 	
 #returns series data in highstock format (JSON):
 def linegraph_rtt(request):
-	device = request.GET.get('deviceid')
-	data = data_helper.parse_rtt_measurements(device)
+	hash = request.GET.get('hash')
+	data = data_helper.parse_rtt_measurements(hash)
 	return HttpResponse(json.dumps(data))
 
 #returns series data in highstock format (JSON):	
 def linegraph_unload(request):
-	device = request.GET.get('deviceid')
-	data = data_helper.parse_underload_measurements(device)
+	hash = request.GET.get('hash')
+	data = data_helper.parse_underload_measurements(hash)
 	return HttpResponse(json.dumps(data))
 	
 #returns series data in highstock format (JSON):
 def linegraph_bitrate(request):
-	device = request.GET.get('deviceid')
+	hash = request.GET.get('hash')
 	graphno = int(request.GET.get('graphno'))
 	if graphno==1:
-		data = data_helper.parse_bitrate_measurements(device,'dw')
+		data = data_helper.parse_bitrate_measurements(hash,'dw')
 	else:
-		data = data_helper.parse_bitrate_measurements(device,'up')
+		data = data_helper.parse_bitrate_measurements(hash,'up')
 	return HttpResponse(json.dumps(data))
 
 #returns series data in highstock format (JSON):
 def linegraph_lmrtt(request):
-	device = request.GET.get('deviceid')
-	data = data_helper.parse_lmrtt_measurements(device)
+	hash = request.GET.get('hash')
+	data = data_helper.parse_lmrtt_measurements(hash)
 	return HttpResponse(json.dumps(data))
 
 #returns series data in highstock format (JSON):
 def linegraph_shaperate(request):
-	device = request.GET.get('deviceid')
+	hash = request.GET.get('hash')
 	data = []
-	shaperate_series = data_helper.parse_shaperate_measurements(device)
-	capacity_series = data_helper.parse_capacity_measurements(device)
+	shaperate_series = data_helper.parse_shaperate_measurements(hash)
+	capacity_series = data_helper.parse_capacity_measurements(hash)
 	for s in shaperate_series:
 		data.append(s)
 	for s in capacity_series:

@@ -5,13 +5,13 @@
     <div style="float: right">
         <a class="btn" href="/"><i class="icon-home"></i> Home</a>
     </div>
-    <h1>{{detail.name}}</h1>
-	{% if detail.is_default %}
+    <h1>{{name}}</h1>
+	{% if is_default %}
     {% else %}
     <table class="table table-striped table-condensed">
         <tr>
             <td>ISP</td>
-            <td>{{detail.isp}}</td>
+            <td>{{isp}}</td>
         </tr>
         <tr>
             <td>Location</td>
@@ -19,7 +19,7 @@
                 <script type="text/javascript">
                 $.ajax({
                     type: "GET",
-                    url: escape("/get_location/{{deviceid}}/"),
+                    url: escape("/get_location/{{hashkey}}/"),
                     success: function(data) {
                         document.getElementById('location_column').innerHTML = data;
                     }
@@ -29,19 +29,19 @@
         </tr>     
 		 <tr>
 	            <td>Service Type</td>
-	            <td>{{detail.servicetype}}</td>
+	            <td>{{servicetype}}</td>
 	        </tr>
         <tr>
             <td>Service Plan</td>
-            <td>{{detail.serviceplan}}</td>
+            <td>{{serviceplan}}</td>
         </tr>
         <tr>
             <td>Download Rate</td>
-            <td>{{detail.downloadrate}} kbps</td>
+            <td>{{downloadrate}} kbps</td>
         </tr>
         <tr>
             <td>Upload Rate</td>
-            <td>{{detail.uploadrate}} kbps</td>
+            <td>{{uploadrate}} kbps</td>
         </tr>
         <tr>
             <td>First Measurement</td>
@@ -58,7 +58,7 @@
         <button id="permalink_button" data-toggle="button" class="btn" onclick="$('#permalink').toggle()"><i class="icon-bookmark"></i> Link to this page</button>
 	</div>
     <div id="permalink" class="alert alert-info" style="display: none">
-        <a href="/display_device/{{detail.hashkey}}">http://networkdashboard.org/display_device/{{detail.hashkey}}</a>
+        <a href="/display_device/{{hashkey}}">http://networkdashboard.org/display_device/{{hashkey}}</a>
     </div>
     <br/>
     <ul id="tab" class="nav nav-tabs" style="clear: both">
@@ -197,8 +197,6 @@
 <script type="text/javascript">
     $('download_throughput').tab('show');
     $('#permalink_button').button()
-    renderGraphs("{{deviceid}}");
-	hashid="{{ detail.hashkey }}";
-	setHashid(hashid);
+    renderGraphs("{{hashkey}}");
 </script>
 {% endblock %}

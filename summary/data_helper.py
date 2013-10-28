@@ -777,10 +777,10 @@ def parse_bitrate_compare(device,earliest,latest,dir,name):
 	return series	
 		
 #returns line series representing all bitrate measurements for a given device:	
-def parse_bitrate_measurements(device, dir):
+def parse_bitrate_measurements(hash, dir):
 	result = []
 	data = []
-	device = device.replace(':','')
+	device = database_helper.get_device_by_hash(hash).replace(':','')
 	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate/' + device
 	#garbage characters to be removed:
 	remove = ')("\n'
@@ -816,9 +816,10 @@ def parse_bitrate_measurements(device, dir):
 	return result
 	
 #returns line series representing all underload measurements for a given device:	
-def parse_underload_measurements(device):
+def parse_underload_measurements(hash):
 	result = []
 	data = []
+	device = database_helper.get_device_by_hash(hash).replace(':','')
 	filename = settings.PROJECT_ROOT + '/summary/measurements/underload/' + device
 	#garbage characters to be removed:
 	remove = ')("\n'
@@ -849,10 +850,11 @@ def parse_underload_measurements(device):
 	return result
 
 #returns line series representing all RTT measurements for a given device:	
-def parse_rtt_measurements(device):
+def parse_rtt_measurements(hash):
 	result = []
 	data = []
 	dstips = []
+	device = database_helper.get_device_by_hash(hash).replace(':','')
 	filename = settings.PROJECT_ROOT + '/summary/measurements/rtt/' + device
 	#garbage characters to be removed:
 	remove = ')("\n'
@@ -890,9 +892,10 @@ def parse_rtt_measurements(device):
 	return result
 	
 #returns line series representing all LMRTT measurements for a given device:	
-def parse_lmrtt_measurements(device):
+def parse_lmrtt_measurements(hash):
 	data = []
 	result = []
+	device = database_helper.get_device_by_hash(hash).replace(':','')
 	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt/' + device
 	#garbage characters to be removed:
 	remove = ')("\n'
@@ -917,9 +920,10 @@ def parse_lmrtt_measurements(device):
 	return result
 	
 #returns line series representing all shaperate measurements for a given device:	
-def parse_shaperate_measurements(device):
+def parse_shaperate_measurements(hash):
 	data = []
 	result = []
+	device = database_helper.get_device_by_hash(hash).replace(':','')
 	filename = settings.PROJECT_ROOT + '/summary/measurements/shaperate/' + device
 	#garbage characters to be removed:
 	remove = ')("\n'
@@ -950,9 +954,10 @@ def parse_shaperate_measurements(device):
 	return result
 	
 #returns line series representing all capacity measurements for a given device:	
-def parse_capacity_measurements(device):
+def parse_capacity_measurements(hash):
 	data = []
 	result = []
+	device = database_helper.get_device_by_hash(hash).replace(':','')
 	filename = settings.PROJECT_ROOT + '/summary/measurements/capacity/' + device
 	#garbage characters to be removed:
 	remove = ')("\n'

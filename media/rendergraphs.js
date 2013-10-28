@@ -1038,13 +1038,13 @@ function compareByIsp(){
 	});
 }
 
-function renderGraphs(deviceid) {
+function renderGraphs(hash) {
     for (var i = 0; i < 6; ++i) {
         var params = createParameters(i);
         $.ajax({
             type: "GET",
             url: params.url,
-            data: {'graphno' : params.graphno, 'deviceid': deviceid, 'filter_by': filter},
+            data: {'graphno' : params.graphno, 'hash': hash, 'filter_by': filter},
             success: onSuccessGraph(params)
         });
     }

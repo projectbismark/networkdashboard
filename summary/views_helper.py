@@ -145,7 +145,8 @@ def compare_line_bitrate_by_city(max_results,city,direction,earliest,latest):
 
 #gets the location of the device. This is the location as specified by the user, as opposed to
 #resolved from IP:
-def get_location(device):
+def get_location(hash):
+	device = database_helper.get_device_by_hash(hash)
 	details = database_helper.get_details_by_deviceid(device)
 	if details.count()>0:
 		return (details[0].city + ", " + details[0].country)  
@@ -157,7 +158,17 @@ def get_response_for_devicehtml(device_details):
 	first = data_helper.get_first_measurement(device_details.deviceid)
 	last = data_helper.get_last_measurement(device_details.deviceid)
 	deviceid = device_details.deviceid.replace(':', '').lower()
-	return render_to_response('device.html', {'detail': device_details,'first_update': first, 'last_update': last, 'deviceid': deviceid}) 
+	is_default = device_details.is_default
+	hashkey = device_details.hashkey
+	isp = device_details.isp
+	servicetype = device_details.servicetype
+	serviceplan = device_details.serviceplan
+	downloadrate = device_details.downloadrate
+	uploadrate = device_details.uploadrate
+	name = device_details.name	
+	return render_to_response('device.html', {'is_default':is_default, 'hashkey':hashkey, \
+	'isp':isp, 'servicetype':servicetype, 'serviceplan':serviceplan, 'downloadrate': downloadrate, \
+	'uploadrate': uploadrate, 'name': name, 'first_update': first, 'last_update': last, 'deviceid':deviceid})
 
 #returns an html page for a particular device for a user who does not own that deviec
 #and forwards data to that page:
@@ -165,7 +176,17 @@ def get_response_for_shared_device(device_details):
 	first = data_helper.get_first_measurement(device_details.deviceid)
 	last = data_helper.get_last_measurement(device_details.deviceid)
 	deviceid = device_details.deviceid.replace(':', '').lower()
-	return render_to_response('shared_device.html', {'detail': device_details,'first_update': first, 'last_update': last, 'deviceid': deviceid})
+	is_default = device_details.is_default
+	hashkey = device_details.hashkey
+	isp = device_details.isp
+	servicetype = device_details.servicetype
+	serviceplan = device_details.serviceplan
+	downloadrate = device_details.downloadrate
+	uploadrate = device_details.uploadrate
+	name = device_details.name
+	return render_to_response('shared_device.html', {'is_default':is_default, 'hashkey':hashkey, \
+	'isp':isp, 'servicetype':servicetype, 'serviceplan':serviceplan, 'downloadrate': downloadrate, \
+	'uploadrate': uploadrate, 'name': name, 'first_update': first, 'last_update': last})
 		
 #gets device counts by country and sorts them alphabetically:
 def get_sorted_country_data():
