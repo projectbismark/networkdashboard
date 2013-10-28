@@ -72,13 +72,6 @@
 			</div>
 			<div class="tab-pane" id="country_list">
 				<div class ="statsdiv" id="stats1">
-					<!--<table class = "tableheader">
-						<tr>
-							<td></td>
-							<td class = "tdright"><h3>Device Count ({{device_count}})</h3></td>
-							<td class= "tdright"><h3>Active ({{active_count}})</h3></td>
-						</tr>
-					</table>-->
 					<table class="table table-striped table-condensed">
 						<tr>
 							<td></td>
@@ -118,12 +111,12 @@
 					<table class="table table-striped table-condensed">
 							<tr>
 								<td>Hide Unregistered Devices</td>
-								<td> <input type="checkbox" id="filter_unregistered" onclick ="HideUnregistered(this.checked)"> </td>
+								<td> <input type="checkbox" id="filter_unregistered" onclick ="hideUnregistered(this.checked)"> </td>
 							</tr>
 							<tr>
 								<td>Filter by Provider</td>
 								<td>
-									<select id="filter_isp" onChange = "FilterProviders(this)">
+									<select id="filter_isp" onChange = "filterProviders(this)">
 										<option value="none" selected = "selected">None</option>
 										{% for isp in isp_data %}
 											<option value="{{isp.isp}}">{{isp.isp}}</option>

@@ -98,11 +98,6 @@
                     </div>
                 </div>
             </div>
-		<!--
-		<div class="latest-measurement" id="latest-measurement-1">
-			Latest Measurement: <b>{{latestdownload.average}} Bits Per Second</b> on {{latestdownload.eventstamp}}.
-		</div>
-		-->
         </div>
         <div class="tab-pane" id="upload_throughput">
 			<div style="clear: both">
@@ -131,11 +126,6 @@
                     </div>
                 </div>
             </div>
-			<!--
-			<div class="latest-measurement" id="latest-measurement-2">
-				Latest Measurement: <b>{{latestdownload.average}} Bits Per Second</b> on {{latestdownload.eventstamp}}.
-			</div>
-			-->
         </div>
         <div class="tab-pane" id="round_trip_latency">
 			<div style="clear: both">
@@ -155,11 +145,6 @@
                     </div>
                 </div>
             </div>
-			<!--
-			<div class="latest-measurement" id="latest-measurement-3">
-				Latest Measurement: <b>{{latestdownload.average}} Milliseconds</b> on {{latestdownload.eventstamp}}.
-			</div>
-			-->
         </div>
         <div class="tab-pane" id="last_mile_latency">  
 			<div style="clear: both">
@@ -179,11 +164,6 @@
                     </div>
                 </div>
             </div>
-			<!--
-			<div class="latest-measurement" id="latest-measurement-4">
-				Latest Measurement: <b>{{latestdownload.average}} Milliseconds</b> on {{latestdownload.eventstamp}}.
-			</div>
-			-->
         </div>
 		<div class="tab-pane" id="shape_rate">  
             <div class="graphdiv" id="graph_div_5">
@@ -193,11 +173,6 @@
                     </div>
                 </div>
             </div>
-			<!--
-			<div class="latest-measurement" id="latest-measurement-4">
-				Latest Measurement: <b>{{latestdownload.average}} Bits Per Second</b> on {{latestdownload.eventstamp}}.
-			</div>
-			-->
         </div>
 		<div class="tab-pane" id="unload_rtt">  
             <div class="graphdiv" id="graph_div_6">
@@ -207,9 +182,6 @@
                     </div>
                 </div>
             </div>
-			<!--
-			<div class="latest-measurement" id="latest-measurement-5"></div>
-			-->
         </div>
 		<div class="tab-pane" id="all_metrics">  
             <div class="graphdiv" id="graph_div_7">
@@ -219,9 +191,6 @@
                     </div>
                 </div>
             </div>
-			<!--
-			<div class="latest-measurement" id="latest-measurement-5"></div>
-			-->
         </div>
     </div>
 </div>
@@ -231,6 +200,5 @@
     renderGraphs("{{deviceid}}");
 	hashid="{{ detail.hashkey }}";
 	setHashid(hashid);
-	
 </script>
 {% endblock %}
