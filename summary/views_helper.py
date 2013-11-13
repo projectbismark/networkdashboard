@@ -172,7 +172,7 @@ def get_response_for_devicehtml(device_details):
 
 #returns an html page for a particular device for a user who does not own that deviec
 #and forwards data to that page:
-def get_response_for_shared_device(device_details):
+def get_response_for_shared_device(device_details,tab,start,end):
 	first = data_helper.get_first_measurement(device_details.deviceid)
 	last = data_helper.get_last_measurement(device_details.deviceid)
 	deviceid = device_details.deviceid.replace(':', '').lower()
@@ -186,7 +186,7 @@ def get_response_for_shared_device(device_details):
 	name = device_details.name
 	return render_to_response('shared_device.html', {'is_default':is_default, 'hashkey':hashkey, \
 	'isp':isp, 'servicetype':servicetype, 'serviceplan':serviceplan, 'downloadrate': downloadrate, \
-	'uploadrate': uploadrate, 'name': name, 'first_update': first, 'last_update': last})
+	'uploadrate': uploadrate, 'name': name, 'first_update': first, 'last_update': last, 'tab': tab, 'start':start, 'end':end})
 		
 #gets device counts by country and sorts them alphabetically:
 def get_sorted_country_data():

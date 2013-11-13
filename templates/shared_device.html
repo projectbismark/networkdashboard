@@ -58,20 +58,20 @@
         <button id="permalink_button" data-toggle="button" class="btn" onclick="$('#permalink').toggle()"><i class="icon-bookmark"></i> Link to this page</button>
 	</div>
     <div id="permalink" class="alert alert-info" style="display: none">
-        <a href="/display_device/{{hashkey}}">http://networkdashboard.org/display_device/{{hashkey}}</a>
+        <a href="/display_device/{{hashkey}}/{{tab}}/{{start}}/{{end}}" id="share_link">http://networkdashboard.org/display_device/{{hashkey}}/{{tab}}/{{start}}/{{end}}</a>
     </div>
     <br/>
     <ul id="tab" class="nav nav-tabs" style="clear: both">
-        <li class="active"><a href="#download_throughput" data-toggle="tab">Download Throughput</a></li>
-        <li><a href="#upload_throughput" data-toggle="tab">Upload Throughput</a></li>
-        <li><a href="#round_trip_latency" data-toggle="tab">Round Trip Latency</a></li>
-        <li><a href="#last_mile_latency" data-toggle="tab">Last Mile Latency</a></li>
-		<li><a href="#shape_rate" data-toggle="tab">Shape Rate</a></li>
-		<li><a href="#unload_rtt" data-toggle="tab">Under Load</a></li>
-		<li><a href="#all_metrics" data-toggle="tab">Show All</a></li>
+        <li {% if tab == "1" %} class="active" {% endif %} id="li_tab_1" ><a href="#download_throughput" onclick="return setTab(1)" data-toggle="tab" on>Download Throughput</a></li>
+        <li {% if tab == "2" %} class="active" {% endif %} id="li_tab_2"><a href="#upload_throughput" onclick="return setTab(2)" data-toggle="tab">Upload Throughput</a></li>
+        <li {% if tab == "3" %} class="active" {% endif %} id="li_tab_3"><a href="#round_trip_latency" onclick="return setTab(3)" data-toggle="tab">Round Trip Latency</a></li>
+        <li {% if tab == "4" %} class="active" {% endif %} id="li_tab_4"><a href="#last_mile_latency" onclick="return setTab(4)" data-toggle="tab">Last Mile Latency</a></li>
+		<li {% if tab == "5" %} class="active"{% endif %} id="li_tab_5"><a href="#shape_rate" onclick="return setTab(5)" data-toggle="tab">Shape Rate</a></li>
+		<li {% if tab == "6" %} class="active"{% endif %} id="li_tab_6"><a href="#unload_rtt" onclick="return setTab(6)" data-toggle="tab">Under Load</a></li>
+		<li {% if tab == "7" %} class="active"{% endif %} id="li_tab_7"><a href="#all_metrics" onclick="return setTab(7)" data-toggle="tab">Show All</a></li>
     </ul>
     <div class="tab-content">
-        <div class="tab-pane active in" id="download_throughput">
+        <div class="tab-pane{% if tab == '1' %} active in {% endif %}" id="download_throughput">
 			<div style="clear: both">
 				<p id="download_desc"><a href="#" onclick="return expandDownloadDesc()">What is Download Throughput?</a></p>
 			</div>
@@ -99,7 +99,7 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane" id="upload_throughput">
+        <div class="tab-pane{% if tab == '2' %} active in {% endif %}" id="upload_throughput">
 			<div style="clear: both">
 				<p id="upload_desc"><a href="#" onclick="return expandUploadDesc()">What is Upload Throughput?</a></p>
 			</div>
@@ -127,7 +127,7 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane" id="round_trip_latency">
+        <div class="tab-pane{% if tab == '3' %} active in {% endif %}" id="round_trip_latency">
 			<div style="clear: both">
 				<p id="rtt_desc"><a href="#" onclick="return expandRttDesc()">What is Round Trip Latency?</a></p>
 			</div>
@@ -146,7 +146,7 @@
                 </div>
             </div>
         </div>
-        <div class="tab-pane" id="last_mile_latency">  
+        <div class="tab-pane{% if tab == '4' %} active in {% endif %}" id="last_mile_latency">  
 			<div style="clear: both">
 				<p id="lmrtt_desc"><a href="#" onclick="return expandLmrttDesc()">What is Last Mile Latency?</a></p>
 			</div>
@@ -165,7 +165,7 @@
                 </div>
             </div>
         </div>
-		<div class="tab-pane" id="shape_rate">  
+		<div class="tab-pane{% if tab == '5' %} active in {% endif %}" id="shape_rate">  
             <div class="graphdiv" id="graph_div_5">
                 <div class="progress_wrapper">
                     <div class="progress progress-info progress-striped active">
@@ -174,7 +174,7 @@
                 </div>
             </div>
         </div>
-		<div class="tab-pane" id="unload_rtt">  
+		<div class="tab-pane{% if tab == '6' %} active in {% endif %}" id="unload_rtt">  
             <div class="graphdiv" id="graph_div_6">
                 <div class="progress_wrapper">
                     <div class="progress progress-info progress-striped active">
@@ -183,7 +183,7 @@
                 </div>
             </div>
         </div>
-		<div class="tab-pane" id="all_metrics">  
+		<div class="tab-pane{% if tab == '7' %} active in {% endif %}" id="all_metrics">  
             <div class="graphdiv" id="graph_div_7">
                 <div class="progress_wrapper">
                     <div class="progress progress-info progress-striped active">
@@ -195,8 +195,9 @@
     </div>
 </div>
 <script type="text/javascript">
-    $('download_throughput').tab('show');
-    $('#permalink_button').button()
-    renderGraphs("{{hashkey}}");
+    $('#permalink_button').button();
+	setHash('{{hashkey}}');
+	setRange('{{tab}}','{{start}}','{{end}}');
+    renderGraphs('{{hashkey}}');
 </script>
 {% endblock %}

@@ -283,13 +283,13 @@ def get_coordinates(request):
 	return HttpResponse(json.dumps(result))
         
 #returns a shared device summary page, a device page that may not be edited by the viewer:
-def shared_device_summary(request,devicehash):
-    device_details = database_helper.get_details_by_hash(devicehash)
+def shared_device_summary(request,hash,tab,start,end):
+    device_details = database_helper.get_details_by_hash(hash)
     if len(device_details)>0:
 		device = device_details[0].deviceid		
     else:
 		return render_to_response('device_not_found.html', {'deviceid': devicehash})
-    return views_helper.get_response_for_shared_device(device_details[0])
+    return views_helper.get_response_for_shared_device(device_details[0],tab,start,end)
 
 #returns a device summary page for the user's own device
 def device_summary(request):

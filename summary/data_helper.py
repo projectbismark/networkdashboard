@@ -784,23 +784,27 @@ def parse_bitrate_measurements(hash, dir):
 	filename = settings.PROJECT_ROOT + '/summary/measurements/bitrate/' + device
 	#garbage characters to be removed:
 	remove = ')("\n'
-	with open(filename,'r') as f:
-		#each line represents one measurement record:
-		for record in f:
-			entry = []
-			for i in range(0,len(remove)):
-				record = record.replace(remove[i],'')
-			record = record.split('|')
-			#eventstamp:
-			entry.append(int(record[0]))
-			#average:
-			entry.append(float(record[1])*1000)
-			#direction:
-			direction = record[2]
-			entry.append(direction)
-			toolid = record[3]
-			entry.append(toolid)
-			data.append(entry)
+	try:
+		with open(filename,'r') as f:
+			#each line represents one measurement record:
+			for record in f:
+				entry = []
+				for i in range(0,len(remove)):
+					record = record.replace(remove[i],'')
+				record = record.split('|')
+				#eventstamp:
+				entry.append(int(record[0]))
+				#average:
+				entry.append(float(record[1])*1000)
+				#direction:
+				direction = record[2]
+				entry.append(direction)
+				toolid = record[3]
+				entry.append(toolid)
+				data.append(entry)
+	#file not found:
+	except:
+		return result
 	#sort by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
 	sorted_multi = [(x,y) for x,y,z,t in sorted_data if z==dir and t=='NETPERF_3']
@@ -823,22 +827,25 @@ def parse_underload_measurements(hash):
 	filename = settings.PROJECT_ROOT + '/summary/measurements/underload/' + device
 	#garbage characters to be removed:
 	remove = ')("\n'
-	f = open(filename, 'r')
-	with open(filename,'r') as f:
-		#each line represents one measurement record:
-		for record in f:
-			entry = []
-			for i in range(0,len(remove)):
-				record = record.replace(remove[i],'')
-			record = record.split('|')
-			#eventstamp:
-			entry.append(int(record[0]))
-			#average:
-			entry.append(float(record[1]))
-			#direction:
-			direction = record[2]
-			entry.append(direction)
-			data.append(entry)
+	try:
+		with open(filename,'r') as f:
+			#each line represents one measurement record:
+			for record in f:
+				entry = []
+				for i in range(0,len(remove)):
+					record = record.replace(remove[i],'')
+				record = record.split('|')
+				#eventstamp:
+				entry.append(int(record[0]))
+				#average:
+				entry.append(float(record[1]))
+				#direction:
+				direction = record[2]
+				entry.append(direction)
+				data.append(entry)
+	#file not found:
+	except:
+			return result
 	#sort by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
 	sorted_up = [(x,y) for x,y,z in sorted_data if z=='up']
@@ -859,25 +866,27 @@ def parse_rtt_measurements(hash):
 	#garbage characters to be removed:
 	remove = ')("\n'
 	ipr = database_helper.get_server_list()
-	f = open(filename, 'r')
-	with open(filename,'r') as f:
-		#each line represents one measurement record:
-		for record in f:
-			entry = []
-			for i in range(0,len(remove)):
-				record = record.replace(remove[i],'')
-			record = record.split('|')
-			#eventstamp:
-			entry.append(int(record[0]))
-			#average:
-			entry.append(float(record[1]))
-			#mserver address:
-			dstip = record[2]
-			entry.append(dstip)
-			if dstip not in dstips and dstip!='':
-				dstips.append(dstip)
-			data.append(entry)
-	f.close()
+	try:
+		with open(filename,'r') as f:
+			#each line represents one measurement record:
+			for record in f:
+				entry = []
+				for i in range(0,len(remove)):
+					record = record.replace(remove[i],'')
+				record = record.split('|')
+				#eventstamp:
+				entry.append(int(record[0]))
+				#average:
+				entry.append(float(record[1]))
+				#mserver address:
+				dstip = record[2]
+				entry.append(dstip)
+				if dstip not in dstips and dstip!='':
+					dstips.append(dstip)
+				data.append(entry)
+	#file not found:
+	except:
+		return result
 	#sort by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
 	#group data into sub-series by measurement server
@@ -899,20 +908,22 @@ def parse_lmrtt_measurements(hash):
 	filename = settings.PROJECT_ROOT + '/summary/measurements/lmrtt/' + device
 	#garbage characters to be removed:
 	remove = ')("\n'
-	f = open(filename, 'r')
-	with open(filename,'r') as f:
-		#each line represents one measurement record:
-		for record in f:
-			entry = []
-			for i in range(0,len(remove)):
-				record = record.replace(remove[i],'')
-			record = record.split('|')
-			#eventstamp:
-			entry.append(int(record[0]))
-			#average:
-			entry.append(float(record[1]))
-			data.append(entry)
-	f.close()
+	try:
+		with open(filename,'r') as f:
+			#each line represents one measurement record:
+			for record in f:
+				entry = []
+				for i in range(0,len(remove)):
+					record = record.replace(remove[i],'')
+				record = record.split('|')
+				#eventstamp:
+				entry.append(int(record[0]))
+				#average:
+				entry.append(float(record[1]))
+				data.append(entry)
+	#file not found:
+	except:
+		return result
 	#sort by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
 	series = dict(name='Last mile latency', type='line', data=sorted_data, priority=1, id=4)
@@ -927,22 +938,24 @@ def parse_shaperate_measurements(hash):
 	filename = settings.PROJECT_ROOT + '/summary/measurements/shaperate/' + device
 	#garbage characters to be removed:
 	remove = ')("\n'
-	f = open(filename, 'r')
-	with open(filename,'r') as f:
-		#each line represents one measurement record:
-		for record in f:
-			entry = []
-			for i in range(0,len(remove)):
-				record = record.replace(remove[i],'')
-			record = record.split('|')
-			#eventstamp:
-			entry.append(int(record[0]))
-			#average:
-			entry.append(float(record[1])*1000)
-			#direction:
-			entry.append(record[2])
-			data.append(entry)
-	f.close()
+	try:	
+		with open(filename,'r') as f:
+			#each line represents one measurement record:
+			for record in f:
+				entry = []
+				for i in range(0,len(remove)):
+					record = record.replace(remove[i],'')
+				record = record.split('|')
+				#eventstamp:
+				entry.append(int(record[0]))
+				#average:
+				entry.append(float(record[1])*1000)
+				#direction:
+				entry.append(record[2])
+				data.append(entry)
+	#file not found:
+	except:
+		return result
 	#sort by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
 	sorted_up = [(x,y) for x,y,z in sorted_data if  z=='up']
@@ -961,22 +974,23 @@ def parse_capacity_measurements(hash):
 	filename = settings.PROJECT_ROOT + '/summary/measurements/capacity/' + device
 	#garbage characters to be removed:
 	remove = ')("\n'
-	f = open(filename, 'r')
-	with open(filename,'r') as f:
-		#each line represents one measurement record:
-		for record in f:
-			entry = []
-			for i in range(0,len(remove)):
-				record = record.replace(remove[i],'')
-			record = record.split('|')
-			#eventstamp:
-			entry.append(int(record[0]))
-			#average:
-			entry.append(float(record[1])*1000)
-			#direction:
-			entry.append(record[2])
-			data.append(entry)
-	f.close()
+	try:
+		with open(filename,'r') as f:
+			#each line represents one measurement record:
+			for record in f:
+				entry = []
+				for i in range(0,len(remove)):
+					record = record.replace(remove[i],'')
+				record = record.split('|')
+				#eventstamp:
+				entry.append(int(record[0]))
+				#average:
+				entry.append(float(record[1])*1000)
+				#direction:
+				entry.append(record[2])
+				data.append(entry)
+	except:
+		return result
 	#sort by eventstamp:
 	sorted_data = sorted(data, key=lambda x: x[0])
 	sorted_up = [(x,y) for x,y,z in sorted_data if  z=='up']

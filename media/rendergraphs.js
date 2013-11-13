@@ -1,6 +1,16 @@
+var hash = "";
 var filter = "none";
 var allSeries = new Array();
+var charts = new Array();
+var tab = 1;
+var start = new Array(7);
+var end = new Array(7);
+var drawn = new Array(7);
 var dateFormatString = '%a, %b %e, %Y at %l:%M %p';
+
+function setHash(hashkey){
+	hash = hashkey;
+}
 
 function recDivide(bits, n, i){
 	var d = n/1000;
@@ -567,6 +577,20 @@ function onSuccessGraph(graphParams) {
             window.chart = new Highcharts.StockChart({
                 chart: {
                     renderTo: graphParams.divid,
+					events: {
+						redraw: function() {
+							var tabId = graphParams.graphid + 1;
+							if(tabId==tab&&drawn[tab-1]!=0){
+								var min = this.xAxis[0].getExtremes().min;
+								start[tab-1]=min;
+								var max = this.xAxis[0].getExtremes().max;
+								end[tab-1]=max;
+								$('#share_link').attr('href','/display_device/' + hash + '/' + tab + '/' + min + '/' + max); 
+								$('#share_link').html('http://networkdashboard.org/display_device/' + hash + '/' + tab + '/' + min + '/' + max);
+							}
+							return;
+						}
+					}
                 },
                 legend: graphParams.legend,
                 rangeSelector: graphParams.rangeSelector,
@@ -590,7 +614,11 @@ function onSuccessGraph(graphParams) {
                 },
                 series: jQuery.parseJSON(data)
             });
-			series = jQuery.parseJSON(data);
+			drawn[graphParams.graphid]=1;
+			if(getTabNumber(graphParams.divid)==tab&&start[tab-1]!=0&&end[tab-1]!=0){
+				chart.xAxis[0].setExtremes(start[tab-1],end[tab-1]);
+			}
+			var series = jQuery.parseJSON(data);
 			allSeries.push(series);
 			if(allSeries.length==5){
 				multiGraph();
@@ -1089,7 +1117,20 @@ function multiGraph(){
 	}
 	window.chart = new Highcharts.StockChart({
 		chart: {
-			renderTo: "graph_div_7"
+			renderTo: "graph_div_7",
+			events: {
+				redraw: function() {
+					if((tab==7)&&(drawn[6]!=0)){
+						var min = this.xAxis[0].getExtremes().min;
+						start[tab-1]=min;
+						var max = this.xAxis[0].getExtremes().max;
+						end[tab-1]=max;
+						$('#share_link').attr('href','/display_device/' + hash + '/' + tab + '/' + min + '/' + max); 
+						$('#share_link').html('http://networkdashboard.org/display_device/' + hash + '/' + tab + '/' + min + '/' + max);
+					}
+					return;
+				}
+			}
 		},
 		legend: {
             enabled: true,
@@ -1181,4 +1222,50 @@ function multiGraph(){
         },
 		series: multiSeries
 	});
+	drawn[6]=1;
+	if((tab==7)&&(start[tab-1])!=0&&(end[tab-1]!=0)){
+		chart.xAxis[0].setExtremes(start[tab-1],end[tab-1]);
+	}
+}
+
+function setRange(tabNo,startDate,endDate){
+	tab = parseInt(tabNo);
+	for(var i=0; i<start.length; i++){
+		start[i]=0;
+		end[i]=0;
+		drawn[i]=0;
+	}
+	start[tab-1] = parseInt(startDate);
+	end[tab-1] = parseInt(endDate);
+	return;
+}
+
+function setTab(tabId){
+	tab = tabId;
+	$('#share_link').attr('href','/display_device/' + hash + '/' + tab + '/' + start[tab-1] + '/' + end[tab-1]); 
+	$('#share_link').html('http://networkdashboard.org/display_device/' + hash + '/' + tab + '/' + start[tab-1] + '/' + end[tab-1]);
+}
+
+function getTabNumber(divid){
+	switch(divid){
+		case 'graph_div_1':
+			return 1;
+			break;
+		case 'graph_div_2':
+			return 2;
+			break;
+		case 'graph_div_3':
+			return 3;
+			break;
+		case 'graph_div_4':
+			return 4;
+			break;
+		case 'graph_div_5':
+			return 5;
+			break;
+		case 'graph_div_6':
+			return 6;
+			break;
+	}
+	return 1	
 }
