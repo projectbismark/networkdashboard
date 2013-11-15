@@ -165,10 +165,13 @@ def get_response_for_devicehtml(device_details):
 	serviceplan = device_details.serviceplan
 	downloadrate = device_details.downloadrate
 	uploadrate = device_details.uploadrate
-	name = device_details.name	
+	name = device_details.name
+	tab = 1
+	start = 0
+	end = 0
 	return render_to_response('device.html', {'is_default':is_default, 'hashkey':hashkey, \
 	'isp':isp, 'servicetype':servicetype, 'serviceplan':serviceplan, 'downloadrate': downloadrate, \
-	'uploadrate': uploadrate, 'name': name, 'first_update': first, 'last_update': last, 'deviceid':deviceid})
+	'uploadrate': uploadrate, 'name': name, 'first_update': first, 'last_update': last, 'deviceid':deviceid, 'tab':tab, 'start': start, 'end':end})
 
 #returns an html page for a particular device for a user who does not own that deviec
 #and forwards data to that page:
