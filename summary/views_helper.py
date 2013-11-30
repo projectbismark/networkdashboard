@@ -166,9 +166,9 @@ def get_response_for_devicehtml(device_details):
 	downloadrate = device_details.downloadrate
 	uploadrate = device_details.uploadrate
 	name = device_details.name
-	tab = 1
-	start = 0
-	end = 0
+	tab = '1'
+	start = '0'
+	end = '0'
 	return render_to_response('device.html', {'is_default':is_default, 'hashkey':hashkey, \
 	'isp':isp, 'servicetype':servicetype, 'serviceplan':serviceplan, 'downloadrate': downloadrate, \
 	'uploadrate': uploadrate, 'name': name, 'first_update': first, 'last_update': last, 'deviceid':deviceid, 'tab':tab, 'start': start, 'end':end})

@@ -66,7 +66,7 @@ function createMarker(d) {
 	marker.active = parseInt(d.active);
 	if (marker.devicehash != ""){
 		google.maps.event.addListener(marker, "click", function() {
-			boxText.innerHTML = "<a href=/display_device/" + marker.devicehash + "\">Show Router Details</a>";
+			boxText.innerHTML = "<a href=/display_device/" + marker.devicehash + "/1/0/0>Show Router Details</a>";
 			infowindow.setContent(boxText);
 			infowindow.open(map, marker);
 		});

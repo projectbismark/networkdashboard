@@ -270,12 +270,15 @@ def bitrate_json(request,device,direction,days,multi):
 	return HttpResponse(json.dumps(result))
 
 #returns a webpage where a user may edit the details of the user's own device
-def edit_device_page(request, devicehash):
-	device_details = database_helper.get_details_by_hash(devicehash)
-	if len(device_details) < 1:
-		return render_to_response('device_not_found.html', {'devicename' : devicehash})
-	device = str(device_details[0].deviceid)
-	return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': device})
+def edit_device_page(request, device):
+	device_details = database_helper.get_details_by_deviceid(device)
+	try:
+		if len(device_details) < 1:
+			return render_to_response('device_not_found.html')
+	except:
+		return render_to_response('device_not_found.html')
+	deviceid = str(device_details[0].deviceid)
+	return render_to_response('edit_device.html', {'detail' : device_details[0], 'deviceid': deviceid})
   
 #returns coordinates in JSON format for the device map:  
 def get_coordinates(request):
@@ -288,7 +291,7 @@ def shared_device_summary(request,hash,tab,start,end):
     if len(device_details)>0:
 		device = device_details[0].deviceid		
     else:
-		return render_to_response('device_not_found.html', {'deviceid': devicehash})
+		return render_to_response('device_not_found.html')
     return views_helper.get_response_for_shared_device(device_details[0],tab,start,end)
 
 #returns a device summary page for the user's own device

@@ -12,7 +12,7 @@
     <div class="alert alert-block">
         <h4 class="alert-heading">Welcome, new Dashboard user!</h4>
         We don't have any information about your router or ISP.
-        Please <a href="/edit_device_page/{{hashkey}}">click here fill in your details</a>.
+        Please <a href="/edit_device_page/{{deviceid}}">click here fill in your details</a>.
     </div>
     {% else %}
     <table class="table table-striped table-condensed">
@@ -69,7 +69,7 @@
         <a href="/display_device/{{hashkey}}/{{tab}}/{{start}}/{{end}}" id="share_link">networkdashboard.org/display_device/{{hashkey}}/{{tab}}/{{start}}/{{end}}</a>
     </div>
     <br/>
-    <<ul id="tab" class="nav nav-tabs" style="clear: both">
+    <ul id="tab" class="nav nav-tabs" style="clear: both">
         <li {% if tab == "1" %} class="active" {% endif %} id="li_tab_1" ><a href="#download_throughput" onclick="return setTab(1)" data-toggle="tab" on>Download Throughput</a></li>
         <li {% if tab == "2" %} class="active" {% endif %} id="li_tab_2"><a href="#upload_throughput" onclick="return setTab(2)" data-toggle="tab">Upload Throughput</a></li>
         <li {% if tab == "3" %} class="active" {% endif %} id="li_tab_3"><a href="#round_trip_latency" onclick="return setTab(3)" data-toggle="tab">Round Trip Latency</a></li>
